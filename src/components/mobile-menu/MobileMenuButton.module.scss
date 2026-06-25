@@ -1,0 +1,60 @@
+@use '../styles/abstracts/colors';
+@use '../styles/abstracts/breakpoints' as *;
+
+.mobileMenuButton {
+    align-items: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: none;
+    height: 40px;
+    justify-content: center;
+    padding: 0;
+    position: relative;
+    width: 40px;
+    z-index: 2;
+
+    @media (max-width: $breakpoint-lg) {
+        display: flex;
+    }
+
+    span {
+        background: colors.$primary;
+        border-radius: 999px;
+        display: block;
+        height: 3px;
+        position: absolute;
+        transition: transform 0.25s ease, opacity 0.2s ease, top 0.25s ease;
+        width: 28px;
+
+        &:nth-child(1) {
+            top: 10px;
+        }
+
+        &:nth-child(2) {
+            top: 18px;
+        }
+
+        &:nth-child(3) {
+            top: 26px;
+        }
+    }
+}
+
+.mobileMenuButtonOpen {
+    span {
+        &:nth-child(1) {
+            top: 18px;
+            transform: rotate(45deg);
+        }
+
+        &:nth-child(2) {
+            opacity: 0;
+        }
+
+        &:nth-child(3) {
+            top: 18px;
+            transform: rotate(-45deg);
+        }
+    }
+}

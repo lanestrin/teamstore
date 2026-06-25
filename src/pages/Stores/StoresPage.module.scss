@@ -1,0 +1,460 @@
+@use "../../styles/variables" as *;
+
+.page {
+    background: #fff;
+    color: #111827;
+}
+
+.hero {
+    max-width: $container-width;
+    margin: 0 auto;
+    padding: 64px 24px 32px;
+}
+
+.hero h1 {
+    margin: 0;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: clamp(3rem, 6vw, 5.25rem);
+    line-height: 0.95;
+    text-transform: uppercase;
+}
+
+.hero p {
+    margin: 14px 0 28px;
+    max-width: 520px;
+    color: #374151;
+    font-size: 1.05rem;
+}
+
+.search {
+    max-width: 620px;
+    height: 56px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 0 18px;
+    background: #fff;
+}
+
+.search svg {
+    font-size: 1.35rem;
+    color: #111827;
+}
+
+.search input {
+    width: 100%;
+    border: 0;
+    outline: 0;
+    font-size: 1rem;
+    background: transparent;
+}
+
+.filters {
+    max-width: $container-width;
+    margin: 0 auto;
+    padding: 24px;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(160px, 1fr));
+    gap: 18px;
+}
+
+.filters label {
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 12px 14px;
+    background: #fff;
+}
+
+.filters span {
+    display: block;
+    margin-bottom: 4px;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.filters select {
+    width: 100%;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.results {
+    max-width: $container-width;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+.resultsHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 18px;
+}
+
+.resultsHeader h2 {
+    margin: 0;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 1.8rem;
+    text-transform: uppercase;
+}
+
+.resultsHeader h2 span {
+    color: #ef3838;
+}
+
+.viewToggle {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.viewToggle button {
+    border: 0;
+    background: transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    color: #111827;
+}
+
+.viewToggle .activeView {
+    color: #ef3838;
+    font-weight: 700;
+}
+
+.storeList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.storeRow {
+    min-height: 86px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 14px 18px;
+    display: grid;
+    grid-template-columns: 92px 1.4fr 1.6fr 140px 24px;
+    align-items: center;
+    gap: 20px;
+    color: #111827;
+    text-decoration: none;
+    background: #fff;
+    transition: all 0.2s ease;
+}
+
+.storeRow:hover {
+    border-color: #cbd5e1;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+.storeRow img {
+    max-width: 76px;
+    max-height: 58px;
+    object-fit: contain;
+}
+
+.storeRow strong {
+    font-size: 1.05rem;
+}
+
+.storeRow small {
+    color: #6b7280;
+    font-weight: 700;
+}
+
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tags span {
+    border-radius: 999px;
+    padding: 5px 10px;
+    background: #f3f4f6;
+    color: #374151;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.rowIcon {
+    justify-self: end;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-top: 32px;
+}
+
+.pagination button {
+    min-width: 38px;
+    height: 38px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+}
+
+.pagination .currentPage {
+    border-color: #ef3838;
+    background: #ef3838;
+    color: white;
+}
+
+.nearby {
+    max-width: $container-width;
+    margin: 0 auto;
+    padding: 32px 24px;
+}
+
+.sectionHeader {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+
+.sectionHeader h2 {
+    margin: 0;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 1.8rem;
+    text-transform: uppercase;
+}
+
+.sectionHeader p {
+    margin: 4px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #111827;
+    font-size: 0.9rem;
+}
+
+.sectionHeader button {
+    border: 0;
+    background: transparent;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #ef3838;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.nearbyGrid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(140px, 1fr));
+    gap: 16px;
+}
+
+.nearbyCard {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 18px 14px;
+    text-align: center;
+    background: #fff;
+}
+
+.nearbyCard img {
+    height: 54px;
+    width: 100%;
+    object-fit: contain;
+    margin-bottom: 12px;
+}
+
+.nearbyCard strong {
+    display: block;
+    font-size: 0.95rem;
+}
+
+.nearbyCard span {
+    display: block;
+    margin-top: 6px;
+    color: #6b7280;
+    font-size: 0.85rem;
+}
+
+.cta {
+    max-width: $container-width;
+    margin: 32px auto 64px;
+    padding: 28px 32px;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #080808 0%, #111 70%, #1a0505 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.cta h2 {
+    margin: 0;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 2rem;
+    text-transform: uppercase;
+}
+
+.cta p {
+    margin: 6px 0 0;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.cta a {
+    min-width: 190px;
+    height: 48px;
+    border-radius: 8px;
+    background: #ef3838;
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Barlow Condensed", sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-decoration: none;
+}
+
+.gridView {
+    display: grid;
+    grid-template-columns: repeat( auto-fill, minmax(250px, 1fr) );
+    gap: 24px;
+}
+
+.gridCard {
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: white;
+    overflow: hidden;
+    transition: all .2s ease;
+}
+
+.gridCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba( 15, 23, 42, .08 );
+}
+
+.gridCardImage {
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fafafa;
+    padding: 24px;
+}
+
+.gridCardImage img {
+    max-width: 100%;
+    max-height: 120px;
+    object-fit: contain;
+}
+
+.gridCardContent {
+    padding: 18px;
+}
+
+.gridCardContent strong {
+    display: block;
+    margin-bottom: 12px;
+}
+
+.gridCardContent small {
+    color: #6b7280;
+}
+
+.gridTags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.gridTags span {
+    background: #f3f4f6;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: .75rem;
+    font-weight: 700;
+}
+
+@media (max-width: 992px) {
+    .filters {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .storeRow {
+        grid-template-columns: 80px 1fr 24px;
+    }
+
+    .tags,
+    .storeRow small {
+        display: none;
+    }
+
+    .nearbyGrid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .cta {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 660px) {
+    .hero {
+        padding-top: 48px;
+    }
+
+    .filters {
+        grid-template-columns: 1fr;
+    }
+
+    .resultsHeader {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .viewToggle {
+        display: none;
+    }
+
+    .storeRow {
+        padding: 12px;
+        gap: 14px;
+    }
+
+    .sectionHeader {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .nearbyGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .cta {
+        margin-left: 24px;
+        margin-right: 24px;
+    }
+
+    .cta a {
+        width: 100%;
+    }
+}

@@ -1,0 +1,45 @@
+.section {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 32px 64px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.header h2 {
+    margin: 0;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 3rem;
+    text-transform: uppercase;
+    color: #111;
+}
+
+.header a {
+    color: #e53935;
+    text-decoration: none;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 1.1rem;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+}
+
+@media (max-width: 1200px) {
+    .grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

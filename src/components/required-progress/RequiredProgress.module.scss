@@ -1,0 +1,79 @@
+.progressCard {
+    padding: 28px;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    background: white;
+}
+
+.progressHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 16px;
+}
+
+.progressHeader h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+.progressHeader span {
+    color: #64748b;
+    font-weight: 600;
+}
+
+.progressBar {
+    height: 12px;
+    background: #e5e7eb;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.progressFill {
+    height: 100%;
+    background: #16a34a;
+    border-radius: 999px;
+}
+
+.progressPercent {
+    margin-top: 12px;
+    color: #16a34a;
+    font-weight: 700;
+}
+
+.requiredChecklist {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.checklistComplete {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #16a34a;
+    font-weight: 600;
+}
+
+.checklistPending {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #64748b;
+}
+
+@media (max-width: 660px) {
+    .progressCard {
+        padding: 20px;
+    }
+
+    .progressHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}

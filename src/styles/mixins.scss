@@ -1,0 +1,23 @@
+@use "./variables" as *;
+
+@mixin page-container {
+    max-width: $container-width;
+    margin: 0 auto;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+@mixin card {
+    background: white;
+    border: 1px solid $border;
+    border-radius: $radius-md;
+    box-shadow: $shadow-sm;
+}
+
+@mixin button-primary {
+    border: none;
+    border-radius: 999px;
+    background: $primary;
+    color: white;
+    cursor: pointer;
+}

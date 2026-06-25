@@ -1,0 +1,57 @@
+@use '../../../styles/abstracts/colors';
+
+.cardHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 1.35rem;
+}
+
+.cardHeaderContent {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.cardIcon {
+    align-items: center;
+    background: colors.$primary-overlay-light;
+    border-radius: 12px;
+    color: colors.$primary;
+    display: flex;
+    flex: 0 0 auto;
+    font-size: 1.45rem;
+    height: 46px;
+    justify-content: center;
+    width: 46px;
+}
+
+.cardTitle {
+    color: colors.$text-primary;
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0;
+}
+
+.cardSubtitle {
+    color: colors.$text-muted;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 0.25rem 0 0;
+}
+
+.validationMessage {
+    color: colors.$error;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin: 0.25rem 0 0;
+}
+
+@media (max-width: 660px) {
+    .cardIcon {
+        font-size: 1.25rem;
+        height: 42px;
+        width: 42px;
+    }
+}

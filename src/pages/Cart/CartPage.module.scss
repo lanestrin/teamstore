@@ -1,0 +1,244 @@
+@use "../../styles/variables" as *;
+
+.cartPage {
+    background: #f8fafc;
+    min-height: calc(100vh - 200px);
+    padding: 48px 0 80px;
+}
+
+.container {
+    max-width: $container-width;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.header {
+    margin-bottom: 32px;
+}
+
+.title {
+    margin: 0;
+    color: #111827;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 3rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+    background: none !important;
+    padding: 0 !important;
+}
+
+.subtitle {
+    margin: 8px 0 0;
+    color: #64748b;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    gap: 32px;
+    align-items: start;
+}
+
+.contentColumn,
+.summaryColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.items,
+.savedItems {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    overflow: hidden;
+    padding: 0 28px;
+}
+
+.savedItemsTitle {
+    margin: 0;
+    padding: 20px 0 16px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #111827;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+
+.loading {
+    padding: 48px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    text-align: center;
+    color: #64748b;
+}
+
+.checkoutButton {
+    width: 100%;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 0;
+    border-radius: 999px;
+    background: $secondary;
+    color: white;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    cursor: pointer;
+    transition: .2s ease;
+}
+
+.checkoutButton:hover {
+    transform: translateY(-1px);
+}
+
+.modalOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(15, 23, 42, .55);
+    backdrop-filter: blur(4px);
+}
+
+.modal {
+    width: 100%;
+    max-width: 500px;
+    background: white;
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, .12);
+}
+
+.modalTitle {
+    margin: 0;
+    color: #111827;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.modalSubtitle {
+    margin: 8px 0 24px;
+    color: #64748b;
+    line-height: 1.6;
+}
+
+.modalField {
+    margin-bottom: 18px;
+}
+
+.modalLabel {
+    display: block;
+    margin-bottom: 8px;
+    color: #111827;
+    font-size: .9rem;
+    font-weight: 600;
+}
+
+.modalInput {
+    width: 100%;
+    height: 48px;
+    padding: 0 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 12px;
+    font-size: .95rem;
+    transition: .2s ease;
+}
+
+.modalInput:focus {
+    outline: none;
+    border-color: $primary;
+    box-shadow: 0 0 0 3px rgba(8, 45, 122, .08);
+}
+
+.modalActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 28px;
+}
+
+.modalCancelButton {
+    height: 48px;
+    padding: 0 20px;
+    border: 1px solid #d1d5db;
+    border-radius: 999px;
+    background: white;
+    color: #475569 !important;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.modalSaveButton {
+    height: 48px;
+    padding: 0 24px;
+    border: 0;
+    border-radius: 999px;
+    background: $secondary;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.modalSaveButton:hover:not(:disabled) {
+    background: $secondary-hover;
+}
+
+.modalSaveButton:disabled,
+.modalCancelButton:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+@media (max-width: 992px) {
+    .layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 660px) {
+    .cartPage {
+        padding: 32px 0 60px;
+    }
+
+    .container {
+        padding: 0 18px;
+    }
+
+    .title {
+        font-size: 2.25rem;
+    }
+
+    .items,
+    .savedItems {
+        padding: 0 18px;
+    }
+
+    .modal {
+        padding: 22px;
+    }
+
+    .modalActions {
+        flex-direction: column;
+    }
+
+    .modalCancelButton,
+    .modalSaveButton {
+        width: 100%;
+    }
+}

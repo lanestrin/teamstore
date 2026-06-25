@@ -1,0 +1,115 @@
+@use '../styles/abstracts/colors';
+
+.mobileDrawerOverlay {
+    background: rgba(15, 23, 42, 0.45);
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    position: fixed;
+    transition: opacity 0.25s ease;
+    z-index: 999;
+
+    &Visible {
+        opacity: 1;
+        pointer-events: auto;
+    }
+}
+
+.mobileDrawer {
+    background: colors.$background;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    height: 100vh;
+    left: -320px;
+    padding: 2rem 1.5rem;
+    position: fixed;
+    top: 0;
+    transition: left 0.25s ease;
+    width: min(280px, 82vw);
+    z-index: 1000;
+
+    &Open {
+        left: 0;
+    }
+}
+
+.mobileDrawerHeader {
+    align-items: center;
+    border-bottom: 1px solid colors.$border;
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 1rem;
+
+    img {
+        max-width: 160px;
+    }
+
+    button {
+        align-items: center;
+        background: transparent;
+        border: none;
+        border-radius: 999px;
+        color: colors.$primary;
+        cursor: pointer;
+        display: flex;
+        height: 36px;
+        justify-content: center;
+        transition: background 0.2s ease, color 0.2s ease;
+        width: 36px;
+
+        &:hover {
+            background: colors.$primary-overlay-light;
+        }
+
+        svg {
+            font-size: 1.5rem;
+        }
+    }
+}
+
+.mobileDrawerAccountActions {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1.5rem;
+
+    button {
+        align-items: center;
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+        min-height: 36px;
+        padding: 0 1rem;
+        width: 100%;
+    }
+}
+
+.mobileDrawerNavigation {
+    border-top: 1px solid colors.$border;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+
+    a {
+        color: colors.$text-primary;
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: 1.25rem;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+        text-decoration: none;
+        text-transform: uppercase;
+        transform: translateX(0);
+        transition: color 0.2s ease, transform 0.2s ease;
+
+        &:hover {
+            color: colors.$primary;
+            transform: translateX(4px);
+        }
+    }
+}
+
+.mobileDrawerCartIcon {
+    flex-shrink: 0;
+    font-size: 1rem;
+}

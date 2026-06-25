@@ -1,0 +1,105 @@
+@use '../../../styles/abstracts/colors';
+
+.summary {
+    position: sticky;
+    top: 1.5rem;
+}
+
+.summaryTitle {
+    color: colors.$text-primary;
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin: 0 0 2rem;
+}
+
+.summaryRow {
+    align-items: center;
+    color: colors.$text-secondary;
+    display: flex;
+    font-size: 0.95rem;
+    justify-content: space-between;
+    margin-bottom: 0.9rem;
+
+    strong {
+        color: colors.$text-primary;
+        font-weight: 700;
+    }
+}
+
+.summaryDivider {
+    background: colors.$border;
+    height: 1px;
+    margin: 1.25rem 0;
+    width: 100%;
+}
+
+.totalRow {
+    align-items: center;
+    color: colors.$text-primary;
+    display: flex;
+    font-size: 1rem;
+    font-weight: 700;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+
+    strong {
+        font-size: 1.35rem;
+    }
+}
+
+.checkoutButton {
+    width: 100%;
+
+    svg {
+        font-size: 1.25rem;
+    }
+}
+
+.trustSection {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.trustItem {
+    align-items: flex-start;
+    display: flex;
+    gap: 0.75rem;
+}
+
+.trustIcon {
+    color: colors.$primary;
+    flex: 0 0 auto;
+    font-size: 1.35rem;
+    margin-top: 0.1rem;
+}
+
+.trustTitle {
+    color: colors.$text-primary;
+    font-size: 0.9rem;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.trustText {
+    color: colors.$text-muted;
+    font-size: 0.85rem;
+    line-height: 1.4;
+
+    a {
+        color: colors.$primary;
+        font-weight: 700;
+        text-decoration: none;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+@media (max-width: 992px) {
+    .summary {
+        position: static;
+    }
+}

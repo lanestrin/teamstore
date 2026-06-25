@@ -1,0 +1,74 @@
+@use "../../styles/variables" as *;
+
+.page {
+    background: #fff;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: $container-width;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+}
+
+.backLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 32px;
+    color: #64748b;
+    text-decoration: none;
+    font-weight: 500;
+    transition: .2s ease;
+}
+
+.backLink:hover {
+    color: $primary;
+}
+
+.productSection {
+    display: grid;
+    grid-template-columns: minmax(0, 50%) minmax(0, 50%);
+    gap: 56px;
+    align-items: start;
+}
+
+.galleryColumn {
+    position: sticky;
+    top: 110px;
+    align-self: start;
+}
+
+.contentColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    min-width: 0;
+}
+
+.notFound {
+    padding: 120px 24px;
+    text-align: center;
+    font-size: 2rem;
+}
+
+@media (max-width: 1200px) {
+    .productSection {
+        gap: 40px;
+    }
+}
+
+@media (max-width: 992px) {
+    .productSection {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
+
+    .galleryColumn {
+        position: static;
+    }
+
+    .contentColumn {
+        gap: 24px;
+    }
+}

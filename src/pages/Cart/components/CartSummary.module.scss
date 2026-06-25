@@ -1,0 +1,130 @@
+@use "../../../styles/variables" as *;
+
+.summary {
+    background: $background;
+    border: 1px solid $border;
+    border-radius: 16px;
+    padding: 24px;
+    position: sticky;
+    top: 110px;
+}
+
+.summaryTitle {
+    margin: 0 0 24px;
+    color: $text-primary;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+.summaryRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    color: $text-secondary;
+    font-size: .95rem;
+
+    strong {
+        color: $text-primary;
+        font-weight: 700;
+    }
+}
+
+.summaryDivider {
+    width: 100%;
+    height: 1px;
+    margin: 20px 0;
+    background: $border;
+}
+
+.totalRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    color: $text-primary;
+    font-weight: 700;
+
+    strong {
+        font-size: 1.5rem;
+    }
+}
+
+.checkoutButton {
+    width: 100%;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 0;
+    border-radius: 999px;
+    background: $secondary;
+    color: white;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    cursor: pointer;
+    transition: .2s ease;
+
+    svg {
+        font-size: 1.25rem;
+    }
+
+    &:hover {
+        background: $secondary-hover;
+        transform: translateY(-1px);
+    }
+}
+
+.trustSection {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.trustItem {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.trustIcon {
+    flex-shrink: 0;
+    color: $primary;
+    font-size: 1.35rem;
+    margin-top: 2px;
+}
+
+.trustTitle {
+    color: $text-primary;
+    font-size: .9rem;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.trustText {
+    color: $text-muted;
+    font-size: .85rem;
+    line-height: 1.5;
+
+    a {
+        color: $primary;
+        font-weight: 600;
+        text-decoration: none;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+@media (max-width: 992px) {
+    .summary {
+        position: static;
+    }
+}
