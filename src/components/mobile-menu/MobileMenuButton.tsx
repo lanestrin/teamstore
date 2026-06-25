@@ -1,4 +1,3 @@
-import React from "react"
 import styles from './MobileMenuButton.module.scss'
 
 interface MobileMenuButtonProps {

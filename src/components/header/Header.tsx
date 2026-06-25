@@ -1,13 +1,6 @@
-import {
-  LuUser,
-  LuShoppingCart,
-  LuSearch,
-} from "react-icons/lu";
-
+import { LuUser, LuShoppingCart, LuSearch } from "react-icons/lu";
 import { Link, NavLink } from "react-router-dom";
-
 import logo from "../../assets/images/teamstore.webp";
-
 import styles from "./Header.module.scss";
 
 export default function Header() {

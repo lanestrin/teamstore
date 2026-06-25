@@ -1,4 +1,3 @@
-import React from 'react'
 import logo from '../../../Images/logo-coachs-assistant.png'
 import { FiShoppingCart, FiX } from 'react-icons/fi'
 import styles from './MobileDrawer.module.scss'
