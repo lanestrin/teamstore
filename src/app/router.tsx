@@ -3,14 +3,12 @@ import {
 } from "react-router-dom";
 
 import MainLayout from "./layouts/MainLayout";
-
-
-import DashboardPage from "../pages/DashboardPage";
-import LoginPage from "../pages/LoginPage";
-import HomePage from "../pages/Home/HomePage";
-import StoresPage from "../pages/Stores/StoresPage";
-import StorePage from "../pages/Stores/StorePage";
-import ProductPage from "../pages/Product/ProductPage";
+import LoginPage from "../features/auth/LoginPage";
+import HomePage from "../features/home/HomePage";
+import ProductPage from "../features/products/ProductPage";
+import StorePage from "../features/stores/StorePage";
+import StoresPage from "../features/stores/StoresPage";
+import AccountPage from "../features/account/AccountPage";
 
 export const router = createBrowserRouter([
   {
@@ -35,7 +33,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "dashboard",
-        element: <DashboardPage />
+        element: <AccountPage />
       },
       {
         path: "login",
