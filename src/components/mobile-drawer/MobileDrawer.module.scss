@@ -1,13 +1,14 @@
-@use '../styles/abstracts/colors';
+@use "../styles/variables" as *;
+@use "../styles/mixins" as *;
 
 .mobileDrawerOverlay {
-    background: rgba(15, 23, 42, 0.45);
+    position: fixed;
     inset: 0;
+    z-index: $z-overlay;
+    background: rgba(15, 23, 42, 0.45);
     opacity: 0;
     pointer-events: none;
-    position: fixed;
-    transition: opacity 0.25s ease;
-    z-index: 999;
+    transition: opacity $transition-base;
 
     &Visible {
         opacity: 1;
@@ -16,16 +17,16 @@
 }
 
 .mobileDrawer {
-    background: colors.$background;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-    height: 100vh;
-    left: -320px;
-    padding: 2rem 1.5rem;
     position: fixed;
     top: 0;
-    transition: left 0.25s ease;
+    left: -320px;
+    z-index: $z-modal;
     width: min(280px, 82vw);
-    z-index: 1000;
+    height: 100vh;
+    padding: $space-8 $space-6;
+    background: $page-background;
+    box-shadow: $shadow-lg;
+    transition: left $transition-base;
 
     &Open {
         left: 0;
@@ -33,31 +34,27 @@
 }
 
 .mobileDrawerHeader {
-    align-items: center;
-    border-bottom: 1px solid colors.$border;
-    display: flex;
-    justify-content: space-between;
-    padding-bottom: 1rem;
+    @include flex-between;
+    padding-bottom: $space-4;
+    border-bottom: 1px solid $border-light;
 
     img {
         max-width: 160px;
     }
 
     button {
-        align-items: center;
-        background: transparent;
-        border: none;
-        border-radius: 999px;
-        color: colors.$primary;
-        cursor: pointer;
-        display: flex;
-        height: 36px;
-        justify-content: center;
-        transition: background 0.2s ease, color 0.2s ease;
+        @include flex-center;
         width: 36px;
+        height: 36px;
+        background: transparent;
+        border: 0;
+        border-radius: $radius-round;
+        color: $brand-red;
+        cursor: pointer;
+        transition: background-color $transition-base, color $transition-base;
 
         &:hover {
-            background: colors.$primary-overlay-light;
+            background: rgba(229, 57, 53, 0.12);
         }
 
         svg {
@@ -69,41 +66,41 @@
 .mobileDrawerAccountActions {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    margin-top: 1.5rem;
+    gap: $space-4;
+    margin-top: $space-6;
 
     button {
-        align-items: center;
         display: flex;
-        gap: 0.5rem;
+        align-items: center;
         justify-content: center;
-        min-height: 36px;
-        padding: 0 1rem;
+        gap: $space-2;
         width: 100%;
+        min-height: 40px;
+        padding: 0 $space-4;
     }
 }
 
 .mobileDrawerNavigation {
-    border-top: 1px solid colors.$border;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    margin-top: 1.5rem;
-    padding-top: 1.5rem;
+    gap: $space-4;
+    margin-top: $space-6;
+    padding-top: $space-6;
+    border-top: 1px solid $border-light;
 
     a {
-        color: colors.$text-primary;
-        font-family: 'Barlow Condensed', sans-serif;
+        color: $text-primary;
+        font-family: "Barlow Condensed", sans-serif;
         font-size: 1.25rem;
-        font-weight: 600;
+        font-weight: $font-semibold;
         letter-spacing: 0.03em;
         text-decoration: none;
         text-transform: uppercase;
         transform: translateX(0);
-        transition: color 0.2s ease, transform 0.2s ease;
+        transition: color $transition-base, transform $transition-base;
 
         &:hover {
-            color: colors.$primary;
+            color: $brand-red;
             transform: translateX(4px);
         }
     }

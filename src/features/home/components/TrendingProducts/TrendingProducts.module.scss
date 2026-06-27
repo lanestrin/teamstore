@@ -1,35 +1,43 @@
+@use "../../../../styles/variables" as *;
+@use "../../../../styles/mixins" as *;
+
 .section {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 32px 64px;
+    @include page-container;
+    padding-top: $space-8;
+    padding-bottom: $space-8;
 }
 
 .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
+    @include flex-between;
+    gap: $space-4;
+    margin-bottom: $space-6;
 }
 
 .header h2 {
     margin: 0;
+    color: $text-primary;
     font-family: "Barlow Condensed", sans-serif;
     font-size: 3rem;
     text-transform: uppercase;
-    color: #111;
 }
 
 .header a {
-    color: #e53935;
-    text-decoration: none;
+    color: $brand-red;
     font-family: "Barlow Condensed", sans-serif;
     font-size: 1.1rem;
+    font-weight: $font-semibold;
+    text-decoration: none;
+    transition: color $transition-base;
+}
+
+.header a:hover {
+    color: $brand-red-hover;
 }
 
 .grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 20px;
+    gap: $space-5;
 }
 
 @media (max-width: 1200px) {
@@ -39,7 +47,22 @@
 }
 
 @media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
     .grid {
         grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .header h2 {
+        font-size: 2.5rem;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
     }
 }

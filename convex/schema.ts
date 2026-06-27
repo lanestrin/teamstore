@@ -8,10 +8,6 @@ export default defineSchema({
 	users: defineTable({
 		name: v.optional(v.string()),
 		email: v.string(),
-		image: v.optional(v.string()),
-
-		createdAt: v.number(),
-		updatedAt: v.number(),
 	}).index("by_email", ["email"]),
 
 	stores: defineTable({

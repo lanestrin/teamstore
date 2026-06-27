@@ -1,4 +1,5 @@
 @use "../../../../styles/variables" as *;
+@use "../../../../styles/mixins" as *;
 
 .info {
 	display: flex;
@@ -11,77 +12,75 @@
 	justify-content: center;
 	width: fit-content;
 	height: 34px;
-	padding: 0 14px;
-	border-radius: 999px;
-	background: #fff7ed;
-	border: 1px solid #fed7aa;
-	color: #c2410c;
-	font-size: .78rem;
-	font-weight: 700;
-	letter-spacing: .06em;
-	margin-bottom: 16px;
+	padding: 0 $space-4;
+	margin-bottom: $space-4;
+	background: $warning-background;
+	border: 1px solid $warning-border;
+	border-radius: $radius-pill;
+	color: $warning-dark;
+	font-size: 0.78rem;
+	font-weight: $font-bold;
+	letter-spacing: 0.06em;
 }
 
 .info h1 {
 	margin: 0;
+	color: $text-primary;
 	font-size: 2.35rem;
 	line-height: 1.05;
-	color: #111827;
 }
 
 .teamName {
-	margin-top: 8px;
-	margin-bottom: 20px;
-	color: #64748b;
+	margin: $space-2 0 $space-4;
+	color: $text-secondary;
 	font-size: 1.1rem;
-	font-weight: 500;
+	font-weight: $font-medium;
 }
 
 .price {
-	margin-bottom: 22px;
+	margin-bottom: $space-5;
+	color: $text-primary;
 	font-size: 1.9rem;
-	font-weight: 700;
-	color: #111827;
+	font-weight: $font-bold;
 }
 
 .alertCard,
 .deliveryCard {
 	display: flex;
-	gap: 14px;
-	padding: 16px;
-	border-radius: 16px;
-	margin-bottom: 16px;
+	align-items: flex-start;
+	gap: $space-4;
+	margin-bottom: $space-5;
+	padding: $space-3;
+	border-radius: $radius-lg;
 }
 
 .alertCard {
-	background: #fff7ed;
-	border: 1px solid #fed7aa;
+	background: $warning-background;
+	border: 1px solid $warning-border;
 }
 
 .deliveryCard {
-	background: #f0fdf4;
-	border: 1px solid #bbf7d0;
+	background: $success-background;
+	border: 1px solid $success-border;
 }
 
 .iconWarning,
 .iconDelivery {
+	@include flex-center;
 	width: 42px;
 	height: 42px;
 	flex-shrink: 0;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	border-radius: 12px;
+	border-radius: $radius-md;
 }
 
 .iconWarning {
-	background: rgba(194, 65, 12, .12);
-	color: #c2410c;
+	background: rgba($warning-dark, 0.12);
+	color: $warning-dark;
 }
 
 .iconDelivery {
-	background: rgba(22, 163, 74, .12);
-	color: #16a34a;
+	background: rgba($success, 0.12);
+	color: $success;
 }
 
 .iconWarning svg,
@@ -90,104 +89,101 @@
 }
 
 .cardTitle {
-	margin-bottom: 4px;
-	font-size: .82rem;
-	font-weight: 700;
-	letter-spacing: .06em;
-	color: #111827;
+	margin-bottom: $space-1;
+	color: $text-primary;
+	font-size: 0.82rem;
+	font-weight: $font-bold;
+	letter-spacing: 0.06em;
 }
 
 .cardText {
-	color: #64748b;
+	color: $text-secondary;
 	line-height: 1.5;
 }
 
 .highlight {
-	margin-top: 6px;
-	color: #c2410c;
-	font-weight: 600;
+	margin-top: $space-2;
+	color: $warning-dark;
+	font-weight: $font-semibold;
 }
 
 .deliveryDate {
-	margin-bottom: 4px;
-	color: #16a34a;
-	font-weight: 600;
+	margin-bottom: $space-1;
+	color: $success;
+	font-weight: $font-semibold;
 }
 
 .sectionLabel {
-	margin-top: 28px;
-	margin-bottom: 14px;
-	color: #64748b;
-	font-size: .8rem;
-	font-weight: 700;
-	letter-spacing: .08em;
+	margin: $space-6 0 $space-3;
+	color: $text-secondary;
+	font-size: 0.8rem;
+	font-weight: $font-bold;
+	letter-spacing: 0.08em;
 }
 
 .groupLabel {
-	margin-bottom: 10px;
-	color: #111827;
-	font-size: .95rem;
-	font-weight: 600;
+	margin-bottom: $space-2;
+	color: $text-primary;
+	font-size: 0.95rem;
+	font-weight: $font-semibold;
 }
 
 .sizeGrid {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 12px;
-	margin-bottom: 18px;
+	gap: $space-3;
+	margin-bottom: $space-4;
 }
 
 .sizeGrid button {
+	@include flex-center;
+	flex-direction: column;
+	gap: $space-1;
 	width: 78px;
 	height: 68px;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	gap: 4px;
-	border: 1px solid #d1d5db;
-	border-radius: 12px;
-	background: white;
+	background: $white;
+	border: 1px solid $border-medium;
+	border-radius: $radius-md;
 	cursor: pointer;
-	transition: .2s ease;
+	transition: background-color $transition-base, border-color $transition-base, color $transition-base;
 }
 
 .sizeGrid button:hover {
-	border-color: $primary;
+	border-color: $brand-red;
 }
 
 .sizeGrid span {
+	color: $text-primary;
 	font-size: 1rem;
-	font-weight: 700;
-	color: #111827;
+	font-weight: $font-bold;
 }
 
 .sizeGrid small {
-	font-size: .72rem;
-	color: #16a34a;
+	color: $success;
+	font-size: 0.72rem;
 }
 
 .activeSize {
-	background: $primary !important;
-	border-color: $primary !important;
+	background: $brand-red !important;
+	border-color: $brand-red !important;
 }
 
 .activeSize span,
 .activeSize small {
-	color: white !important;
+	color: $white !important;
 }
 
 .sizeChart {
-	width: fit-content;
 	display: inline-flex;
 	align-items: center;
-	gap: 8px;
-	margin-bottom: 28px;
+	gap: $space-2;
+	width: fit-content;
+	margin-bottom: $space-6;
 	padding: 0;
-	border: 0;
 	background: transparent;
-	color: $primary;
-	font-weight: 600;
+	border: 0;
+	color: $brand-red;
+	font-weight: $font-semibold;
 	cursor: pointer;
 }
 
@@ -195,123 +191,115 @@
 	font-size: 1rem;
 }
 
-.quantitySection {
-	margin-bottom: 16px;
-}
-
-.quantitySection label {
-	display: block;
-	margin-bottom: 10px;
-	color: #111827;
-	font-weight: 600;
-}
-
-.quantityControls {
-	display: inline-flex;
-	align-items: center;
-	border: 1px solid #d1d5db;
-	border-radius: 12px;
-	overflow: hidden;
-}
-
-.quantityControls button {
-	width: 48px;
-	height: 48px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	border: 0;
-	background: white;
-	cursor: pointer;
-}
-
-.quantityControls button:hover {
-	background: #f8fafc;
-}
-
-.quantityControls span {
-	width: 60px;
-	text-align: center;
-	font-weight: 700;
-}
-
-.addToCart {
-	width: 100%;
-	height: 52px;
-	border: 0;
-	border-radius: 999px;
-	background: $secondary;
-	color: white;
-	font-family: "Barlow Condensed", sans-serif;
-	font-size: 1.15rem;
-	font-weight: 700;
-	letter-spacing: .04em;
-	cursor: pointer;
-	transition: .2s ease;
-}
-
-.addToCart:hover:not(:disabled) {
-	transform: translateY(-1px);
-}
-
-.addToCart:disabled {
-	opacity: .6;
-	cursor: not-allowed;
-}
-
-.cartNote {
-	margin-top: 14px;
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	color: #16a34a;
-	font-size: .9rem;
-}
-
-.cartNote svg {
-	flex-shrink: 0;
-}
-
 .personalization {
-	border-top: 1px solid #e5e7eb;
-	padding-top: 24px;
-	margin-bottom: 28px;
+	margin-bottom: $space-6;
+	padding-top: $space-5;
+	border-top: 1px solid $border-light;
 }
 
 .personalizationField {
-	margin-bottom: 16px;
+	margin-bottom: $space-3;
 }
 
 .personalizationField label {
 	display: block;
-	margin-bottom: 8px;
-	color: #111827;
-	font-size: .9rem;
-	font-weight: 600;
+	margin-bottom: $space-2;
+	color: $text-primary;
+	font-size: 0.9rem;
+	font-weight: $font-semibold;
 }
 
 .personalizationField input {
 	width: 100%;
 	height: 48px;
-	padding: 0 14px;
-	border: 1px solid #d1d5db;
-	border-radius: 12px;
-	background: white;
-	font-size: .95rem;
-	transition: .2s ease;
+	padding: 0 $space-4;
+	background: $white;
+	border: 1px solid $border-medium;
+	border-radius: $radius-md;
+	font-size: 0.95rem;
+	transition: border-color $transition-base, box-shadow $transition-base;
 }
 
 .personalizationField input:focus {
 	outline: none;
-	border-color: $primary;
-	box-shadow: 0 0 0 3px rgba(8, 45, 122, .08);
+	border-color: $brand-red;
+	box-shadow: 0 0 0 3px rgba($brand-red, 0.12);
 }
 
 .personalizationNote {
-	font-size: .85rem;
-	margin-top: 8px;
+	margin-top: $space-2;
+	color: $text-secondary;
+	font-size: 0.85rem;
 	line-height: 1.5;
-	color: #64748b;
+}
+
+.quantitySection {
+	margin-bottom: $space-4;
+}
+
+.quantitySection label {
+	display: block;
+	margin-bottom: $space-2;
+	color: $text-primary;
+	font-weight: $font-semibold;
+}
+
+.quantityControls {
+	display: inline-flex;
+	align-items: center;
+	overflow: hidden;
+	border: 1px solid $border-medium;
+	border-radius: $radius-md;
+}
+
+.quantityControls button {
+	@include flex-center;
+	width: 48px;
+	height: 48px;
+	background: $white;
+	border: 0;
+	cursor: pointer;
+	transition: background-color $transition-base;
+}
+
+.quantityControls button:hover {
+	background: $gray-100;
+}
+
+.quantityControls span {
+	width: 60px;
+	text-align: center;
+	font-weight: $font-bold;
+}
+
+.addToCart {
+	@include button-red;
+	width: 100%;
+	height: 52px;
+	margin-top: $space-2;
+	font-family: "Barlow Condensed", sans-serif;
+	font-size: 1.1rem;
+	font-weight: $font-bold;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+}
+
+.addToCart:disabled {
+	cursor: not-allowed;
+	opacity: 0.6;
+}
+
+.cartNote {
+	display: flex;
+	align-items: center;
+	gap: $space-2;
+	margin-top: $space-3;
+	color: $success;
+	font-size: 0.9rem;
+}
+
+.cartNote svg {
+	flex-shrink: 0;
 }
 
 @media (max-width: 992px) {

@@ -1,8 +1,12 @@
+@use "../../../../styles/variables" as *;
+@use "../../../../styles/mixins" as *;
+
 .hero {
     position: relative;
-    height: 600px;
+    height: 720px;
+    margin-bottom: -110px;
     overflow: hidden;
-    background: #000;
+    background: $background-dark;
 }
 
 .hero::before {
@@ -10,14 +14,25 @@
     position: absolute;
     inset: 0;
     z-index: 1;
-    background: linear-gradient( 90deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.90) 20%, rgba(0, 0, 0, 0.75) 40%, rgba(0, 0, 0, 0.45) 60%, rgba(0, 0, 0, 0.15) 80%, rgba(0, 0, 0, 0) 100% );
+
+    background: linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0.95) 0%,
+        rgba(0, 0, 0, 0.90) 20%,
+        rgba(0, 0, 0, 0.75) 40%,
+        rgba(0, 0, 0, 0.45) 60%,
+        rgba(0, 0, 0, 0.15) 80%,
+        rgba(0, 0, 0, 0) 100%
+    );
 }
 
 .background {
     position: absolute;
     inset: 0;
+
     width: 100%;
     height: 100%;
+
     object-fit: cover;
     object-position: 75% top;
 }
@@ -26,21 +41,23 @@
     position: absolute;
     inset: 0;
     z-index: 2;
+
     display: flex;
     align-items: center;
 }
 
 .content {
-    max-width: 1400px;
+    @include page-container;
+
     width: 100%;
-    margin: 0 auto;
-    padding: 0 48px;
+    padding-bottom: 140px;
 }
 
 .kicker {
     display: block;
-    margin-bottom: 12px;
-    color: #e53935;
+    margin-bottom: $space-3;
+
+    color: $brand-red;
     font-family: "Barlow Condensed", sans-serif;
     font-size: 2rem;
     text-transform: uppercase;
@@ -48,62 +65,65 @@
 
 .title {
     margin: 0;
-    color: white;
+
+    color: $text-inverse;
     font-family: "Barlow Condensed", sans-serif;
     font-size: 5.5rem;
+    font-weight: $font-bold;
     line-height: 0.9;
-    font-weight: 700;
     text-transform: uppercase;
 }
 
 .title span {
-    color: #e53935;
+    color: $brand-red;
 }
 
 .description {
-    margin-top: 24px;
     max-width: 550px;
-    color: white;
+    margin-top: $space-5;
+
+    color: $text-inverse;
     font-size: 1.25rem;
     line-height: 1.7;
 }
 
 .actions {
-    margin-top: 40px;
     display: flex;
-    gap: 24px;
+    gap: $space-5;
+
+    margin-top: $space-6;
+}
+
+.primaryButton,
+.secondaryButton {
+    height: 52px;
+    padding: 0 $space-6;
+
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 1rem;
+    font-weight: $font-bold;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
 }
 
 .primaryButton {
-    background: #e53935;
-    color: white;
-    padding: 18px 34px;
-    border-radius: 999px;
-    font-family: "Barlow Condensed", sans-serif;
-    font-size: 1rem;
-    font-weight: 700;
-    text-transform: uppercase;
+    @include button-red;
 }
 
 .secondaryButton {
-    border: 2px solid rgba(255, 255, 255, 0.4);
-    color: white;
-    padding: 18px 34px;
-    border-radius: 999px;
-    font-family: "Barlow Condensed", sans-serif;
-    font-size: 1rem;
-    font-weight: 700;
-    text-transform: uppercase;
+    @include button-ghost;
 }
 
 @media (max-width: 768px) {
     .hero {
         height: auto;
         min-height: 520px;
+        margin-bottom: 0;
     }
 
     .content {
-        padding: 48px 24px;
+        padding-top: $space-8;
+        padding-bottom: $space-8;
     }
 
     .kicker {
@@ -121,15 +141,13 @@
     }
 
     .actions {
-        gap: 12px;
-        flex-direction: row;
+        gap: $space-3;
     }
 
     .primaryButton,
     .secondaryButton {
         flex: 1;
-        text-align: center;
-        padding: 16px 20px;
+        justify-content: center;
     }
 }
 
