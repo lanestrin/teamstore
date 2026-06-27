@@ -9,6 +9,7 @@ import ProductPage from "../features/products/ProductPage";
 import StorePage from "../features/stores/StorePage";
 import StoresPage from "../features/stores/StoresPage";
 import AccountPage from "../features/account/AccountPage";
+import ProtectedRoute from "../features/auth/ProtectedRoute";
 
 export const router = createBrowserRouter([
   {
@@ -33,7 +34,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "dashboard",
-        element: <AccountPage />
+        element: (
+          <ProtectedRoute>
+            <AccountPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "login",

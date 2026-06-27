@@ -1,3 +1,17 @@
+import { Authenticated, Unauthenticated } from "convex/react";
+import { Navigate } from "react-router-dom";
+import AuthForm from "./AuthForm";
+
 export default function LoginPage() {
-  return <h1>Login Page</h1>;
+	return (
+		<>
+			<Authenticated>
+				<Navigate to="/dashboard" replace />
+			</Authenticated>
+
+			<Unauthenticated>
+				<AuthForm />
+			</Unauthenticated>
+		</>
+	);
 }

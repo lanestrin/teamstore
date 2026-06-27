@@ -1,46 +1,45 @@
 @use "../../../../styles/variables" as *;
+@use "../../../../styles/mixins" as *;
 
 .details {
     width: 100%;
 }
 
 .accordionGroup {
-    display: flex;
-    flex-direction: column;
-    border-top: 1px solid $border;
+    @include flex-column;
+    border-top: 1px solid $border-light;
 }
 
 .accordion {
-    border-bottom: 1px solid $border;
+    border-bottom: 1px solid $border-light;
 }
 
 .accordionHeader {
+    @include flex-between;
     width: 100%;
-    background: none;
+    padding: $space-5 0;
+    background: transparent;
     border: 0;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 22px 0;
+    color: $text-primary;
     font: inherit;
     text-align: left;
-    color: $text-primary;
+    cursor: pointer;
+    transition: color $transition-base;
 
     span {
         font-size: 1rem;
-        font-weight: 700;
+        font-weight: $font-bold;
     }
 
     svg {
         flex-shrink: 0;
         font-size: 1.1rem;
-        transition: transform 0.25s ease;
+        transition: transform $transition-base;
     }
-}
 
-.accordionHeader:hover {
-    color: $primary;
+    &:hover {
+        color: $brand-red;
+    }
 }
 
 .rotate {
@@ -48,29 +47,29 @@
 }
 
 .accordionContent {
-    padding: 0 0 24px;
+    padding-bottom: $space-6;
 
     p {
-        margin: 0 0 16px;
+        margin: 0 0 $space-4;
         color: $text-secondary;
         line-height: 1.7;
     }
 
     ul {
         margin: 0;
-        padding-left: 20px;
+        padding-left: $space-5;
     }
 
     li {
+        margin-bottom: $space-3;
         color: $text-secondary;
         line-height: 1.7;
-        margin-bottom: 10px;
     }
 }
 
 @media (max-width: 768px) {
     .accordionHeader {
-        padding: 18px 0;
+        padding: $space-4 0;
 
         span {
             font-size: 0.95rem;

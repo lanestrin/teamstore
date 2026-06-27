@@ -1,46 +1,52 @@
+@use "../../../../styles/variables" as *;
+@use "../../../../styles/mixins" as *;
+
 .section {
-	max-width: 1400px;
-	margin: 0 auto;
-	padding: 48px 32px;
+	@include page-container;
+	padding-top: $space-8;
+	padding-bottom: $space-8;
 }
 
 .header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 18px;
+	@include flex-between;
+	gap: $space-4;
+	margin-bottom: $space-5;
 }
 
 .header h2 {
 	margin: 0;
-	color: #111;
+	color: $text-primary;
 	font-family: "Barlow Condensed", sans-serif;
 	font-size: 3rem;
 	text-transform: uppercase;
 }
 
 .header a {
-	color: #e53935;
-	text-decoration: none;
+	color: $brand-red;
 	font-family: "Barlow Condensed", sans-serif;
 	font-size: 1.1rem;
+	font-weight: $font-semibold;
+	text-decoration: none;
+	transition: color $transition-base;
+}
+
+.header a:hover {
+	color: $brand-red-dark;
 }
 
 .grid {
 	display: grid;
 	grid-template-columns: repeat(5, 1fr);
-	gap: 20px;
+	gap: $space-5;
 }
 
 .logo {
+	@include flex-center;
 	width: 90px;
 	height: 90px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	margin: 0 auto 20px;
-	background: #111;
-	border-radius: 12px;
+	margin: 0 auto $space-5;
+	background: $background-dark;
+	border-radius: $radius-md;
 }
 
 .logoImage {
@@ -48,7 +54,7 @@
 	height: 100%;
 	object-fit: contain;
 	filter: grayscale(100%) brightness(1.2) contrast(1.1);
-	transition: filter 0.25s ease, transform 0.25s ease;
+	transition: filter $transition-base, transform $transition-base;
 }
 
 @media (max-width: 1200px) {
@@ -58,12 +64,17 @@
 }
 
 @media (max-width: 768px) {
-	.grid {
-		grid-template-columns: repeat(2, 1fr);
+	.header {
+		flex-direction: column;
+		align-items: flex-start;
 	}
 
 	.header h2 {
 		font-size: 2.2rem;
+	}
+
+	.grid {
+		grid-template-columns: repeat(2, 1fr);
 	}
 }
 

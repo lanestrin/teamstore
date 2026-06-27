@@ -2,6 +2,8 @@ import { LuUser, LuShoppingCart, LuSearch } from "react-icons/lu";
 import { Link, NavLink } from "react-router-dom";
 import logo from "../../assets/images/teamstore.webp";
 import styles from "./Header.module.scss";
+import { Unauthenticated, Authenticated } from "convex/react";
+import UserMenu from "../user-menu/UserMenu";
 
 export default function Header() {
   const cartCount = 3;
@@ -48,13 +50,26 @@ export default function Header() {
         </nav>
 
         <div className={styles.actions}>
-          <Link to="/login" className={styles.account}>
-            <LuUser />
-            <span>Login</span>
-          </Link>
+          <Unauthenticated>
+            <Link
+              to="/login"
+              className={styles.account}
+            >
+              <LuUser />
+              <span>Login</span>
+            </Link>
+          </Unauthenticated>
 
-          <Link to="/cart" className={styles.cart}>
+          <Authenticated>
+            <UserMenu />
+          </Authenticated>
+
+          <Link
+            to="/cart"
+            className={styles.cart}
+          >
             <LuShoppingCart />
+
             <span className={styles.cartCount}>
               {cartCount}
             </span>

@@ -1,40 +1,41 @@
+@use "../../../../styles/variables" as *;
+@use "../../../../styles/mixins" as *;
+
 .card {
+    @include card;
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 15px 15px;
-    position: relative;
-    overflow: hidden;
-    background: linear-gradient( 180deg, #0c0c0c 0%, #050505 100% );
-    border: 1px solid #1f1f1f;
-    border-radius: 14px;
-    text-decoration: none;
     min-height: 260px;
-    transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    padding: $space-4;
+    overflow: hidden;
+    text-decoration: none;
+    background: linear-gradient( 180deg, $background-dark 0%, $background-dark-alt 100% );
+    transition: transform $transition-base, box-shadow $transition-base, border-color $transition-base;
 }
 
 .card::before {
     content: "";
     position: absolute;
     top: 0;
-    left: 0;
     right: 0;
+    left: 0;
     height: 1px;
-    background: rgba(255,255,255,.10);
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, .35);
+    border-color: $border-medium;
+    box-shadow: $shadow-lg;
 }
 
 .logo {
+    @include flex-center;
     width: 100%;
     height: 150px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 20px;
+    margin-bottom: $space-5;
 }
 
 .logoImage {
@@ -42,7 +43,7 @@
     height: 90%;
     object-fit: contain;
     filter: grayscale(100%) brightness(1.15) contrast(1.1);
-    transition: filter .25s ease, transform .25s ease;
+    transition: filter $transition-base, transform $transition-base;
 }
 
 .card:hover .logoImage {
@@ -51,26 +52,22 @@
 }
 
 .card h3 {
-    margin: 0 0 6px;
-    color: #ffffff;
+    margin: 0 0 $space-2;
+    color: $text-inverse;
     font-family: "Barlow Condensed", sans-serif;
     font-size: 1.6rem;
-    font-weight: 600;
+    font-weight: $font-semibold;
     text-align: center;
 }
 
 .card p {
     margin: 0;
-    color: #94a3b8;
+    color: $text-muted;
     font-size: 0.95rem;
     text-align: center;
 }
 
 @media (max-width: 768px) {
-    .container {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
     .card {
         min-height: 220px;
     }
