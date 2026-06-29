@@ -1,0 +1,124 @@
+@use "../../../../styles/variables" as *;
+@use "../../../../styles/mixins" as *;
+
+.card {
+    @include card;
+    display: flex;
+    flex-direction: column;
+    padding: $space-6;
+}
+
+.header {
+    @include flex-between;
+    align-items: flex-start;
+    margin-bottom: $space-6;
+}
+
+.header h2 {
+    margin: 0;
+    font-family: $font-heading;
+    font-size: 2rem;
+    font-weight: $font-semibold;
+    letter-spacing: $letter-spacing-heading;
+    color: $text-primary;
+}
+
+.underline {
+    width: 42px;
+    height: 3px;
+    margin-top: $space-2;
+    border-radius: $radius-pill;
+    background: $brand-red;
+}
+
+.headerIcon {
+    font-size: 1.5rem;
+    color: $text-secondary;
+}
+
+.list {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: $space-5;
+    flex: 1;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.store {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.logo {
+    @include flex-center;
+    width: 130px;
+    height: 130px;
+    margin-bottom: $space-4;
+    padding: $space-3;
+    border: 1px solid $border-light;
+    border-radius: $radius-lg;
+    background: $gray-50;
+    transition: transform $transition-base, box-shadow $transition-base, border-color $transition-base;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+}
+
+.store:hover .logo {
+    transform: translateY(-2px);
+    border-color: rgba($brand-red, 0.2);
+    box-shadow: $shadow-sm;
+}
+
+.store h3 {
+    margin: 0 0 $space-1;
+    font-size: 1rem;
+    font-weight: $font-semibold;
+    color: $text-primary;
+}
+
+.store p {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: $text-secondary;
+}
+
+.viewAll {
+    @include button-white;
+    align-self: center;
+    margin-top: $space-7;
+    padding: 0.85rem 2rem;
+    font-weight: $font-semibold;
+}
+
+:global(.EmptyState_emptyState) {
+    flex: 1;
+    justify-content: center;
+    padding: 0;
+}
+
+@media (max-width: 768px) {
+    .list {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .store {
+        width: 100%;
+    }
+
+    .logo {
+        width: 120px;
+        height: 120px;
+    }
+}

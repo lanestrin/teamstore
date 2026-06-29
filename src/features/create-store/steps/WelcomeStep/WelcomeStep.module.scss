@@ -1,0 +1,96 @@
+@use "../../../../styles/variables" as *;
+@use "../../../../styles/mixins" as *;
+
+.step {
+    display: flex;
+    flex-direction: column;
+    max-width: 720px;
+    padding: $space-8 0;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    height: 34px;
+    padding: 0 $space-4;
+    margin-bottom: $space-5;
+    background: rgba($brand-red, 0.08);
+    border-radius: $radius-pill;
+    color: $brand-red;
+    font-size: .8rem;
+    font-weight: $font-bold;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+}
+
+h1 {
+    margin-bottom: $space-5;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 3.5rem;
+    font-weight: $font-bold;
+    line-height: 1;
+    color: $text-primary;
+}
+
+.description {
+    max-width: 620px;
+    margin-bottom: $space-8;
+    color: $text-secondary;
+    font-size: 1.15rem;
+    line-height: 1.8;
+}
+
+.features {
+    display: flex;
+    flex-direction: column;
+    gap: $space-5;
+    margin-bottom: $space-8;
+}
+
+.feature {
+    display: flex;
+    align-items: flex-start;
+    gap: $space-4;
+    padding: $space-5;
+    background: $white;
+    border: 1px solid $border-light;
+    border-radius: $radius-lg;
+}
+
+.feature svg {
+    flex-shrink: 0;
+    font-size: 1.6rem;
+    color: $brand-red;
+}
+
+.feature h3 {
+    margin-bottom: $space-2;
+    font-size: 1rem;
+    font-weight: $font-bold;
+}
+
+.feature p {
+    color: $text-secondary;
+    line-height: 1.6;
+}
+
+.startButton {
+    @include button-red;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: $space-2;
+    width: fit-content;
+    min-width: 220px;
+}
+
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2.5rem;
+    }
+
+    .description {
+        font-size: 1rem;
+    }
+}

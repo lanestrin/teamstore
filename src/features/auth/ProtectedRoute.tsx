@@ -4,6 +4,7 @@ import {
 	AuthLoading,
 } from "convex/react";
 import { Navigate } from "react-router-dom";
+import AccountSkeleton from "../account/AccountSkeleton";
 
 interface ProtectedRouteProps {
 	children: React.ReactNode;
@@ -15,7 +16,7 @@ export default function ProtectedRoute({
 	return (
 		<>
 			<AuthLoading>
-				<div>Loading...</div>
+				<AccountSkeleton />
 			</AuthLoading>
 
 			<Authenticated>

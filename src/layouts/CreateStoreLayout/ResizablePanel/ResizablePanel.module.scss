@@ -1,0 +1,124 @@
+@use "../../../styles/variables" as *;
+
+.panel {
+    --left-size: 50%;
+    display: grid;
+    grid-template-columns: minmax(0, var(--left-size)) 16px minmax(0, 1fr);
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    background: $white;
+    transition: grid-template-columns $transition-base;
+}
+
+.dragging {
+    cursor: col-resize;
+    user-select: none;
+    transition: none;
+}
+
+.previewCollapsed {
+    grid-template-columns: minmax(0, 1fr) 16px 0;
+}
+
+.leftPanel,
+.rightPanel {
+    min-width: 0;
+    min-height: 0;
+    overflow: auto;
+    transition: opacity $transition-base, visibility $transition-base;
+}
+
+.leftPanel {
+    background: $white;
+}
+
+.rightPanel {
+    border-left: 1px solid $border-light;
+    background: $gray-50;
+}
+
+.previewCollapsed .rightPanel {
+    visibility: hidden;
+    opacity: 0;
+    overflow: hidden;
+}
+
+.divider {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    border-left: 1px solid $border-light;
+    border-right: 1px solid $border-light;
+    background: $gray-100;
+    cursor: col-resize;
+    transition: background $transition-base, box-shadow $transition-base;
+}
+
+.divider:hover,
+.divider:focus-visible {
+    background: $gray-200;
+    box-shadow: 0 0 0 3px rgba($black, 0.08);
+    outline: none;
+}
+
+.dividerHandle {
+    width: 3px;
+    height: 44px;
+    border-radius: $radius-round;
+    background: $gray-400;
+    transition: background $transition-base;
+}
+
+.divider:hover .dividerHandle,
+.divider:focus-visible .dividerHandle {
+    background: $gray-600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .panel,
+    .leftPanel,
+    .rightPanel,
+    .divider,
+    .dividerHandle {
+        transition: none;
+    }
+}
+
+@media (max-width: 992px) {
+    .panel,
+    .previewCollapsed {
+        display: flex;
+        flex-direction: column;
+        height: auto;
+        min-height: 100%;
+        overflow: visible;
+    }
+
+    .leftPanel,
+    .rightPanel {
+        overflow: visible;
+    }
+
+    .rightPanel {
+        border-left: 0;
+        border-top: 1px solid $border-light;
+    }
+
+    .previewCollapsed .rightPanel {
+        visibility: visible;
+        opacity: 1;
+        overflow: visible;
+    }
+
+    .divider {
+        display: none;
+    }
+}

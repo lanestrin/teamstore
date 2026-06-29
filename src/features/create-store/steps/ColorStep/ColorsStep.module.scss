@@ -1,0 +1,153 @@
+@use "../../../../styles/variables" as *;
+@use "../../../../styles/mixins" as *;
+
+.page {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	padding: $space-5;
+	background: $white;
+	gap: 50px;
+}
+
+.step {
+	display: inline-flex;
+	align-items: center;
+	align-self: flex-start;
+	height: 32px;
+	padding: 0 $space-3;
+	background: rgba($brand-red, 0.08);
+	border-radius: $radius-pill;
+	color: $brand-red;
+	font-size: 0.75rem;
+	font-weight: $font-bold;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+}
+
+.page h1 {
+	margin: 0 0 $space-3;
+	color: $text-primary;
+	font-family: "Barlow Condensed", sans-serif;
+	font-size: 3rem;
+	line-height: 1;
+	text-transform: uppercase;
+}
+
+.description {
+	max-width: 700px;
+	margin: 0 0 $space-4;
+	color: $text-secondary;
+	font-size: 1rem;
+	line-height: 1.7;
+}
+
+.page h2 {
+	margin: 0 0 $space-3;
+	color: $text-primary;
+	font-size: 1.25rem;
+	font-weight: $font-semibold;
+}
+
+.grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+	gap: $space-4;
+	max-width: 760px;
+}
+
+.info {
+	max-width: 760px;
+	padding: $space-6;
+	background: $gray-50;
+	border: 1px solid $border-light;
+	border-radius: $radius-lg;
+}
+
+.info h3 {
+	margin: 0 0 $space-3;
+	color: $text-primary;
+	font-size: 1rem;
+	font-weight: $font-semibold;
+}
+
+.info p {
+	margin: 0;
+	color: $text-secondary;
+	line-height: 1.7;
+}
+
+.actions {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-top: auto;
+	padding-top: $space-8;
+	border-top: 1px solid $border-light;
+}
+
+.primaryButton,
+.secondaryButton {
+	min-width: 140px;
+	height: 48px;
+	padding: 0 $space-6;
+	border-radius: $radius-md;
+	font-size: 0.95rem;
+	font-weight: $font-semibold;
+	cursor: pointer;
+	transition: all $transition-base;
+}
+
+.primaryButton {
+	background: $brand-red;
+	border: none;
+	color: $white;
+}
+
+.primaryButton:hover {
+	filter: brightness(0.95);
+}
+
+.secondaryButton {
+	background: transparent;
+	border: 1px solid $border-light;
+	color: $text-primary;
+}
+
+.secondaryButton:hover {
+	background: $gray-50;
+}
+
+@media (max-width: 992px) {
+	.page {
+		padding: $space-6;
+	}
+
+	.page h1 {
+		font-size: 2.4rem;
+	}
+
+	.grid {
+		grid-template-columns: repeat(3, 1fr);
+	}
+
+	.actions {
+		flex-direction: column-reverse;
+		gap: $space-3;
+	}
+
+	.primaryButton,
+	.secondaryButton {
+		width: 100%;
+	}
+}
+
+@media (max-width: 640px) {
+	.grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+
+	.page h1 {
+		font-size: 2rem;
+	}
+}
