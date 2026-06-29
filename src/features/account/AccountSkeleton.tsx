@@ -1,3 +1,4 @@
+import Skeleton from "../../components/skeleton/Skeleton";
 import styles from "./AccountSkeleton.module.scss";
 
 export default function AccountSkeleton() {
@@ -5,10 +6,10 @@ export default function AccountSkeleton() {
 		<div className={styles.page}>
 			<div className={styles.container}>
 				<header className={styles.hero}>
-					<div className={styles.eyebrow} />
-					<div className={styles.title} />
-					<div className={styles.text} />
-					<div className={styles.textShort} />
+					<Skeleton className={styles.eyebrow} />
+					<Skeleton className={styles.title} />
+					<Skeleton className={styles.text} />
+					<Skeleton className={styles.textShort} />
 				</header>
 
 				<section className={styles.actions}>
@@ -23,11 +24,11 @@ export default function AccountSkeleton() {
 
 				<div className={styles.helpCard}>
 					<div>
-						<div className={styles.helpTitle} />
-						<div className={styles.helpText} />
+						<Skeleton className={styles.helpTitle} />
+						<Skeleton className={styles.helpText} />
 					</div>
 
-					<div className={styles.helpButton} />
+					<Skeleton className={styles.helpButton} />
 				</div>
 			</div>
 		</div>
@@ -37,11 +38,11 @@ export default function AccountSkeleton() {
 function SkeletonActionCard() {
 	return (
 		<div className={styles.actionCard}>
-			<div className={styles.icon} />
-			<div className={styles.cardTitle} />
-			<div className={styles.cardText} />
-			<div className={styles.cardTextShort} />
-			<div className={styles.button} />
+			<Skeleton className={styles.icon} />
+			<Skeleton className={styles.cardTitle} />
+			<Skeleton className={styles.cardText} />
+			<Skeleton className={styles.cardTextShort} />
+			<Skeleton className={styles.button} />
 		</div>
 	);
 }
@@ -51,17 +52,17 @@ function SkeletonDashboardCard() {
 		<div className={styles.dashboardCard}>
 			<div className={styles.cardHeader}>
 				<div>
-					<div className={styles.sectionTitle} />
-					<div className={styles.underline} />
+					<Skeleton className={styles.sectionTitle} />
+					<Skeleton className={styles.underline} />
 				</div>
 
-				<div className={styles.headerIcon} />
+				<Skeleton className={styles.headerIcon} />
 			</div>
 
 			<div className={styles.list}>
-				<div className={styles.listItem} />
-				<div className={styles.listItem} />
-				<div className={styles.listItem} />
+				<Skeleton className={styles.listItem} />
+				<Skeleton className={styles.listItem} />
+				<Skeleton className={styles.listItem} />
 			</div>
 		</div>
 	);

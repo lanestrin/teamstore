@@ -59,7 +59,7 @@ export default function UserMenu() {
 			{open && (
 				<div className={styles.dropdown}>
 					<Link
-						to="/dashboard"
+						to="/account"
 						onClick={() => setOpen(false)}
 					>
 						<LuUser />

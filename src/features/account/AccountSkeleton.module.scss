@@ -69,36 +69,6 @@
     gap: $space-4;
 }
 
-.eyebrow,
-.title,
-.text,
-.textShort,
-.icon,
-.cardTitle,
-.cardText,
-.cardTextShort,
-.button,
-.sectionTitle,
-.underline,
-.headerIcon,
-.listItem,
-.helpTitle,
-.helpText,
-.helpButton {
-    position: relative;
-    overflow: hidden;
-    border-radius: $radius-md;
-    background: $gray-200;
-
-    &::after {
-        position: absolute;
-        inset: 0;
-        content: "";
-        transform: translateX(-100%);
-        background: linear-gradient( 90deg, transparent, rgba(255, 255, 255, 0.65), transparent );
-        animation: shimmer 1.35s infinite;
-    }
-}
 
 .eyebrow {
     width: 76px;
@@ -194,12 +164,6 @@
     width: 132px;
     height: 40px;
     border-radius: $radius-pill;
-}
-
-@keyframes shimmer {
-    100% {
-        transform: translateX(100%);
-    }
 }
 
 @media (max-width: 992px) {

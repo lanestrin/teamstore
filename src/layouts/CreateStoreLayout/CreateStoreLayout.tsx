@@ -1,10 +1,9 @@
 import { Outlet } from "react-router-dom";
 
-import ProgressSidebar from "./ProgressSidebar/ProgressSidebar";
-import LivePreview from "./ProgressSidebar/LivePreview";
-
+import ProgressSidebar from "../../features/create-store/components/ProgressSidebar/ProgressSidebar";
+import ResizablePanel from "../../features/create-store/components/ResizablePanel/ResizablePanel";
 import styles from "./CreateStoreLayout.module.scss";
-import ResizablePanel from "./ResizablePanel/ResizablePanel";
+import LivePreview from "../../features/create-store/components/LivePreview/LivePreview";
 
 export default function CreateStoreLayout() {
 	return (

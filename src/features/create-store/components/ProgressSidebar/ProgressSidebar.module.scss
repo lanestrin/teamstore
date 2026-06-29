@@ -1,17 +1,37 @@
-@use "../../../styles/variables" as *;
+@use "../../../../styles/variables" as *;
 
 .sidebar {
 	display: flex;
 	flex-direction: column;
 	height: 100%;
-	padding: 2rem 1.5rem;
+	padding: 1.5rem;
 	background: linear-gradient( 180deg, #111111 0%, #0b0b0b 100% );
 	color: white;
 }
 
 .logo {
-	width: 180px;
-	margin-bottom: 2.5rem;
+	display: flex;
+	align-items: center;
+	flex-shrink: 0;
+	margin-bottom: $space-4;
+	text-decoration: none;
+}
+
+.logo:focus-visible {
+	outline: 2px solid rgba(255, 255, 255, 0.9);
+	outline-offset: 4px;
+	border-radius: $radius-sm;
+}
+
+.logoImage {
+	display: block;
+	width: auto;
+	height: 32px;
+	transition: transform $transition-base;
+}
+
+.logo:hover .logoImage {
+	transform: scale(1.02);
 }
 
 .label {

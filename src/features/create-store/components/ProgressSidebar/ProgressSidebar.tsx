@@ -1,7 +1,7 @@
+import { Link } from "react-router-dom";
 import { LuCheck, LuLogOut } from "react-icons/lu";
-
 import styles from "./ProgressSidebar.module.scss";
-import { images } from "../../../assets/images";
+import { images } from "../../../../assets/images";
 
 interface ProgressSidebarProps {
 	currentStep: number;
@@ -36,11 +36,14 @@ export default function ProgressSidebar({
 	return (
 		<aside className={styles.sidebar}>
 			<div className={styles.header}>
+
+				<Link to="/" className={styles.logo}>
 				<img
 					src={images.teamstore}
 					alt="TeamStore"
-					className={styles.logo}
+					className={styles.logoImage}
 				/>
+				</Link>
 
 				<span className={styles.label}>
 					Create Your Store

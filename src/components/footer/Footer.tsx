@@ -9,7 +9,7 @@ import {
 } from "react-icons/fa6";
 
 import styles from "./Footer.module.scss";
-import teamstoreLogo from "../../assets/images/teamstore.webp";
+import { images } from "../../assets/images";
 
 export default function Footer() {
   return (
@@ -17,7 +17,7 @@ export default function Footer() {
       <div className={styles.container}>
         <div className={styles.brand}>
           <img
-            src={teamstoreLogo}
+            src={images.teamstore}
             alt="TeamStore"
             className={styles.logo}
           />
