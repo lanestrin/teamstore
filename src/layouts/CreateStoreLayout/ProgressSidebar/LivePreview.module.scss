@@ -1,0 +1,110 @@
+@use "../../../styles/variables" as *;
+@use "../../../styles/mixins" as *;
+
+.preview {
+	display: flex;
+	flex-direction: column;
+	padding: $space-7;
+	background: $white;
+	border-left: 1px solid $border-light;
+}
+
+.header {
+	margin-bottom: $space-6;
+}
+
+.badge {
+	display: inline-flex;
+	align-items: center;
+	height: 30px;
+	padding: 0 $space-3;
+	margin-bottom: $space-3;
+	background: rgba($brand-red, 0.08);
+	border-radius: $radius-pill;
+	color: $brand-red;
+	font-size: 0.75rem;
+	font-weight: $font-bold;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+}
+
+.header h2 {
+	margin-bottom: $space-2;
+	color: $text-primary;
+	font-family: "Barlow Condensed", sans-serif;
+	font-size: 2rem;
+	line-height: 1;
+	text-transform: uppercase;
+}
+
+.header p {
+	color: $text-secondary;
+	line-height: 1.6;
+}
+
+.storePreview {
+	flex: 1;
+	display: flex;
+}
+
+.browser {
+	width: 100%;
+	background: $white;
+	border: 1px solid $border-light;
+	border-radius: $radius-xl;
+	box-shadow: $shadow-lg;
+	overflow: hidden;
+}
+
+.browserBar {
+	display: flex;
+	align-items: center;
+	gap: $space-2;
+	height: 42px;
+	padding: 0 $space-4;
+	background: $gray-100;
+	border-bottom: 1px solid $border-light;
+}
+
+.browserBar span {
+	width: 10px;
+	height: 10px;
+	border-radius: $radius-round;
+	background: $gray-300;
+}
+
+.store {
+	padding: $space-5;
+}
+
+.storeHeader {
+	height: 48px;
+	margin-bottom: $space-5;
+	background: $gray-200;
+	border-radius: $radius-md;
+}
+
+.hero {
+	height: 150px;
+	margin-bottom: $space-5;
+	background: linear-gradient( 135deg, $gray-200, $gray-100 );
+	border-radius: $radius-lg;
+}
+
+.products {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: $space-4;
+}
+
+.productCard {
+	height: 140px;
+	background: $gray-100;
+	border-radius: $radius-md;
+}
+
+@media (max-width: 1200px) {
+	.preview {
+		display: none;
+	}
+}

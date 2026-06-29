@@ -1,0 +1,112 @@
+@use "../../styles/variables" as *;
+@use "../../styles/mixins" as *;
+
+.page {
+    min-height: 100vh;
+    padding: $space-8 0;
+    background: $page-background;
+}
+
+.container {
+    @include page-container;
+    display: flex;
+    flex-direction: column;
+    gap: $space-6;
+}
+
+/* ========================================
+   Hero
+======================================== */
+
+.hero {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    max-width: 720px;
+    padding: $space-4 0;
+}
+
+.eyebrow {
+    display: inline-block;
+    margin-bottom: $space-2;
+    font-size: 0.75rem;
+    font-weight: $font-bold;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: $brand-red;
+}
+
+.hero h1 {
+    margin: 0 0 $space-3;
+    font-family: $font-heading;
+    font-size: 2.75rem;
+    font-weight: $font-bold;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: $text-primary;
+}
+
+.hero p {
+    max-width: 560px;
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: $text-secondary;
+}
+
+/* ========================================
+   Primary Actions
+======================================== */
+
+.actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: $space-5;
+}
+
+/* ========================================
+   Dashboard
+======================================== */
+
+.contentGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: $space-5;
+}
+
+/* ========================================
+   Responsive
+======================================== */
+
+@media (max-width: 992px) {
+    .actions,
+    .contentGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .hero {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .page {
+        padding: $space-6 0;
+    }
+
+    .container {
+        gap: $space-5;
+    }
+
+    .hero {
+        padding: $space-2 0;
+    }
+
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    .hero p {
+        font-size: 0.9375rem;
+    }
+}

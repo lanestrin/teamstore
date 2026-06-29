@@ -1,0 +1,161 @@
+@use "../../../../styles/variables" as *;
+@use "../../../../styles/mixins" as *;
+
+.wrapper {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: $space-2;
+}
+
+.label {
+	font-size: 0.875rem;
+	font-weight: $font-semibold;
+	color: $text-primary;
+}
+
+.trigger {
+	display: flex;
+	align-items: center;
+	gap: $space-3;
+	width: 100%;
+	height: 52px;
+	padding: 0 $space-4;
+	background: $white;
+	border: 1px solid $border-light;
+	border-radius: $radius-md;
+	cursor: pointer;
+	transition: border-color $transition-base, box-shadow $transition-base;
+
+	svg:last-child {
+		margin-left: auto;
+		color: $text-secondary;
+		font-size: 1rem;
+	}
+}
+
+.trigger:hover {
+	border-color: $brand-red;
+}
+
+.trigger:focus-visible {
+	outline: none;
+	border-color: $brand-red;
+	box-shadow: 0 0 0 3px rgba($brand-red, 0.15);
+}
+
+.swatch {
+	flex-shrink: 0;
+	width: 22px;
+	height: 22px;
+	border: 1px solid $border-light;
+	border-radius: $radius-round;
+}
+
+.hex {
+	font-family: monospace;
+	font-size: 0.95rem;
+	font-weight: $font-medium;
+	color: $text-primary;
+}
+
+.popover {
+	position: absolute;
+	top: calc(100% + #{$space-2});
+	left: 0;
+	z-index: 100;
+	width: 320px;
+	padding: $space-5;
+	background: $white;
+	border: 1px solid $border-light;
+	border-radius: $radius-lg;
+	box-shadow: $shadow-lg;
+}
+
+.popover :global(.react-colorful) {
+	width: 100%;
+	height: 200px;
+}
+
+.popover :global(.react-colorful__saturation) {
+	border-radius: $radius-md;
+	margin-bottom: $space-4;
+}
+
+.popover :global(.react-colorful__hue) {
+	height: 14px;
+	border-radius: $radius-pill;
+}
+
+.inputGroup {
+	display: flex;
+	flex-direction: column;
+	gap: $space-2;
+	margin-top: $space-5;
+}
+
+.inputGroup label {
+	font-size: 0.85rem;
+	font-weight: $font-semibold;
+	color: $text-secondary;
+}
+
+.inputGroup input {
+	height: 44px;
+	padding: 0 $space-3;
+	font-family: monospace;
+	font-size: 0.95rem;
+	border: 1px solid $border-light;
+	border-radius: $radius-md;
+	transition: border-color $transition-base, box-shadow $transition-base;
+}
+
+.inputGroup input:focus {
+	outline: none;
+	border-color: $brand-red;
+	box-shadow: 0 0 0 3px rgba($brand-red, 0.15);
+}
+
+.actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: $space-3;
+	margin-top: $space-5;
+}
+
+.cancel,
+.apply {
+	min-width: 100px;
+	height: 42px;
+	border-radius: $radius-md;
+	font-weight: $font-semibold;
+	cursor: pointer;
+	transition: all $transition-base;
+}
+
+.cancel {
+	background: $white;
+	border: 1px solid $border-light;
+	color: $text-primary;
+}
+
+.cancel:hover {
+	background: $gray-50;
+}
+
+.apply {
+	background: $brand-red;
+	border: none;
+	color: $white;
+}
+
+.apply:hover {
+	filter: brightness(0.95);
+}
+
+@media (max-width: 768px) {
+	.popover {
+		width: 100%;
+		min-width: 280px;
+	}
+}
