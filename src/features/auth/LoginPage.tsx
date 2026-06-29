@@ -6,7 +6,7 @@ export default function LoginPage() {
 	return (
 		<>
 			<Authenticated>
-				<Navigate to="/dashboard" replace />
+				<Navigate to="/account" replace />
 			</Authenticated>
 
 			<Unauthenticated>

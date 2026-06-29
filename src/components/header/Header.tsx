@@ -1,9 +1,9 @@
 import { LuUser, LuShoppingCart, LuSearch } from "react-icons/lu";
 import { Link, NavLink } from "react-router-dom";
-import logo from "../../assets/images/teamstore.webp";
 import styles from "./Header.module.scss";
 import { Unauthenticated, Authenticated } from "convex/react";
 import UserMenu from "../user-menu/UserMenu";
+import { images } from "../../assets/images";
 
 export default function Header() {
   const cartCount = 3;
@@ -13,7 +13,7 @@ export default function Header() {
       <div className={styles.container}>
         <Link to="/" className={styles.logo}>
           <img
-            src={logo}
+            src={images.teamstore}
             alt="TeamStore"
             className={styles.logoImage}
           />

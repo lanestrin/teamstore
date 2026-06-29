@@ -68,7 +68,7 @@ export default function AccountPage({
 						onClick={() =>
 							navigate(
 								hasStore
-									? "/dashboard"
+									? "/account"
 									: "/create-store"
 							)
 						}
