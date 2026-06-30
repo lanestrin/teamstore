@@ -13,6 +13,13 @@
 	margin-bottom: $space-6;
 }
 
+.titleRow {
+	display: flex;
+	align-items: center;
+	gap: $space-3;
+	margin-bottom: $space-2;
+}
+
 .badge {
 	display: inline-flex;
 	align-items: center;
@@ -29,7 +36,7 @@
 }
 
 .header h2 {
-	margin-bottom: $space-2;
+	margin: 0;
 	color: $text-primary;
 	font-family: "Barlow Condensed", sans-serif;
 	font-size: 2rem;
@@ -101,6 +108,26 @@
 	height: 140px;
 	background: $gray-100;
 	border-radius: $radius-md;
+}
+
+.colorPalette {
+	display: inline-flex;
+	align-items: stretch;
+	width: 40px;
+	height: 22px;
+	overflow: hidden;
+	border-radius: $radius-pill;
+	background: $white;
+	box-shadow: $shadow-sm;
+}
+
+.primaryColor,
+.secondaryColor {
+	flex: 1;
+}
+
+.primaryColor {
+	border-right: 1px solid rgba($white, 0.35);
 }
 
 @media (max-width: 1200px) {

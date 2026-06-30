@@ -1,6 +1,13 @@
+import { useCreateStore } from "../../context/CreateStoreContext";
+
 import styles from "./LivePreview.module.scss";
 
 export default function LivePreview() {
+	const {
+		primaryColor,
+		secondaryColor,
+	} = useCreateStore();
+
 	return (
 		<aside className={styles.preview}>
 			<div className={styles.header}>
@@ -8,7 +15,32 @@ export default function LivePreview() {
 					Live Preview
 				</span>
 
-				<h2>Your Store</h2>
+				<div className={styles.titleRow}>
+					<h2>Your Store</h2>
+
+					<div
+						className={styles.colorPalette}
+						aria-label="Selected team colors"
+					>
+						<span
+							className={styles.primaryColor}
+							style={{
+								backgroundColor:
+									primaryColor,
+							}}
+						/>
+
+						<span
+							className={
+								styles.secondaryColor
+							}
+							style={{
+								backgroundColor:
+									secondaryColor,
+							}}
+						/>
+					</div>
+				</div>
 
 				<p>
 					Every change you make will appear
@@ -25,15 +57,42 @@ export default function LivePreview() {
 					</div>
 
 					<div className={styles.store}>
-						<div className={styles.storeHeader} />
+						<div
+							className={
+								styles.storeHeader
+							}
+						/>
 
 						<div className={styles.hero} />
 
-						<div className={styles.products}>
-							<div className={styles.productCard} />
-							<div className={styles.productCard} />
-							<div className={styles.productCard} />
-							<div className={styles.productCard} />
+						<div
+							className={
+								styles.products
+							}
+						>
+							<div
+								className={
+									styles.productCard
+								}
+							/>
+
+							<div
+								className={
+									styles.productCard
+								}
+							/>
+
+							<div
+								className={
+									styles.productCard
+								}
+							/>
+
+							<div
+								className={
+									styles.productCard
+								}
+							/>
 						</div>
 					</div>
 				</div>

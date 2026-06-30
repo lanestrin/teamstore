@@ -4,8 +4,7 @@ import ColorsStep from "./steps/ColorStep/ColorsStep";
 import ColorsStepSkeleton from "./steps/ColorStep/ColorsStepSkeleton";
 
 export default function CreateStorePage() {
-	const [isLoading, setIsLoading] =
-		useState(true);
+	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
 		const timer = setTimeout(() => {
