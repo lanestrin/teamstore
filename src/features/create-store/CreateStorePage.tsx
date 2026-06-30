@@ -4,8 +4,13 @@ import ColorsStep from "./steps/ColorStep/ColorsStep";
 import ColorsStepSkeleton from "./steps/ColorStep/ColorsStepSkeleton";
 
 export default function CreateStorePage() {
-	const [isLoading, setIsLoading] =
-		useState(true);
+	const [isLoading, setIsLoading] = useState(true);
+
+	const [primaryColor, setPrimaryColor] =
+		useState("#111827");
+
+	const [secondaryColor, setSecondaryColor] =
+		useState("#DC2626");
 
 	useEffect(() => {
 		const timer = setTimeout(() => {
@@ -19,5 +24,12 @@ export default function CreateStorePage() {
 		return <ColorsStepSkeleton />;
 	}
 
-	return <ColorsStep />;
+	return (
+		<ColorsStep
+			primaryColor={primaryColor}
+			secondaryColor={secondaryColor}
+			onPrimaryColorChange={setPrimaryColor}
+			onSecondaryColorChange={setSecondaryColor}
+		/>
+	);
 }

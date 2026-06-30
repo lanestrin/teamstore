@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import ColorCard from "../../components/ColorCard/ColorCard";
 import ColorPicker from "../../components/ColorPicker/ColorPicker";
+import { useCreateStore } from "../../context/CreateStoreContext";
 
 import styles from "./ColorsStep.module.scss";
 
@@ -42,11 +43,12 @@ export default function ColorsStep() {
 	const [selectedColorId, setSelectedColorId] =
 		useState(1);
 
-	const [primaryColor, setPrimaryColor] =
-		useState(colorOptions[0].primary);
-
-	const [secondaryColor, setSecondaryColor] =
-		useState(colorOptions[0].secondary);
+	const {
+		primaryColor,
+		secondaryColor,
+		setPrimaryColor,
+		setSecondaryColor,
+	} = useCreateStore();
 
 	function handlePresetSelect(
 		id: number,
@@ -65,46 +67,44 @@ export default function ColorsStep() {
 			</span>
 
 			<div>
+				<h1>Choose Your Team Colors</h1>
 
-			<h1>Choose Your Team Colors</h1>
-
-			<p className={styles.description}>
-				Choose one of our popular color
-				combinations or customize your own.
-				Your selections will instantly update
-				the store preview.
+				<p className={styles.description}>
+					Choose one of our popular color
+					combinations or customize your own.
+					Your selected colors will be applied
+					when your storefront preview is
+					created.
 				</p>
 			</div>
 
 			<div>
+				<h2>Popular Color Combinations</h2>
 
-			<h2>Popular Color Combinations</h2>
-
-			<div className={styles.grid}>
-				{colorOptions.map((option) => (
-					<ColorCard
-						key={option.id}
-						primaryColor={
-							option.primary
-						}
-						secondaryColor={
-							option.secondary
-						}
-						selected={
-							selectedColorId ===
-							option.id
-						}
-						onClick={() =>
-							handlePresetSelect(
-								option.id,
-								option.primary,
+				<div className={styles.grid}>
+					{colorOptions.map((option) => (
+						<ColorCard
+							key={option.id}
+							primaryColor={
+								option.primary
+							}
+							secondaryColor={
 								option.secondary
-							)
-						}
-					/>
-				))}
+							}
+							selected={
+								selectedColorId ===
+								option.id
+							}
+							onClick={() =>
+								handlePresetSelect(
+									option.id,
+									option.primary,
+									option.secondary
+								)
+							}
+						/>
+					))}
 				</div>
-
 			</div>
 
 			<div className={styles.customColors}>
@@ -122,9 +122,7 @@ export default function ColorsStep() {
 			</div>
 
 			<div className={styles.info}>
-				<h3>
-					Customize your colors
-				</h3>
+				<h3>Customize your colors</h3>
 
 				<p>
 					Need an exact match for your school
