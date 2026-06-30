@@ -10,6 +10,8 @@ interface ColorPickerProps {
 	onChange: (color: string) => void;
 }
 
+const PICKER_HEIGHT = 420;
+
 export default function ColorPicker({
 	label,
 	value,
@@ -17,23 +19,19 @@ export default function ColorPicker({
 }: ColorPickerProps) {
 	const [isOpen, setIsOpen] = useState(false);
 	const [tempColor, setTempColor] = useState(value);
+	const [openAbove, setOpenAbove] = useState(false);
 
-	const pickerRef =
-		useRef<HTMLDivElement>(null);
+	const wrapperRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		setTempColor(value);
 	}, [value]);
 
 	useEffect(() => {
-		function handleClickOutside(
-			event: MouseEvent
-		) {
+		function handleClickOutside(event: MouseEvent) {
 			if (
-				pickerRef.current &&
-				!pickerRef.current.contains(
-					event.target as Node
-				)
+				wrapperRef.current &&
+				!wrapperRef.current.contains(event.target as Node)
 			) {
 				setIsOpen(false);
 				setTempColor(value);
@@ -53,6 +51,24 @@ export default function ColorPicker({
 		};
 	}, [value]);
 
+	useEffect(() => {
+		if (!isOpen || !wrapperRef.current) {
+			return;
+		}
+
+		const rect =
+			wrapperRef.current.getBoundingClientRect();
+
+		const spaceAbove = rect.top;
+		const spaceBelow =
+			window.innerHeight - rect.bottom;
+
+		setOpenAbove(
+			spaceBelow < PICKER_HEIGHT &&
+			spaceAbove > spaceBelow
+		);
+	}, [isOpen]);
+
 	function handleApply() {
 		onChange(tempColor);
 		setIsOpen(false);
@@ -65,8 +81,8 @@ export default function ColorPicker({
 
 	return (
 		<div
+			ref={wrapperRef}
 			className={styles.wrapper}
-			ref={pickerRef}
 		>
 			<label className={styles.label}>
 				{label}
@@ -76,7 +92,7 @@ export default function ColorPicker({
 				type="button"
 				className={styles.trigger}
 				onClick={() =>
-					setIsOpen(!isOpen)
+					setIsOpen((open) => !open)
 				}
 			>
 				<span
@@ -94,16 +110,26 @@ export default function ColorPicker({
 			</button>
 
 			{isOpen && (
-				<div className={styles.popover}>
+				<div
+					className={`${styles.popover} ${openAbove
+							? styles.top
+							: styles.bottom
+						}`}
+				>
 					<HexColorPicker
 						color={tempColor}
 						onChange={setTempColor}
 					/>
 
-					<div className={styles.inputGroup}>
-						<label>Hex</label>
+					<div
+						className={`field ${styles.inputGroup}`}
+					>
+						<label htmlFor="hex">
+							Hex
+						</label>
 
 						<input
+							id="hex"
 							type="text"
 							value={tempColor}
 							onChange={(e) =>

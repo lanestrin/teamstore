@@ -1,0 +1,107 @@
+@use "../../../../styles/variables" as *;
+@use "../../../../styles/mixins" as *;
+
+.page {
+    display: flex;
+    flex-direction: column;
+    gap: $space-8;
+    max-width: 720px;
+    padding: $space-8;
+}
+
+.header {
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    height: 30px;
+    width: fit-content;
+    padding: 0 $space-3;
+    margin-bottom: $space-3;
+    background: rgba($brand-red, 0.08);
+    border-radius: $radius-pill;
+    color: $brand-red;
+    font-size: 0.75rem;
+    font-weight: $font-bold;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 3rem;
+    font-weight: $font-bold;
+    line-height: 1;
+    text-transform: uppercase;
+    color: $text-primary;
+}
+
+.description {
+    max-width: 640px;
+    margin: 0;
+    font-size: 1.125rem;
+    line-height: $line-height-body;
+    color: $text-secondary;
+}
+
+.stepContent {
+    display: flex;
+    flex-direction: column;
+    gap: $space-6;
+}
+
+.primaryButton {
+    @include button-red;
+    height: 42px;
+    width: 100px;
+    padding: 0 $space-4;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 0.95rem;
+    font-weight: $font-bold;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.secondaryButton {
+    @include button-ghost;
+    height: 42px;
+    width: 100px;
+    padding: 0 $space-4;
+    font-family: "Barlow Condensed", sans-serif;
+    font-size: 0.95rem;
+    font-weight: $font-bold;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: $space-2;
+}
+
+@media (max-width: 768px) {
+    .page {
+        padding: $space-6;
+    }
+
+    .header h1 {
+        font-size: 2.5rem;
+    }
+
+    .actions {
+        flex-direction: column-reverse;
+        gap: $space-3;
+    }
+
+    .primaryButton,
+    .secondaryButton {
+        width: 100%;
+    }
+}

@@ -7,8 +7,8 @@ import HomePage from "../features/home/HomePage";
 import ProductPage from "../features/products/ProductPage";
 import StorePage from "../features/stores/StorePage";
 import StoresPage from "../features/stores/StoresPage";
-import CreateStoreLayout from "../layouts/CreateStoreLayout/CreateStoreLayout";
-import MainLayout from "../layouts/MainLayout";
+import CreateStoreLayout from "../features/create-store/layouts/CreateStoreLayout";
+import MainLayout from "./layouts/MainLayout";
 
 export const router = createBrowserRouter([
 	{

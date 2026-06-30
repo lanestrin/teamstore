@@ -61,7 +61,6 @@
 
 .popover {
 	position: absolute;
-	top: calc(100% + #{$space-2});
 	left: 0;
 	z-index: 100;
 	width: 320px;
@@ -70,6 +69,14 @@
 	border: 1px solid $border-light;
 	border-radius: $radius-lg;
 	box-shadow: $shadow-lg;
+}
+
+.bottom {
+	top: calc(100% + #{$space-2});
+}
+
+.top {
+	bottom: calc(100% + #{$space-2});
 }
 
 .popover :global(.react-colorful) {
@@ -88,32 +95,11 @@
 }
 
 .inputGroup {
-	display: flex;
-	flex-direction: column;
-	gap: $space-2;
 	margin-top: $space-5;
 }
 
-.inputGroup label {
-	font-size: 0.85rem;
-	font-weight: $font-semibold;
-	color: $text-secondary;
-}
-
 .inputGroup input {
-	height: 44px;
-	padding: 0 $space-3;
 	font-family: monospace;
-	font-size: 0.95rem;
-	border: 1px solid $border-light;
-	border-radius: $radius-md;
-	transition: border-color $transition-base, box-shadow $transition-base;
-}
-
-.inputGroup input:focus {
-	outline: none;
-	border-color: $brand-red;
-	box-shadow: 0 0 0 3px rgba($brand-red, 0.15);
 }
 
 .actions {
@@ -123,34 +109,14 @@
 	margin-top: $space-5;
 }
 
-.cancel,
-.apply {
-	min-width: 100px;
-	height: 42px;
-	border-radius: $radius-md;
-	font-weight: $font-semibold;
-	cursor: pointer;
-	transition: all $transition-base;
-}
-
 .cancel {
-	background: $white;
-	border: 1px solid $border-light;
-	color: $text-primary;
-}
-
-.cancel:hover {
-	background: $gray-50;
+	@include button-white;
+	min-width: 100px;
 }
 
 .apply {
-	background: $brand-red;
-	border: none;
-	color: $white;
-}
-
-.apply:hover {
-	filter: brightness(0.95);
+	@include button-red;
+	min-width: 100px;
 }
 
 @media (max-width: 768px) {

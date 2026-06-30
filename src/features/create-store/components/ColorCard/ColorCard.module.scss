@@ -2,32 +2,29 @@
 
 .card {
 	position: relative;
-
 	display: flex;
 	align-items: center;
 	justify-content: center;
-
 	width: 92px;
 	height: 64px;
-
 	padding: $space-2;
-
 	background: $white;
-
 	border: 1px solid $border-light;
 	border-radius: $radius-lg;
-
 	cursor: pointer;
-
-	transition:
-		border-color $transition-base,
-		box-shadow $transition-base,
-		transform $transition-base;
+	transition: border-color $transition-base, box-shadow $transition-base, transform $transition-base;
 }
 
 .card:hover {
+	border-color: $success;
 	transform: translateY(-2px);
 	box-shadow: $shadow-md;
+}
+
+.card:focus-visible {
+	outline: none;
+	border-color: $success;
+	box-shadow: 0 0 0 3px rgba($success, 0.15), $shadow-md;
 }
 
 .selected {
@@ -35,15 +32,11 @@
 	box-shadow: 0 0 0 2px rgba($success, 0.18), $shadow-md;
 }
 
-
 .colors {
 	display: flex;
-
 	width: 100%;
 	height: 100%;
-
 	overflow: hidden;
-
 	border-radius: calc(#{$radius-md} - 2px);
 }
 
@@ -64,7 +57,7 @@
 	background: $success;
 	border: 2px solid $white;
 	border-radius: $radius-round;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+	box-shadow: $shadow-sm;
 	color: $white;
 	font-size: 0.65rem;
 }

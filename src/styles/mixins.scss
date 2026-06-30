@@ -96,12 +96,13 @@
 @mixin button-ghost {
     @include button-base;
     background: $button-ghost-bg;
-    border: 1px solid $button-ghost-border;
+    border: 2px solid $button-ghost-border;
     color: $button-ghost-text;
 
     &:hover {
         background: $button-ghost-hover;
         border-color: $button-ghost-border-hover;
         transform: translateY(-1px);
+        color: $brand-red;
     }
 }

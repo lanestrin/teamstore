@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import ColorCard from "../../components/ColorCard/ColorCard";
 import ColorPicker from "../../components/ColorPicker/ColorPicker";
+import WizardLayout from "../../components/WizardLayout/WizardLayout";
 import { useCreateStore } from "../../context/CreateStoreContext";
 
 import styles from "./ColorsStep.module.scss";
@@ -44,6 +45,8 @@ export default function ColorsStep() {
 		useState(1);
 
 	const {
+		currentStep,
+		setCurrentStep,
 		primaryColor,
 		secondaryColor,
 		setPrimaryColor,
@@ -53,7 +56,7 @@ export default function ColorsStep() {
 	function handlePresetSelect(
 		id: number,
 		primary: string,
-		secondary: string
+		secondary: string,
 	) {
 		setSelectedColorId(id);
 		setPrimaryColor(primary);
@@ -61,36 +64,24 @@ export default function ColorsStep() {
 	}
 
 	return (
-		<section className={styles.page}>
-			<span className={styles.step}>
-				Step 1 of 5
-			</span>
-
+		<WizardLayout
+			step={currentStep}
+			title="Choose Your Team Colors"
+			description="Choose one of our popular color combinations or customize your own. Your selected colors will be applied when your storefront preview is created."
+			hideBack
+			onNext={() => setCurrentStep(2)}
+		>
 			<div>
-				<h1>Choose Your Team Colors</h1>
-
-				<p className={styles.description}>
-					Choose one of our popular color
-					combinations or customize your own.
-					Your selected colors will be applied
-					when your storefront preview is
-					created.
-				</p>
-			</div>
-
-			<div>
-				<h2>Popular Color Combinations</h2>
+				<h2 className={styles.sectionTitle}>
+					Popular Color Combinations
+				</h2>
 
 				<div className={styles.grid}>
 					{colorOptions.map((option) => (
 						<ColorCard
 							key={option.id}
-							primaryColor={
-								option.primary
-							}
-							secondaryColor={
-								option.secondary
-							}
+							primaryColor={option.primary}
+							secondaryColor={option.secondary}
 							selected={
 								selectedColorId ===
 								option.id
@@ -99,7 +90,7 @@ export default function ColorsStep() {
 								handlePresetSelect(
 									option.id,
 									option.primary,
-									option.secondary
+									option.secondary,
 								)
 							}
 						/>
@@ -125,28 +116,13 @@ export default function ColorsStep() {
 				<h3>Customize your colors</h3>
 
 				<p>
-					Need an exact match for your school
-					or organization? Use the color
-					pickers above to choose any color or
-					enter a custom hex value.
+					Need an exact match for your
+					organization? Use the color
+					pickers above to choose any
+					color or enter a custom hex
+					value.
 				</p>
 			</div>
-
-			<div className={styles.actions}>
-				<button
-					type="button"
-					className={styles.secondaryButton}
-				>
-					Back
-				</button>
-
-				<button
-					type="button"
-					className={styles.primaryButton}
-				>
-					Next
-				</button>
-			</div>
-		</section>
+		</WizardLayout>
 	);
 }
