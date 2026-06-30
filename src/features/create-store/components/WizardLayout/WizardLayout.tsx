@@ -1,10 +1,8 @@
-import { ReactNode } from "react";
-
+import type { ReactNode } from "react";
 import styles from "./WizardLayout.module.scss";
 
 interface WizardLayoutProps {
 	step: number;
-	totalSteps?: number;
 	title: string;
 	description: string;
 	children: ReactNode;
@@ -18,7 +16,6 @@ interface WizardLayoutProps {
 
 export default function WizardLayout({
 	step,
-	totalSteps = 5,
 	title,
 	description,
 	children,
