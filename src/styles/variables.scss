@@ -114,10 +114,10 @@ $button-red-hover: $brand-red-hover;
 $button-red-text: $white;
 
 $button-ghost-bg: rgba(255, 255, 255, 0.04);
-$button-ghost-hover: rgba(255, 255, 255, 0.08);
-$button-ghost-border: rgba(255, 255, 255, 0.24);
-$button-ghost-border-hover: rgba(255, 255, 255, 0.45);
-$button-ghost-text: $white;
+$button-ghost-hover: $white;
+$button-ghost-border: $gray-700;
+$button-ghost-border-hover: $brand-red;
+$button-ghost-text: $gray-700;
 
 $button-radius: $radius-pill;
 

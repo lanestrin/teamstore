@@ -1,15 +1,19 @@
-import {
-	createContext,
-	useContext,
-	useState,
-	type ReactNode,
-} from "react";
+import {createContext, useContext, useState, type ReactNode, type Dispatch, type SetStateAction } from "react";
 
 interface CreateStoreContextValue {
+	currentStep: number;
+	setCurrentStep: Dispatch<
+		SetStateAction<number>
+	>;
+
 	primaryColor: string;
 	secondaryColor: string;
-	setPrimaryColor: React.Dispatch<React.SetStateAction<string>>;
-	setSecondaryColor: React.Dispatch<React.SetStateAction<string>>;
+	setPrimaryColor: Dispatch<
+		SetStateAction<string>
+	>;
+	setSecondaryColor: React.Dispatch<
+		SetStateAction<string>
+	>;
 }
 
 const CreateStoreContext =
@@ -22,6 +26,9 @@ interface CreateStoreProviderProps {
 export function CreateStoreProvider({
 	children,
 }: CreateStoreProviderProps) {
+	const [currentStep, setCurrentStep] =
+		useState(1);
+
 	const [primaryColor, setPrimaryColor] =
 		useState("#111827");
 
@@ -31,6 +38,9 @@ export function CreateStoreProvider({
 	return (
 		<CreateStoreContext.Provider
 			value={{
+				currentStep,
+				setCurrentStep,
+
 				primaryColor,
 				secondaryColor,
 				setPrimaryColor,

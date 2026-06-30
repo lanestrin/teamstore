@@ -1,0 +1,73 @@
+@use "../../../../styles/variables" as *;
+@use "../../../../styles/mixins" as *;
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: $space-7;
+}
+
+.slug {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    padding: $space-3 $space-4;
+    background: $gray-100;
+    border: 1px solid $border-light;
+    border-radius: $radius-md;
+}
+
+.slug span {
+    color: $text-secondary;
+}
+
+.slug strong {
+    font-weight: $font-semibold;
+    color: $text-primary;
+}
+
+.upload {
+    @include flex-center;
+    flex-direction: column;
+    gap: $space-3;
+    min-height: 220px;
+    padding: $space-8;
+    text-align: center;
+    background: $white;
+    border: 2px dashed $border-light;
+    border-radius: $radius-lg;
+    transition: border-color $transition-base, background-color $transition-base;
+}
+
+.upload:hover {
+    border-color: $brand-red;
+    background: rgba($brand-red, 0.02);
+}
+
+.uploadIcon {
+    @include flex-center;
+    width: 56px;
+    height: 56px;
+    border: 1px solid $border-light;
+    border-radius: $radius-round;
+    font-size: 1.5rem;
+    font-weight: $font-semibold;
+    color: $text-secondary;
+}
+
+.upload h3 {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: $font-semibold;
+    color: $text-primary;
+}
+
+.upload p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: $text-secondary;
+}
+
+.upload input[type="file"] {
+    display: none;
+}
