@@ -1,11 +1,48 @@
+import {
+	LuCheck,
+	LuTrash2,
+	LuUpload,
+} from "react-icons/lu";
+
 import WizardLayout from "../../components/WizardLayout/WizardLayout";
 import { useCreateStore } from "../../context/CreateStoreContext";
 
 import formStyles from "../../../../styles/Forms.module.scss";
 import styles from "./OrganizationStep.module.scss";
 
+function slugify(value: string): string {
+	return value
+		.toLowerCase()
+		.trim()
+		.replace(/[^a-z0-9]+/g, "-")
+		.replace(/^-+|-+$/g, "");
+}
+
 export default function OrganizationStep() {
-	const { currentStep, setCurrentStep } = useCreateStore();
+	const {
+		currentStep,
+		setCurrentStep,
+		storeDraft,
+		updateStoreDraft,
+	} = useCreateStore();
+
+	function handleStoreNameChange(value: string) {
+		updateStoreDraft({
+			storeName: value,
+			storeSlug: slugify(value),
+		});
+	}
+
+	const logoExtension = storeDraft.logoFile
+		? storeDraft.logoFile.name
+			.split(".")
+			.pop()
+			?.toUpperCase()
+		: null;
+
+	const logoSize = storeDraft.logoFile
+		? `${Math.round(storeDraft.logoFile.size / 1024)} KB`
+		: null;
 
 	return (
 		<WizardLayout
@@ -26,6 +63,12 @@ export default function OrganizationStep() {
 						id="organizationName"
 						type="text"
 						placeholder="e.g. Springfield Soccer Club"
+						value={storeDraft.organizationName}
+						onChange={(e) =>
+							updateStoreDraft({
+								organizationName: e.target.value,
+							})
+						}
 					/>
 
 					<p className={styles.helper}>
@@ -43,6 +86,10 @@ export default function OrganizationStep() {
 						id="storeName"
 						type="text"
 						placeholder="e.g. 2026 Spring Store"
+						value={storeDraft.storeName}
+						onChange={(e) =>
+							handleStoreNameChange(e.target.value)
+						}
 					/>
 
 					<p className={styles.helper}>
@@ -55,7 +102,10 @@ export default function OrganizationStep() {
 
 					<div className={styles.slug}>
 						<span>teamstore.com/store/</span>
-						<strong>your-store-name</strong>
+
+						<strong>
+							{storeDraft.storeSlug || "your-store-name"}
+						</strong>
 					</div>
 
 					<p className={styles.helper}>
@@ -69,26 +119,76 @@ export default function OrganizationStep() {
 						Organization Logo
 					</label>
 
-					<div className={styles.upload}>
+					<label
+						htmlFor="logo"
+						className={styles.upload}
+					>
 						<div className={styles.uploadIcon}>
-							↑
+							{storeDraft.logoFile ? (
+								<LuCheck />
+							) : (
+								<LuUpload />
+							)}
 						</div>
 
-						<h3>Upload your logo</h3>
+						<h3>
+							{storeDraft.logoFile
+								? storeDraft.logoFile.name
+								: "Upload your logo"}
+						</h3>
 
-						<p>PNG, JPG or SVG (max 5 MB)</p>
+						<p>
+							{storeDraft.logoFile
+								? `${logoExtension} • ${logoSize}`
+								: "PNG, JPG or SVG (max 5 MB)"}
+						</p>
 
 						<input
 							id="logo"
 							type="file"
 							accept=".png,.jpg,.jpeg,.svg"
+							className={styles.fileInput}
+							onChange={(e) =>
+								updateStoreDraft({
+									logoFile:
+										e.target.files?.[0] ?? null,
+								})
+							}
 						/>
-					</div>
+
+						{storeDraft.logoFile && (
+							<div className={styles.actions}>
+								<span
+									className={styles.replaceLogo}
+								>
+									<LuUpload />
+									Replace Logo
+								</span>
+
+								<button
+									type="button"
+									className={styles.removeLogo}
+									onClick={(e) => {
+										e.preventDefault();
+										e.stopPropagation();
+
+										updateStoreDraft({
+											logoFile: null,
+										});
+									}}
+								>
+									<LuTrash2 />
+									Remove Logo
+								</button>
+							</div>
+						)}
+					</label>
 				</div>
 
 				<div className={formStyles.field}>
 					<label htmlFor="description">
 						Store Description
+
 						<span className={styles.optional}>
 							(Optional)
 						</span>
@@ -98,6 +198,13 @@ export default function OrganizationStep() {
 						id="description"
 						rows={5}
 						placeholder="Tell customers about your organization, season, or what makes your store unique."
+						value={storeDraft.storeDescription}
+						onChange={(e) =>
+							updateStoreDraft({
+								storeDescription:
+									e.target.value,
+							})
+						}
 					/>
 
 					<p className={styles.helper}>

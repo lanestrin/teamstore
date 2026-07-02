@@ -7,59 +7,68 @@
 	padding: $space-7;
 	background: $white;
 	border-left: 1px solid $border-light;
+	overflow-y: auto;
 }
 
 .header {
-	margin-bottom: $space-6;
-}
-
-.titleRow {
-	display: flex;
-	align-items: center;
-	gap: $space-3;
-	margin-bottom: $space-2;
+	margin-bottom: $space-5;
 }
 
 .badge {
 	display: inline-flex;
 	align-items: center;
-	height: 30px;
 	padding: 0 $space-3;
+	height: 30px;
 	margin-bottom: $space-3;
-	background: rgba($brand-red, 0.08);
+	background: rgba($brand-red, .08);
 	border-radius: $radius-pill;
 	color: $brand-red;
-	font-size: 0.75rem;
+	font-size: .75rem;
 	font-weight: $font-bold;
 	text-transform: uppercase;
-	letter-spacing: 0.08em;
+	letter-spacing: .08em;
 }
 
-.header h2 {
+.titleRow {
+	@include flex-between;
+	gap: $space-3;
+	margin-bottom: $space-2;
+}
+
+.titleRow h2 {
 	margin: 0;
-	color: $text-primary;
-	font-family: "Barlow Condensed", sans-serif;
+	font-family: $font-heading;
 	font-size: 2rem;
 	line-height: 1;
 	text-transform: uppercase;
 }
 
-.header p {
+.header > p {
+	margin: 0;
 	color: $text-secondary;
-	line-height: 1.6;
+	font-size: .9rem;
+}
+
+.colorPalette {
+	display: flex;
+	width: 42px;
+	height: 22px;
+	overflow: hidden;
+	border-radius: $radius-pill;
+	box-shadow: $shadow-sm;
+}
+
+.primaryColor,
+.secondaryColor {
+	flex: 1;
 }
 
 .storePreview {
 	flex: 1;
-	display: flex;
 }
 
 .browser {
-	width: 100%;
-	background: $white;
-	border: 1px solid $border-light;
-	border-radius: $radius-xl;
-	box-shadow: $shadow-lg;
+	@include card;
 	overflow: hidden;
 }
 
@@ -76,59 +85,173 @@
 .browserBar span {
 	width: 10px;
 	height: 10px;
-	border-radius: $radius-round;
+	border-radius: 50%;
 	background: $gray-300;
 }
 
 .store {
-	padding: $space-5;
+	background: $gray-50;
+}
+
+.promoBar {
+	@include flex-center;
+	gap: $space-2;
+	height: 36px;
+	color: $white;
+	font-size: .8rem;
+	font-weight: $font-semibold;
 }
 
 .storeHeader {
+	@include flex-between;
+	padding: $space-4 $space-5;
+	background: $white;
+	border-bottom: 1px solid $border-light;
+}
+
+.brand {
+	display: flex;
+	align-items: center;
+	gap: $space-3;
+}
+
+.logoImage {
+	width: 48px;
 	height: 48px;
-	margin-bottom: $space-5;
-	background: $gray-200;
-	border-radius: $radius-md;
+	flex-shrink: 0;
+	display: block;
+	object-fit: contain;
+	object-position: center;
 }
 
-.hero {
-	height: 150px;
-	margin-bottom: $space-5;
-	background: linear-gradient( 135deg, $gray-200, $gray-100 );
-	border-radius: $radius-lg;
+.brand strong {
+	display: block;
+	font-size: .95rem;
 }
 
-.products {
-	display: grid;
-	grid-template-columns: repeat(2, 1fr);
+.brand span {
+	display: block;
+	font-size: .75rem;
+	color: $text-secondary;
+}
+
+.nav {
+	display: flex;
+	gap: $space-5;
+	font-size: .82rem;
+	font-weight: $font-medium;
+	color: $text-secondary;
+}
+
+.actions {
+	display: flex;
+	align-items: center;
 	gap: $space-4;
 }
 
-.productCard {
-	height: 140px;
-	background: $gray-100;
-	border-radius: $radius-md;
+.actions svg {
+	font-size: 1.1rem;
 }
 
-.colorPalette {
-	display: inline-flex;
-	align-items: stretch;
-	width: 40px;
-	height: 22px;
-	overflow: hidden;
+.cart {
+	position: relative;
+}
+
+.cart span {
+	position: absolute;
+	top: -8px;
+	right: -10px;
+	min-width: 18px;
+	height: 18px;
+	padding: 0 4px;
 	border-radius: $radius-pill;
-	background: $white;
-	box-shadow: $shadow-sm;
+	color: $white;
+	font-size: .65rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
-.primaryColor,
-.secondaryColor {
-	flex: 1;
+.hero {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: $space-8;
+	min-height: 320px;
+	padding: $space-7;
+	overflow: hidden;
+	color: $white;
 }
 
-.primaryColor {
-	border-right: 1px solid rgba($white, 0.35);
+.heroContent {
+	position: relative;
+	z-index: 2;
+	max-width: 420px;
 }
+
+.heroContent > span {
+	font-size: .85rem;
+	text-transform: uppercase;
+	letter-spacing: .08em;
+	opacity: .9;
+}
+
+.heroContent h3 {
+	margin: $space-2 0;
+	font-family: $font-heading;
+	font-size: 3rem;
+	line-height: 1;
+	text-transform: uppercase;
+}
+
+.heroContent p {
+	margin: 0 0 $space-5;
+	line-height: 1.6;
+	max-width: 340px;
+}
+
+.heroActions {
+	display: flex;
+	gap: $space-3;
+}
+
+.heroActions button {
+	@include button-white;
+	padding: .8rem 1.4rem;
+	font-weight: $font-semibold;
+}
+
+.heroActions button:first-child {
+	color: $white;
+	border: none;
+}
+
+.heroArtwork {
+	position: absolute;
+	right: -40px;
+	bottom: -20px;
+	display: flex;
+	align-items: flex-end;
+	justify-content: flex-end;
+	width: 55%;
+	height: 100%;
+	pointer-events: none;
+}
+
+.heroLogo {
+	width: 100%;
+	max-width: 380px;
+	max-height: 320px;
+	object-fit: contain;
+	opacity: .18;
+}
+
+
+
+
+
+
 
 @media (max-width: 1200px) {
 	.preview {
