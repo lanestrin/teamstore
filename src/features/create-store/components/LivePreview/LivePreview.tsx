@@ -6,8 +6,8 @@ import { createStoreTheme } from "../../utils/theme/createStoreTheme";
 
 import styles from "./LivePreview.module.scss";
 import FooterPreview from "../FooterPreview/FooterPreview";
-import ProductPreview from "../ProductPreview.tsx/ProductPreview";
-import BenefitsPreview from "../BenefitsPreview.tsx/BenefitsPreview";
+import ProductPreview from "../ProductPreview/ProductPreview";
+import BenefitsPreview from "../BenefitsPreview/BenefitsPreview";
 
 export default function LivePreview() {
 	const {
