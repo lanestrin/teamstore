@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 import ColorCard from "../../components/ColorCard/ColorCard";
 import ColorPicker from "../../components/ColorPicker/ColorPicker";
 import WizardLayout from "../../components/WizardLayout/WizardLayout";
@@ -41,9 +39,6 @@ const colorOptions = [
 ];
 
 export default function ColorsStep() {
-	const [selectedColorId, setSelectedColorId] =
-		useState(1);
-
 	const {
 		currentStep,
 		setCurrentStep,
@@ -53,12 +48,16 @@ export default function ColorsStep() {
 		setSecondaryColor,
 	} = useCreateStore();
 
+	const selectedColorId = colorOptions.find(
+		(option) =>
+			option.primary === primaryColor &&
+			option.secondary === secondaryColor,
+	)?.id;
+
 	function handlePresetSelect(
-		id: number,
 		primary: string,
 		secondary: string,
 	) {
-		setSelectedColorId(id);
 		setPrimaryColor(primary);
 		setSecondaryColor(secondary);
 	}
@@ -82,13 +81,9 @@ export default function ColorsStep() {
 							key={option.id}
 							primaryColor={option.primary}
 							secondaryColor={option.secondary}
-							selected={
-								selectedColorId ===
-								option.id
-							}
+							selected={selectedColorId === option.id}
 							onClick={() =>
 								handlePresetSelect(
-									option.id,
 									option.primary,
 									option.secondary,
 								)
