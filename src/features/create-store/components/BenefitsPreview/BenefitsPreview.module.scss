@@ -1,32 +1,88 @@
 @use "../../../../styles/variables" as *;
+@use "../../../../styles/mixins" as *;
+
+/* ==========================================================
+   Benefits
+   ========================================================== */
 
 .benefits {
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
-	gap: $space-4;
-	padding: $space-5;
 	background: $white;
-	border-bottom: 1px solid $border-light;
+	border-top: 1px solid #eef2f7;
+	border-bottom: 1px solid #e8edf3;
 }
 
-.benefits > div {
+.item {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 18px;
+	padding: 22px 32px;
+	min-height: 92px;
+}
+
+.item:not(:last-child)::after {
+	content: "";
+	position: absolute;
+	right: 0;
+	top: 50%;
+	width: 1px;
+	height: 42px;
+	background: #e7ebf1;
+	transform: translateY(-50%);
+}
+
+.icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	width: 36px;
+	height: 36px;
+
+	svg {
+		font-size: 1.75rem;
+		stroke-width: 1.75;
+	}
+}
+
+.content {
 	display: flex;
 	flex-direction: column;
-	align-items: center;
-	text-align: center;
-	gap: $space-2;
+	gap: 3px;
+	min-width: 0;
 }
 
-.benefits svg {
-	font-size: 1.5rem;
+.content h3 {
+	margin: 0;
+	font-size: 0.95rem;
+	font-weight: $font-semibold;
+	line-height: 1.2;
+	color: $text-primary;
 }
 
-.benefits strong {
-	font-size: .9rem;
-}
-
-.benefits span {
-	font-size: .75rem;
+.content p {
+	margin: 0;
+	font-size: 0.74rem;
+	line-height: 1.45;
 	color: $text-secondary;
-	line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+	.benefits {
+		grid-template-columns: 1fr;
+	}
+
+	.item {
+		padding: 20px 24px;
+	}
+
+	.item::after {
+		display: none;
+	}
+
+	.item:not(:last-child) {
+		border-bottom: 1px solid #eef2f7;
+	}
 }
