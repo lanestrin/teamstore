@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { LuTruck, LuSearch, LuShoppingCart } from "react-icons/lu";
 
 import { useCreateStore } from "../../context/CreateStoreContext";
@@ -95,7 +95,14 @@ export default function LivePreview() {
 							<span>Free shipping on orders over $75</span>
 						</div>
 
-						<header className={styles.storeHeader}>
+						<header
+							className={styles.storeHeader}
+							style={
+								{
+									"--primary-color": primaryColor,
+								} as CSSProperties
+							}
+						>
 							<div className={styles.brand}>
 								{logoUrl && (
 									<img

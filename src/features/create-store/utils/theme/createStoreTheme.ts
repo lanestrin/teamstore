@@ -54,15 +54,22 @@ export function createStoreTheme(
 		? primaryColor
 		: secondaryColor;
 
+	const promoBarBackground = isLightColor(primaryColor)
+		? secondaryColor
+		: primaryColor;
+
+	const promoBarText =
+		getContrastTextColor(promoBarBackground);
+
 	return {
 		hero: {
-			background: `linear-gradient(135deg, ${primaryColor}, #111827)`,
+			background: primaryColor,
 			text: heroText,
 		},
 
 		promoBar: {
-			background: primaryColor,
-			text: heroText,
+			background: promoBarBackground,
+			text: promoBarText,
 		},
 
 		buttons: {
