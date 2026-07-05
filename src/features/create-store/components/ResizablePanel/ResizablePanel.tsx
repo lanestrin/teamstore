@@ -1,4 +1,12 @@
-import { useRef, useState, useEffect, useMemo, useCallback, type ReactNode, type PointerEvent } from "react";
+import {
+	useRef,
+	useState,
+	useEffect,
+	useMemo,
+	useCallback,
+	type ReactNode,
+	type PointerEvent,
+} from "react";
 import styles from "./ResizablePanel.module.scss";
 
 type CollapsedSide = "left" | "right" | null;
@@ -62,35 +70,32 @@ export default function ResizablePanel({
 	rightClassName,
 	dividerLabel = "Resize preview panel",
 }: ResizablePanelProps) {
+	const safeMin = clamp(minLeftPercent, 5, 90);
+	const safeMax = clamp(maxLeftPercent, safeMin, 95);
+
 	const containerRef = useRef<HTMLDivElement | null>(null);
 	const clickTimerRef = useRef<number | null>(null);
 	const lastExpandedPercentRef = useRef(defaultLeftPercent);
 	const didDragRef = useRef(false);
 
-	const [leftPercent, setLeftPercent] = useState(defaultLeftPercent);
-	const [collapsedSide, setCollapsedSide] = useState<CollapsedSide>(null);
-	const [isDragging, setIsDragging] = useState(false);
-
-	const safeMin = clamp(minLeftPercent, 5, 90);
-	const safeMax = clamp(maxLeftPercent, safeMin, 95);
-
-	useEffect(() => {
+	const [leftPercent, setLeftPercent] = useState(() => {
 		const storedState = readStoredState(storageKey);
 
 		if (!storedState) {
-			setLeftPercent(clamp(defaultLeftPercent, safeMin, safeMax));
-			return;
+			return clamp(defaultLeftPercent, safeMin, safeMax);
 		}
 
-		const safePercent = clamp(storedState.leftPercent, safeMin, safeMax);
+		return clamp(storedState.leftPercent, safeMin, safeMax);
+	});
 
-		setLeftPercent(safePercent);
-		setCollapsedSide(storedState.collapsedSide);
+	const [collapsedSide, setCollapsedSide] =
+		useState<CollapsedSide>(() => {
+			const storedState = readStoredState(storageKey);
 
-		if (!storedState.collapsedSide) {
-			lastExpandedPercentRef.current = safePercent;
-		}
-	}, [defaultLeftPercent, safeMax, safeMin, storageKey]);
+			return storedState?.collapsedSide ?? null;
+		});
+
+	const [isDragging, setIsDragging] = useState(false);
 
 	useEffect(() => {
 		try {
@@ -141,7 +146,8 @@ export default function ResizablePanel({
 
 			// If the window is too small, fall back to percentage limits.
 			if (maxLeft <= minLeft) {
-				const nextPercent = ((clientX - rect.left) / rect.width) * 100;
+				const nextPercent =
+					((clientX - rect.left) / rect.width) * 100;
 				const clampedPercent = clamp(nextPercent, safeMin, safeMax);
 
 				lastExpandedPercentRef.current = clampedPercent;
@@ -205,7 +211,7 @@ export default function ResizablePanel({
 		}
 
 		clickTimerRef.current = window.setTimeout(() => {
-			setCollapsedSide(currentSide => {
+			setCollapsedSide((currentSide) => {
 				if (currentSide === "right") {
 					setLeftPercent(lastExpandedPercentRef.current);
 					return null;
@@ -222,7 +228,11 @@ export default function ResizablePanel({
 			window.clearTimeout(clickTimerRef.current);
 		}
 
-		lastExpandedPercentRef.current = clamp(defaultLeftPercent, safeMin, safeMax);
+		lastExpandedPercentRef.current = clamp(
+			defaultLeftPercent,
+			safeMin,
+			safeMax
+		);
 		setLeftPercent(lastExpandedPercentRef.current);
 		setCollapsedSide(null);
 	};

@@ -24,10 +24,6 @@ export default function ColorPicker({
 	const wrapperRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
-		setTempColor(value);
-	}, [value]);
-
-	useEffect(() => {
 		function handleClickOutside(event: MouseEvent) {
 			if (
 				wrapperRef.current &&
@@ -51,23 +47,29 @@ export default function ColorPicker({
 		};
 	}, [value]);
 
-	useEffect(() => {
-		if (!isOpen || !wrapperRef.current) {
+	function handleTriggerClick() {
+		if (isOpen) {
+			setIsOpen(false);
 			return;
 		}
 
-		const rect =
-			wrapperRef.current.getBoundingClientRect();
+		if (wrapperRef.current) {
+			const rect =
+				wrapperRef.current.getBoundingClientRect();
 
-		const spaceAbove = rect.top;
-		const spaceBelow =
-			window.innerHeight - rect.bottom;
+			const spaceAbove = rect.top;
+			const spaceBelow =
+				window.innerHeight - rect.bottom;
 
-		setOpenAbove(
-			spaceBelow < PICKER_HEIGHT &&
-			spaceAbove > spaceBelow
-		);
-	}, [isOpen]);
+			setOpenAbove(
+				spaceBelow < PICKER_HEIGHT &&
+					spaceAbove > spaceBelow
+			);
+		}
+
+		setTempColor(value);
+		setIsOpen(true);
+	}
 
 	function handleApply() {
 		onChange(tempColor);
@@ -91,9 +93,7 @@ export default function ColorPicker({
 			<button
 				type="button"
 				className={styles.trigger}
-				onClick={() =>
-					setIsOpen((open) => !open)
-				}
+				onClick={handleTriggerClick}
 			>
 				<span
 					className={styles.swatch}
@@ -111,10 +111,11 @@ export default function ColorPicker({
 
 			{isOpen && (
 				<div
-					className={`${styles.popover} ${openAbove
+					className={`${styles.popover} ${
+						openAbove
 							? styles.top
 							: styles.bottom
-						}`}
+					}`}
 				>
 					<HexColorPicker
 						color={tempColor}

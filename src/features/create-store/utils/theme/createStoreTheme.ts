@@ -11,6 +11,17 @@ export interface StoreTheme {
 		text: string;
 	};
 
+	header: {
+		background: string;
+		text: string;
+		inverted: boolean;
+	};
+
+	badge: {
+		background: string;
+		text: string;
+	};
+
 	buttons: {
 		primary: {
 			background: string;
@@ -32,15 +43,14 @@ export interface StoreTheme {
 	brand: {
 		color: string;
 		text: string;
-	}
+	};
 }
 
 export function createStoreTheme(
 	primaryColor: string,
 	secondaryColor: string,
 ): StoreTheme {
-	const heroText =
-		getContrastTextColor(primaryColor);
+	const heroText = getContrastTextColor(primaryColor);
 
 	const primaryButtonText =
 		getContrastTextColor(secondaryColor);
@@ -61,6 +71,39 @@ export function createStoreTheme(
 	const promoBarText =
 		getContrastTextColor(promoBarBackground);
 
+	const sameColor =
+		primaryColor.toLowerCase() ===
+		secondaryColor.toLowerCase();
+
+	const header = sameColor
+		? isLightColor(primaryColor)
+			? {
+				background: "#111827",
+				text: "#FFFFFF",
+				inverted: true,
+			}
+			: {
+				background: "#FFFFFF",
+				text: "#111827",
+				inverted: true,
+			}
+		: {
+			background: "#FFFFFF",
+			text: "#111827",
+			inverted: false,
+		};
+
+	const secondaryIsWhite =
+		secondaryColor.toLowerCase() === "#ffffff";
+
+	// Badge uses the secondary color except when secondary is white.
+	const badgeBackground = secondaryIsWhite
+		? primaryColor
+		: secondaryColor;
+
+	const badgeText =
+		getContrastTextColor(badgeBackground);
+
 	return {
 		hero: {
 			background: primaryColor,
@@ -70,6 +113,13 @@ export function createStoreTheme(
 		promoBar: {
 			background: promoBarBackground,
 			text: promoBarText,
+		},
+
+		header,
+
+		badge: {
+			background: badgeBackground,
+			text: badgeText,
 		},
 
 		buttons: {
