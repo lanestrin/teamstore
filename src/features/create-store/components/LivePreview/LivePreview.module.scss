@@ -193,8 +193,11 @@
 	justify-content: center;
 }
 
+
+
 .hero {
 	position: relative;
+	isolation: isolate;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -205,9 +208,45 @@
 	color: $white;
 }
 
+.hero::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: linear-gradient( 90deg, rgba(0, 0, 0, .18) 0%, rgba(0, 0, 0, .12) 34%, rgba(0, 0, 0, .34) 62%, rgba(0, 0, 0, .48) 100% );
+	pointer-events: none;
+}
+
+.heroTexture {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	background-size: 100% 100%;
+	background-position: center;
+	background-repeat: no-repeat;
+	mix-blend-mode: multiply;
+	opacity: .75;
+	pointer-events: none;
+}
+
+.heroTexture::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: linear-gradient( 120deg, rgba(0, 0, 0, .18) 0%, rgba(0, 0, 0, .12) 34%, rgba(0, 0, 0, .34) 62%, rgba(0, 0, 0, .48) 100% );
+	pointer-events: none;
+}
+
+.heroTexture::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: radial-gradient( circle at 28% 18%, rgba(255, 255, 255, .18), transparent 28% ), radial-gradient( circle at 78% 38%, rgba(255, 255, 255, .10), transparent 34% );
+	pointer-events: none;
+}
+
 .heroContent {
 	position: relative;
-	z-index: 2;
+	z-index: 3;
 	max-width: 420px;
 }
 
@@ -250,22 +289,31 @@
 
 .heroArtwork {
 	position: absolute;
-	right: -40px;
-	bottom: -20px;
+	right: -110px;
+	bottom: -52px;
+	z-index: 2;
 	display: flex;
 	align-items: flex-end;
 	justify-content: flex-end;
-	width: 55%;
-	height: 100%;
+	width: 76%;
+	height: 112%;
 	pointer-events: none;
 }
 
 .heroLogo {
 	width: 100%;
-	max-width: 380px;
-	max-height: 320px;
+	max-width: 620px;
+	max-height: 430px;
 	object-fit: contain;
-	opacity: .18;
+	object-position: right bottom;
+	filter: grayscale(1) brightness(.48) contrast(1.08);
+	mix-blend-mode: multiply;
+	-webkit-mask-image: linear-gradient( to top, transparent 0%, rgba(0, 0, 0, .08) 18%, rgba(0, 0, 0, .30) 46%, rgba(0, 0, 0, .48) 100% );
+	mask-image: linear-gradient( to top, transparent 0%, rgba(0, 0, 0, .08) 18%, rgba(0, 0, 0, .30) 46%, rgba(0, 0, 0, .48) 100% );
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	-webkit-mask-size: 100% 100%;
+	mask-size: 100% 100%;
 }
 
 @media (max-width: 1200px) {

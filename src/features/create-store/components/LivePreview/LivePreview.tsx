@@ -149,11 +149,24 @@ export default function LivePreview() {
 
 						<section
 							className={styles.hero}
-							style={{
-								background: theme.hero.background,
-								color: theme.hero.text,
-							}}
+							style={
+								{
+									"--hero-primary": primaryColor,
+									"--hero-secondary": secondaryColor,
+									"--hero-base": theme.hero.backgroundColor,
+									color: theme.hero.text,
+									backgroundColor: theme.hero.backgroundColor,
+								} as CSSProperties
+							}
 						>
+
+							<div
+								className={styles.heroTexture}
+								style={{
+									backgroundImage: theme.hero.backgroundImage,
+								}}
+							/>
+
 							<div className={styles.heroContent}>
 								<span>Official gear for</span>
 

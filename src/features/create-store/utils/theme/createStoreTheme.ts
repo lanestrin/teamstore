@@ -1,8 +1,10 @@
+import { images } from "../../../../assets/images";
 import { getContrastTextColor, isLightColor } from "./color";
 
 export interface StoreTheme {
 	hero: {
-		background: string;
+		backgroundColor: string;
+		backgroundImage: string;
 		text: string;
 	};
 
@@ -106,8 +108,9 @@ export function createStoreTheme(
 
 	return {
 		hero: {
-			background: primaryColor,
-			text: heroText,
+			backgroundColor: primaryColor,
+			backgroundImage: `url(${images.heroBg.polyBG})`,
+			text: getContrastTextColor(primaryColor),
 		},
 
 		promoBar: {
