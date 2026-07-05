@@ -5,7 +5,6 @@ export interface StoreTheme {
 	hero: {
 		backgroundColor: string;
 		backgroundImage: string;
-		text: string;
 	};
 
 	promoBar: {
@@ -110,7 +109,6 @@ export function createStoreTheme(
 		hero: {
 			backgroundColor: primaryColor,
 			backgroundImage: `url(${images.heroBg.polyBG})`,
-			text: getContrastTextColor(primaryColor),
 		},
 
 		promoBar: {

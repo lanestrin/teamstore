@@ -154,7 +154,6 @@ export default function LivePreview() {
 									"--hero-primary": primaryColor,
 									"--hero-secondary": secondaryColor,
 									"--hero-base": theme.hero.backgroundColor,
-									color: theme.hero.text,
 									backgroundColor: theme.hero.backgroundColor,
 								} as CSSProperties
 							}
