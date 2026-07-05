@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "convex": "npx convex dev"
+    "convex": "npx convex dev",
+    "test": "vitest"
   },
   "dependencies": {
     "@auth/core": "^0.41.1",
@@ -39,6 +40,7 @@
     "sass": "^1.101.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.59.2",
-    "vite": "^8.0.12"
+    "vite": "^8.0.12",
+    "vitest": "^4.1.9"
   }
 }

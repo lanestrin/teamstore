@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, type CSSProperties } from "react";
 import { LuTruck, LuSearch, LuShoppingCart } from "react-icons/lu";
 
 import { useCreateStore } from "../../context/CreateStoreContext";
@@ -31,20 +31,21 @@ export default function LivePreview() {
 	const storeSlug =
 		storeDraft.storeSlug || "your-store-name";
 
-	const [logoUrl, setLogoUrl] = useState<string | null>(null);
+	const logoUrl = useMemo(() => {
+		if (!storeDraft.logoFile) {
+			return null;
+		}
+
+		return URL.createObjectURL(storeDraft.logoFile);
+	}, [storeDraft.logoFile]);
 
 	useEffect(() => {
-		if (!storeDraft.logoFile) {
-			setLogoUrl(null);
+		if (!logoUrl) {
 			return;
 		}
 
-		const objectUrl = URL.createObjectURL(storeDraft.logoFile);
-
-		setLogoUrl(objectUrl);
-
-		return () => URL.revokeObjectURL(objectUrl);
-	}, [storeDraft.logoFile]);
+		return () => URL.revokeObjectURL(logoUrl);
+	}, [logoUrl]);
 
 	return (
 		<aside className={styles.preview}>
@@ -100,6 +101,9 @@ export default function LivePreview() {
 							style={
 								{
 									"--primary-color": primaryColor,
+									"--header-muted-text-color": theme.header.text,
+									background: theme.header.background,
+									color: theme.header.text,
 								} as CSSProperties
 							}
 						>
@@ -133,8 +137,8 @@ export default function LivePreview() {
 
 									<span
 										style={{
-											background: theme.brand.color,
-											color: theme.brand.text,
+											background: theme.badge.background,
+											color: theme.badge.text,
 										}}
 									>
 										2
