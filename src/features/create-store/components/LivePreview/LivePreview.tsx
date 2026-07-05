@@ -148,13 +148,17 @@ export default function LivePreview() {
 						</header>
 
 						<section
-							className={styles.hero}
+							className={[
+								styles.hero,
+								theme.hero.disableGradients ? styles.heroNoGradients : "",
+							].filter(Boolean).join(" ")}
 							style={
 								{
 									"--hero-primary": primaryColor,
 									"--hero-secondary": secondaryColor,
 									"--hero-base": theme.hero.backgroundColor,
 									backgroundColor: theme.hero.backgroundColor,
+									color: theme.hero.text,
 								} as CSSProperties
 							}
 						>

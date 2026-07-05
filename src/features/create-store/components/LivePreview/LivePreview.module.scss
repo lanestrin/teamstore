@@ -208,11 +208,28 @@
 	color: $white;
 }
 
+.hero::before {
+	content: "";
+	position: absolute;
+	top: -32%;
+	right: -18%;
+	width: 82%;
+	height: 74%;
+	z-index: 4;
+	pointer-events: none;
+	background: radial-gradient( ellipse at 82% 18%, rgba(255, 255, 255, .36) 0%, rgba(255, 255, 255, .20) 20%, rgba(255, 255, 255, .08) 42%, transparent 68% ), linear-gradient( 155deg, transparent 0%, transparent 24%, rgba(255, 255, 255, .18) 42%, rgba(255, 255, 255, .08) 58%, transparent 78% );
+	filter: blur(14px);
+	opacity: .9;
+	mix-blend-mode: screen;
+	transform: rotate(-8deg);
+}
+
 .hero::after {
 	content: "";
 	position: absolute;
 	inset: 0;
-	background: linear-gradient( 90deg, rgba(0, 0, 0, .18) 0%, rgba(0, 0, 0, .12) 34%, rgba(0, 0, 0, .34) 62%, rgba(0, 0, 0, .48) 100% );
+	z-index: 2;
+	background: linear-gradient( 90deg, rgba(0, 0, 0, .06) 0%, rgba(0, 0, 0, .04) 34%, rgba(0, 0, 0, .10) 62%, rgba(0, 0, 0, .16) 100% );
 	pointer-events: none;
 }
 
@@ -228,13 +245,13 @@
 	pointer-events: none;
 }
 
-.heroTexture::before {
+/*.heroTexture::before {
 	content: "";
 	position: absolute;
 	inset: 0;
 	background: linear-gradient( 120deg, rgba(0, 0, 0, .18) 0%, rgba(0, 0, 0, .12) 34%, rgba(0, 0, 0, .34) 62%, rgba(0, 0, 0, .48) 100% );
 	pointer-events: none;
-}
+}*/
 
 .heroTexture::after {
 	content: "";
@@ -244,9 +261,16 @@
 	pointer-events: none;
 }
 
+.heroNoGradients::after,
+.heroNoGradients .heroTexture::before {
+	content: none;
+	display: none;
+	background: none;
+}
+
 .heroContent {
 	position: relative;
-	z-index: 3;
+	z-index: 5;
 	max-width: 420px;
 }
 
@@ -291,7 +315,7 @@
 	position: absolute;
 	right: -110px;
 	bottom: -52px;
-	z-index: 2;
+	z-index: 3;
 	display: flex;
 	align-items: flex-end;
 	justify-content: flex-end;
@@ -306,10 +330,10 @@
 	max-height: 430px;
 	object-fit: contain;
 	object-position: right bottom;
-	filter: grayscale(1) brightness(.48) contrast(1.08);
+	filter: grayscale(1) brightness(.72) contrast(1.05);
 	mix-blend-mode: multiply;
-	-webkit-mask-image: linear-gradient( to top, transparent 0%, rgba(0, 0, 0, .08) 18%, rgba(0, 0, 0, .30) 46%, rgba(0, 0, 0, .48) 100% );
-	mask-image: linear-gradient( to top, transparent 0%, rgba(0, 0, 0, .08) 18%, rgba(0, 0, 0, .30) 46%, rgba(0, 0, 0, .48) 100% );
+	-webkit-mask-image: linear-gradient( to top, transparent 0%, rgba(0, 0, 0, .22) 12%, rgba(0, 0, 0, .62) 38%, rgba(0, 0, 0, .92) 100% );
+	mask-image: linear-gradient( to top, transparent 0%, rgba(0, 0, 0, .22) 12%, rgba(0, 0, 0, .62) 38%, rgba(0, 0, 0, .92) 100% );
 	-webkit-mask-repeat: no-repeat;
 	mask-repeat: no-repeat;
 	-webkit-mask-size: 100% 100%;
