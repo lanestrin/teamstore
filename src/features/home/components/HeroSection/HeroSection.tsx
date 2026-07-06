@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 
 import heroBanner from "../../../../assets/images/hero-banner.webp";
+import FeaturesBar from "../FeaturesBar/FeaturesBar";
 
 import styles from "./HeroSection.module.scss";
 
@@ -15,9 +16,7 @@ export default function HeroSection() {
 
       <div className={styles.overlay}>
         <div className={styles.content}>
-          <span className={styles.kicker}>
-            GEAR UP.
-          </span>
+          <span className={styles.kicker}>GEAR UP.</span>
 
           <h1 className={styles.title}>
             REP YOUR TEAM.
@@ -31,21 +30,19 @@ export default function HeroSection() {
           </p>
 
           <div className={styles.actions}>
-            <Link
-              to="/stores"
-              className={styles.primaryButton}
-            >
+            <Link to="/stores" className={styles.primaryButton}>
               SHOP STORES
             </Link>
 
-            <Link
-              to="/categories"
-              className={styles.secondaryButton}
-            >
+            <Link to="/categories" className={styles.secondaryButton}>
               BROWSE CATEGORIES
             </Link>
           </div>
         </div>
+      </div>
+
+      <div className={styles.heroFooter}>
+        <FeaturesBar />
       </div>
     </section>
   );

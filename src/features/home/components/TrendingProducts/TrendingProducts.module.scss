@@ -58,11 +58,21 @@
 }
 
 @media (max-width: 576px) {
+    .section {
+        padding-top: $space-7;
+        padding-bottom: $space-7;
+    }
+
+    .header {
+        margin-bottom: $space-5;
+    }
+
     .header h2 {
-        font-size: 2.5rem;
+        font-size: 2.35rem;
     }
 
     .grid {
         grid-template-columns: 1fr;
+        gap: $space-4;
     }
 }

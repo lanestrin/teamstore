@@ -69,14 +69,60 @@
 
 @media (max-width: 768px) {
     .card {
-        min-height: 220px;
+        min-height: 180px;
+        padding: $space-4;
+    }
+
+    .card:hover,
+    .card:focus-visible,
+    .card:active {
+        transform: translateY(-4px);
+    }
+
+    .card::after {
+        right: $space-4;
+        bottom: $space-4;
     }
 
     .logo {
-        height: 120px;
+        width: 100%;
+        height: 96px;
+        margin-bottom: $space-3;
+    }
+
+    .logoImage {
+        width: 82%;
+        height: 82%;
     }
 
     .card h3 {
-        font-size: 1.4rem;
+        font-size: 1.45rem;
+        text-align: center;
+    }
+
+    .card p {
+        font-size: 0.9rem;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .card {
+        min-height: 155px;
+        padding: $space-4;
+    }
+
+    .logo {
+        height: 82px;
+        margin-bottom: $space-1;
+    }
+
+    .logoImage {
+        width: 80%;
+        height: 80%;
+    }
+
+    .card h3 {
+        font-size: 1.35rem;
     }
 }

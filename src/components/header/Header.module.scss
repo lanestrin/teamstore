@@ -10,22 +10,25 @@
 	@include page-container;
 	display: flex;
 	align-items: center;
-	gap: $space-8;
+	gap: $space-6;
+	width: 100%;
 	height: 68px;
+	min-width: 0;
 	padding-top: 0;
 	padding-bottom: 0;
 }
 
 .logo {
 	display: flex;
-	align-items: center;
 	flex-shrink: 0;
+	align-items: center;
 	text-decoration: none;
 }
 
 .logoImage {
 	display: block;
 	width: auto;
+	max-width: 230px;
 	height: 40px;
 	transition: transform $transition-base;
 }
@@ -36,29 +39,30 @@
 
 .search {
 	position: relative;
-	flex: 1 1 560px;
-	max-width: 680px;
+	flex: 1 1 360px;
+	min-width: 180px;
+	max-width: 520px;
 }
 
 .searchIcon {
 	position: absolute;
 	top: 50%;
 	left: $space-4;
-	transform: translateY(-50%);
 	color: rgba(255, 255, 255, 0.45);
 	font-size: 1rem;
 	pointer-events: none;
+	transform: translateY(-50%);
 }
 
 .searchInput {
 	width: 100%;
 	height: 38px;
 	padding: 0 $space-4 0 44px;
-	background: linear-gradient( 180deg, #141414 20%, #101010 100% );
+	background: linear-gradient(180deg, #141414 20%, #101010 100%);
 	border: 1px solid rgba(255, 255, 255, 0.14);
 	border-radius: $radius-pill;
-	outline: none;
 	color: $text-inverse;
+	outline: none;
 	transition: border-color $transition-base, background-color $transition-base;
 }
 
@@ -74,14 +78,15 @@
 .searchInput:focus-visible {
 	background: #161616;
 	border-color: rgba($brand-red, 0.65);
-	outline: none;
 	box-shadow: none;
+	outline: none;
 }
 
 .nav {
 	display: flex;
+	flex-shrink: 0;
 	align-items: center;
-	gap: $space-7;
+	gap: $space-6;
 	margin-left: auto;
 }
 
@@ -92,19 +97,20 @@
 	font-size: 1rem;
 	font-weight: $font-semibold;
 	letter-spacing: 0.04em;
-	text-transform: uppercase;
 	text-decoration: none;
+	text-transform: uppercase;
+	white-space: nowrap;
 	transition: color $transition-base;
 }
 
 .nav a::after {
-	content: "";
 	position: absolute;
-	left: 0;
 	bottom: -8px;
+	left: 0;
 	width: 100%;
 	height: 2px;
 	background: $brand-red;
+	content: "";
 	transform: scaleX(0);
 	transform-origin: center;
 	transition: transform $transition-base;
@@ -123,10 +129,18 @@
 	color: $brand-red !important;
 }
 
-.actions {
+.desktopActions {
 	display: flex;
+	flex-shrink: 0;
 	align-items: center;
 	gap: $space-4;
+}
+
+.mobileActions {
+	display: none;
+	align-items: center;
+	gap: $space-3;
+	margin-left: auto;
 }
 
 .account {
@@ -136,13 +150,13 @@
 	background: transparent;
 	border: 0;
 	color: $text-inverse;
+	cursor: pointer;
 	font-family: "Barlow Condensed", sans-serif;
 	font-size: 1rem;
 	font-weight: $font-semibold;
 	letter-spacing: 0.03em;
-	text-transform: uppercase;
 	text-decoration: none;
-	cursor: pointer;
+	text-transform: uppercase;
 	transition: color $transition-base, transform $transition-base;
 }
 
@@ -160,9 +174,9 @@
 	border: 0;
 	border-radius: $radius-round;
 	color: $text-inverse;
+	cursor: pointer;
 	font-size: 1.4rem;
 	text-decoration: none;
-	cursor: pointer;
 	transition: color $transition-base, transform $transition-base;
 }
 
@@ -184,4 +198,57 @@
 	color: $text-inverse;
 	font-size: 0.6875rem;
 	font-weight: $font-bold;
+}
+
+@media (max-width: 1080px) {
+	.container {
+		gap: $space-4;
+	}
+
+	.search {
+		flex-basis: 260px;
+		max-width: 360px;
+	}
+
+	.nav {
+		gap: $space-4;
+	}
+}
+
+@media (max-width: 900px) {
+	.container {
+		height: 64px;
+	}
+
+	.search,
+	.nav,
+	.desktopActions {
+		display: none;
+	}
+
+	.mobileActions {
+		display: flex;
+	}
+
+	.logoImage {
+		max-width: 210px;
+		height: 34px;
+	}
+}
+
+@media (max-width: 480px) {
+	.container {
+		gap: $space-3;
+	}
+
+	.logoImage {
+		max-width: 180px;
+		height: 32px;
+	}
+
+	.cart {
+		width: 38px;
+		height: 38px;
+		font-size: 1.25rem;
+	}
 }
