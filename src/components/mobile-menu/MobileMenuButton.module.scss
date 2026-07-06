@@ -1,9 +1,8 @@
-@use "../styles/variables" as *;
-@use "../styles/mixins" as *;
+@use "../../styles/variables" as *;
+@use "../../styles/mixins" as *;
 
 .mobileMenuButton {
     @include flex-center;
-    display: none;
     position: relative;
     z-index: 2;
     width: 40px;
@@ -12,10 +11,6 @@
     background: transparent;
     border: 0;
     cursor: pointer;
-
-    @include lg {
-        display: flex;
-    }
 
     span {
         position: absolute;

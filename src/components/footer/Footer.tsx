@@ -17,7 +17,7 @@ export default function Footer() {
       <div className={styles.container}>
         <div className={styles.brand}>
           <img
-            src={images.teamstore}
+            src={images.teamstore.teamstoreLogo}
             alt="TeamStore"
             className={styles.logo}
           />

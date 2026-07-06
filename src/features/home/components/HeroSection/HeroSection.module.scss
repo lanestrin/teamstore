@@ -4,7 +4,7 @@
 .hero {
     position: relative;
     height: 720px;
-    margin-bottom: -110px;
+    margin-bottom: 0;
     overflow: hidden;
     background: $background-dark;
 }
@@ -14,25 +14,14 @@
     position: absolute;
     inset: 0;
     z-index: 1;
-
-    background: linear-gradient(
-        90deg,
-        rgba(0, 0, 0, 0.95) 0%,
-        rgba(0, 0, 0, 0.90) 20%,
-        rgba(0, 0, 0, 0.75) 40%,
-        rgba(0, 0, 0, 0.45) 60%,
-        rgba(0, 0, 0, 0.15) 80%,
-        rgba(0, 0, 0, 0) 100%
-    );
+    background: linear-gradient( 90deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.90) 20%, rgba(0, 0, 0, 0.75) 40%, rgba(0, 0, 0, 0.45) 60%, rgba(0, 0, 0, 0.15) 80%, rgba(0, 0, 0, 0) 100% );
 }
 
 .background {
     position: absolute;
     inset: 0;
-
     width: 100%;
     height: 100%;
-
     object-fit: cover;
     object-position: 75% top;
 }
@@ -41,22 +30,19 @@
     position: absolute;
     inset: 0;
     z-index: 2;
-
     display: flex;
     align-items: center;
 }
 
 .content {
     @include page-container;
-
     width: 100%;
-    padding-bottom: 140px;
+    padding-bottom: 160px;
 }
 
 .kicker {
     display: block;
     margin-bottom: $space-3;
-
     color: $brand-red;
     font-family: "Barlow Condensed", sans-serif;
     font-size: 2rem;
@@ -65,7 +51,6 @@
 
 .title {
     margin: 0;
-
     color: $text-inverse;
     font-family: "Barlow Condensed", sans-serif;
     font-size: 5.5rem;
@@ -81,7 +66,6 @@
 .description {
     max-width: 550px;
     margin-top: $space-5;
-
     color: $text-inverse;
     font-size: 1.25rem;
     line-height: 1.7;
@@ -90,7 +74,6 @@
 .actions {
     display: flex;
     gap: $space-5;
-
     margin-top: $space-6;
 }
 
@@ -98,7 +81,6 @@
 .secondaryButton {
     height: 52px;
     padding: 0 $space-6;
-
     font-family: "Barlow Condensed", sans-serif;
     font-size: 1rem;
     font-weight: $font-bold;
@@ -114,16 +96,37 @@
     @include button-ghost;
 }
 
+.heroFooter {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 3;
+}
+
+@media (max-width: 900px) {
+    .hero {
+        height: 680px;
+    }
+
+    .content {
+        padding-bottom: 220px;
+    }
+}
+
 @media (max-width: 768px) {
     .hero {
         height: auto;
-        min-height: 520px;
-        margin-bottom: 0;
+        min-height: 700px;
+    }
+
+    .overlay {
+        align-items: flex-start;
     }
 
     .content {
         padding-top: $space-8;
-        padding-bottom: $space-8;
+        padding-bottom: 240px;
     }
 
     .kicker {
@@ -143,11 +146,19 @@
     .actions {
         gap: $space-3;
     }
+}
 
-    .primaryButton,
-    .secondaryButton {
-        flex: 1;
-        justify-content: center;
+@media (max-width: 480px) {
+    .hero {
+        min-height: 620px;
+    }
+
+    .content {
+        padding-bottom: $space-8;
+    }
+
+    .actions {
+        flex-direction: column;
     }
 }
 

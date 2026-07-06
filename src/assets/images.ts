@@ -13,6 +13,7 @@ import jaguarsLogo from "./images/jaguars_logo.png";
 import knightsLogo from "./images/knights_logo.png";
 import lionsLogo from "./images/lions_logo.png";
 import teamstoreLogo from "./images/teamstore_logo.png";
+import teamstoreLogoDark from "./images/teamstore-logo-dark.png"
 import tee from "./images/tee.png";
 import tigersLogo from "./images/tigers_logo.png";
 import trojanLogo from "./images/trojan_logo.png";
@@ -40,5 +41,8 @@ export const images = {
 	},
 
 	hero: heroBanner,
-	teamstore: teamstoreLogo,
+	teamstore: {
+		teamstoreLogo,
+		teamstoreLogoDark,
+	}
 };

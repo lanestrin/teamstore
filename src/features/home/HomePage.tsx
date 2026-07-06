@@ -8,7 +8,6 @@ export default function HomePage() {
   return (
     <>
       <HeroSection />
-      <FeaturesBar />
       <FeaturedStores />
       <TrendingProducts />
     </>

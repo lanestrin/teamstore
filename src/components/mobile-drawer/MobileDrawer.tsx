@@ -1,115 +1,117 @@
-import logo from '../../../Images/logo-coachs-assistant.png'
-import { FiShoppingCart, FiX } from 'react-icons/fi'
-import styles from './MobileDrawer.module.scss'
+import { LuShoppingCart, LuUser, LuX } from "react-icons/lu";
+import { Link, NavLink } from "react-router-dom";
+import { Authenticated, Unauthenticated } from "convex/react";
+
+import styles from "./MobileDrawer.module.scss";
+import { images } from "../../assets/images";
 
 interface MobileDrawerProps {
-	isOpen: boolean
-	onClose: () => void
+  isOpen: boolean;
+  onClose: () => void;
+  cartCount: number;
 }
 
-function MobileDrawer({
-	isOpen,
-	onClose
+export default function MobileDrawer({
+  isOpen,
+  onClose,
+  cartCount,
 }: MobileDrawerProps) {
+  const getLinkClassName = ({ isActive }: { isActive: boolean }) =>
+    isActive ? styles.activeDrawerLink : undefined;
 
-	const handleManageLockerRoomClick = (
-		event: React.MouseEvent<HTMLAnchorElement>,
-	) => {
-		event.preventDefault()
+  return (
+    <>
+      <button
+        aria-label="Close navigation overlay"
+        className={[
+          styles.mobileDrawerOverlay,
+          isOpen ? styles.mobileDrawerOverlayVisible : "",
+        ].join(" ")}
+        onClick={onClose}
+        type="button"
+      />
 
-		window.location.href = '/Account/Login'
-	}
+      <aside
+        id="mobile-navigation-drawer"
+        className={[
+          styles.mobileDrawer,
+          isOpen ? styles.mobileDrawerOpen : "",
+        ].join(" ")}
+        aria-hidden={!isOpen}
+      >
+        <div className={styles.mobileDrawerHeader}>
+          <Link to="/" onClick={onClose}>
+            <img src={images.teamstore.teamstoreLogoDark} alt="TeamStore" />
+          </Link>
 
-	return (
-		<>
-			<div
-				className={[
-					styles.mobileDrawerOverlay,
-					isOpen ? styles.mobileDrawerOverlayVisible : ''
-				].join(' ')}
-				onClick={onClose}
-			/>
+          <button
+            aria-label="Close menu"
+            onClick={onClose}
+            type="button"
+            className={styles.closeButton}
+          >
+            <LuX />
+          </button>
+        </div>
 
-			<div
-				className={[
-					styles.mobileDrawer,
-					isOpen ? styles.mobileDrawerOpen : ''
-				].join(' ')}
-			>
-				<div className={styles.mobileDrawerHeader}>
-					<img
-						alt="Coach's Assistant"
-						src={logo}
-					/>
+        <div className={styles.mobileDrawerAccountActions}>
+          <Unauthenticated>
+            <Link
+              to="/login"
+              className={`${styles.drawerButton} ${styles.drawerButtonGhost}`}
+              onClick={onClose}
+            >
+              <LuUser />
+              <span>Login</span>
+            </Link>
+          </Unauthenticated>
 
-					<button
-						aria-label="Close Menu"
-						onClick={onClose}
-						type="button"
-					>
-						<FiX />
-					</button>
-				</div>
+          <Authenticated>
+            <Link
+              to="/account"
+              className={`${styles.drawerButton} ${styles.drawerButtonPrimary}`}
+              onClick={onClose}
+            >
+              <LuUser />
+              <span>My Account</span>
+            </Link>
+          </Authenticated>
 
-				<div className={styles.mobileDrawerAccountActions}>
-					<button
-						className="button button--ghost"
-						type="button"
-					>
-						Log In
-					</button>
+          <Link
+            to="/cart"
+            className={`${styles.drawerButton} ${styles.drawerButtonRed}`}
+            onClick={onClose}
+          >
+            <span>My Cart</span>
+            <span className={styles.mobileDrawerCartMeta}>
+              {cartCount}
+              <LuShoppingCart />
+            </span>
+          </Link>
+        </div>
 
-					<button
-						className="button button--primary"
-						type="button"
-					>
-						My Account
-					</button>
+        <nav className={styles.mobileDrawerNavigation}>
+          <NavLink to="/" end className={getLinkClassName} onClick={onClose}>
+            Home
+          </NavLink>
 
-					<button
-						className="button button--orange"
-						type="button"
-					>
-						<span>My Cart</span>
-						<FiShoppingCart className={styles.mobileDrawerCartIcon} />
-					</button>
-				</div>
+          <NavLink
+            to="/stores"
+            className={getLinkClassName}
+            onClick={onClose}
+          >
+            Stores
+          </NavLink>
 
-				<nav className={styles.mobileDrawerNavigation}>
-					<a href="/">
-						Home
-					</a>
-
-					<a href="/LockerRoom/Create">
-						Build Your Locker Room
-					</a>
-
-					<a href="/Search/SearchLockers">
-						Find A Locker
-					</a>
-
-					<a
-						href="#"
-						onClick={handleManageLockerRoomClick}
-					>
-						Manage Locker Room
-					</a>
-
-					<a href="/Service/HowItWorks">
-						How It Works
-					</a>
-
-					<a
-						href="https://championteamwear.com/ContactUs.aspx#contactForm"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						Contact Us
-					</a>
-				</nav>
-			</div>
-		</>
-	)
+          <NavLink
+            to="/how-it-works"
+            className={getLinkClassName}
+            onClick={onClose}
+          >
+            How It Works
+          </NavLink>
+        </nav>
+      </aside>
+    </>
+  );
 }
-
-export default MobileDrawer
