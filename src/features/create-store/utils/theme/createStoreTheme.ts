@@ -1,9 +1,12 @@
+import { images } from "../../../../assets/images";
 import { getContrastTextColor, isLightColor } from "./color";
 
 export interface StoreTheme {
 	hero: {
-		background: string;
+		backgroundColor: string;
+		backgroundImage: string;
 		text: string;
+		disableGradients: boolean;
 	};
 
 	promoBar: {
@@ -50,7 +53,6 @@ export function createStoreTheme(
 	primaryColor: string,
 	secondaryColor: string,
 ): StoreTheme {
-	const heroText = getContrastTextColor(primaryColor);
 
 	const primaryButtonText =
 		getContrastTextColor(secondaryColor);
@@ -104,10 +106,31 @@ export function createStoreTheme(
 	const badgeText =
 		getContrastTextColor(badgeBackground);
 
+	function isWhiteColor(color?: string): boolean {
+		if (!color) return false;
+
+		const normalized = color
+			.trim()
+			.toLowerCase()
+			.replace(/\s+/g, "");
+
+		return (
+			normalized === "#fff" ||
+			normalized === "#ffffff" ||
+			normalized === "white" ||
+			normalized === "rgb(255,255,255)" ||
+			normalized === "rgba(255,255,255,1)"
+		);
+	}
+
+	const isPrimaryWhite = isWhiteColor(primaryColor);
+
 	return {
 		hero: {
-			background: primaryColor,
-			text: heroText,
+			backgroundColor: primaryColor,
+			backgroundImage: `url(${images.heroBg.polyBG})`,
+			text: getContrastTextColor(primaryColor),
+			disableGradients: isPrimaryWhite,
 		},
 
 		promoBar: {

@@ -18,6 +18,10 @@ import tee from "./images/tee.png";
 import tigersLogo from "./images/tigers_logo.png";
 import trojanLogo from "./images/trojan_logo.png";
 
+import polyBG from "./images/poly-bg.webp";
+import ribbonBg from "./images/flowy-bg.webp";
+
+
 export const images = {
 	account: {
 		heart: accountHeart,
@@ -44,5 +48,10 @@ export const images = {
 	teamstore: {
 		teamstoreLogo,
 		teamstoreLogoDark,
-	}
+	},
+
+	heroBg: {
+		polyBG,
+		ribbonBg
+	},
 };
