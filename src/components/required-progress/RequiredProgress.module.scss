@@ -1,6 +1,3 @@
-@use "../../styles/variables" as *;
-@use "../../styles/mixins" as *;
-
 .progressCard {
     @include card;
     padding: $space-6;

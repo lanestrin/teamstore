@@ -1,6 +1,3 @@
-@use "../../../../styles/variables" as *;
-@use "../../../../styles/mixins" as *;
-
 .form {
     display: flex;
     flex-direction: column;
@@ -41,9 +38,8 @@
 }
 
 .upload:hover {
-    border-color: $brand-red;
-    background: rgba($brand-red, 0.03);
-    transform: translateY(-2px);
+    border-color: $gray-400;
+    background: rgba($gray-400, 0.03);
 }
 
 .uploadIcon {
@@ -56,11 +52,6 @@
     font-size: 1.5rem;
     color: $text-secondary;
     transition: background-color $transition-base, color $transition-base, border-color $transition-base;
-}
-
-.upload:hover .uploadIcon {
-    border-color: $brand-red;
-    color: $brand-red;
 }
 
 .upload h3 {
