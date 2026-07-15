@@ -1,6 +1,3 @@
-@use "../../styles/variables" as *;
-@use "../../styles/mixins" as *;
-
 .page {
     background: $page-background;
     color: $text-primary;
@@ -201,7 +198,7 @@
 .gridCard:hover,
 .nearbyCard:hover {
     transform: translateY(-2px);
-    box-shadow: $shadow-md;
+    box-shadow: $shadow-sm;
 }
 
 .storeRow:hover,

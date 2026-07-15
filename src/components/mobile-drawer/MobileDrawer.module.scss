@@ -1,6 +1,3 @@
-@use "../../styles/variables" as *;
-@use "../../styles/mixins" as *;
-
 .mobileDrawerOverlay {
     position: fixed;
     inset: 0;
@@ -29,7 +26,7 @@
     padding: $space-6;
     overflow-y: auto;
     background: $white;
-    box-shadow: $shadow-lg;
+    box-shadow: $shadow-md;
     transform: translateX(100%);
     transition: transform $transition-base;
 }
