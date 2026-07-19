@@ -1,7 +1,19 @@
 import ProductCard from "../../components/product-card/ProductCard";
-import styles from "./StorePage.module.scss";
 import jaguarsLogo from "../../assets/images/jaguars_logo.png";
-import { requiredProducts, fanwearProducts } from "../../mocks/products";
+import { fanwearProducts, requiredProducts } from "../../mocks/products";
+import styles from "./StorePage.module.scss";
+
+function createProductCardData(product: (typeof requiredProducts)[number]) {
+  return {
+    id: String(product.id),
+    name: product.name,
+    imageUrl: product.image,
+    priceLabel: `$${product.price.toFixed(2)}`,
+    productUrl: `/product/${product.slug}`,
+    deadline: product.deadline,
+    inCart: product.inCart,
+  };
+}
 
 export default function StorePage() {
   return (
@@ -15,15 +27,12 @@ export default function StorePage() {
           />
 
           <div>
-            <span className={styles.storeLabel}>
-              OFFICIAL TEAM STORE
-            </span>
+            <span className={styles.storeLabel}>OFFICIAL TEAM STORE</span>
 
             <h1>Jaguars Soccer</h1>
 
             <p>
-              Team uniforms, required apparel,
-              spirit wear, and fan gear for
+              Team uniforms, required apparel, spirit wear, and fan gear for
               players, families, and supporters.
             </p>
 
@@ -41,30 +50,20 @@ export default function StorePage() {
           <div>
             <h2>Required Team Items</h2>
 
-            <p>
-              These items are required for all
-              rostered players.
-            </p>
+            <p>These items are required for all rostered players.</p>
           </div>
         </div>
 
         <div className={styles.deadlineBanner}>
-          <div className={styles.deadlineIcon}>
-            ⚠
-          </div>
+          <div className={styles.deadlineIcon}>⚠</div>
 
           <div>
-            <strong>
-              REQUIRED ITEMS ORDER DEADLINE
-            </strong>
+            <strong>REQUIRED ITEMS ORDER DEADLINE</strong>
 
-            <span>
-              August 15, 2026 • 12 Days Remaining
-            </span>
+            <span>August 15, 2026 • 12 Days Remaining</span>
 
             <small>
-              All required team items must be
-              ordered before the deadline.
+              All required team items must be ordered before the deadline.
             </small>
           </div>
         </div>
@@ -73,7 +72,7 @@ export default function StorePage() {
           {requiredProducts.map((product) => (
             <ProductCard
               key={product.id}
-              product={product}
+              product={createProductCardData(product)}
               showDeadline
               showRequiredStatus
             />
@@ -87,9 +86,8 @@ export default function StorePage() {
             <h2>Featured Fanwear</h2>
 
             <p>
-              Optional apparel and accessories
-              for family, friends, alumni,
-              and supporters.
+              Optional apparel and accessories for family, friends, alumni, and
+              supporters.
             </p>
           </div>
         </div>
@@ -98,7 +96,7 @@ export default function StorePage() {
           {fanwearProducts.map((product) => (
             <ProductCard
               key={product.id}
-              product={product}
+              product={createProductCardData(product)}
             />
           ))}
         </div>
