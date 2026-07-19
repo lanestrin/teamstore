@@ -9,8 +9,13 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as csvDemoCatalog from "../csvDemoCatalog.js";
+import type * as docs_selectedProductsData from "../docs/selectedProductsData.js";
 import type * as http from "../http.js";
+import type * as lib_authz from "../lib/authz.js";
 import type * as organizations from "../organizations.js";
+import type * as productVariants from "../productVariants.js";
+import type * as products from "../products.js";
 import type * as users from "../users.js";
 
 import type {
@@ -21,8 +26,13 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  csvDemoCatalog: typeof csvDemoCatalog;
+  "docs/selectedProductsData": typeof docs_selectedProductsData;
   http: typeof http;
+  "lib/authz": typeof lib_authz;
   organizations: typeof organizations;
+  productVariants: typeof productVariants;
+  products: typeof products;
   users: typeof users;
 }>;
 

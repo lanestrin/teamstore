@@ -56,12 +56,13 @@
     }
 
     ul {
-        margin: 0;
-        padding-left: $space-5;
+    display: grid;
+    gap: $space-3;
+    margin: 0;
+    padding-left: $space-5;
     }
 
     li {
-        margin-bottom: $space-3;
         color: $text-secondary;
         line-height: 1.7;
     }

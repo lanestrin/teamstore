@@ -1,259 +1,144 @@
-import {
-  LuCalendar,
-  LuMinus,
-  LuPackage,
-  LuPlus,
-  LuRuler,
-  LuTriangleAlert,
-} from "react-icons/lu";
+import { LuMinus, LuPlus } from "react-icons/lu";
 
 import styles from "./ProductInfo.module.scss";
 
+interface ProductColorOption {
+  name: string;
+  imageUrl: string;
+}
+
 interface ProductInfoProps {
   name: string;
-  teamName: string;
-  price: number;
-  isRequired?: boolean;
-  deadline?: string;
-  deliveryEstimate?: string;
-  youthSizes?: string[];
-  adultSizes?: string[];
+  category?: string;
+  priceLabel: string;
+  colors: ProductColorOption[];
+  selectedColor: string;
+  sizes: string[];
   selectedSize: string;
   quantity: number;
+  onColorChange: (color: string) => void;
   onSizeChange: (size: string) => void;
   onQuantityChange: (quantity: number) => void;
-  allowNamePersonalization?: boolean;
-  allowNumberPersonalization?: boolean;
 }
 
 export default function ProductInfo({
   name,
-  teamName,
-  price,
-  isRequired,
-  deadline,
-  deliveryEstimate,
-  youthSizes = [],
-  adultSizes = [],
+  category,
+  priceLabel,
+  colors,
+  selectedColor,
+  sizes,
   selectedSize,
   quantity,
+  onColorChange,
   onSizeChange,
   onQuantityChange,
-  allowNamePersonalization,
-  allowNumberPersonalization,
 }: ProductInfoProps) {
+  const hasAvailableColors = colors.length > 0;
+  const hasAvailableSizes = sizes.length > 0;
+
+  const canAddToCart =
+    hasAvailableColors &&
+    Boolean(selectedColor) &&
+    hasAvailableSizes &&
+    Boolean(selectedSize);
+
   return (
     <div className={styles.info}>
-      {isRequired && (
-        <div className={styles.requiredBadge}>
-          REQUIRED TEAM ITEM
-        </div>
-      )}
-
       <h1>{name}</h1>
 
-      <div className={styles.teamName}>
-        {teamName}
-      </div>
+      {category && <div className={styles.teamName}>{category}</div>}
 
-      <div className={styles.price}>
-        ${price.toFixed(2)}
-      </div>
+      <div className={styles.price}>{priceLabel}</div>
 
-      {deadline && (
-        <div className={styles.alertCard}>
-          <div className={styles.iconWarning}>
-            <LuTriangleAlert />
-          </div>
-
-          <div>
-            <div className={styles.cardTitle}>
-              REQUIRED FOR ALL PLAYERS
-            </div>
-
-            <div className={styles.cardText}>
-              This item must be purchased
-              before the order deadline.
-            </div>
-
-            <div className={styles.highlight}>
-              Order by{" "}
-              {new Date(
-                deadline
-              ).toLocaleDateString()}
-            </div>
-          </div>
+      <div className={styles.optionSection}>
+        <div className={styles.sectionLabel}>
+          COLOR
+          {selectedColor && (
+            <span className={styles.selectedOption}>{selectedColor}</span>
+          )}
         </div>
-      )}
 
-      {deliveryEstimate && (
-        <div className={styles.deliveryCard}>
-          <div className={styles.iconDelivery}>
-            <LuPackage />
+        {hasAvailableColors ? (
+          <div className={styles.colorGrid}>
+            {colors.map((color) => {
+              const isSelected = selectedColor === color.name;
+
+              return (
+                <button
+                  key={color.name}
+                  type="button"
+                  className={`${styles.colorOption} ${
+                    isSelected ? styles.activeColor : ""
+                  }`}
+                  aria-label={`Select ${color.name}`}
+                  aria-pressed={isSelected}
+                  title={color.name}
+                  onClick={() => onColorChange(color.name)}
+                >
+                  <img
+                    src={color.imageUrl}
+                    alt=""
+                    className={styles.colorThumbnail}
+                    loading="lazy"
+                  />
+
+                  <span className={styles.colorName}>{color.name}</span>
+                </button>
+              );
+            })}
           </div>
-
-          <div>
-            <div className={styles.cardTitle}>
-              EXPECTED DELIVERY
-            </div>
-
-            <div className={styles.deliveryDate}>
-              {deliveryEstimate}
-            </div>
-
-            <div className={styles.cardText}>
-              Orders will be delivered
-              to the team.
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className={styles.sectionLabel}>
-        SELECT SIZE
-      </div>
-
-      {youthSizes.length > 0 && (
-        <>
+        ) : (
           <div className={styles.groupLabel}>
-            Youth Sizes
-          </div>
-
-          <div className={styles.sizeGrid}>
-            {youthSizes.map((size) => (
-              <button
-                key={size}
-                type="button"
-                className={
-                  selectedSize === size
-                    ? styles.activeSize
-                    : ""
-                }
-                onClick={() =>
-                  onSizeChange(size)
-                }
-              >
-                <span>{size}</span>
-
-                <small>In Stock</small>
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-
-      {adultSizes.length > 0 && (
-        <>
-          <div className={styles.groupLabel}>
-            Adult Sizes
-          </div>
-
-          <div className={styles.sizeGrid}>
-            {adultSizes.map((size) => (
-              <button
-                key={size}
-                type="button"
-                className={
-                  selectedSize === size
-                    ? styles.activeSize
-                    : ""
-                }
-                onClick={() =>
-                  onSizeChange(size)
-                }
-              >
-                <span>{size}</span>
-
-                <small>In Stock</small>
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-
-      <button
-        type="button"
-        className={styles.sizeChart}
-      >
-        <LuRuler />
-        Size Chart
-      </button>
-
-      {(allowNamePersonalization ||
-        allowNumberPersonalization) && (
-          <div
-            className={styles.personalization}
-          >
-            <div
-              className={styles.sectionLabel}
-            >
-              PERSONALIZATION
-            </div>
-
-            {allowNamePersonalization && (
-              <div
-                className={
-                  styles.personalizationField
-                }
-              >
-                <label>
-                  Player Name
-                </label>
-
-                <input
-                  type="text"
-                  placeholder="Enter player name"
-                  maxLength={18}
-                />
-              </div>
-            )}
-
-            {allowNumberPersonalization && (
-              <div
-                className={
-                  styles.personalizationField
-                }
-              >
-                <label>
-                  Player Number
-                </label>
-
-              <input
-                type="text"
-                inputMode="numeric"
-                maxLength={2}
-                placeholder="00"
-              />
-              </div>
-            )}
-
-            <div
-              className={
-                styles.personalizationNote
-              }
-            >
-              Personalized items are custom
-              produced and cannot be returned.
-            </div>
+            No colors are currently available.
           </div>
         )}
+      </div>
+
+      <div className={styles.optionSection}>
+        <div className={styles.sectionLabel}>
+          SIZE
+          {selectedSize && (
+            <span className={styles.selectedOption}>{selectedSize}</span>
+          )}
+        </div>
+
+        {hasAvailableSizes ? (
+          <div className={styles.sizeGrid}>
+            {sizes.map((size) => {
+              const isSelected = selectedSize === size;
+
+              return (
+                <button
+                  key={size}
+                  type="button"
+                  className={isSelected ? styles.activeSize : ""}
+                  aria-label={`Select size ${size}`}
+                  aria-pressed={isSelected}
+                  onClick={() => onSizeChange(size)}
+                >
+                  <span>{size}</span>
+                  <small>In Stock</small>
+                </button>
+              );
+            })}
+          </div>
+        ) : (
+          <div className={styles.groupLabel}>
+            No sizes are currently available for this color.
+          </div>
+        )}
+      </div>
 
       <div className={styles.quantitySection}>
         <label>Quantity</label>
 
-        <div
-          className={styles.quantityControls}
-        >
+        <div className={styles.quantityControls}>
           <button
             type="button"
-            onClick={() =>
-              onQuantityChange(
-                Math.max(
-                  1,
-                  quantity - 1
-                )
-              )
-            }
+            aria-label="Decrease quantity"
+            disabled={quantity <= 1}
+            onClick={() => onQuantityChange(Math.max(1, quantity - 1))}
           >
             <LuMinus />
           </button>
@@ -262,11 +147,8 @@ export default function ProductInfo({
 
           <button
             type="button"
-            onClick={() =>
-              onQuantityChange(
-                quantity + 1
-              )
-            }
+            aria-label="Increase quantity"
+            onClick={() => onQuantityChange(quantity + 1)}
           >
             <LuPlus />
           </button>
@@ -274,22 +156,20 @@ export default function ProductInfo({
       </div>
 
       <button
+        type="button"
         className={styles.addToCart}
-        disabled={!selectedSize}
+        disabled={!canAddToCart}
       >
-        {selectedSize
-          ? "ADD TO CART"
-          : "SELECT SIZE"}
+        {!hasAvailableColors
+          ? "UNAVAILABLE"
+          : !selectedColor
+            ? "SELECT COLOR"
+            : !hasAvailableSizes
+              ? "UNAVAILABLE"
+              : !selectedSize
+                ? "SELECT SIZE"
+                : "ADD TO CART"}
       </button>
-
-      <div className={styles.cartNote}>
-        <LuCalendar />
-
-        <span>
-          Added items remain in your
-          cart for up to 30 days.
-        </span>
-      </div>
     </div>
   );
 }

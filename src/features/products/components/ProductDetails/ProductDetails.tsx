@@ -3,34 +3,44 @@ import { LuChevronDown } from "react-icons/lu";
 
 import styles from "./ProductDetails.module.scss";
 
+type ProductDetailSection = "details" | "sizing" | "care" | "returns";
+
 interface ProductDetailsProps {
   description?: string;
-  deadline?: string;
 }
 
-export default function ProductDetails({
-  description,
-}: ProductDetailsProps) {
-  const [openSections, setOpenSections] =
-    useState<string[]>([
-      "details",
-    ]);
+const FALLBACK_DESCRIPTION =
+  "A quality product selected for everyday wear and performance.";
 
-  const toggleSection = (
-    section: string
-  ) => {
-    setOpenSections((prev) =>
-      prev.includes(section)
-        ? prev.filter(
-          (item) => item !== section
-        )
-        : [...prev, section]
+function getDescriptionFeatures(description?: string) {
+  if (!description?.includes("*")) {
+    return [];
+  }
+
+  return description
+    .split("*")
+    .map((feature) => feature.trim())
+    .filter(Boolean);
+}
+
+export default function ProductDetails({ description }: ProductDetailsProps) {
+  const [openSections, setOpenSections] = useState<ProductDetailSection[]>([
+    "details",
+  ]);
+
+  const descriptionText = description?.trim() || FALLBACK_DESCRIPTION;
+  const descriptionFeatures = getDescriptionFeatures(descriptionText);
+
+  const toggleSection = (section: ProductDetailSection) => {
+    setOpenSections((currentSections) =>
+      currentSections.includes(section)
+        ? currentSections.filter((item) => item !== section)
+        : [...currentSections, section],
     );
   };
 
-  const isOpen = (
-    section: string
-  ) => openSections.includes(section);
+  const isOpen = (section: ProductDetailSection) =>
+    openSections.includes(section);
 
   return (
     <section className={styles.details}>
@@ -39,54 +49,32 @@ export default function ProductDetails({
           <button
             type="button"
             className={styles.accordionHeader}
-            onClick={() =>
-              toggleSection("details")
-            }
+            aria-expanded={isOpen("details")}
+            aria-controls="product-details-content"
+            onClick={() => toggleSection("details")}
           >
-            <span>
-              Product Details
-            </span>
+            <span>Product Details</span>
 
             <LuChevronDown
-              className={
-                isOpen("details")
-                  ? styles.rotate
-                  : ""
-              }
+              aria-hidden="true"
+              className={isOpen("details") ? styles.rotate : ""}
             />
           </button>
 
           {isOpen("details") && (
             <div
-              className={
-                styles.accordionContent
-              }
+              id="product-details-content"
+              className={styles.accordionContent}
             >
-              <p>
-                {description ||
-                  "Official team apparel produced for your organization."}
-              </p>
-
-              <ul>
-                <li>
-                  Official team-approved
-                  apparel
-                </li>
-
-                <li>
-                  Premium quality garment
-                </li>
-
-                <li>
-                  Decorated with approved
-                  team artwork
-                </li>
-
-                <li>
-                  Available in youth and
-                  adult sizes
-                </li>
-              </ul>
+              {descriptionFeatures.length > 1 ? (
+                <ul>
+                  {descriptionFeatures.map((feature, index) => (
+                    <li key={`${feature}-${index}`}>{feature}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p>{descriptionText}</p>
+              )}
             </div>
           )}
         </div>
@@ -95,54 +83,32 @@ export default function ProductDetails({
           <button
             type="button"
             className={styles.accordionHeader}
-            onClick={() =>
-              toggleSection("sizing")
-            }
+            aria-expanded={isOpen("sizing")}
+            aria-controls="product-sizing-content"
+            onClick={() => toggleSection("sizing")}
           >
-            <span>
-              Sizing Information
-            </span>
+            <span>Sizing Information</span>
 
             <LuChevronDown
-              className={
-                isOpen("sizing")
-                  ? styles.rotate
-                  : ""
-              }
+              aria-hidden="true"
+              className={isOpen("sizing") ? styles.rotate : ""}
             />
           </button>
 
           {isOpen("sizing") && (
             <div
-              className={
-                styles.accordionContent
-              }
+              id="product-sizing-content"
+              className={styles.accordionContent}
             >
               <p>
-                Please review the size
-                chart before placing your
-                order. Team store items
-                are produced specifically
-                for your order and cannot
-                be exchanged due to
-                incorrect sizing
-                selections.
+                Review the available sizes before placing your order. Sizing may
+                vary by product and manufacturer.
               </p>
 
               <ul>
-                <li>
-                  Youth and Adult sizing
-                  available
-                </li>
-
-                <li>
-                  Refer to garment-specific
-                  measurements
-                </li>
-
-                <li>
-                  When in doubt, size up
-                </li>
+                <li>Select from the currently available sizes</li>
+                <li>Review product-specific measurements when available</li>
+                <li>Consider sizing up when between sizes</li>
               </ul>
             </div>
           )}
@@ -152,58 +118,30 @@ export default function ProductDetails({
           <button
             type="button"
             className={styles.accordionHeader}
-            onClick={() =>
-              toggleSection(
-                "decoration"
-              )
-            }
+            aria-expanded={isOpen("care")}
+            aria-controls="product-care-content"
+            onClick={() => toggleSection("care")}
           >
-            <span>
-              Decoration
-            </span>
+            <span>Care Instructions</span>
 
             <LuChevronDown
-              className={
-                isOpen(
-                  "decoration"
-                )
-                  ? styles.rotate
-                  : ""
-              }
+              aria-hidden="true"
+              className={isOpen("care") ? styles.rotate : ""}
             />
           </button>
 
-          {isOpen("decoration") && (
-            <div
-              className={
-                styles.accordionContent
-              }
-            >
+          {isOpen("care") && (
+            <div id="product-care-content" className={styles.accordionContent}>
               <p>
-                All artwork, colors, and
-                placement have been
-                approved by your
-                organization.
+                Follow the garment care label to protect the product, material,
+                and printed details.
               </p>
 
               <ul>
-                <li>
-                  Official team branding
-                </li>
-
-                <li>
-                  Professional decoration
-                </li>
-
-                <li>
-                  Colors matched to team
-                  standards
-                </li>
-
-                <li>
-                  Decoration methods may
-                  vary by garment
-                </li>
+                <li>Wash with similar colors</li>
+                <li>Use mild detergent</li>
+                <li>Avoid bleach unless the care label permits it</li>
+                <li>Follow the recommended drying instructions</li>
               </ul>
             </div>
           )}
@@ -213,56 +151,32 @@ export default function ProductDetails({
           <button
             type="button"
             className={styles.accordionHeader}
-            onClick={() =>
-              toggleSection("returns")
-            }
+            aria-expanded={isOpen("returns")}
+            aria-controls="product-returns-content"
+            onClick={() => toggleSection("returns")}
           >
-            <span>
-              Returns & Exchanges
-            </span>
+            <span>Returns &amp; Exchanges</span>
 
             <LuChevronDown
-              className={
-                isOpen("returns")
-                  ? styles.rotate
-                  : ""
-              }
+              aria-hidden="true"
+              className={isOpen("returns") ? styles.rotate : ""}
             />
           </button>
 
           {isOpen("returns") && (
             <div
-              className={
-                styles.accordionContent
-              }
+              id="product-returns-content"
+              className={styles.accordionContent}
             >
               <p>
-                Team store products are
-                custom produced and
-                decorated specifically for
-                your organization.
+                Return eligibility depends on the product condition and the
+                applicable store policy.
               </p>
 
               <ul>
-                <li>
-                  All sales are final
-                </li>
-
-                <li>
-                  No returns on decorated
-                  garments
-                </li>
-
-                <li>
-                  No exchanges for
-                  incorrect size
-                  selections
-                </li>
-
-                <li>
-                  Contact support for
-                  damaged products
-                </li>
+                <li>Items must be unused and in their original condition</li>
+                <li>Personalized items may not be eligible for return</li>
+                <li>Contact support for damaged or incorrect products</li>
               </ul>
             </div>
           )}
