@@ -7,6 +7,7 @@ export type ProductCategory =
 export interface IProduct {
   id: number;
   sku: string;
+  slug: string;
 
   storeId?: number;
   storeName?: string;

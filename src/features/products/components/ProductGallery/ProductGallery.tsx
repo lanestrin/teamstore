@@ -1,54 +1,106 @@
 import { useState } from "react";
 
 import styles from "./ProductGallery.module.scss";
-import { LuSearch } from "react-icons/lu";
+
+type ProductImageView =
+  | "leftQuarter"
+  | "front"
+  | "back"
+  | "left"
+  | "right"
+  | "detail"
+  | "other";
+
+export interface ProductGalleryImage {
+  id: string;
+  url: string;
+  view: ProductImageView;
+  altText?: string;
+}
 
 interface ProductGalleryProps {
   name: string;
-  images: string[];
+  color: string;
+  images: ProductGalleryImage[];
+}
+
+const VIEW_LABELS: Record<ProductImageView, string> = {
+  leftQuarter: "Quarter",
+  front: "Front",
+  back: "Back",
+  left: "Left",
+  right: "Right",
+  detail: "Detail",
+  other: "Alternate",
+};
+
+function formatViewLabel(view: ProductImageView) {
+  return VIEW_LABELS[view];
 }
 
 export default function ProductGallery({
   name,
+  color,
   images,
 }: ProductGalleryProps) {
-  const [selectedImage, setSelectedImage] =
-    useState(0);
+  const [selectedImageId, setSelectedImageId] = useState<string>();
+
+  const selectedImage =
+    images.find((image) => image.id === selectedImageId) ?? images[0];
+
+  if (!selectedImage) {
+    return (
+      <div className={styles.gallery}>
+        <div className={styles.mainImage}>
+          <div className={styles.emptyState}>Image unavailable</div>
+        </div>
+      </div>
+    );
+  }
+
+  const selectedImageAlt =
+    selectedImage.altText?.trim() ||
+    `${name} in ${color} — ${formatViewLabel(selectedImage.view)} view`;
 
   return (
     <div className={styles.gallery}>
-      <div className={styles.thumbnails}>
-        {images.map((image, index) => (
-          <button
-            key={index}
-            type="button"
-            className={
-              selectedImage === index
-                ? styles.activeThumb
-                : ""
-            }
-            onClick={() =>
-              setSelectedImage(index)
-            }
-          >
-            <img
-              src={image}
-              alt={`${name} ${index + 1}`}
-            />
-          </button>
-        ))}
-      </div>
+      {images.length > 1 && (
+        <div
+          className={styles.thumbnails}
+          aria-label={`${name} in ${color} product views`}
+        >
+          {images.map((image) => {
+            const isSelected = image.id === selectedImage.id;
+            const viewLabel = formatViewLabel(image.view);
+
+            return (
+              <button
+                key={image.id}
+                type="button"
+                className={`${styles.thumbnail} ${
+                  isSelected ? styles.activeThumb : ""
+                }`}
+                aria-label={`View ${viewLabel.toLowerCase()} image`}
+                aria-pressed={isSelected}
+                onClick={() => setSelectedImageId(image.id)}
+              >
+                <span className={styles.thumbnailMedia}>
+                  <img src={image.url} alt="" loading="lazy" />
+                </span>
+
+                <span className={styles.thumbnailLabel}>{viewLabel}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       <div className={styles.mainImage}>
         <img
-          src={images[selectedImage]}
-          alt={name}
+          key={selectedImage.id}
+          src={selectedImage.url}
+          alt={selectedImageAlt}
         />
-
-        <div className={styles.zoomHint}>
-          <LuSearch />
-          <span>Roll over image to zoom</span>
-        </div>
       </div>
     </div>
   );

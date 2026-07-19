@@ -1,114 +1,142 @@
 .gallery {
-    display: grid;
-    grid-template-columns: 76px 1fr;
-    align-items: start;
-    gap: $space-4;
+	display: grid;
+	grid-template-columns: 88px minmax(0, 1fr);
+	align-items: start;
+	gap: $space-4;
 }
 
 .thumbnails {
-    display: flex;
-    flex-direction: column;
-    gap: $space-3;
+	display: flex;
+	flex-direction: column;
+	gap: $space-3;
 }
 
-.thumbnails button {
-    width: 76px;
-    height: 76px;
-    padding: 0;
-    overflow: hidden;
-    background: $white;
-    border: 1px solid $border-light;
-    border-radius: $radius-md;
-    cursor: pointer;
-    transition: border-color $transition-base, box-shadow $transition-base;
-}
+.thumbnail {
+	display: flex;
+	flex-direction: column;
+	gap: $space-1;
+	width: 88px;
+	padding: $space-1;
+	overflow: hidden;
+	background: $white;
+	border: 1px solid $border-light;
+	border-radius: $radius-md;
+	cursor: pointer;
+	transition:
+		border-color $transition-base,
+		box-shadow $transition-base,
+		transform $transition-base;
 
-.thumbnails button:hover {
-    border-color: $brand-red;
+	&:hover {
+		border-color: $brand-red;
+		transform: translateY(-1px);
+	}
+
+	&:focus-visible {
+		outline: none;
+		border-color: $brand-red;
+		box-shadow: 0 0 0 3px rgba($brand-red, 0.12);
+	}
 }
 
 .activeThumb {
-    border: 2px solid $brand-red !important;
+	border-color: $brand-red;
+	box-shadow: 0 0 0 2px $brand-red;
 }
 
-.thumbnails img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+.thumbnailMedia {
+	display: block;
+	width: 100%;
+	aspect-ratio: 1;
+	overflow: hidden;
+	background: $page-background-alt;
+	border-radius: calc($radius-md - 2px);
+}
+
+.thumbnailMedia img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+}
+
+.thumbnailLabel {
+	overflow: hidden;
+	padding-inline: $space-1;
+	color: $text-secondary;
+	font-size: 0.72rem;
+	font-weight: $font-semibold;
+	line-height: 1.25;
+	text-align: center;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.activeThumb .thumbnailLabel {
+	color: $brand-red;
 }
 
 .mainImage {
-    @include flex-center;
-    position: relative;
-    min-height: 500px;
-    padding: $space-4;
-    background: $page-background-alt;
-    border: 1px solid $border-light;
-    border-radius: $radius-xl;
+	@include flex-center;
+	position: relative;
+	min-width: 0;
+	min-height: 500px;
+	padding: $space-4;
+	overflow: hidden;
+	background: $page-background-alt;
+	border: 1px solid $border-light;
+	border-radius: $radius-xl;
 }
 
 .mainImage img {
-    max-width: 98%;
-    max-height: 560px;
-    object-fit: contain;
-    user-select: none;
+	display: block;
+	max-width: 98%;
+	max-height: 560px;
+	object-fit: contain;
+	user-select: none;
 }
 
-.zoomHint {
-    position: absolute;
-    left: $space-6;
-    bottom: $space-5;
-    display: flex;
-    align-items: center;
-    gap: $space-2;
-    color: $text-muted;
-    font-size: 0.875rem;
-}
-
-.zoomHint svg {
-    flex-shrink: 0;
-    font-size: 0.9rem;
+.emptyState {
+	color: $text-muted;
+	font-size: 0.95rem;
+	text-align: center;
 }
 
 @media (max-width: 992px) {
-    .mainImage {
-        min-height: 550px;
-    }
+	.mainImage {
+		min-height: 500px;
+	}
 }
 
 @media (max-width: 768px) {
-    .gallery {
-        grid-template-columns: 1fr;
-    }
+	.gallery {
+		grid-template-columns: minmax(0, 1fr);
+	}
 
-    .thumbnails {
-        order: 2;
-        flex-direction: row;
-        overflow-x: auto;
-        padding-bottom: $space-1;
-    }
+	.thumbnails {
+		order: 2;
+		flex-direction: row;
+		overflow-x: auto;
+		padding: $space-1;
+		scrollbar-width: thin;
+	}
 
-    .thumbnails button {
-        flex-shrink: 0;
-    }
+	.thumbnail {
+		flex: 0 0 88px;
+	}
 
-    .mainImage {
-        min-height: 450px;
-    }
+	.mainImage {
+		min-height: 440px;
+	}
 }
 
 @media (max-width: 480px) {
-    .mainImage {
-        min-height: 350px;
-        padding: $space-5;
-    }
+	.mainImage {
+		min-height: 340px;
+		padding: $space-3;
+	}
 
-    .mainImage img {
-        max-height: 300px;
-    }
-
-    .zoomHint {
-        display: none;
-    }
+	.mainImage img {
+		max-height: 310px;
+	}
 }

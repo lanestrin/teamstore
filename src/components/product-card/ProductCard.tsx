@@ -1,10 +1,20 @@
 import { LuCheck } from "react-icons/lu";
-import styles from "./ProductCard.module.scss";
-import type { IProduct } from "../../types/product";
 import { Link } from "react-router-dom";
 
+import styles from "./ProductCard.module.scss";
+
+export interface ProductCardData {
+  id: string;
+  name: string;
+  imageUrl: string;
+  priceLabel: string;
+  productUrl: string;
+  deadline?: string;
+  inCart?: boolean;
+}
+
 interface ProductCardProps {
-  product: IProduct;
+  product: ProductCardData;
   showDeadline?: boolean;
   showRequiredStatus?: boolean;
 }
@@ -14,36 +24,22 @@ export default function ProductCard({
   showDeadline = false,
   showRequiredStatus = false,
 }: ProductCardProps) {
-
-  if (!product) {
-    console.error("Product is undefined");
-    return null;
-  }
-
   return (
     <article className={styles.card}>
       {showRequiredStatus && (
         <div
-          className={`${styles.statusBadge} ${product.inCart
-              ? styles.statusComplete
-              : styles.statusIncomplete
-            }`}
+          className={`${styles.statusBadge} ${
+            product.inCart ? styles.statusComplete : styles.statusIncomplete
+          }`}
         >
           <LuCheck />
 
-          <span>
-            {product.inCart
-              ? "Added to Cart"
-              : "Required"}
-          </span>
+          <span>{product.inCart ? "Added to Cart" : "Required"}</span>
         </div>
       )}
 
       <div className={styles.imageWrapper}>
-        <img
-          src={product.image}
-          alt={product.name}
-        />
+        <img src={product.imageUrl} alt={product.name} loading="lazy" />
       </div>
 
       <div className={styles.content}>
@@ -52,26 +48,18 @@ export default function ProductCard({
         {showDeadline && product.deadline && (
           <div className={styles.deadline}>
             Order By:{" "}
-            {new Date(product.deadline).toLocaleDateString(
-              "en-US",
-              {
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-              }
-            )}
+            {new Date(product.deadline).toLocaleDateString("en-US", {
+              month: "long",
+              day: "numeric",
+              year: "numeric",
+            })}
           </div>
         )}
 
         <div className={styles.footer}>
-          <span className={styles.price}>
-            ${product.price.toFixed(2)}
-          </span>
+          <span className={styles.price}>{product.priceLabel}</span>
 
-          <Link
-            to={`/product/${product.sku}`}
-            className={styles.button}
-          >
+          <Link to={product.productUrl} className={styles.button}>
             View Product
           </Link>
         </div>

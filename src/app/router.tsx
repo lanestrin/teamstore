@@ -8,9 +8,9 @@ import ProtectedRoute from "../features/auth/ProtectedRoute";
 import CreateStorePage from "../features/create-store/CreateStorePage";
 import CreateStoreLayout from "../features/create-store/layouts/CreateStoreLayout";
 import HomePage from "../features/home/HomePage";
-import ProductPage from "../features/products/ProductPage";
 import StorePage from "../features/stores/StorePage";
 import StoresPage from "../features/stores/StoresPage";
+import ProductDetailsPage from "../features/products/ProductDetailsPage";
 
 export const router = createBrowserRouter([
   {
@@ -30,8 +30,8 @@ export const router = createBrowserRouter([
         element: <StorePage />,
       },
       {
-        path: "product/:sku",
-        element: <ProductPage />,
+        path: "product/:slug",
+        element: <ProductDetailsPage />,
       },
       {
         path: "account",

@@ -10,6 +10,7 @@ import ActionCard from "./components/ActionCard/ActionCard";
 import FavoriteStores from "./components/FavoriteStores/FavoriteStores";
 import HelpCard from "./components/HelpCard/HelpCard";
 import RecentOrders from "./components/RecentOrders/RecentOrders";
+import ReplaceCatalogButton from "./components/ReplaceCatalogButton/ReplaceCatalogButton";
 
 import { favoriteStores, recentOrders } from "../../mocks/account";
 
@@ -161,6 +162,28 @@ export default function AccountPage() {
             onClick={() => navigate("/create-store")}
           />
         </section>
+
+        {currentUser?.isPlatformAdmin === true && (
+          <section
+            className={styles.storeSection}
+            aria-labelledby="catalog-tools-heading"
+          >
+            <div className={styles.sectionHeader}>
+              <div>
+                <h2 id="catalog-tools-heading">Platform Catalog Tools</h2>
+
+                <p>
+                  Replace the existing catalog with the curated CSV-only demo
+                  catalog.
+                </p>
+              </div>
+
+              <span className={styles.activeStatus}>Admin</span>
+            </div>
+
+            <ReplaceCatalogButton />
+          </section>
+        )}
 
         <section
           className={styles.storeSection}
