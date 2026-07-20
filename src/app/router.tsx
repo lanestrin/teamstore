@@ -13,6 +13,7 @@ import HomePage from "../features/home/HomePage";
 import ProductDetailsPage from "../features/products/ProductDetailsPage";
 import StorePage from "../features/stores/StorePage";
 import StoresPage from "../features/stores/StoresPage";
+import { HowItWorksPage } from "../features/how-it-works/HowItWorksPage";
 
 export const router = createBrowserRouter([
   {
@@ -38,6 +39,10 @@ export const router = createBrowserRouter([
       {
         path: "product/:slug",
         element: <ProductDetailsPage />,
+      },
+      {
+        path: "/how-it-works",
+        element: <HowItWorksPage />,
       },
       {
         path: "cart",

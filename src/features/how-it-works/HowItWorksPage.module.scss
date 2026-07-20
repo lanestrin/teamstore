@@ -1,0 +1,255 @@
+@use "../../styles/variables" as *;
+@use "../../styles/mixins" as *;
+
+.page {
+  @include page-container;
+
+  display: flex;
+  flex-direction: column;
+  gap: $section-gap;
+  padding-block: $space-8;
+}
+
+.hero {
+  max-width: 760px;
+  margin: 0 auto;
+  text-align: center;
+
+  h1 {
+    margin: $space-3 0;
+    font-size: clamp(2.25rem, 6vw, 4.5rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+
+  p {
+    max-width: 640px;
+    margin: 0 auto;
+    color: $text-secondary;
+    font-size: 1.125rem;
+    line-height: $line-height-body;
+  }
+}
+
+.eyebrow {
+  display: inline-block;
+  color: $brand-red;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.heroActions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: $space-3;
+  margin-top: $space-6;
+}
+
+.primaryButton,
+.secondaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.5rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    transform 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+
+  &:focus-visible {
+    outline: 3px solid currentColor;
+    outline-offset: 3px;
+  }
+}
+
+.primaryButton {
+  border: 1px solid $brand-red;
+  background: $brand-red;
+  color: #fff;
+}
+
+.secondaryButton {
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  background: transparent;
+  color: inherit;
+
+  &:hover {
+    border-color: rgba(0, 0, 0, 0.4);
+  }
+}
+
+.process {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+}
+
+.sectionHeading {
+  max-width: 680px;
+
+  h2 {
+    margin: $space-3 0;
+    font-size: clamp(1.75rem, 4vw, 2.75rem);
+    line-height: 1.1;
+  }
+
+  p {
+    margin: 0;
+    color: $text-secondary;
+    line-height: $line-height-body;
+  }
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: $space-5;
+}
+
+.stepCard {
+  @include card;
+
+  position: relative;
+  min-height: 260px;
+  padding: $space-6;
+  overflow: hidden;
+
+  h3 {
+    margin: $space-5 0 $space-3;
+    font-size: 1.25rem;
+  }
+
+  p {
+    margin: 0;
+    color: $text-secondary;
+    line-height: $line-height-body;
+  }
+}
+
+.stepNumber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(204, 0, 0, 0.08);
+  color: $brand-red;
+  font-weight: 800;
+}
+
+.benefits {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+  gap: $space-8;
+  align-items: center;
+  padding: clamp(1.5rem, 5vw, 4rem);
+  border-radius: 1rem;
+  background: rgba(0, 0, 0, 0.035);
+}
+
+.benefitsContent {
+  h2 {
+    margin: $space-3 0;
+    font-size: clamp(1.75rem, 4vw, 2.75rem);
+    line-height: 1.1;
+  }
+
+  p {
+    max-width: 620px;
+    margin: 0;
+    color: $text-secondary;
+    line-height: $line-height-body;
+  }
+}
+
+.benefitsList {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: $space-3;
+    font-weight: 600;
+  }
+
+  span {
+    flex: 0 0 auto;
+    color: $brand-red;
+    font-weight: 800;
+  }
+}
+
+.cta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $space-6;
+  padding: clamp(1.5rem, 5vw, 3rem);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 1rem;
+
+  h2 {
+    margin: $space-3 0;
+  }
+
+  p {
+    margin: 0;
+    color: $text-secondary;
+    line-height: $line-height-body;
+  }
+
+  .primaryButton {
+    flex: 0 0 auto;
+  }
+}
+
+@media (max-width: 850px) {
+  .steps {
+    grid-template-columns: 1fr;
+  }
+
+  .stepCard {
+    min-height: auto;
+  }
+
+  .benefits {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding-block: $space-6;
+  }
+
+  .heroActions {
+    flex-direction: column;
+  }
+
+  .primaryButton,
+  .secondaryButton {
+    width: 100%;
+  }
+
+  .cta {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
