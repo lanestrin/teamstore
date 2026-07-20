@@ -5,6 +5,7 @@ import { LuSearch } from "react-icons/lu";
 import { api } from "../../../convex/_generated/api";
 import ProductCard from "../../components/product-card/ProductCard";
 import styles from "./CatalogPage.module.scss";
+import CatalogSkeleton from "./CatalogSkeleton";
 
 type SortOption =
   | "featured"
@@ -37,12 +38,72 @@ function toggleFilterValue(currentValues: string[], value: string): string[] {
   return [...currentValues, value];
 }
 
+const SIZE_ORDER = [
+  "XXS",
+  "XS",
+  "S",
+  "M",
+  "L",
+  "XL",
+  "2XL",
+  "3XL",
+  "4XL",
+  "5XL",
+  "6XL",
+  "OS",
+];
+
+const SIZE_ALIASES: Record<string, string> = {
+  XXL: "2XL",
+  XXXL: "3XL",
+  XXXXL: "4XL",
+  XXXXXL: "5XL",
+  OSFA: "OS",
+  "ONE SIZE": "OS",
+  "ONE SIZE FITS ALL": "OS",
+};
+
+function normalizeSize(size: string) {
+  const normalizedSize = size.trim().toUpperCase();
+
+  return SIZE_ALIASES[normalizedSize] ?? normalizedSize;
+}
+
+function expandSize(size: string) {
+  return size.split("/").map(normalizeSize).filter(Boolean);
+}
+
+function getFilterSizes(sizes: string[]) {
+  return [...new Set(sizes.flatMap(expandSize))];
+}
+
+function compareSizes(firstSize: string, secondSize: string) {
+  const firstIndex = SIZE_ORDER.indexOf(firstSize);
+  const secondIndex = SIZE_ORDER.indexOf(secondSize);
+
+  if (firstIndex !== -1 && secondIndex !== -1) {
+    return firstIndex - secondIndex;
+  }
+
+  if (firstIndex !== -1) {
+    return -1;
+  }
+
+  if (secondIndex !== -1) {
+    return 1;
+  }
+
+  return firstSize.localeCompare(secondSize, undefined, {
+    numeric: true,
+  });
+}
+
 export default function CatalogPage() {
   const products = useQuery(api.products.listActive, {});
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [sortOption, setSortOption] = useState<SortOption>("featured");
 
   const categories = useMemo(() => {
@@ -56,20 +117,14 @@ export default function CatalogPage() {
     );
   }, [products]);
 
-  const brands = useMemo(() => {
+  const sizes = useMemo(() => {
     if (!products) {
       return [];
     }
 
-    return [
-      ...new Set(
-        products.flatMap((product) => {
-          const brand = product.brand?.trim();
-
-          return brand ? [brand] : [];
-        }),
-      ),
-    ].sort((firstBrand, secondBrand) => firstBrand.localeCompare(secondBrand));
+    return getFilterSizes(
+      products.flatMap((product) => product.availableSizes),
+    ).sort(compareSizes);
   }, [products]);
 
   const filteredProducts = useMemo(() => {
@@ -83,19 +138,19 @@ export default function CatalogPage() {
       const matchesSearch =
         !normalizedSearchTerm ||
         product.name.toLowerCase().includes(normalizedSearchTerm) ||
-        product.category.toLowerCase().includes(normalizedSearchTerm) ||
-        product.brand?.toLowerCase().includes(normalizedSearchTerm) ||
-        product.division?.toLowerCase().includes(normalizedSearchTerm);
+        product.category.toLowerCase().includes(normalizedSearchTerm);
 
       const matchesCategory =
         selectedCategories.length === 0 ||
         selectedCategories.includes(product.category);
 
-      const matchesBrand =
-        selectedBrands.length === 0 ||
-        (product.brand !== undefined && selectedBrands.includes(product.brand));
+      const productFilterSizes = getFilterSizes(product.availableSizes);
 
-      return matchesSearch && matchesCategory && matchesBrand;
+      const matchesSize =
+        selectedSizes.length === 0 ||
+        selectedSizes.some((size) => productFilterSizes.includes(size));
+
+      return matchesSearch && matchesCategory && matchesSize;
     });
 
     if (sortOption === "featured") {
@@ -119,17 +174,21 @@ export default function CatalogPage() {
 
       return secondPrice - firstPrice;
     });
-  }, [products, searchTerm, selectedCategories, selectedBrands, sortOption]);
+  }, [products, searchTerm, selectedCategories, selectedSizes, sortOption]);
+
+  if (products === undefined) {
+    return <CatalogSkeleton />;
+  }
 
   const hasActiveFilters =
     searchTerm.trim().length > 0 ||
     selectedCategories.length > 0 ||
-    selectedBrands.length > 0;
+    selectedSizes.length > 0;
 
   const clearFilters = () => {
     setSearchTerm("");
     setSelectedCategories([]);
-    setSelectedBrands([]);
+    setSelectedSizes([]);
   };
 
   return (
@@ -138,18 +197,6 @@ export default function CatalogPage() {
         <header className={styles.pageHeader}>
           <div>
             <span className={styles.eyebrow}>Blank apparel</span>
-
-            <h1>Catalog</h1>
-
-            <p>
-              Shop individual blank apparel, headwear, bags, and accessories.
-              Select a product to choose its color, size, and quantity.
-            </p>
-          </div>
-
-          <div className={styles.productTotal}>
-            <strong>{products?.length ?? 0}</strong>
-            <span>Products</span>
           </div>
         </header>
 
@@ -221,24 +268,24 @@ export default function CatalogPage() {
               </div>
             </fieldset>
 
-            {brands.length > 0 && (
+            {sizes.length > 0 && (
               <fieldset className={styles.filterGroup}>
-                <legend>Brand</legend>
+                <legend>Size</legend>
 
                 <div className={styles.filterOptions}>
-                  {brands.map((brand) => (
-                    <label key={brand} className={styles.filterOption}>
+                  {sizes.map((size) => (
+                    <label key={size} className={styles.filterOption}>
                       <input
                         type="checkbox"
-                        checked={selectedBrands.includes(brand)}
+                        checked={selectedSizes.includes(size)}
                         onChange={() =>
-                          setSelectedBrands((currentBrands) =>
-                            toggleFilterValue(currentBrands, brand),
+                          setSelectedSizes((currentSizes) =>
+                            toggleFilterValue(currentSizes, size),
                           )
                         }
                       />
 
-                      <span>{brand}</span>
+                      <span>{size}</span>
                     </label>
                   ))}
                 </div>
@@ -287,12 +334,16 @@ export default function CatalogPage() {
                     product={{
                       id: product._id,
                       name: product.name,
-                      imageUrl: product.imageUrls[0],
+                      imageUrl:
+                        product.colorOptions[0]?.imageUrl ??
+                        product.imageUrls[0],
                       priceLabel: formatPrice(
                         product.minPriceInCents,
                         product.maxPriceInCents,
                       ),
                       productUrl: `/product/${product.slug}`,
+                      colorOptions: product.colorOptions,
+                      availableSizeCount: product.availableSizes.length,
                     }}
                   />
                 ))}

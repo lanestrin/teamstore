@@ -87,8 +87,6 @@ export default function ProductInfo({
                     className={styles.colorThumbnail}
                     loading="lazy"
                   />
-
-                  <span className={styles.colorName}>{color.name}</span>
                 </button>
               );
             })}

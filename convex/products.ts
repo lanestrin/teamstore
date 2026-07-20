@@ -229,6 +229,52 @@ function buildProductColorOptions(
   });
 }
 
+function buildProductCardColorOptions(
+  variants: Doc<"productVariants">[],
+  productImages: ResolvedProductImage[],
+) {
+  const purchasableVariants = variants.filter(
+    (variant) =>
+      variant.status === "active" &&
+      variant.availability === "available",
+  );
+
+  const colorNames = new Map<string, string>();
+
+  for (const variant of purchasableVariants) {
+    const color = variant.color.trim();
+
+    if (!color || colorNames.has(variant.colorKey)) {
+      continue;
+    }
+
+    colorNames.set(variant.colorKey, color);
+  }
+
+  return [...colorNames.entries()].flatMap(([colorKey, color]) => {
+    const colorImages = productImages.filter(
+      (image) => image.colorKey === colorKey,
+    );
+
+    const previewImage =
+      colorImages.find((image) => image.view === "leftQuarter") ??
+      colorImages.find((image) => image.view === "front") ??
+      colorImages[0];
+
+    if (!previewImage) {
+      return [];
+    }
+
+    return [
+      {
+        color,
+        colorKey,
+        imageUrl: previewImage.imageUrl,
+      },
+    ];
+  });
+}
+
 async function decorateProductCard(
   ctx: CatalogReadCtx,
   product: Doc<"products">,
@@ -242,6 +288,8 @@ async function decorateProductCard(
     ...product,
 
     imageUrls: [...new Set(images.map((image) => image.imageUrl))],
+
+    colorOptions: buildProductCardColorOptions(variants, images),
 
     ...summarizeVariants(variants),
   };
