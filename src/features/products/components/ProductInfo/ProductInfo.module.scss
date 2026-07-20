@@ -62,23 +62,22 @@
 /* Color variants */
 
 .colorGrid {
-	display: grid;
-	grid-template-columns: repeat(
-		auto-fill,
-		minmax(96px, 1fr)
-	);
-	gap: $space-3;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: $space-2;
 }
 
 .colorOption {
-	display: flex;
-	flex-direction: column;
-	gap: $space-2;
-	min-width: 0;
-	padding: $space-2;
-	background: $white;
+	@include flex-center;
+	flex: 0 0 38px;
+	width: 38px;
+	height: 38px;
+	padding: 2px;
+	overflow: hidden;
+	background: $gray-100;
 	border: 1px solid $border-medium;
-	border-radius: $radius-md;
+	border-radius: 50%;
 	cursor: pointer;
 	transition:
 		border-color $transition-base,
@@ -91,38 +90,24 @@
 	}
 
 	&:focus-visible {
-		outline: none;
-		border-color: $brand-red;
-		box-shadow: 0 0 0 3px rgba($brand-red, 0.12);
+		outline: 2px solid $brand-red;
+		outline-offset: 2px;
 	}
 }
 
 .activeColor {
 	border-color: $brand-red;
-	box-shadow: 0 0 0 2px $brand-red;
+	box-shadow: 0 0 0 1px $brand-red;
 }
 
 .colorThumbnail {
 	display: block;
 	width: 100%;
-	aspect-ratio: 1;
-	object-fit: contain;
+	height: 100%;
 	background: $gray-100;
-	border-radius: calc($radius-md - 2px);
-}
-
-.colorName {
-	display: -webkit-box;
-	min-height: calc(1.25em * 2);
-	overflow: hidden;
-	color: $text-primary;
-	font-size: 0.78rem;
-	font-weight: $font-semibold;
-	line-height: 1.25;
-	text-align: center;
-	overflow-wrap: anywhere;
-	-webkit-box-orient: vertical;
-	-webkit-line-clamp: 2;
+	border-radius: inherit;
+	object-fit: contain;
+	mix-blend-mode: darken;
 }
 
 /* Size variants */
@@ -322,16 +307,23 @@
 		font-size: 1.75rem;
 	}
 
-	.colorGrid {
-		grid-template-columns: repeat(
-			auto-fill,
-			minmax(84px, 1fr)
-		);
+	.colorOption {
+		flex-basis: 44px;
+		width: 44px;
+		height: 44px;
 	}
 
 	.sizeGrid button {
 		width: 80px;
 		height: 74px;
+	}
+}
+
+@media (max-width: 576px) {
+	.colorOption {
+		flex-basis: 36px;
+		width: 36px;
+		height: 36px;
 	}
 }
 

@@ -4,19 +4,36 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    transition: transform $transition-base, box-shadow $transition-base, border-color $transition-base;
+    transition:
+        transform $transition-base,
+        box-shadow $transition-base,
+        border-color $transition-base;
 }
 
 .card:hover,
-.card:focus-visible {
-    box-shadow: $shadow-sm;
+.card:focus-within {
+    box-shadow: $shadow-md;
     transform: translateY(-2px);
+}
+
+.cardLink {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    color: inherit;
+    text-decoration: none;
+}
+
+.cardLink:focus-visible {
+    outline: 2px solid $brand-red;
+    outline-offset: -2px;
 }
 
 .imageWrapper {
     @include flex-center;
     height: 240px;
     padding: $space-4;
+    overflow: hidden;
     background: $page-background-alt;
 }
 
@@ -26,6 +43,12 @@
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
+    transition: transform $transition-base;
+    mix-blend-mode: darken;
+}
+
+.cardLink:hover .imageWrapper img {
+    transform: scale(1.025);
 }
 
 .content {
@@ -64,15 +87,70 @@
     font-weight: $font-bold;
 }
 
-.button {
-    @include button-red;
-    height: 42px;
-    padding: 0 $space-4;
-    font-family: "Barlow Condensed", sans-serif;
-    font-size: 0.95rem;
+.variantSummary {
+    padding: 0 $space-4 $space-4;
+}
+
+.colorOptions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $space-2;
+}
+
+.colorOption {
+    @include flex-center;
+    width: 38px;
+    height: 38px;
+    padding: 2px;
+    overflow: hidden;
+    border: 1px solid $border-light;
+    border-radius: 50%;
+    background: $page-background-alt;
+    cursor: pointer;
+    transition:
+        border-color $transition-base,
+        box-shadow $transition-base,
+        transform $transition-base;
+}
+
+.colorOption:hover {
+    border-color: $text-muted;
+    transform: translateY(-1px);
+}
+
+.colorOption:focus-visible {
+    outline: 2px solid $border-medium;
+    outline-offset: 2px;
+}
+
+.colorOption img {
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    object-fit: contain;
+    mix-blend-mode: darken;
+}
+
+.colorOptionSelected {
+    border-color: $brand-red;
+    box-shadow: 0 0 0 1px $brand-red;
+}
+
+.additionalColors {
+    display: inline-flex;
+    align-items: center;
+    min-height: 38px;
+    color: $text-secondary;
+    font-size: 0.85rem;
     font-weight: $font-bold;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+}
+
+.variantMeta {
+    margin: $space-3 0 0;
+    color: $text-secondary;
+    font-size: 0.85rem;
+    line-height: 1.4;
 }
 
 .statusBadge {
@@ -85,6 +163,7 @@
     gap: $space-2;
     padding: $space-1 $space-3;
     border-radius: $radius-pill;
+    pointer-events: none;
     font-size: 0.75rem;
     font-weight: $font-bold;
 }
@@ -116,14 +195,13 @@
         padding: $space-3;
     }
 
-    .footer {
-        flex-direction: column;
-        align-items: stretch;
-        gap: $space-3;
+    .colorOption {
+        width: 36px;
+        height: 36px;
     }
 
-    .button {
-        width: 100%;
+    .additionalColors {
+        min-height: 36px;
     }
 }
 

@@ -87,8 +87,6 @@ export default function ProductGallery({
                 <span className={styles.thumbnailMedia}>
                   <img src={image.url} alt="" loading="lazy" />
                 </span>
-
-                <span className={styles.thumbnailLabel}>{viewLabel}</span>
               </button>
             );
           })}
