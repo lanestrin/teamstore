@@ -1,16 +1,18 @@
+import { Authenticated, Unauthenticated } from "convex/react";
 import { useEffect, useState } from "react";
-import { LuUser, LuShoppingCart, LuSearch } from "react-icons/lu";
+import { LuSearch, LuShoppingCart, LuUser } from "react-icons/lu";
 import { Link, NavLink } from "react-router-dom";
-import { Unauthenticated, Authenticated } from "convex/react";
 
-import styles from "./Header.module.scss";
-import UserMenu from "../user-menu/UserMenu";
 import { images } from "../../assets/images";
-import MobileMenuButton from "../mobile-menu/MobileMenuButton";
+import { useCart } from "../../features/cart/CartContext";
 import MobileDrawer from "../mobile-drawer/MobileDrawer";
+import MobileMenuButton from "../mobile-menu/MobileMenuButton";
+import UserMenu from "../user-menu/UserMenu";
+import styles from "./Header.module.scss";
 
 export default function Header() {
-  const cartCount = 3;
+  const { itemCount } = useCart();
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -48,6 +50,15 @@ export default function Header() {
 
         <nav className={styles.nav}>
           <NavLink
+            to="/products"
+            className={({ isActive }) =>
+              isActive ? styles.activeLink : undefined
+            }
+          >
+            Shop Blanks
+          </NavLink>
+
+          <NavLink
             to="/stores"
             className={({ isActive }) =>
               isActive ? styles.activeLink : undefined
@@ -81,7 +92,9 @@ export default function Header() {
           <Link to="/cart" className={styles.cart}>
             <LuShoppingCart />
 
-            <span className={styles.cartCount}>{cartCount}</span>
+            {itemCount > 0 && (
+              <span className={styles.cartCount}>{itemCount}</span>
+            )}
           </Link>
         </div>
 
@@ -89,7 +102,9 @@ export default function Header() {
           <Link to="/cart" className={styles.cart}>
             <LuShoppingCart />
 
-            <span className={styles.cartCount}>{cartCount}</span>
+            {itemCount > 0 && (
+              <span className={styles.cartCount}>{itemCount}</span>
+            )}
           </Link>
 
           <MobileMenuButton
@@ -102,7 +117,7 @@ export default function Header() {
       <MobileDrawer
         isOpen={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
-        cartCount={cartCount}
+        cartCount={itemCount}
       />
     </header>
   );

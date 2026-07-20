@@ -5,12 +5,14 @@ import MainLayout from "./layouts/MainLayout";
 import AccountPage from "../features/account/AccountPage";
 import LoginPage from "../features/auth/LoginPage";
 import ProtectedRoute from "../features/auth/ProtectedRoute";
+import CartPage from "../features/cart/CartPage";
+import CatalogPage from "../features/catalog/CatalogPage";
 import CreateStorePage from "../features/create-store/CreateStorePage";
 import CreateStoreLayout from "../features/create-store/layouts/CreateStoreLayout";
 import HomePage from "../features/home/HomePage";
+import ProductDetailsPage from "../features/products/ProductDetailsPage";
 import StorePage from "../features/stores/StorePage";
 import StoresPage from "../features/stores/StoresPage";
-import ProductDetailsPage from "../features/products/ProductDetailsPage";
 
 export const router = createBrowserRouter([
   {
@@ -30,8 +32,16 @@ export const router = createBrowserRouter([
         element: <StorePage />,
       },
       {
+        path: "products",
+        element: <CatalogPage />,
+      },
+      {
         path: "product/:slug",
         element: <ProductDetailsPage />,
+      },
+      {
+        path: "cart",
+        element: <CartPage />,
       },
       {
         path: "account",

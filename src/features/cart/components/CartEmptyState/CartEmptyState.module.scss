@@ -1,0 +1,88 @@
+.emptyState {
+  display: grid;
+  min-height: 420px;
+  place-content: center;
+  justify-items: center;
+  padding: 4rem 1.5rem;
+  border: 1px dashed #cfd2d6;
+  border-radius: 14px;
+  background: #fff;
+  text-align: center;
+
+  h2 {
+    margin: 1.25rem 0 0;
+    color: #17191c;
+    font-size: 1.65rem;
+    line-height: 1.2;
+  }
+
+  p {
+    max-width: 500px;
+    margin: 0.75rem 0 1.5rem;
+    color: #656970;
+    line-height: 1.65;
+  }
+}
+
+.iconContainer {
+  display: grid;
+  width: 76px;
+  height: 76px;
+  place-items: center;
+  border-radius: 50%;
+  background: #f4f4f5;
+  color: #b42318;
+
+  svg {
+    width: 2rem;
+    height: 2rem;
+  }
+}
+
+.continueButton {
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1.25rem;
+  border-radius: 9px;
+  background: #17191c;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 750;
+  text-decoration: none;
+  transition:
+    background-color 160ms ease,
+    transform 160ms ease;
+
+  &:hover {
+    background: #b42318;
+    transform: translateY(-1px);
+  }
+
+  &:focus-visible {
+    outline: 3px solid rgb(180 35 24 / 22%);
+    outline-offset: 3px;
+  }
+}
+
+@media (max-width: 560px) {
+  .emptyState {
+    min-height: 360px;
+    padding: 3rem 1.25rem;
+
+    h2 {
+      font-size: 1.4rem;
+    }
+  }
+
+  .iconContainer {
+    width: 64px;
+    height: 64px;
+
+    svg {
+      width: 1.75rem;
+      height: 1.75rem;
+    }
+  }
+}
