@@ -383,10 +383,8 @@ export const createOrganizationWithStore = mutation({
 
     validateColor(args.secondaryColor, "Secondary color");
 
-    let existingDraft = null;
-
     if (args.storeId) {
-      existingDraft = await ctx.db.get(args.storeId);
+      const existingDraft = await ctx.db.get(args.storeId);
 
       if (
         existingDraft === null ||

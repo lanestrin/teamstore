@@ -1,9 +1,9 @@
+import { Authenticated, Unauthenticated } from "convex/react";
 import { LuShoppingCart, LuUser, LuX } from "react-icons/lu";
 import { Link, NavLink } from "react-router-dom";
-import { Authenticated, Unauthenticated } from "convex/react";
 
-import styles from "./MobileDrawer.module.scss";
 import { images } from "../../assets/images";
+import styles from "./MobileDrawer.module.scss";
 
 interface MobileDrawerProps {
   isOpen: boolean;
@@ -83,6 +83,7 @@ export default function MobileDrawer({
             onClick={onClose}
           >
             <span>My Cart</span>
+
             <span className={styles.mobileDrawerCartMeta}>
               {cartCount}
               <LuShoppingCart />
@@ -96,10 +97,14 @@ export default function MobileDrawer({
           </NavLink>
 
           <NavLink
-            to="/stores"
+            to="/products"
             className={getLinkClassName}
             onClick={onClose}
           >
+            Shop Blanks
+          </NavLink>
+
+          <NavLink to="/stores" className={getLinkClassName} onClick={onClose}>
             Stores
           </NavLink>
 

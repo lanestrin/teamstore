@@ -362,6 +362,7 @@ function parseArgs(argv: string[]): CliOptions {
         printHelp();
         process.exit(0);
 
+      // eslint-disable-next-line no-fallthrough
       default:
         throw new Error(`Unknown argument: ${argument}`);
     }
@@ -1718,4 +1719,3 @@ main().catch((error) => {
   );
   process.exitCode = 1;
 });
-

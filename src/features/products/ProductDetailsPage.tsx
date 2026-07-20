@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery } from "convex/react";
 import { LuChevronLeft } from "react-icons/lu";
 import { Link, useParams } from "react-router-dom";
 
 import { api } from "../../../convex/_generated/api";
+import { useCart } from "../cart/CartContext";
 import ProductDetails from "./components/ProductDetails/ProductDetails";
 import ProductGallery from "./components/ProductGallery/ProductGallery";
 import ProductInfo from "./components/ProductInfo/ProductInfo";
@@ -26,10 +27,12 @@ function formatPrice(
   return `$${minimumPrice}`;
 }
 
-export default function ProductPage() {
+export default function ProductDetailsPage() {
   const { slug } = useParams<{
     slug: string;
   }>();
+
+  const { addItem } = useCart();
 
   const product = useQuery(
     api.products.getActiveBySlug,
@@ -39,12 +42,19 @@ export default function ProductPage() {
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState(1);
+  const [isAddedToCart, setIsAddedToCart] = useState(false);
+
+  const confirmationTimeoutRef = useRef<
+    ReturnType<typeof window.setTimeout> | undefined
+  >(undefined);
 
   useEffect(() => {
-    setSelectedColor("");
-    setSelectedSize("");
-    setQuantity(1);
-  }, [slug]);
+    return () => {
+      if (confirmationTimeoutRef.current !== undefined) {
+        window.clearTimeout(confirmationTimeoutRef.current);
+      }
+    };
+  }, []);
 
   if (!slug) {
     return <div className={styles.notFound}>Product not found</div>;
@@ -98,9 +108,62 @@ export default function ProductPage() {
     ];
   });
 
+  const clearAddedConfirmation = () => {
+    setIsAddedToCart(false);
+
+    if (confirmationTimeoutRef.current !== undefined) {
+      window.clearTimeout(confirmationTimeoutRef.current);
+      confirmationTimeoutRef.current = undefined;
+    }
+  };
+
   const handleColorChange = (color: string) => {
     setSelectedColor(color);
     setSelectedSize("");
+    clearAddedConfirmation();
+  };
+
+  const handleSizeChange = (size: string) => {
+    setSelectedSize(size);
+    clearAddedConfirmation();
+  };
+
+  const handleAddToCart = () => {
+    if (!selectedVariant) {
+      return;
+    }
+
+    const productImage =
+      selectedColorOption.images.find((image) => image.view === "front") ??
+      selectedColorOption.images[0];
+
+    if (!productImage) {
+      return;
+    }
+
+    addItem({
+      productId: product._id,
+      variantId: selectedVariant._id,
+      slug: product.slug,
+      name: product.name,
+      imageUrl: productImage.url,
+      color: selectedColorOption.color,
+      size: selectedVariant.size,
+      unitPriceInCents: selectedVariant.directPriceInCents,
+      quantity,
+    });
+
+    setQuantity(1);
+    setIsAddedToCart(true);
+
+    if (confirmationTimeoutRef.current !== undefined) {
+      window.clearTimeout(confirmationTimeoutRef.current);
+    }
+
+    confirmationTimeoutRef.current = window.setTimeout(() => {
+      setIsAddedToCart(false);
+      confirmationTimeoutRef.current = undefined;
+    }, 3000);
   };
 
   return (
@@ -132,8 +195,10 @@ export default function ProductPage() {
               sizes={selectedColorOption.sizes}
               selectedSize={selectedSize}
               quantity={quantity}
-              onSizeChange={setSelectedSize}
+              isAddedToCart={isAddedToCart}
+              onSizeChange={handleSizeChange}
               onQuantityChange={setQuantity}
+              onAddToCart={handleAddToCart}
             />
 
             <ProductDetails description={product.description} />

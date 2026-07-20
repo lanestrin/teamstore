@@ -1,0 +1,161 @@
+.page {
+  min-height: 100%;
+  padding-block: 3rem 5rem;
+  background: #f7f7f8;
+}
+
+.container {
+  width: min(100% - 2rem, 1440px);
+  margin-inline: auto;
+}
+
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 2rem;
+
+  h1 {
+    margin: 0.35rem 0 0.75rem;
+    color: #17191c;
+    font-size: clamp(2.5rem, 6vw, 4.25rem);
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+  }
+
+  p {
+    margin: 0;
+    color: #656970;
+    line-height: 1.6;
+  }
+}
+
+.eyebrow {
+  color: #b42318;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.clearButton {
+  flex-shrink: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #73777d;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 750;
+  cursor: pointer;
+  transition: color 150ms ease;
+
+  &:hover {
+    color: #b42318;
+  }
+
+  &:focus-visible {
+    border-radius: 4px;
+    outline: 3px solid rgb(180 35 24 / 20%);
+    outline-offset: 3px;
+  }
+}
+
+.cartToolbar {
+  display: flex;
+  min-height: 50px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  padding: 0 0.25rem;
+
+  p {
+    margin: 0;
+    color: #656970;
+    font-size: 0.9rem;
+  }
+
+  strong {
+    color: #17191c;
+  }
+
+  a {
+    color: #b42318;
+    font-size: 0.85rem;
+    font-weight: 750;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    &:focus-visible {
+      border-radius: 4px;
+      outline: 3px solid rgb(180 35 24 / 20%);
+      outline-offset: 3px;
+    }
+  }
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 2rem;
+  align-items: start;
+}
+
+.items {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.summaryColumn {
+  min-width: 0;
+}
+
+@media (max-width: 1000px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 850px) {
+  .page {
+    padding-block: 2.5rem 4rem;
+  }
+
+  .header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .container {
+    width: min(100% - 1.25rem, 1440px);
+  }
+
+  .header {
+    margin-bottom: 1.5rem;
+
+    h1 {
+      font-size: 2.7rem;
+    }
+  }
+
+  .cartToolbar {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+}

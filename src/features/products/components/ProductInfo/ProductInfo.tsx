@@ -1,4 +1,5 @@
-import { LuMinus, LuPlus } from "react-icons/lu";
+import { LuCheck, LuMinus, LuPlus } from "react-icons/lu";
+import { Link } from "react-router-dom";
 
 import styles from "./ProductInfo.module.scss";
 
@@ -16,9 +17,11 @@ interface ProductInfoProps {
   sizes: string[];
   selectedSize: string;
   quantity: number;
+  isAddedToCart: boolean;
   onColorChange: (color: string) => void;
   onSizeChange: (size: string) => void;
   onQuantityChange: (quantity: number) => void;
+  onAddToCart: () => void;
 }
 
 export default function ProductInfo({
@@ -30,9 +33,11 @@ export default function ProductInfo({
   sizes,
   selectedSize,
   quantity,
+  isAddedToCart,
   onColorChange,
   onSizeChange,
   onQuantityChange,
+  onAddToCart,
 }: ProductInfoProps) {
   const hasAvailableColors = colors.length > 0;
   const hasAvailableSizes = sizes.length > 0;
@@ -157,19 +162,36 @@ export default function ProductInfo({
 
       <button
         type="button"
-        className={styles.addToCart}
+        className={`${styles.addToCart} ${
+          isAddedToCart ? styles.addedToCart : ""
+        }`}
         disabled={!canAddToCart}
+        onClick={onAddToCart}
       >
-        {!hasAvailableColors
-          ? "UNAVAILABLE"
-          : !selectedColor
-            ? "SELECT COLOR"
-            : !hasAvailableSizes
+        {isAddedToCart && <LuCheck aria-hidden="true" />}
+
+        <span>
+          {isAddedToCart
+            ? "ADDED TO CART"
+            : !hasAvailableColors
               ? "UNAVAILABLE"
-              : !selectedSize
-                ? "SELECT SIZE"
-                : "ADD TO CART"}
+              : !selectedColor
+                ? "SELECT COLOR"
+                : !hasAvailableSizes
+                  ? "UNAVAILABLE"
+                  : !selectedSize
+                    ? "SELECT SIZE"
+                    : "ADD TO CART"}
+        </span>
       </button>
+
+      {isAddedToCart && (
+        <div className={styles.cartConfirmation} role="status">
+          <span>This item was added to your cart.</span>
+
+          <Link to="/cart">View Cart</Link>
+        </div>
+      )}
     </div>
   );
 }
