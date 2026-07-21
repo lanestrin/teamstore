@@ -37,10 +37,8 @@ export default defineSchema({
 
   users: defineTable({
     name: v.optional(v.string()),
-    email: v.string(),
-
-    // Platform catalog mutations are restricted to these users.
-    // Bootstrap the first admin from the Convex dashboard.
+    email: v.optional(v.string()),
+    isAnonymous: v.optional(v.boolean()),
     isPlatformAdmin: v.optional(v.boolean()),
   }).index("by_email", ["email"]),
 
