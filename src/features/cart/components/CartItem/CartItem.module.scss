@@ -28,6 +28,7 @@
   object-fit: contain;
   padding: 0.75rem;
   transition: transform 180ms ease;
+  mix-blend-mode: darken;
 
   .imageLink:hover & {
     transform: scale(1.03);

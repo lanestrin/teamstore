@@ -14,6 +14,7 @@ import ProductDetailsPage from "../features/products/ProductDetailsPage";
 import StorePage from "../features/stores/StorePage";
 import StoresPage from "../features/stores/StoresPage";
 import { HowItWorksPage } from "../features/how-it-works/HowItWorksPage";
+import DemoPage from "../features/auth/DemoPage";
 
 export const router = createBrowserRouter([
   {
@@ -55,6 +56,10 @@ export const router = createBrowserRouter([
             <AccountPage />
           </ProtectedRoute>
         ),
+      },
+      {
+        path: "demo",
+        element: <DemoPage />,
       },
       {
         path: "login",

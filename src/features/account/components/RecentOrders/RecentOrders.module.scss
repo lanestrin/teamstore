@@ -67,6 +67,7 @@
     border-radius: $radius-md;
     overflow: hidden;
     background: $gray-100;
+    mix-blend-mode: darken;
 
     img {
         width: 100%;
