@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { LuCheck } from "react-icons/lu";
 import { Link } from "react-router-dom";
 
@@ -10,6 +10,7 @@ export interface ProductCardColorOption {
   color: string;
   colorKey: string;
   imageUrl: string;
+  colorFamilies?: string[];
 }
 
 export interface ProductCardData {
@@ -26,29 +27,69 @@ export interface ProductCardData {
 
 interface ProductCardProps {
   product: ProductCardData;
+  preferredColorFamily?: string | null;
   showDeadline?: boolean;
   showRequiredStatus?: boolean;
 }
 
 export default function ProductCard({
   product,
+  preferredColorFamily = null,
   showDeadline = false,
   showRequiredStatus = false,
 }: ProductCardProps) {
-  const colorOptions = product.colorOptions ?? [];
+  const colorOptions = useMemo(
+    () => product.colorOptions ?? [],
+    [product.colorOptions],
+  );
+
+  const preferredColorOption = useMemo(() => {
+    if (!preferredColorFamily) {
+      return undefined;
+    }
+
+    return colorOptions.find((colorOption) =>
+      colorOption.colorFamilies?.includes(preferredColorFamily),
+    );
+  }, [colorOptions, preferredColorFamily]);
+
+  const firstColorKey = colorOptions[0]?.colorKey ?? null;
+  const preferredColorKey = preferredColorOption?.colorKey ?? null;
 
   const [selectedColorKey, setSelectedColorKey] = useState<string | null>(
-    colorOptions[0]?.colorKey ?? null,
+    preferredColorKey ?? firstColorKey,
   );
+
+  useEffect(() => {
+    setSelectedColorKey(preferredColorKey ?? firstColorKey);
+  }, [product.id, preferredColorKey, firstColorKey]);
 
   const selectedColorOption =
     colorOptions.find(
       (colorOption) => colorOption.colorKey === selectedColorKey,
-    ) ?? colorOptions[0];
+    ) ??
+    preferredColorOption ??
+    colorOptions[0];
 
   const previewImageUrl = selectedColorOption?.imageUrl ?? product.imageUrl;
 
-  const visibleColorOptions = colorOptions.slice(0, MAX_VISIBLE_COLOR_OPTIONS);
+  const visibleColorOptions = useMemo(() => {
+    const firstOptions = colorOptions.slice(0, MAX_VISIBLE_COLOR_OPTIONS);
+
+    if (
+      !selectedColorOption ||
+      firstOptions.some(
+        (colorOption) => colorOption.colorKey === selectedColorOption.colorKey,
+      )
+    ) {
+      return firstOptions;
+    }
+
+    return [
+      ...firstOptions.slice(0, MAX_VISIBLE_COLOR_OPTIONS - 1),
+      selectedColorOption,
+    ];
+  }, [colorOptions, selectedColorOption]);
 
   const additionalColorCount = Math.max(
     colorOptions.length - visibleColorOptions.length,

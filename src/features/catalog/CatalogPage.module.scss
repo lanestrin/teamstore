@@ -72,7 +72,7 @@
   grid-template-columns: minmax(280px, 1fr) auto;
   gap: 1rem;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   padding: 1rem;
   border: 1px solid #e1e3e6;
   border-radius: 14px;
@@ -154,9 +154,49 @@
   }
 }
 
+.activeFilterBar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.activeFilterLabel {
+  color: #73777d;
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.filterChip {
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 0.75rem;
+  border: 1px solid #d7d9dc;
+  border-radius: 999px;
+  background: #fff;
+  color: #2f3337;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover {
+    border-color: #b42318;
+    color: #b42318;
+  }
+
+  &:focus-visible {
+    outline: 3px solid rgb(180 35 24 / 18%);
+    outline-offset: 2px;
+  }
+}
+
 .catalogLayout {
   display: grid;
-  grid-template-columns: 250px minmax(0, 1fr);
+  grid-template-columns: 280px minmax(0, 1fr);
   gap: 2rem;
   align-items: start;
 }
@@ -164,11 +204,9 @@
 .filters {
   position: sticky;
   top: 1.5rem;
-  display: grid;
-  gap: 1.25rem;
-  padding: 1.25rem;
+  overflow: hidden;
   border: 1px solid #e1e3e6;
-  border-radius: 14px;
+  border-radius: 16px;
   background: #fff;
   box-shadow: 0 12px 32px rgb(17 24 39 / 5%);
 }
@@ -178,13 +216,13 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding-bottom: 1rem;
+  padding: 1rem 1.1rem;
   border-bottom: 1px solid #eceef0;
 
   h2 {
     margin: 0;
     color: #17191c;
-    font-size: 1.05rem;
+    font-size: 1rem;
   }
 
   button {
@@ -193,7 +231,7 @@
     background: transparent;
     color: #b42318;
     font: inherit;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 800;
     cursor: pointer;
 
@@ -210,15 +248,224 @@
   }
 }
 
+.filterSections {
+  display: block;
+}
+
+.filterSection {
+  border-bottom: 1px solid #eceef0;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+.filterSectionButton {
+  display: flex;
+  width: 100%;
+  min-height: 52px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0 1.1rem;
+  border: 0;
+  background: #fff;
+  color: #17191c;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 800;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: #fafafa;
+  }
+
+  &:focus-visible {
+    position: relative;
+    z-index: 1;
+    outline: 3px solid rgb(180 35 24 / 18%);
+    outline-offset: -3px;
+  }
+}
+
+.filterSectionMeta {
+  display: inline-flex;
+  gap: 0.55rem;
+  align-items: center;
+  color: #73777d;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.filterSectionIcon {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  border-radius: 50%;
+  background: #f2f3f4;
+  color: #5f6368;
+  font-size: 1rem;
+  line-height: 1;
+  transition: transform 160ms ease;
+}
+
+.filterSectionIconOpen {
+  transform: rotate(180deg);
+}
+
+.filterSectionBody {
+  padding: 0 1.1rem 1rem;
+}
+
+.categoryOptions {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.categoryOption {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 0.65rem;
+  align-items: center;
+  min-height: 30px;
+  color: #4d5156;
+  font-size: 0.84rem;
+  cursor: pointer;
+
+  input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: #b42318;
+    cursor: pointer;
+  }
+
+  &:hover span {
+    color: #17191c;
+  }
+}
+
+.colorGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.65rem 0.45rem;
+}
+
+.colorOption {
+  display: grid;
+  gap: 0.35rem;
+  justify-items: center;
+  padding: 0.45rem 0.2rem;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: #5f6368;
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover {
+    border-color: #d7d9dc;
+    background: #fafafa;
+    color: #17191c;
+    transform: translateY(-1px);
+  }
+
+  &:focus-visible {
+    outline: 3px solid rgb(180 35 24 / 18%);
+    outline-offset: 2px;
+  }
+}
+
+.colorOptionSelected {
+  border-color: #17191c;
+  background: #f3f3f4;
+  color: #17191c;
+}
+
+.colorSwatch {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgb(23 25 28 / 18%);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 2px #fff,
+    0 0 0 3px rgb(23 25 28 / 8%);
+}
+
+.colorSwatchSelected {
+  &::after {
+    position: absolute;
+    inset: 50% auto auto 50%;
+    width: 7px;
+    height: 12px;
+    border: solid currentcolor;
+    border-width: 0 2px 2px 0;
+    content: "";
+    transform: translate(-50%, -60%) rotate(45deg);
+  }
+}
+
+.colorSwatchLight {
+  color: #17191c;
+}
+
+.colorSwatchDark {
+  color: #fff;
+}
+
+.sizeGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.sizeOption {
+  min-height: 36px;
+  padding: 0 0.4rem;
+  border: 1px solid #d7d9dc;
+  border-radius: 9px;
+  background: #fff;
+  color: #4d5156;
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 750;
+  cursor: pointer;
+
+  &:hover {
+    border-color: #17191c;
+    color: #17191c;
+  }
+
+  &:focus-visible {
+    outline: 3px solid rgb(180 35 24 / 18%);
+    outline-offset: 2px;
+  }
+}
+
+.sizeOptionSelected {
+  border-color: #17191c;
+  background: #17191c;
+  color: #fff;
+
+  &:hover {
+    color: #fff;
+  }
+}
+
+/* Retained while the existing JSX is being replaced. */
 .filterGroup {
   min-width: 0;
   margin: 0;
-  padding: 0 0 1.25rem;
+  padding: 1rem 1.1rem;
   border: 0;
   border-bottom: 1px solid #eceef0;
 
   &:last-child {
-    padding-bottom: 0;
     border-bottom: 0;
   }
 
@@ -343,9 +590,6 @@
     font: inherit;
     font-weight: 750;
     cursor: pointer;
-    transition:
-      background-color 160ms ease,
-      transform 160ms ease;
 
     &:hover {
       background: #b42318;
@@ -412,16 +656,20 @@
 
   .filters {
     position: static;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .filterHeader {
-    grid-column: 1 / -1;
+  .filterSections {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .filterGroup {
-    padding: 0;
+  .filterSection {
+    border-right: 1px solid #eceef0;
     border-bottom: 0;
+
+    &:last-child {
+      border-right: 0;
+    }
   }
 }
 
@@ -441,6 +689,19 @@
       width: 100%;
     }
   }
+
+  .filterSections {
+    grid-template-columns: 1fr;
+  }
+
+  .filterSection {
+    border-right: 0;
+    border-bottom: 1px solid #eceef0;
+
+    &:last-child {
+      border-bottom: 0;
+    }
+  }
 }
 
 @media (max-width: 560px) {
@@ -452,7 +713,6 @@
     }
   }
 
-  .filters,
   .productGrid {
     grid-template-columns: 1fr;
   }
