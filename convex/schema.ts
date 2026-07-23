@@ -14,6 +14,108 @@ const productStatus = v.union(
   v.literal("archived"),
 );
 
+const productColorFamily = v.union(
+  v.literal("black"),
+  v.literal("white"),
+  v.literal("gray"),
+  v.literal("silver"),
+  v.literal("red"),
+  v.literal("orange"),
+  v.literal("yellow"),
+  v.literal("green"),
+  v.literal("blue"),
+  v.literal("purple"),
+  v.literal("pink"),
+  v.literal("brown"),
+  v.literal("multicolor"),
+  v.literal("unknown"),
+);
+
+const productColorCategory = v.union(
+  v.literal("black"),
+  v.literal("white"),
+  v.literal("vintage-white"),
+  v.literal("graphite"),
+  v.literal("charcoal"),
+  v.literal("light-charcoal"),
+  v.literal("carbon"),
+  v.literal("gray"),
+  v.literal("silver"),
+  v.literal("red"),
+  v.literal("scarlet"),
+  v.literal("cardinal"),
+  v.literal("maroon"),
+  v.literal("orange"),
+  v.literal("burnt-orange"),
+  v.literal("yellow"),
+  v.literal("gold"),
+  v.literal("light-gold"),
+  v.literal("vegas-gold"),
+  v.literal("green"),
+  v.literal("forest"),
+  v.literal("lime"),
+  v.literal("teal"),
+  v.literal("blue"),
+  v.literal("columbia-blue"),
+  v.literal("royal"),
+  v.literal("navy"),
+  v.literal("purple"),
+  v.literal("pink"),
+  v.literal("brown"),
+  v.literal("tan"),
+  v.literal("multicolor"),
+  v.literal("unknown"),
+);
+
+const productColorTone = v.union(
+  v.literal("light"),
+  v.literal("medium"),
+  v.literal("dark"),
+  v.literal("unknown"),
+);
+
+const productColorPattern = v.union(
+  v.literal("solid"),
+  v.literal("heather"),
+  v.literal("digital"),
+  v.literal("camo"),
+  v.literal("patterned"),
+  v.literal("unknown"),
+);
+
+const productColorComposition = v.union(
+  v.literal("single"),
+  v.literal("two-tone"),
+  v.literal("three-tone"),
+  v.literal("multicolor"),
+  v.literal("unknown"),
+);
+
+const productColorClassificationSource = v.union(
+  v.literal("supplier-hex"),
+  v.literal("name-rule"),
+  v.literal("ai"),
+  v.literal("manual"),
+);
+
+const productColorReviewReason = v.union(
+  v.literal("missing-hex"),
+  v.literal("invalid-hex"),
+  v.literal("conflicting-hex"),
+  v.literal("compound-color"),
+  v.literal("ambiguous-name"),
+  v.literal("image-name-conflict"),
+  v.literal("low-confidence"),
+  v.literal("unknown-category"),
+  v.literal("inconsistent-classification"),
+);
+
+const productColorAccent = v.object({
+  family: productColorFamily,
+  category: productColorCategory,
+  hexValue: v.optional(v.string()),
+});
+
 const productImageView = v.union(
   v.literal("leftQuarter"),
   v.literal("front"),
@@ -115,6 +217,44 @@ export default defineSchema({
     .index("by_status", ["status"])
     .index("by_status_category", ["status", "category"])
     .index("by_provider_product", ["provider", "providerProductId"]),
+
+  // Canonical color options for blank products.
+  // One row represents one productId + colorKey pair and stores the
+  // deterministic color classification used by catalog filtering.
+  productColors: defineTable({
+    productId: v.id("products"),
+
+    color: v.string(),
+    colorKey: v.string(),
+    providerColor: v.optional(v.string()),
+    normalizedProviderColor: v.string(),
+
+    // Supplier-provided values only. Use an empty array when none exist.
+    supplierHexValues: v.array(v.string()),
+
+    primaryFamily: productColorFamily,
+    primaryCategory: productColorCategory,
+    primaryHexValue: v.optional(v.string()),
+
+    accents: v.array(productColorAccent),
+
+    tone: productColorTone,
+    pattern: productColorPattern,
+    composition: productColorComposition,
+
+    classificationSource: productColorClassificationSource,
+    classificationConfidence: v.number(),
+
+    needsReview: v.boolean(),
+    reviewReasons: v.array(productColorReviewReason),
+
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_product", ["productId"])
+    .index("by_product_color_key", ["productId", "colorKey"])
+    .index("by_primary_family", ["primaryFamily"])
+    .index("by_primary_category", ["primaryCategory"]),
 
   // Color-specific gallery images.
   // Images represent product views such as front, back,
