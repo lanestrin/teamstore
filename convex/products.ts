@@ -112,6 +112,52 @@ async function getVariantsForProduct(
     .collect();
 }
 
+async function getProductColorsForProduct(
+  ctx: CatalogReadCtx,
+  productId: Id<"products">,
+) {
+  return await ctx.db
+    .query("productColors")
+    .withIndex("by_product", (q) => q.eq("productId", productId))
+    .collect();
+}
+
+function getAvailableColorFamilies(
+  variants: Doc<"productVariants">[],
+  productColors: Doc<"productColors">[],
+) {
+  const purchasableColorKeys = new Set(
+    variants
+      .filter(
+        (variant) =>
+          variant.status === "active" &&
+          variant.availability === "available",
+      )
+      .map((variant) => variant.colorKey),
+  );
+
+  const families = new Set<Doc<"productColors">["primaryFamily"]>();
+
+  for (const productColor of productColors) {
+    if (!purchasableColorKeys.has(productColor.colorKey)) {
+      continue;
+    }
+
+    const classifiedFamilies = [
+      productColor.primaryFamily,
+      ...productColor.accents.map((accent) => accent.family),
+    ];
+
+    for (const family of classifiedFamilies) {
+      if (family !== "unknown") {
+        families.add(family);
+      }
+    }
+  }
+
+  return [...families];
+}
+
 async function getProductImagesForProduct(
   ctx: CatalogReadCtx,
   productId: Id<"products">,
@@ -232,6 +278,7 @@ function buildProductColorOptions(
 function buildProductCardColorOptions(
   variants: Doc<"productVariants">[],
   productImages: ResolvedProductImage[],
+  productColors: Doc<"productColors">[],
 ) {
   const purchasableVariants = variants.filter(
     (variant) =>
@@ -265,11 +312,25 @@ function buildProductCardColorOptions(
       return [];
     }
 
+    const productColor = productColors.find(
+      (candidate) => candidate.colorKey === colorKey,
+    );
+
+    const colorFamilies = productColor
+      ? [
+          ...new Set([
+            productColor.primaryFamily,
+            ...productColor.accents.map((accent) => accent.family),
+          ]),
+        ].filter((family) => family !== "unknown")
+      : [];
+
     return [
       {
         color,
         colorKey,
         imageUrl: previewImage.imageUrl,
+        colorFamilies,
       },
     ];
   });
@@ -279,9 +340,10 @@ async function decorateProductCard(
   ctx: CatalogReadCtx,
   product: Doc<"products">,
 ) {
-  const [variants, images] = await Promise.all([
+  const [variants, images, productColors] = await Promise.all([
     getVariantsForProduct(ctx, product._id),
     getResolvedProductImages(ctx, product._id),
+    getProductColorsForProduct(ctx, product._id),
   ]);
 
   return {
@@ -289,7 +351,16 @@ async function decorateProductCard(
 
     imageUrls: [...new Set(images.map((image) => image.imageUrl))],
 
-    colorOptions: buildProductCardColorOptions(variants, images),
+    colorOptions: buildProductCardColorOptions(
+      variants,
+      images,
+      productColors,
+    ),
+
+    availableColorFamilies: getAvailableColorFamilies(
+      variants,
+      productColors,
+    ),
 
     ...summarizeVariants(variants),
   };
