@@ -82,10 +82,12 @@ export default function ReplaceCatalogButton() {
     setProgressText("Clearing the existing catalog...");
 
     let productsDeleted = 0;
+    let colorsDeleted = 0;
     let variantsDeleted = 0;
     let imagesDeleted = 0;
 
     let productsInserted = 0;
+    let colorsInserted = 0;
     let variantsInserted = 0;
     let imagesInserted = 0;
 
@@ -98,6 +100,10 @@ export default function ReplaceCatalogButton() {
 
         if (result.phase === "products") {
           productsDeleted += result.deleted;
+        }
+
+        if (result.phase === "productColors") {
+          colorsDeleted += result.deleted;
         }
 
         if (result.phase === "productVariants") {
@@ -114,7 +120,8 @@ export default function ReplaceCatalogButton() {
 
         setProgressText(
           `Clearing catalog... Deleted ${productsDeleted} products, ` +
-            `${variantsDeleted} variants, and ${imagesDeleted} images.`,
+            `${colorsDeleted} colors, ${variantsDeleted} variants, and ` +
+            `${imagesDeleted} images.`,
         );
       }
 
@@ -126,6 +133,7 @@ export default function ReplaceCatalogButton() {
         });
 
         productsInserted += result.productsInserted;
+        colorsInserted += result.colorsInserted;
         variantsInserted += result.variantsInserted;
         imagesInserted += result.imagesInserted;
         nextIndex = result.nextIndex;
@@ -143,7 +151,8 @@ export default function ReplaceCatalogButton() {
       setMessageType("success");
       setMessage(
         `Catalog replaced. Inserted ${productsInserted} products, ` +
-          `${variantsInserted} variants, and ${imagesInserted} images.`,
+          `${colorsInserted} colors, ${variantsInserted} variants, and ` +
+          `${imagesInserted} images.`,
       );
 
       setIsConfirmationOpen(false);
@@ -172,13 +181,19 @@ export default function ReplaceCatalogButton() {
 
           <p className={styles.description}>
             Deletes the current catalog, then loads the audited Augusta catalog
-            with product images, colors, sizes, pricing, and variants.
+            with classified colors, product images, sizes, pricing, and
+            variants.
           </p>
 
           <dl className={styles.summary}>
             <div>
               <dt>Products</dt>
               <dd>60</dd>
+            </div>
+
+            <div>
+              <dt>Colors</dt>
+              <dd>360</dd>
             </div>
 
             <div>

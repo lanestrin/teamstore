@@ -2,6 +2,11 @@ import { ConvexError, v } from "convex/values";
 
 import { mutation } from "./_generated/server";
 import {
+  classifyProductColor,
+  extractProductColorHexValues,
+  normalizeProductColorName,
+} from "../src/lib/classifyProductColor";
+import {
   selectedCatalogSummary,
   selectedProducts,
 } from "./docs/selectedProductsData";
@@ -22,8 +27,8 @@ function normalizeColorKey(providerColor: string) {
 /**
  * Deletes the existing catalog in bounded batches.
  *
- * Call this repeatedly until `done` is true. Images and variants are deleted
- * before products so product references are not left behind.
+ * Call this repeatedly until `done` is true. Images, variants, and product
+ * colors are deleted before products so references are not left behind.
  */
 export const clearCatalogBatch = mutation({
   args: {
@@ -68,6 +73,20 @@ export const clearCatalogBatch = mutation({
         done: false,
         phase: "productVariants" as const,
         deleted: variants.length,
+      };
+    }
+
+    const productColors = await ctx.db.query("productColors").take(limit);
+
+    if (productColors.length > 0) {
+      for (const productColor of productColors) {
+        await ctx.db.delete(productColor._id);
+      }
+
+      return {
+        done: false,
+        phase: "productColors" as const,
+        deleted: productColors.length,
       };
     }
 
@@ -118,6 +137,7 @@ export const importCatalogBatch = mutation({
         done: true,
         nextIndex: startIndex,
         productsInserted: 0,
+        colorsInserted: 0,
         imagesInserted: 0,
         variantsInserted: 0,
         totalProducts: selectedCatalogSummary.products,
@@ -159,6 +179,47 @@ export const importCatalogBatch = mutation({
       createdAt: now,
       updatedAt: now,
     });
+
+    for (const color of product.colors) {
+      const classification = classifyProductColor({
+        providerColor: color.providerColor,
+        hexValue: color.colorHexValue,
+      });
+
+      await ctx.db.insert("productColors", {
+        productId,
+        color: color.color,
+        colorKey: normalizeColorKey(color.colorKey),
+        providerColor: normalizeOptionalText(color.providerColor),
+        normalizedProviderColor: normalizeProductColorName(
+          color.providerColor,
+        ),
+        supplierHexValues: extractProductColorHexValues(color.colorHexValue),
+
+        primaryFamily: classification.primary.family,
+        primaryCategory: classification.primary.category,
+        primaryHexValue: classification.primary.hexValue,
+
+        accents: classification.accents.map((accent) => ({
+          family: accent.family,
+          category: accent.category,
+          hexValue: accent.hexValue,
+        })),
+
+        tone: classification.tone,
+        pattern: classification.pattern,
+        composition: classification.composition,
+
+        classificationSource: classification.source,
+        classificationConfidence: classification.confidence,
+
+        needsReview: classification.needsReview,
+        reviewReasons: classification.reviewReasons,
+
+        createdAt: now,
+        updatedAt: now,
+      });
+    }
 
     for (const image of product.images) {
       await ctx.db.insert("productImages", {
@@ -216,6 +277,7 @@ export const importCatalogBatch = mutation({
       done: nextIndex >= selectedProducts.length,
       nextIndex,
       productsInserted: 1,
+      colorsInserted: product.colors.length,
       imagesInserted: product.images.length,
       variantsInserted: product.variants.length,
       totalProducts: selectedCatalogSummary.products,

@@ -4,7 +4,7 @@ import tee from "../assets/images/tee.png";
 import backpack from "../assets/images/backpack.png";
 import cap from "../assets/images/cap.png";
 
-import type { IProduct } from "../types/product";
+import type { IProduct } from "../types/product.types";
 
 const apparelSizes = {
   youthSizes: ["YS", "YM", "YL"],
