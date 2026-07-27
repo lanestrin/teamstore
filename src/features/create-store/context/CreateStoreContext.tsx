@@ -1,208 +1,191 @@
 /* eslint-disable react-refresh/only-export-components */
 
 import {
-	createContext,
-	useContext,
-	useState,
-	type Dispatch,
-	type ReactNode,
-	type SetStateAction,
+  createContext,
+  useContext,
+  useState,
+  type Dispatch,
+  type ReactNode,
+  type SetStateAction,
 } from "react";
 
-import type {
-	Doc,
-	Id,
-} from "../../../../convex/_generated/dataModel";
+import type { Doc, Id } from "../../../../convex/_generated/dataModel";
+
+import type { ArtworkAdjustments } from "../steps/ProductStep/artworkEditor";
 
 const DEFAULT_PRIMARY_COLOR = "#111827";
 const DEFAULT_SECONDARY_COLOR = "#DC2626";
 
+export interface ArtworkTextDraft {
+  organizationName: string;
+  yearEstablished: string;
+  mascotName: string;
+}
+
 export interface CreateStoreDraft {
-	organizationName: string;
-	organizationSlug: string;
+  organizationName: string;
+  organizationSlug: string;
 
-	storeName: string;
-	storeSlug: string;
-	storeDescription: string;
+  storeName: string;
+  storeSlug: string;
+  storeDescription: string;
 
-	logoFile: File | null;
-	logoStorageId: Id<"_storage"> | null;
+  logoFile: File | null;
+  logoStorageId: Id<"_storage"> | null;
+
+  artworkAdjustments: ArtworkAdjustments;
+  artworkText: ArtworkTextDraft;
 }
 
 interface CreateStoreContextValue {
-	storeId: Id<"stores"> | null;
-	setStoreId: Dispatch<
-		SetStateAction<Id<"stores"> | null>
-	>;
+  storeId: Id<"stores"> | null;
+  setStoreId: Dispatch<SetStateAction<Id<"stores"> | null>>;
 
-	currentStep: number;
-	setCurrentStep: Dispatch<SetStateAction<number>>;
+  currentStep: number;
+  setCurrentStep: Dispatch<SetStateAction<number>>;
 
-	primaryColor: string;
-	secondaryColor: string;
+  primaryColor: string;
+  secondaryColor: string;
 
-	setPrimaryColor: Dispatch<SetStateAction<string>>;
-	setSecondaryColor: Dispatch<
-		SetStateAction<string>
-	>;
+  setPrimaryColor: Dispatch<SetStateAction<string>>;
+  setSecondaryColor: Dispatch<SetStateAction<string>>;
 
-	storeDraft: CreateStoreDraft;
+  storeDraft: CreateStoreDraft;
 
-	updateStoreDraft: (
-		updates: Partial<CreateStoreDraft>
-	) => void;
+  updateStoreDraft: (updates: Partial<CreateStoreDraft>) => void;
 
-	loadStoreDraft: (
-		draft: Doc<"stores">
-	) => void;
+  loadStoreDraft: (draft: Doc<"stores">) => void;
 
-	resetStoreDraft: () => void;
+  resetStoreDraft: () => void;
 }
 
 const defaultStoreDraft: CreateStoreDraft = {
-	organizationName: "",
-	organizationSlug: "",
+  organizationName: "",
+  organizationSlug: "",
 
-	storeName: "",
-	storeSlug: "",
-	storeDescription: "",
+  storeName: "",
+  storeSlug: "",
+  storeDescription: "",
 
-	logoFile: null,
-	logoStorageId: null,
+  logoFile: null,
+  logoStorageId: null,
+
+  artworkAdjustments: {},
+
+  artworkText: {
+    organizationName: "",
+    yearEstablished: "2020",
+    mascotName: "MUSTANGS",
+  },
 };
 
-const CreateStoreContext =
-	createContext<CreateStoreContextValue | null>(null);
+const CreateStoreContext = createContext<CreateStoreContextValue | null>(null);
 
 interface CreateStoreProviderProps {
-	children: ReactNode;
+  children: ReactNode;
 }
 
-export function CreateStoreProvider({
-	children,
-}: CreateStoreProviderProps) {
-	const [storeId, setStoreId] =
-		useState<Id<"stores"> | null>(null);
+export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
+  const [storeId, setStoreId] = useState<Id<"stores"> | null>(null);
 
-	const [currentStep, setCurrentStep] =
-		useState(1);
+  const [currentStep, setCurrentStep] = useState(1);
 
-	const [primaryColor, setPrimaryColor] =
-		useState(DEFAULT_PRIMARY_COLOR);
+  const [primaryColor, setPrimaryColor] = useState(DEFAULT_PRIMARY_COLOR);
 
-	const [secondaryColor, setSecondaryColor] =
-		useState(DEFAULT_SECONDARY_COLOR);
+  const [secondaryColor, setSecondaryColor] = useState(DEFAULT_SECONDARY_COLOR);
 
-	const [storeDraft, setStoreDraft] =
-		useState<CreateStoreDraft>(
-			defaultStoreDraft
-		);
+  const [storeDraft, setStoreDraft] =
+    useState<CreateStoreDraft>(defaultStoreDraft);
 
-	function updateStoreDraft(
-		updates: Partial<CreateStoreDraft>
-	) {
-		setStoreDraft((currentDraft) => ({
-			...currentDraft,
-			...updates,
-		}));
-	}
+  function updateStoreDraft(updates: Partial<CreateStoreDraft>) {
+    setStoreDraft((currentDraft) => ({
+      ...currentDraft,
+      ...updates,
+    }));
+  }
 
-	function loadStoreDraft(
-		draft: Doc<"stores">
-	) {
-		if (draft.status !== "draft") {
-			throw new Error(
-				"Only draft stores can be loaded into the store wizard."
-			);
-		}
+  function loadStoreDraft(draft: Doc<"stores">) {
+    if (draft.status !== "draft") {
+      throw new Error("Only draft stores can be loaded into the store wizard.");
+    }
 
-		setStoreId(draft._id);
-		setCurrentStep(draft.currentStep);
+    setStoreId(draft._id);
+    setCurrentStep(draft.currentStep);
 
-		setPrimaryColor(
-			draft.primaryColor ??
-				DEFAULT_PRIMARY_COLOR
-		);
+    setPrimaryColor(draft.primaryColor ?? DEFAULT_PRIMARY_COLOR);
 
-		setSecondaryColor(
-			draft.secondaryColor ??
-				DEFAULT_SECONDARY_COLOR
-		);
+    setSecondaryColor(draft.secondaryColor ?? DEFAULT_SECONDARY_COLOR);
 
-		setStoreDraft({
-			organizationName:
-				draft.organizationName ?? "",
+    setStoreDraft({
+      organizationName: draft.organizationName ?? "",
 
-			organizationSlug:
-				draft.organizationSlug ?? "",
+      organizationSlug: draft.organizationSlug ?? "",
 
-			storeName: draft.name ?? "",
-			storeSlug: draft.slug ?? "",
+      storeName: draft.name ?? "",
+      storeSlug: draft.slug ?? "",
 
-			storeDescription:
-				draft.description ?? "",
+      storeDescription: draft.description ?? "",
 
-			logoFile: null,
+      logoFile: null,
 
-			logoStorageId:
-				draft.logoStorageId ?? null,
-		});
-	}
+      logoStorageId: draft.logoStorageId ?? null,
 
-	function resetStoreDraft() {
-		setStoreId(null);
-		setCurrentStep(1);
+      artworkAdjustments: {},
 
-		setPrimaryColor(
-			DEFAULT_PRIMARY_COLOR
-		);
+      artworkText: {
+        organizationName: draft.organizationName ?? "",
+        yearEstablished: "2020",
+        mascotName: "MUSTANGS",
+      },
+    });
+  }
 
-		setSecondaryColor(
-			DEFAULT_SECONDARY_COLOR
-		);
+  function resetStoreDraft() {
+    setStoreId(null);
+    setCurrentStep(1);
 
-		setStoreDraft({
-			...defaultStoreDraft,
-		});
-	}
+    setPrimaryColor(DEFAULT_PRIMARY_COLOR);
 
-	return (
-		<CreateStoreContext.Provider
-			value={{
-				storeId,
-				setStoreId,
+    setSecondaryColor(DEFAULT_SECONDARY_COLOR);
 
-				currentStep,
-				setCurrentStep,
+    setStoreDraft({
+      ...defaultStoreDraft,
+    });
+  }
 
-				primaryColor,
-				secondaryColor,
+  return (
+    <CreateStoreContext.Provider
+      value={{
+        storeId,
+        setStoreId,
 
-				setPrimaryColor,
-				setSecondaryColor,
+        currentStep,
+        setCurrentStep,
 
-				storeDraft,
-				updateStoreDraft,
+        primaryColor,
+        secondaryColor,
 
-				loadStoreDraft,
-				resetStoreDraft,
-			}}
-		>
-			{children}
-		</CreateStoreContext.Provider>
-	);
+        setPrimaryColor,
+        setSecondaryColor,
+
+        storeDraft,
+        updateStoreDraft,
+
+        loadStoreDraft,
+        resetStoreDraft,
+      }}
+    >
+      {children}
+    </CreateStoreContext.Provider>
+  );
 }
 
 export function useCreateStore() {
-	const context = useContext(
-		CreateStoreContext
-	);
+  const context = useContext(CreateStoreContext);
 
-	if (!context) {
-		throw new Error(
-			"useCreateStore must be used within CreateStoreProvider."
-		);
-	}
+  if (!context) {
+    throw new Error("useCreateStore must be used within CreateStoreProvider.");
+  }
 
-	return context;
+  return context;
 }
