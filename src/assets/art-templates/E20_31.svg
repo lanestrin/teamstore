@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<svg
+  id="Template"
+  xmlns="http://www.w3.org/2000/svg"
+  version="1.1"
+  viewBox="0 0 1021.907 857.513"
+>
+  <defs>
+    <path
+      id="Line1Path"
+      d="M81.83,432.283c0-176.813,194.677-320.148,431.124-320.148s431.124,143.335,431.124,320.148"
+    />
+  </defs>
+
+  <rect
+    id="Mascot"
+    x="265.227"
+    y="208.546"
+    width="491.454"
+    height="491.454"
+    fill="#ff63bf"
+  />
+
+  <text
+    id="Line1"
+    font-family="HeadCapitalBoldGrunge, 'Head Capital Bold Grunge'"
+    font-size="125.09"
+    text-anchor="middle"
+  >
+    <textPath
+      href="#Line1Path"
+      startOffset="50%"
+    >
+      MARTINIVILLE
+    </textPath>
+  </text>
+
+  <text
+    id="Line2"
+    x="245.227"
+    y="525.543"
+    text-anchor="end"
+    font-family="HeadCapitalBoldGrunge, 'Head Capital Bold Grunge'"
+    font-size="182.88"
+    letter-spacing=".015em"
+  >
+    20
+  </text>
+
+  <text
+    id="Line3"
+    x="776.681"
+    y="525.543"
+    text-anchor="start"
+    font-family="HeadCapitalBoldGrunge, 'Head Capital Bold Grunge'"
+    font-size="182.88"
+    letter-spacing=".015em"
+  >
+    20
+  </text>
+
+  <text
+    id="Line4"
+    x="510.954"
+    y="840.044"
+    text-anchor="middle"
+    font-family="HeadCapitalBoldGrunge, 'Head Capital Bold Grunge'"
+    font-size="125.09"
+    letter-spacing=".03em"
+  >
+    MUSTANGS
+  </text>
+</svg>
