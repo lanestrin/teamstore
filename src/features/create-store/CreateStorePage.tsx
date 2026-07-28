@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 
 import { useCreateStore } from "./context/CreateStoreContext";
 
-import ColorsStep from "./steps/ColorStep/ColorsStep";
-import ColorsStepSkeleton from "./steps/ColorStep/ColorsStepSkeleton";
-import OrganizationStep from "./steps/OraganizationStep/OrganizationStep";
-import ProductStep from "./steps/ProductStep/ProductStep";
+import ColorsStep from "./feature/1_ColorStep/ColorsStep";
+import ColorsStepSkeleton from "./feature/1_ColorStep/ColorsStepSkeleton";
+import OrganizationStep from "./feature/2_OraganizationStep/OrganizationStep";
+import SelectArtworkStep from "./feature/3_ArtworkStep/ArtworkStep";
 
 export default function CreateStorePage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -32,7 +32,7 @@ export default function CreateStorePage() {
       return <OrganizationStep />;
 
     case 3:
-      return <ProductStep />;
+      return <SelectArtworkStep />;
 
     default:
       return <ColorsStep />;

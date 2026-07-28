@@ -25,12 +25,12 @@ const steps = [
     description: "Tell us about your team",
   },
   {
-    title: "Products",
-    description: "Choose what to sell",
+    title: "Artwork",
+    description: "Choose and customize your artwork",
   },
   {
-    title: "Store Settings",
-    description: "Dates, ordering & options",
+    title: "Products",
+    description: "Choose what to sell",
   },
   {
     title: "Review",
