@@ -3,10 +3,17 @@
 
 .page {
     display: flex;
-    flex-direction: column;
-    gap: $space-8;
+    width: 100%;
+    min-height: 100%;
     max-width: 720px;
     padding: $space-8;
+    flex-direction: column;
+    gap: $space-8;
+    box-sizing: border-box;
+}
+
+.wide {
+    max-width: none;
 }
 
 .header {
@@ -17,47 +24,56 @@
 
 .badge {
     display: inline-flex;
-    align-items: center;
-    height: 30px;
     width: fit-content;
-    padding: 0 $space-3;
+    height: 30px;
     margin-bottom: $space-3;
-    background: rgba($brand-red, 0.08);
+    padding: 0 $space-3;
+    align-items: center;
     border-radius: $radius-pill;
+    background: rgba($brand-red, 0.08);
     color: $brand-red;
     font-size: 0.75rem;
     font-weight: $font-bold;
-    text-transform: uppercase;
     letter-spacing: 0.08em;
+    text-transform: uppercase;
 }
 
 .header h1 {
     margin: 0;
+    color: $text-primary;
     font-size: 3rem;
     font-weight: $font-bold;
     line-height: 1;
     text-transform: uppercase;
-    color: $text-primary;
 }
 
 .description {
     max-width: 640px;
     margin: 0;
+    color: $text-secondary;
     font-size: 1.125rem;
     line-height: $line-height-body;
-    color: $text-secondary;
 }
 
 .stepContent {
     display: flex;
+    min-width: 0;
     flex-direction: column;
     gap: $space-6;
 }
 
+.actions {
+    display: flex;
+    margin-top: auto;
+    padding-top: $space-2;
+    align-items: center;
+    justify-content: space-between;
+}
+
 .primaryButton {
     @include button-red;
-    height: 42px;
     width: 100px;
+    height: 42px;
     padding: 0 $space-4;
     font-family: "Barlow Condensed", sans-serif;
     font-size: 0.95rem;
@@ -68,22 +84,22 @@
 
 .secondaryButton {
     @include button-ghost;
-    height: 42px;
     width: 100px;
+    height: 42px;
     padding: 0 $space-4;
+    border: 2px solid rgba($black, 0.3);
+    background: transparent;
+    color: $text-primary;
     font-family: "Barlow Condensed", sans-serif;
     font-size: 0.95rem;
     font-weight: $font-bold;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-}
 
-.actions {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: auto;
-    padding-top: $space-2;
+    &:hover {
+        border: 2px solid $brand-red;
+        color: $brand-red;
+    }
 }
 
 @media (max-width: 768px) {

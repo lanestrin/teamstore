@@ -5,7 +5,6 @@ import {
   ART_TEMPLATES,
   type ArtTemplateEditableElement,
 } from "../../../../assets/art-templates";
-import ArtTemplatePreview from "../../../../components/art-template-preview/ArtTemplatePreview";
 import WizardLayout from "../../components/WizardLayout/WizardLayout";
 import {
   useCreateStore,
@@ -18,7 +17,8 @@ import {
   type ArtworkAdjustments,
 } from "./artworkEditor";
 
-import styles from "./ProductStep.module.scss";
+import styles from "./ArtworkStep.module.scss";
+import ArtTemplatePreview from "./components/ArtTemplatePreview/ArtTemplatePreview";
 
 const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
 const MAX_MASCOT_FILE_SIZE = 5 * 1024 * 1024;
@@ -171,7 +171,7 @@ function formatFileSize(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export default function ProductStep() {
+export default function SelectArtStep() {
   const { currentStep, setCurrentStep, storeDraft, updateStoreDraft } =
     useCreateStore();
 
@@ -251,10 +251,11 @@ export default function ProductStep() {
     <>
       <WizardLayout
         step={currentStep}
-        title="Choose Your Products"
-        description="Preview generated artwork and choose products for your store."
+        title="Choose Your Artwork"
+        description="Preview generated artwork for your store."
         onBack={() => setCurrentStep(2)}
         nextDisabled
+        width="wide"
       >
         <div className={styles.editor}>
           <section

@@ -1,5 +1,4 @@
-import type { ArtTemplate } from "../../assets/art-templates";
-
+import type { ArtTemplate } from "../../../../../../assets/art-templates";
 import styles from "./ArtTemplatePreview.module.scss";
 
 interface ArtTemplatePreviewProps {

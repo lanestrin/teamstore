@@ -11,7 +11,7 @@ import {
 
 import type { Doc, Id } from "../../../../convex/_generated/dataModel";
 
-import type { ArtworkAdjustments } from "../steps/ProductStep/artworkEditor";
+import type { ArtworkAdjustments } from "../feature/3_ArtworkStep/artworkEditor";
 
 const DEFAULT_PRIMARY_COLOR = "#111827";
 const DEFAULT_SECONDARY_COLOR = "#DC2626";

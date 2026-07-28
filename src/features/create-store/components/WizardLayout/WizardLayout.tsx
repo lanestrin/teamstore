@@ -1,71 +1,72 @@
 import type { ReactNode } from "react";
+
 import styles from "./WizardLayout.module.scss";
 
 interface WizardLayoutProps {
-	step: number;
-	title: string;
-	description: string;
-	children: ReactNode;
-	onBack?: () => void;
-	onNext?: () => void;
-	nextLabel?: string;
-	backLabel?: string;
-	nextDisabled?: boolean;
-	hideBack?: boolean;
+  step: number;
+  title: string;
+  description: string;
+  children: ReactNode;
+  onBack?: () => void;
+  onNext?: () => void;
+  nextLabel?: string;
+  backLabel?: string;
+  nextDisabled?: boolean;
+  hideBack?: boolean;
+  width?: "standard" | "wide";
 }
 
 export default function WizardLayout({
-	step,
-	title,
-	description,
-	children,
-	onBack,
-	onNext,
-	nextLabel = "Next",
-	backLabel = "Back",
-	nextDisabled = false,
-	hideBack = false,
+  step,
+  title,
+  description,
+  children,
+  onBack,
+  onNext,
+  nextLabel = "Next",
+  backLabel = "Back",
+  nextDisabled = false,
+  hideBack = false,
+  width = "standard",
 }: WizardLayoutProps) {
-	return (
-		<section className={styles.page}>
-			<header className={styles.header}>
-				<div className={styles.badge}>
-					Step {step}
-				</div>
+  const pageClassName = [styles.page, width === "wide" ? styles.wide : ""]
+    .filter(Boolean)
+    .join(" ");
 
-				<h1>{title}</h1>
+  return (
+    <section className={pageClassName}>
+      <header className={styles.header}>
+        <div className={styles.badge}>Step {step}</div>
 
-				<p className={styles.description}>
-					{description}
-				</p>
-			</header>
+        <h1>{title}</h1>
 
-			<div className={styles.stepContent}>
-				{children}
-			</div>
+        <p className={styles.description}>{description}</p>
+      </header>
 
-			<footer className={styles.actions}>
-				{hideBack ? (
-					<div />
-				) : (
-					<button
-						type="button"
-						className={styles.secondaryButton}
-						onClick={onBack}
-					>
-						{backLabel}
-					</button>
-				)}
+      <div className={styles.stepContent}>{children}</div>
 
-				<button
-					type="button"
-					className={styles.primaryButton}
-					onClick={onNext}
-					disabled={nextDisabled}
-				>
-					{nextLabel}
-				</button>
-			</footer>
-		</section>
-	);
+      <footer className={styles.actions}>
+        {hideBack ? (
+          <div aria-hidden="true" />
+        ) : (
+          <button
+            type="button"
+            className={styles.secondaryButton}
+            onClick={onBack}
+          >
+            {backLabel}
+          </button>
+        )}
+
+        <button
+          type="button"
+          className={styles.primaryButton}
+          onClick={onNext}
+          disabled={nextDisabled}
+        >
+          {nextLabel}
+        </button>
+      </footer>
+    </section>
+  );
 }
