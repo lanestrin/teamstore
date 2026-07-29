@@ -19,7 +19,7 @@
     y="208.546"
     width="491.454"
     height="491.454"
-    fill="#ff63bf"
+    fill="#e600ff"
   />
 
   <text
@@ -27,6 +27,7 @@
     font-family="HeadCapitalBoldGrunge, 'Head Capital Bold Grunge'"
     font-size="125.09"
     text-anchor="middle"
+    fill="black"
   >
     <textPath
       href="#Line1Path"
@@ -41,6 +42,7 @@
     x="245.227"
     y="525.543"
     text-anchor="end"
+    fill="black"
     font-family="HeadCapitalBoldGrunge, 'Head Capital Bold Grunge'"
     font-size="182.88"
     letter-spacing=".015em"
@@ -53,6 +55,7 @@
     x="776.681"
     y="525.543"
     text-anchor="start"
+    fill="black"
     font-family="HeadCapitalBoldGrunge, 'Head Capital Bold Grunge'"
     font-size="182.88"
     letter-spacing=".015em"
@@ -65,10 +68,11 @@
     x="510.954"
     y="840.044"
     text-anchor="middle"
+    fill="black"
     font-family="HeadCapitalBoldGrunge, 'Head Capital Bold Grunge'"
     font-size="125.09"
     letter-spacing=".03em"
   >
-    MUSTANGS
+    <tspan data-fit-width="930" data-fit-mode="squeeze">MUSTANGS</tspan>
   </text>
 </svg>

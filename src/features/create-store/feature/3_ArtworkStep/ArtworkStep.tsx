@@ -2,8 +2,10 @@ import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { LuImage, LuPencil, LuUpload } from "react-icons/lu";
 
 import {
-  ART_TEMPLATES,
+  ART_TEMPLATE_LIST,
+  type ArtTemplate,
   type ArtTemplateEditableElement,
+  type ArtTemplateTextBinding,
 } from "../../../../assets/art-templates";
 import WizardLayout from "../../components/WizardLayout/WizardLayout";
 import {
@@ -12,16 +14,151 @@ import {
 } from "../../context/CreateStoreContext";
 
 import ArtworkEditorModal from "./components/ArtworkEditorModal/ArtworkEditorModal";
+import ArtTemplatePreview from "./components/ArtTemplatePreview/ArtTemplatePreview";
 import {
   applyArtworkAdjustments,
   type ArtworkAdjustments,
 } from "./artworkEditor";
 
 import styles from "./ArtworkStep.module.scss";
-import ArtTemplatePreview from "./components/ArtTemplatePreview/ArtTemplatePreview";
 
 const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
 const MAX_MASCOT_FILE_SIZE = 5 * 1024 * 1024;
+
+interface ArtworkTemplateGalleryItem {
+  template: ArtTemplate;
+  baseSvg: string;
+  customizedSvg: string;
+  isSelected: boolean;
+  artworkAdjustments: ArtworkAdjustments;
+}
+
+function getPresentationAttribute(element: Element, name: string) {
+  let current: Element | null = element;
+
+  while (current) {
+    const directValue = current.getAttribute(name);
+
+    if (directValue) {
+      return directValue;
+    }
+
+    const inlineStyle = current.getAttribute("style");
+
+    if (inlineStyle) {
+      const declaration = inlineStyle
+        .split(";")
+        .map((item) => item.trim())
+        .find((item) =>
+          item.toLowerCase().startsWith(`${name.toLowerCase()}:`),
+        );
+
+      if (declaration) {
+        return declaration.slice(declaration.indexOf(":") + 1).trim();
+      }
+    }
+
+    current = current.parentElement;
+  }
+
+  return null;
+}
+
+function parseSvgNumber(value: string | null, fallback: number) {
+  if (!value) {
+    return fallback;
+  }
+
+  const parsedValue = Number.parseFloat(value);
+
+  return Number.isFinite(parsedValue) ? parsedValue : fallback;
+}
+
+let textMeasurementContext: CanvasRenderingContext2D | null | undefined;
+
+function getTextMeasurementContext() {
+  if (typeof document === "undefined") {
+    return null;
+  }
+
+  if (textMeasurementContext !== undefined) {
+    return textMeasurementContext;
+  }
+
+  const canvas = document.createElement("canvas");
+  textMeasurementContext = canvas.getContext("2d");
+
+  return textMeasurementContext;
+}
+
+function measureSvgText(element: Element, value: string) {
+  const context = getTextMeasurementContext();
+
+  if (!context || !value) {
+    return 0;
+  }
+
+  const fontStyle = getPresentationAttribute(element, "font-style") ?? "normal";
+  const fontWeight =
+    getPresentationAttribute(element, "font-weight") ?? "normal";
+  const fontSize = parseSvgNumber(
+    getPresentationAttribute(element, "font-size"),
+    16,
+  );
+  const fontFamily =
+    getPresentationAttribute(element, "font-family") ?? "sans-serif";
+  const letterSpacing = parseSvgNumber(
+    getPresentationAttribute(element, "letter-spacing"),
+    0,
+  );
+
+  context.font = `${fontStyle} ${fontWeight} ${fontSize}px ${fontFamily}`;
+
+  const measuredWidth = context.measureText(value).width;
+  const spacingWidth = Math.max(0, value.length - 1) * letterSpacing;
+
+  return measuredWidth + spacingWidth;
+}
+
+function getTextFitWidth(
+  svgDocument: Document,
+  element: Element,
+  textTarget: Element,
+  originalValue: string,
+) {
+  const configuredWidth =
+    textTarget.getAttribute("data-fit-width") ??
+    element.getAttribute("data-fit-width");
+
+  if (configuredWidth) {
+    return parseSvgNumber(configuredWidth, 0);
+  }
+
+  const existingTextLength =
+    textTarget.getAttribute("textLength") ?? element.getAttribute("textLength");
+
+  if (existingTextLength) {
+    return parseSvgNumber(existingTextLength, 0);
+  }
+
+  const originalWidth = measureSvgText(textTarget, originalValue);
+
+  if (originalWidth > 0) {
+    return originalWidth;
+  }
+
+  const viewBox = svgDocument.documentElement
+    .getAttribute("viewBox")
+    ?.trim()
+    .split(/[\s,]+/)
+    .map(Number);
+
+  if (viewBox?.length === 4 && Number.isFinite(viewBox[2])) {
+    return viewBox[2] * 0.92;
+  }
+
+  return 0;
+}
 
 function setSvgText(svgDocument: Document, elementId: string, value: string) {
   const element = svgDocument.getElementById(elementId);
@@ -35,25 +172,52 @@ function setSvgText(svgDocument: Document, elementId: string, value: string) {
     element.querySelector("textPath") ??
     element.querySelector("tspan") ??
     element;
+  const originalValue = textTarget.textContent?.trim() ?? "";
+  const fitWidth = getTextFitWidth(
+    svgDocument,
+    element,
+    textTarget,
+    originalValue,
+  );
 
   textTarget.textContent = value;
+  textTarget.removeAttribute("textLength");
+  textTarget.removeAttribute("lengthAdjust");
+
+  const updatedWidth = measureSvgText(textTarget, value);
+
+  if (fitWidth > 0 && updatedWidth > fitWidth) {
+    textTarget.setAttribute("textLength", fitWidth.toFixed(3));
+    textTarget.setAttribute("lengthAdjust", "spacingAndGlyphs");
+  }
 }
 
-function setSvgMascot(svgDocument: Document, mascotSource: string | null) {
-  if (!mascotSource) {
+function setSvgMascot(
+  svgDocument: Document,
+  mascotElementId: string | undefined,
+  mascotSource: string | null,
+) {
+  if (!mascotElementId || !mascotSource) {
     return;
   }
 
-  const currentMascot = svgDocument.getElementById("Mascot");
+  const currentMascot = svgDocument.getElementById(mascotElementId);
 
   if (!currentMascot) {
-    console.warn('SVG element "#Mascot" was not found.');
+    console.warn(`SVG element "#${mascotElementId}" was not found.`);
     return;
   }
 
   const mascotImage = svgDocument.createElementNS(SVG_NAMESPACE, "image");
 
-  for (const attribute of ["x", "y", "width", "height", "transform"]) {
+  for (const attribute of [
+    "x",
+    "y",
+    "width",
+    "height",
+    "transform",
+    "clip-path",
+  ]) {
     const value = currentMascot.getAttribute(attribute);
 
     if (value) {
@@ -61,38 +225,58 @@ function setSvgMascot(svgDocument: Document, mascotSource: string | null) {
     }
   }
 
-  mascotImage.setAttribute("id", "Mascot");
+  mascotImage.setAttribute("id", mascotElementId);
   mascotImage.setAttribute("preserveAspectRatio", "xMidYMid meet");
   mascotImage.setAttribute("href", mascotSource);
 
   currentMascot.replaceWith(mascotImage);
 }
 
+function getTextBindingValue(
+  values: ArtworkTextDraft,
+  binding: ArtTemplateTextBinding,
+) {
+  let value = values[binding.field];
+
+  if (binding.field === "yearEstablished") {
+    value = value.replace(/\D/g, "").slice(0, 4);
+  } else {
+    value = value.trim();
+  }
+
+  if (binding.slice) {
+    value = value.slice(binding.slice[0], binding.slice[1]);
+  }
+
+  if (binding.transform === "uppercase") {
+    value = value.toUpperCase();
+  }
+
+  return value;
+}
+
 function createCustomizedSvg(
-  templateSvg: string,
+  template: ArtTemplate,
   values: ArtworkTextDraft,
   mascotSource: string | null,
 ) {
   const parser = new DOMParser();
-  const svgDocument = parser.parseFromString(templateSvg, "image/svg+xml");
+  const svgDocument = parser.parseFromString(template.svg, "image/svg+xml");
 
   if (svgDocument.querySelector("parsererror")) {
-    console.error("The artwork template could not be parsed.");
-    return templateSvg;
+    console.error(`Artwork template "${template.id}" could not be parsed.`);
+    return template.svg;
   }
 
-  const year = values.yearEstablished.replace(/\D/g, "").slice(0, 4);
+  for (const binding of template.textBindings) {
+    setSvgText(
+      svgDocument,
+      binding.elementId,
+      getTextBindingValue(values, binding),
+    );
+  }
 
-  setSvgText(
-    svgDocument,
-    "Line1",
-    values.organizationName.trim().toUpperCase(),
-  );
-  setSvgText(svgDocument, "Line2", year.slice(0, 2));
-  setSvgText(svgDocument, "Line3", year.slice(2, 4));
-  setSvgText(svgDocument, "Line4", values.mascotName.trim().toUpperCase());
-
-  setSvgMascot(svgDocument, mascotSource);
+  setSvgMascot(svgDocument, template.mascotElementId, mascotSource);
 
   return new XMLSerializer().serializeToString(svgDocument.documentElement);
 }
@@ -172,49 +356,95 @@ function formatFileSize(bytes: number) {
 }
 
 export default function SelectArtStep() {
-  const { currentStep, setCurrentStep, storeDraft, updateStoreDraft } =
-    useCreateStore();
-
-  const template = ART_TEMPLATES.E20_31;
+  const {
+    currentStep,
+    setCurrentStep,
+    storeDraft,
+    updateStoreDraft,
+    updateArtworkTemplateDraft,
+  } = useCreateStore();
 
   const artworkText = useMemo<ArtworkTextDraft>(
     () => ({
       ...storeDraft.artworkText,
       organizationName:
-        storeDraft.artworkText.organizationName ||
-        storeDraft.organizationName ||
-        "MARTINIVILLE",
+        storeDraft.artworkText.organizationName || storeDraft.organizationName,
     }),
     [storeDraft.artworkText, storeDraft.organizationName],
   );
 
-  const artworkAdjustments = storeDraft.artworkAdjustments;
-
-  const [isArtworkEditorOpen, setIsArtworkEditorOpen] = useState(false);
+  const [editingTemplateId, setEditingTemplateId] = useState<string | null>(
+    null,
+  );
 
   const [mascotError, setMascotError] = useState<string | null>(null);
+  const [fontLoadVersion, setFontLoadVersion] = useState(0);
 
   const mascotDataUrl = useFileDataUrl(storeDraft.logoFile);
 
-  const baseCustomizedSvg = useMemo(
-    () => createCustomizedSvg(template.svg, artworkText, mascotDataUrl),
-    [template.svg, artworkText, mascotDataUrl],
+  useEffect(() => {
+    if (typeof document === "undefined" || !document.fonts) {
+      return;
+    }
+
+    let isCancelled = false;
+
+    void document.fonts.ready.then(() => {
+      if (!isCancelled) {
+        setFontLoadVersion((current) => current + 1);
+      }
+    });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
+
+  const templateGalleryItems = useMemo<ArtworkTemplateGalleryItem[]>(
+    () =>
+      ART_TEMPLATE_LIST.map((template) => {
+        const templateDraft = storeDraft.artworkTemplates[template.id];
+        const artworkAdjustments = templateDraft?.artworkAdjustments ?? {};
+        const baseSvg = createCustomizedSvg(
+          template,
+          artworkText,
+          mascotDataUrl,
+        );
+
+        return {
+          template,
+          baseSvg,
+          customizedSvg: applySavedArtworkAdjustments(
+            baseSvg,
+            template.editableElements,
+            artworkAdjustments,
+          ),
+          isSelected: templateDraft?.isSelected ?? false,
+          artworkAdjustments,
+        };
+      }),
+    [artworkText, fontLoadVersion, mascotDataUrl, storeDraft.artworkTemplates],
   );
 
-  const customizedSvg = useMemo(
+  const editingTemplate = useMemo(
     () =>
-      applySavedArtworkAdjustments(
-        baseCustomizedSvg,
-        template.editableElements,
-        artworkAdjustments,
-      ),
-    [baseCustomizedSvg, template.editableElements, artworkAdjustments],
+      editingTemplateId
+        ? (templateGalleryItems.find(
+            ({ template }) => template.id === editingTemplateId,
+          ) ?? null)
+        : null,
+    [editingTemplateId, templateGalleryItems],
+  );
+
+  const selectedTemplateCount = useMemo(
+    () => templateGalleryItems.filter(({ isSelected }) => isSelected).length,
+    [templateGalleryItems],
   );
 
   const updateArtworkText = (field: keyof ArtworkTextDraft, value: string) => {
     updateStoreDraft({
       artworkText: {
-        ...artworkText,
+        ...storeDraft.artworkText,
         [field]: value,
       },
     });
@@ -252,9 +482,9 @@ export default function SelectArtStep() {
       <WizardLayout
         step={currentStep}
         title="Choose Your Artwork"
-        description="Preview generated artwork for your store."
+        description="Customize the previews, then select every artwork template you want to use."
         onBack={() => setCurrentStep(2)}
-        nextDisabled
+        nextDisabled={selectedTemplateCount === 0}
         width="wide"
       >
         <div className={styles.editor}>
@@ -265,7 +495,7 @@ export default function SelectArtStep() {
             <div className={styles.controlSection}>
               <div className={styles.controlsHeading}>
                 <h2>Artwork Text</h2>
-                <p>Changes appear in the preview immediately.</p>
+                <p>Changes appear in every template preview immediately.</p>
               </div>
 
               <label className={styles.field}>
@@ -321,7 +551,7 @@ export default function SelectArtStep() {
                 <h2>Mascot</h2>
                 <p>
                   The mascot uploaded earlier is loaded automatically. Upload
-                  another file to replace it.
+                  another file to replace it in every preview.
                 </p>
               </div>
 
@@ -381,34 +611,91 @@ export default function SelectArtStep() {
             </div>
           </section>
 
-          <div className={styles.preview}>
-            <ArtTemplatePreview template={template} svg={customizedSvg} />
+          <section
+            className={styles.templateGallery}
+            aria-labelledby="artwork-template-gallery-title"
+          >
+            <div className={styles.templateGalleryHeader}>
+              <div>
+                <h2 id="artwork-template-gallery-title">Artwork Templates</h2>
+                <p>
+                  Select any number of templates. Each template keeps its own
+                  artwork adjustments.
+                </p>
+              </div>
 
-            <button
-              type="button"
-              className={styles.replaceButton}
-              onClick={() => setIsArtworkEditorOpen(true)}
-            >
-              <LuPencil aria-hidden="true" />
-              Edit Artwork
-            </button>
-          </div>
+              <p className={styles.selectionCount} aria-live="polite">
+                {selectedTemplateCount} selected
+              </p>
+            </div>
+
+            <div className={styles.templateGrid}>
+              {templateGalleryItems.map(
+                ({ template, customizedSvg, isSelected }) => (
+                  <article
+                    key={template.id}
+                    className={styles.templateCard}
+                    data-selected={isSelected}
+                  >
+                    <div className={styles.templateCardHeader}>
+                      <h3>{template.name}</h3>
+                    </div>
+
+                    <div className={styles.templateThumbnail}>
+                      <ArtTemplatePreview
+                        template={template}
+                        svg={customizedSvg}
+                      />
+                    </div>
+
+                    <div className={styles.templateCardActions}>
+                      <label className={styles.templateCheckbox}>
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={(event) =>
+                            updateArtworkTemplateDraft(template.id, {
+                              isSelected: event.currentTarget.checked,
+                            })
+                          }
+                        />
+
+                        <span>Use this template</span>
+                      </label>
+
+                      <button
+                        type="button"
+                        className={styles.editArtworkButton}
+                        aria-label={`Edit ${template.name} artwork`}
+                        onClick={() => setEditingTemplateId(template.id)}
+                      >
+                        <LuPencil aria-hidden="true" />
+                        <span>Edit art</span>
+                      </button>
+                    </div>
+                  </article>
+                ),
+              )}
+            </div>
+          </section>
         </div>
       </WizardLayout>
 
-      <ArtworkEditorModal
-        isOpen={isArtworkEditorOpen}
-        svg={baseCustomizedSvg}
-        editableElements={template.editableElements}
-        adjustments={artworkAdjustments}
-        onCancel={() => setIsArtworkEditorOpen(false)}
-        onSave={(nextAdjustments) => {
-          updateStoreDraft({
-            artworkAdjustments: nextAdjustments,
-          });
-          setIsArtworkEditorOpen(false);
-        }}
-      />
+      {editingTemplate && (
+        <ArtworkEditorModal
+          isOpen
+          svg={editingTemplate.baseSvg}
+          editableElements={editingTemplate.template.editableElements}
+          adjustments={editingTemplate.artworkAdjustments}
+          onCancel={() => setEditingTemplateId(null)}
+          onSave={(nextAdjustments) => {
+            updateArtworkTemplateDraft(editingTemplate.template.id, {
+              artworkAdjustments: nextAdjustments,
+            });
+            setEditingTemplateId(null);
+          }}
+        />
+      )}
     </>
   );
 }

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+  id="Template"
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 1000 487"
+>
+  <rect
+    id="Mascot"
+    x="405.748"
+    y="9.496"
+    width="188.504"
+    height="188.504"
+    fill="#e600ff"
+  />
+
+  <g id="Line2">
+    <text
+      x="500"
+      y="330"
+      text-anchor="middle"
+      fill="white"
+      stroke="black"
+      stroke-width="15"
+      paint-order="stroke fill"
+      font-family="College"
+      font-size="250"
+      font-kerning="normal"
+      font-feature-settings="'kern' 1"
+      letter-spacing="normal"
+      text-rendering="optimizeLegibility"
+      >
+      <tspan data-fit-width="920" data-fit-mode="squeeze">WARRIORS</tspan>
+    </text>
+  </g>
+
+  <g id="Line1">
+    <text
+      x="500"
+      y="420"
+      text-anchor="middle"
+      fill="white"
+      stroke="black"
+      stroke-width="15"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      paint-order="stroke fill"
+      font-family="BrushScriptBT-Regular"
+      font-size="165"
+      letter-spacing="-0.02em"
+      text-rendering="optimizeLegibility"
+    >
+      <tspan data-fit-width="840" data-fit-mode="squeeze">Cheerleader</tspan>
+    </text>
+  </g>
+</svg>
