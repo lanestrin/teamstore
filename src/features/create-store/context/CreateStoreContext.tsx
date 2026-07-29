@@ -22,6 +22,14 @@ export interface ArtworkTextDraft {
   mascotName: string;
 }
 
+export interface ArtworkTemplateDraft {
+  selectedArtTemplateId: string;
+  isSelected: boolean;
+  artworkAdjustments: ArtworkAdjustments;
+}
+
+export type ArtworkTemplatesDraft = Record<string, ArtworkTemplateDraft>;
+
 export interface CreateStoreDraft {
   organizationName: string;
   organizationSlug: string;
@@ -33,7 +41,7 @@ export interface CreateStoreDraft {
   logoFile: File | null;
   logoStorageId: Id<"_storage"> | null;
 
-  artworkAdjustments: ArtworkAdjustments;
+  artworkTemplates: ArtworkTemplatesDraft;
   artworkText: ArtworkTextDraft;
 }
 
@@ -54,30 +62,37 @@ interface CreateStoreContextValue {
 
   updateStoreDraft: (updates: Partial<CreateStoreDraft>) => void;
 
+  updateArtworkTemplateDraft: (
+    templateId: string,
+    updates: Partial<Omit<ArtworkTemplateDraft, "selectedArtTemplateId">>,
+  ) => void;
+
   loadStoreDraft: (draft: Doc<"stores">) => void;
 
   resetStoreDraft: () => void;
 }
 
-const defaultStoreDraft: CreateStoreDraft = {
-  organizationName: "",
-  organizationSlug: "",
-
-  storeName: "",
-  storeSlug: "",
-  storeDescription: "",
-
-  logoFile: null,
-  logoStorageId: null,
-
-  artworkAdjustments: {},
-
-  artworkText: {
+function createDefaultStoreDraft(): CreateStoreDraft {
+  return {
     organizationName: "",
-    yearEstablished: "2020",
-    mascotName: "MUSTANGS",
-  },
-};
+    organizationSlug: "",
+
+    storeName: "",
+    storeSlug: "",
+    storeDescription: "",
+
+    logoFile: null,
+    logoStorageId: null,
+
+    artworkTemplates: {},
+
+    artworkText: {
+      organizationName: "Smallville",
+      yearEstablished: "2026",
+      mascotName: "Crows",
+    },
+  };
+}
 
 const CreateStoreContext = createContext<CreateStoreContextValue | null>(null);
 
@@ -94,14 +109,42 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
 
   const [secondaryColor, setSecondaryColor] = useState(DEFAULT_SECONDARY_COLOR);
 
-  const [storeDraft, setStoreDraft] =
-    useState<CreateStoreDraft>(defaultStoreDraft);
+  const [storeDraft, setStoreDraft] = useState<CreateStoreDraft>(
+    createDefaultStoreDraft,
+  );
 
   function updateStoreDraft(updates: Partial<CreateStoreDraft>) {
     setStoreDraft((currentDraft) => ({
       ...currentDraft,
       ...updates,
     }));
+  }
+
+  function updateArtworkTemplateDraft(
+    templateId: string,
+    updates: Partial<Omit<ArtworkTemplateDraft, "selectedArtTemplateId">>,
+  ) {
+    setStoreDraft((currentDraft) => {
+      const currentTemplateDraft = currentDraft.artworkTemplates[
+        templateId
+      ] ?? {
+        selectedArtTemplateId: templateId,
+        isSelected: false,
+        artworkAdjustments: {},
+      };
+
+      return {
+        ...currentDraft,
+        artworkTemplates: {
+          ...currentDraft.artworkTemplates,
+          [templateId]: {
+            ...currentTemplateDraft,
+            ...updates,
+            selectedArtTemplateId: templateId,
+          },
+        },
+      };
+    });
   }
 
   function loadStoreDraft(draft: Doc<"stores">) {
@@ -130,7 +173,7 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
 
       logoStorageId: draft.logoStorageId ?? null,
 
-      artworkAdjustments: {},
+      artworkTemplates: {},
 
       artworkText: {
         organizationName: draft.organizationName ?? "",
@@ -148,9 +191,7 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
 
     setSecondaryColor(DEFAULT_SECONDARY_COLOR);
 
-    setStoreDraft({
-      ...defaultStoreDraft,
-    });
+    setStoreDraft(createDefaultStoreDraft());
   }
 
   return (
@@ -170,6 +211,7 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
 
         storeDraft,
         updateStoreDraft,
+        updateArtworkTemplateDraft,
 
         loadStoreDraft,
         resetStoreDraft,
