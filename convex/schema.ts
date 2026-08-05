@@ -8,6 +8,18 @@ const storeStatus = v.union(
   v.literal("archived"),
 );
 
+const storeActivity = v.union(
+  v.literal("basketball"),
+  v.literal("baseball"),
+  v.literal("football"),
+  v.literal("soccer"),
+  v.literal("softball"),
+  v.literal("volleyball"),
+  v.literal("wrestling"),
+  v.literal("spirit-wear"),
+  v.literal("other"),
+);
+
 const productStatus = v.union(
   v.literal("draft"),
   v.literal("active"),
@@ -169,6 +181,7 @@ export default defineSchema({
     organizationId: v.optional(v.id("organizations")),
     organizationName: v.optional(v.string()),
     organizationSlug: v.optional(v.string()),
+    activity: v.optional(storeActivity),
     name: v.optional(v.string()),
     slug: v.optional(v.string()),
     description: v.optional(v.string()),
@@ -180,8 +193,12 @@ export default defineSchema({
     status: storeStatus,
     createdAt: v.number(),
     updatedAt: v.number(),
-  })
+    })
     .index("by_slug", ["slug"])
+    .index("by_organization_slug_and_slug", [
+      "organizationSlug",
+      "slug",
+    ])
     .index("by_creator", ["createdBy"])
     .index("by_creator_status", ["createdBy", "status"])
     .index("by_organization", ["organizationId"]),

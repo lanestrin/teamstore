@@ -1,9 +1,22 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import type { Id } from "./_generated/dataModel";
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const HEX_COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/;
+
+const storeActivity = v.union(
+  v.literal("basketball"),
+  v.literal("baseball"),
+  v.literal("football"),
+  v.literal("soccer"),
+  v.literal("softball"),
+  v.literal("volleyball"),
+  v.literal("wrestling"),
+  v.literal("spirit-wear"),
+  v.literal("other"),
+);
 
 function normalizeOptionalText(value: string | undefined): string | undefined {
   const normalizedValue = value?.trim();
@@ -43,6 +56,8 @@ export const saveDraft = mutation({
 
     organizationName: v.optional(v.string()),
     organizationSlug: v.optional(v.string()),
+
+    activity: v.optional(storeActivity),
 
     storeName: v.optional(v.string()),
     storeSlug: v.optional(v.string()),
@@ -110,6 +125,8 @@ export const saveDraft = mutation({
         organizationName,
         organizationSlug,
 
+        activity: args.activity,
+
         name: storeName,
         slug: storeSlug,
         description: storeDescription,
@@ -144,6 +161,8 @@ export const saveDraft = mutation({
 
       organizationName,
       organizationSlug,
+
+      activity: args.activity,
 
       name: storeName,
       slug: storeSlug,
@@ -330,6 +349,8 @@ export const createOrganizationWithStore = mutation({
     organizationName: v.string(),
     organizationSlug: v.string(),
 
+    activity: storeActivity,
+
     storeName: v.string(),
     storeSlug: v.string(),
     storeDescription: v.optional(v.string()),
@@ -350,13 +371,9 @@ export const createOrganizationWithStore = mutation({
     }
 
     const organizationName = args.organizationName.trim();
-
     const organizationSlug = args.organizationSlug.trim().toLowerCase();
-
     const storeName = args.storeName.trim();
-
     const storeSlug = args.storeSlug.trim().toLowerCase();
-
     const storeDescription = normalizeOptionalText(args.storeDescription);
 
     if (!organizationName) {
@@ -376,11 +393,9 @@ export const createOrganizationWithStore = mutation({
     }
 
     validateSlug(organizationSlug, "Organization slug");
-
     validateSlug(storeSlug, "Store slug");
 
     validateColor(args.primaryColor, "Primary color");
-
     validateColor(args.secondaryColor, "Secondary color");
 
     if (args.storeId) {
@@ -400,39 +415,68 @@ export const createOrganizationWithStore = mutation({
       .withIndex("by_slug", (q) => q.eq("slug", organizationSlug))
       .unique();
 
-    if (existingOrganization) {
-      throw new ConvexError("That organization URL is already in use.");
-    }
-
     const storesWithSlug = await ctx.db
       .query("stores")
-      .withIndex("by_slug", (q) => q.eq("slug", storeSlug))
+      .withIndex("by_organization_slug_and_slug", (q) =>
+        q
+          .eq("organizationSlug", organizationSlug)
+          .eq("slug", storeSlug),
+      )
       .collect();
 
     const conflictingStore = storesWithSlug.find(
-      (store) => store.status === "active" && store._id !== args.storeId,
+      (store) =>
+        store.status === "active" &&
+        store._id !== args.storeId,
     );
 
     if (conflictingStore) {
-      throw new ConvexError("That store URL is already in use.");
+      throw new ConvexError(
+        "That store URL is already in use for this organization.",
+      );
     }
 
     const now = Date.now();
 
-    const organizationId = await ctx.db.insert("organizations", {
-      name: organizationName,
-      slug: organizationSlug,
-      createdBy: userId,
-      createdAt: now,
-      updatedAt: now,
-    });
+    let organizationId: Id<"organizations">;
 
-    await ctx.db.insert("organizationMembers", {
-      organizationId,
-      userId,
-      role: "owner",
-      createdAt: now,
-    });
+    if (existingOrganization) {
+      const membership = await ctx.db
+        .query("organizationMembers")
+        .withIndex("by_organization_user", (q) =>
+          q
+            .eq("organizationId", existingOrganization._id)
+            .eq("userId", userId),
+        )
+        .unique();
+
+      if (
+        membership === null ||
+        (membership.role !== "owner" &&
+          membership.role !== "admin")
+      ) {
+        throw new ConvexError(
+          "That organization URL is already in use.",
+        );
+      }
+
+      organizationId = existingOrganization._id;
+    } else {
+      organizationId = await ctx.db.insert("organizations", {
+        name: organizationName,
+        slug: organizationSlug,
+        createdBy: userId,
+        createdAt: now,
+        updatedAt: now,
+      });
+
+      await ctx.db.insert("organizationMembers", {
+        organizationId,
+        userId,
+        role: "owner",
+        createdAt: now,
+      });
+    }
 
     if (args.storeId) {
       await ctx.db.patch(args.storeId, {
@@ -440,6 +484,8 @@ export const createOrganizationWithStore = mutation({
 
         organizationName,
         organizationSlug,
+
+        activity: args.activity,
 
         name: storeName,
         slug: storeSlug,
@@ -468,6 +514,7 @@ export const createOrganizationWithStore = mutation({
       return {
         organizationId,
         storeId: args.storeId,
+        organizationSlug,
         storeSlug,
       };
     }
@@ -478,6 +525,8 @@ export const createOrganizationWithStore = mutation({
 
       organizationName,
       organizationSlug,
+
+      activity: args.activity,
 
       name: storeName,
       slug: storeSlug,
@@ -499,25 +548,40 @@ export const createOrganizationWithStore = mutation({
     return {
       organizationId,
       storeId,
+      organizationSlug,
       storeSlug,
     };
   },
 });
 
 /**
- * Checks whether a public store slug is available.
+ * Checks whether a public store URL is available
+ * within an organization.
  *
- * Draft stores do not reserve a public slug.
+ * Draft stores do not reserve a public URL.
  */
 export const checkStoreSlugAvailability = query({
   args: {
-    slug: v.string(),
+    organizationSlug: v.string(),
+    storeSlug: v.string(),
     excludeStoreId: v.optional(v.id("stores")),
   },
-  handler: async (ctx, args) => {
-    const slug = args.slug.trim().toLowerCase();
 
-    if (!slug || !SLUG_PATTERN.test(slug)) {
+  handler: async (ctx, args) => {
+    const organizationSlug = args.organizationSlug
+      .trim()
+      .toLowerCase();
+
+    const storeSlug = args.storeSlug
+      .trim()
+      .toLowerCase();
+
+    if (
+      !organizationSlug ||
+      !storeSlug ||
+      !SLUG_PATTERN.test(organizationSlug) ||
+      !SLUG_PATTERN.test(storeSlug)
+    ) {
       return {
         available: false,
       };
@@ -525,15 +589,66 @@ export const checkStoreSlugAvailability = query({
 
     const matchingStores = await ctx.db
       .query("stores")
-      .withIndex("by_slug", (q) => q.eq("slug", slug))
+      .withIndex("by_organization_slug_and_slug", (q) =>
+        q
+          .eq("organizationSlug", organizationSlug)
+          .eq("slug", storeSlug),
+      )
       .collect();
 
     const conflictingStore = matchingStores.find(
-      (store) => store.status === "active" && store._id !== args.excludeStoreId,
+      (store) =>
+        store.status === "active" &&
+        store._id !== args.excludeStoreId,
     );
 
     return {
       available: conflictingStore === undefined,
     };
+  },
+});
+
+/**
+ * Returns an active public store using its organization
+ * and store URL slugs.
+ */
+export const getActiveStoreBySlugs = query({
+  args: {
+    organizationSlug: v.string(),
+    storeSlug: v.string(),
+  },
+
+  handler: async (ctx, args) => {
+    const organizationSlug = args.organizationSlug
+      .trim()
+      .toLowerCase();
+
+    const storeSlug = args.storeSlug
+      .trim()
+      .toLowerCase();
+
+    if (
+      !organizationSlug ||
+      !storeSlug ||
+      !SLUG_PATTERN.test(organizationSlug) ||
+      !SLUG_PATTERN.test(storeSlug)
+    ) {
+      return null;
+    }
+
+    const matchingStores = await ctx.db
+      .query("stores")
+      .withIndex("by_organization_slug_and_slug", (q) =>
+        q
+          .eq("organizationSlug", organizationSlug)
+          .eq("slug", storeSlug),
+      )
+      .collect();
+
+    return (
+      matchingStores.find(
+        (store) => store.status === "active",
+      ) ?? null
+    );
   },
 });
