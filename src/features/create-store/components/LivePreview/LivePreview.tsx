@@ -1,4 +1,4 @@
-import { useEffect, useMemo, type CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { LuTruck, LuSearch, LuShoppingCart } from "react-icons/lu";
 
 import { useCreateStore } from "../../context/CreateStoreContext";
@@ -9,230 +9,250 @@ import FooterPreview from "../FooterPreview/FooterPreview";
 import ProductPreview from "../ProductPreview/ProductPreview";
 import BenefitsPreview from "../BenefitsPreview/BenefitsPreview";
 
+function useFileDataUrl(file: File | null): string | null {
+  const [dataUrl, setDataUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!file) {
+      setDataUrl(null);
+      return;
+    }
+
+    const reader = new FileReader();
+    let isCancelled = false;
+
+    reader.onload = () => {
+      if (!isCancelled && typeof reader.result === "string") {
+        setDataUrl(reader.result);
+      }
+    };
+
+    reader.onerror = () => {
+      if (!isCancelled) {
+        setDataUrl(null);
+      }
+    };
+
+    reader.readAsDataURL(file);
+
+    return () => {
+      isCancelled = true;
+
+      if (reader.readyState === FileReader.LOADING) {
+        reader.abort();
+      }
+    };
+  }, [file]);
+
+  return dataUrl;
+}
+
 export default function LivePreview() {
-	const {
-		primaryColor,
-		secondaryColor,
-		storeDraft,
-	} = useCreateStore();
+  const { primaryColor, secondaryColor, storeDraft } = useCreateStore();
 
-	const theme = createStoreTheme(primaryColor, secondaryColor);
+  const theme = createStoreTheme(primaryColor, secondaryColor);
 
-	const organizationName =
-		storeDraft.organizationName || "Your Organization";
+  const organizationName = storeDraft.organizationName || "Your Organization";
 
-	const storeName =
-		storeDraft.storeName || "Your Team Store";
+  const organizationSlug = storeDraft.organizationSlug || "your-organization";
 
-	const storeDescription =
-		storeDraft.storeDescription ||
-		"Show your pride. Represent your team.";
+  const storeName = storeDraft.storeName || "Your Team Store";
 
-	const storeSlug =
-		storeDraft.storeSlug || "your-store-name";
+  const storeDescription =
+    storeDraft.storeDescription || "Show your pride. Represent your team.";
 
-	const logoUrl = useMemo(() => {
-		if (!storeDraft.logoFile) {
-			return null;
-		}
+  const storeSlug = storeDraft.storeSlug || "your-store-name";
 
-		return URL.createObjectURL(storeDraft.logoFile);
-	}, [storeDraft.logoFile]);
+  const logoUrl = useFileDataUrl(storeDraft.logoFile);
 
-	useEffect(() => {
-		if (!logoUrl) {
-			return;
-		}
+  return (
+    <aside className={styles.preview}>
+      <div className={styles.header}>
+        <span className={styles.badge}>Live Preview</span>
 
-		return () => URL.revokeObjectURL(logoUrl);
-	}, [logoUrl]);
+        <div className={styles.titleRow}>
+          <h2>{storeName}</h2>
 
-	return (
-		<aside className={styles.preview}>
-			<div className={styles.header}>
-				<span className={styles.badge}>
-					Live Preview
-				</span>
+          <div
+            className={styles.colorPalette}
+            aria-label="Selected team colors"
+          >
+            <span
+              className={styles.primaryColor}
+              style={{
+                backgroundColor: primaryColor,
+              }}
+            />
 
-				<div className={styles.titleRow}>
-					<h2>{storeName}</h2>
+            <span
+              className={styles.secondaryColor}
+              style={{
+                backgroundColor: secondaryColor,
+              }}
+            />
+          </div>
+        </div>
 
-					<div
-						className={styles.colorPalette}
-						aria-label="Selected team colors"
-					>
-						<span
-							className={styles.primaryColor}
-							style={{ backgroundColor: primaryColor }}
-						/>
+        <p>
+          teamstore.com/store/{organizationSlug}/{storeSlug}
+        </p>
+      </div>
 
-						<span
-							className={styles.secondaryColor}
-							style={{ backgroundColor: secondaryColor }}
-						/>
-					</div>
-				</div>
+      <div className={styles.storePreview}>
+        <div className={styles.browser}>
+          <div className={styles.browserBar}>
+            <span />
+            <span />
+            <span />
+          </div>
 
-				<p>teamstore.com/store/{storeSlug}</p>
-			</div>
+          <div className={styles.store}>
+            <div
+              className={styles.promoBar}
+              style={{
+                background: theme.promoBar.background,
+                color: theme.promoBar.text,
+              }}
+            >
+              <LuTruck />
 
-			<div className={styles.storePreview}>
-				<div className={styles.browser}>
-					<div className={styles.browserBar}>
-						<span />
-						<span />
-						<span />
-					</div>
+              <span>Free shipping on orders over $75</span>
+            </div>
 
-					<div className={styles.store}>
-						<div
-							className={styles.promoBar}
-							style={{
-								background: theme.promoBar.background,
-								color: theme.promoBar.text,
-							}}
-						>
-							<LuTruck />
-							<span>Free shipping on orders over $75</span>
-						</div>
+            <header
+              className={styles.storeHeader}
+              style={
+                {
+                  "--primary-color": primaryColor,
+                  "--header-muted-text-color": theme.header.text,
+                  background: theme.header.background,
+                  color: theme.header.text,
+                } as CSSProperties
+              }
+            >
+              <div className={styles.brand}>
+                {logoUrl && (
+                  <img
+                    src={logoUrl}
+                    alt={`${organizationName} logo`}
+                    className={styles.logoImage}
+                  />
+                )}
 
-						<header
-							className={styles.storeHeader}
-							style={
-								{
-									"--primary-color": primaryColor,
-									"--header-muted-text-color": theme.header.text,
-									background: theme.header.background,
-									color: theme.header.text,
-								} as CSSProperties
-							}
-						>
-							<div className={styles.brand}>
-								{logoUrl && (
-									<img
-										src={logoUrl}
-										alt={`${organizationName} logo`}
-										className={styles.logoImage}
-									/>
-								)}
+                <div>
+                  <strong>{storeName}</strong>
+                  <span>{organizationName}</span>
+                </div>
+              </div>
 
-								<div>
-									<strong>{storeName}</strong>
-									<span>{organizationName}</span>
-								</div>
-							</div>
+              <nav className={styles.nav}>
+                <span>Shop</span>
+                <span>Required Items</span>
+                <span>Fanwear</span>
+                <span>About Us</span>
+              </nav>
 
-							<nav className={styles.nav}>
-								<span>Shop</span>
-								<span>Required Items</span>
-								<span>Fanwear</span>
-								<span>About Us</span>
-							</nav>
+              <div className={styles.actions}>
+                <LuSearch />
 
-							<div className={styles.actions}>
-								<LuSearch />
+                <div className={styles.cart}>
+                  <LuShoppingCart />
 
-								<div className={styles.cart}>
-									<LuShoppingCart />
+                  <span
+                    style={{
+                      background: theme.badge.background,
+                      color: theme.badge.text,
+                    }}
+                  >
+                    2
+                  </span>
+                </div>
+              </div>
+            </header>
 
-									<span
-										style={{
-											background: theme.badge.background,
-											color: theme.badge.text,
-										}}
-									>
-										2
-									</span>
-								</div>
-							</div>
-						</header>
+            <section
+              className={[
+                styles.hero,
+                theme.hero.disableGradients ? styles.heroNoGradients : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              style={
+                {
+                  "--hero-primary": primaryColor,
+                  "--hero-secondary": secondaryColor,
+                  "--hero-base": theme.hero.backgroundColor,
+                  backgroundColor: theme.hero.backgroundColor,
+                  color: theme.hero.text,
+                } as CSSProperties
+              }
+            >
+              <div
+                className={styles.heroTexture}
+                style={{
+                  backgroundImage: theme.hero.backgroundImage,
+                }}
+              />
 
-						<section
-							className={[
-								styles.hero,
-								theme.hero.disableGradients ? styles.heroNoGradients : "",
-							].filter(Boolean).join(" ")}
-							style={
-								{
-									"--hero-primary": primaryColor,
-									"--hero-secondary": secondaryColor,
-									"--hero-base": theme.hero.backgroundColor,
-									backgroundColor: theme.hero.backgroundColor,
-									color: theme.hero.text,
-								} as CSSProperties
-							}
-						>
+              <div className={styles.heroContent}>
+                <span>Official gear for</span>
 
-							<div
-								className={styles.heroTexture}
-								style={{
-									backgroundImage: theme.hero.backgroundImage,
-								}}
-							/>
+                <h3>{storeName}</h3>
 
-							<div className={styles.heroContent}>
-								<span>Official gear for</span>
+                <p>{storeDescription}</p>
 
-								<h3>{storeName}</h3>
+                <div className={styles.heroActions}>
+                  <button
+                    type="button"
+                    style={{
+                      background: theme.buttons.primary.background,
+                      color: theme.buttons.primary.text,
+                    }}
+                  >
+                    Shop Required Items
+                  </button>
 
-								<p>{storeDescription}</p>
+                  <button
+                    type="button"
+                    style={{
+                      background: theme.buttons.secondary.background,
+                      color: theme.buttons.secondary.text,
+                      borderColor: theme.buttons.secondary.border,
+                    }}
+                  >
+                    Shop Fanwear
+                  </button>
+                </div>
+              </div>
 
-								<div className={styles.heroActions}>
-									<button
-										type="button"
-										style={{
-											background: theme.buttons.primary.background,
-											color: theme.buttons.primary.text,
-										}}
-									>
-										Shop Required Items
-									</button>
+              {logoUrl && (
+                <div className={styles.heroArtwork}>
+                  <img
+                    src={logoUrl}
+                    alt={`${organizationName} logo`}
+                    className={styles.heroLogo}
+                  />
+                </div>
+              )}
+            </section>
 
-									<button
-										type="button"
-										style={{
-											background: theme.buttons.secondary.background,
-											color: theme.buttons.secondary.text,
-											borderColor: theme.buttons.secondary.border,
-										}}
-									>
-										Shop Fanwear
-									</button>
-								</div>
-							</div>
+            <BenefitsPreview brandColor={theme.brand.color} />
 
-							{logoUrl && (
-								<div className={styles.heroArtwork}>
-									<img
-										src={logoUrl}
-										alt={`${organizationName} logo`}
-										className={styles.heroLogo}
-									/>
-								</div>
-							)}
-						</section>
+            <ProductPreview
+              title="Required Team Items"
+              brandColor={theme.brand.color}
+              showStatus
+            />
 
-						<BenefitsPreview
-							brandColor={theme.brand.color}
-						/>
+            <ProductPreview
+              title="Featured Fanwear"
+              brandColor={theme.brand.color}
+            />
 
-						<ProductPreview
-							title="Required Team Items"
-							brandColor={theme.brand.color}
-							showStatus
-						/>
-
-						<ProductPreview
-							title="Featured Fanwear"
-							brandColor={theme.brand.color}
-						/>
-
-						<FooterPreview
-							brandColor={theme.brand.color}
-						/>
-					</div>
-				</div>
-			</div>
-		</aside>
-	);
+            <FooterPreview brandColor={theme.brand.color} />
+          </div>
+        </div>
+      </div>
+    </aside>
+  );
 }

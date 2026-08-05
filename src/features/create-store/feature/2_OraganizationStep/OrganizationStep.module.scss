@@ -1,109 +1,182 @@
 .form {
-    display: flex;
-    flex-direction: column;
-    gap: $space-7;
+  display: flex;
+  flex-direction: column;
+  gap: $space-7;
 }
 
 .slug {
-    display: flex;
-    align-items: center;
-    gap: $space-2;
-    padding: $space-3 $space-4;
-    background: $gray-100;
-    border: 1px solid $border-light;
-    border-radius: $radius-md;
+  display: flex;
+  align-items: center;
+  padding: $space-3 $space-4;
+  background: $gray-100;
+  border: 1px solid $border-light;
+  border-radius: $radius-md;
 }
 
 .slug span {
-    color: $text-secondary;
+  color: $text-secondary;
 }
 
 .slug strong {
-    font-weight: $font-semibold;
-    color: $text-primary;
+  font-weight: $font-semibold;
+  color: $text-primary;
+  overflow-wrap: anywhere;
 }
 
 .upload {
-    @include flex-center;
-    flex-direction: column;
-    gap: $space-3;
-    min-height: 220px;
-    padding: $space-8;
-    text-align: center;
-    background: $white;
-    border: 2px dashed $border-light;
-    border-radius: $radius-lg;
-    cursor: pointer;
-    transition: border-color $transition-base, background-color $transition-base, transform $transition-base;
+  @include flex-center;
+  flex-direction: column;
+  gap: $space-3;
+  min-height: 220px;
+  padding: $space-8;
+  text-align: center;
+  background: $white;
+  border: 2px dashed $border-light;
+  border-radius: $radius-lg;
+  cursor: pointer;
+  transition:
+    border-color $transition-base,
+    background-color $transition-base,
+    transform $transition-base;
 }
 
 .upload:hover {
-    border-color: $gray-400;
-    background: rgba($gray-400, 0.03);
+  border-color: $gray-400;
+  background: rgba($gray-400, 0.03);
+}
+
+.uploadWithLogo {
+  align-items: stretch;
+  min-height: auto;
+  padding: $space-5;
+  text-align: left;
+  border-style: solid;
+  cursor: default;
 }
 
 .uploadIcon {
-    @include flex-center;
-    width: 56px;
-    height: 56px;
-    border: 1px solid $border-light;
-    border-radius: $radius-round;
-    background: $gray-50;
-    font-size: 1.5rem;
-    color: $text-secondary;
-    transition: background-color $transition-base, color $transition-base, border-color $transition-base;
+  @include flex-center;
+  width: 56px;
+  height: 56px;
+  border: 1px solid $border-light;
+  border-radius: $radius-round;
+  background: $gray-50;
+  font-size: 1.5rem;
+  color: $text-secondary;
+  transition:
+    background-color $transition-base,
+    color $transition-base,
+    border-color $transition-base;
 }
 
-.upload h3 {
-    margin: 0;
-    font-size: 1.125rem;
-    font-weight: $font-semibold;
-    color: $text-primary;
-    word-break: break-word;
+.logoPreviewRow {
+  display: flex;
+  align-items: center;
+  gap: $space-4;
 }
 
-.upload p {
-    margin: 0;
-    font-size: 0.875rem;
-    color: $text-secondary;
+.logoPreview {
+  @include flex-center;
+  flex: 0 0 auto;
+  width: 88px;
+  height: 88px;
+  padding: $space-2;
+  overflow: hidden;
+  background: $gray-50;
+  border: 1px solid $border-light;
+  border-radius: $radius-md;
+}
+
+.logoPreview img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.logoDetails {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: $space-1;
+  min-width: 0;
+}
+
+.upload h3,
+.logoDetails h3 {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: $font-semibold;
+  color: $text-primary;
+  word-break: break-word;
+}
+
+.upload p,
+.logoDetails p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: $text-secondary;
 }
 
 .fileInput {
-    display: none;
+  display: none;
 }
 
 .actions {
-    display: flex;
-    align-items: center;
-    gap: $space-3;
-    margin-top: $space-2;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: $space-3;
+  margin-top: $space-3;
 }
 
 .replaceLogo,
 .removeLogo {
-    @include button-base;
-    gap: $space-2;
-    padding: $space-2 $space-4;
-    font-size: 0.875rem;
-    font-weight: $font-medium;
+  @include button-base;
+  gap: $space-2;
+  padding: $space-2 $space-4;
+  font-size: 0.875rem;
+  font-weight: $font-medium;
 }
 
 .replaceLogo {
-    background: $gray-100;
-    border: 1px solid $border-light;
-    color: $text-primary;
+  background: $gray-100;
+  border: 1px solid $border-light;
+  color: $text-primary;
+  cursor: pointer;
 }
 
 .replaceLogo:hover {
-    background: $gray-200;
+  background: $gray-200;
 }
 
 .removeLogo {
-    background: transparent;
-    border: 1px solid $error-border;
-    color: $error;
+  background: transparent;
+  border: 1px solid $error-border;
+  color: $error;
 }
 
 .removeLogo:hover {
-    background: $error-background;
+  background: $error-background;
+}
+
+@media (max-width: 520px) {
+  .logoPreviewRow {
+    align-items: flex-start;
+  }
+
+  .logoPreview {
+    width: 72px;
+    height: 72px;
+  }
+
+  .actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .replaceLogo,
+  .removeLogo {
+    width: 100%;
+  }
 }

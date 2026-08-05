@@ -40,6 +40,20 @@ function getStoreName(
   return name?.trim() || organizationName?.trim() || "Untitled store";
 }
 
+function getStorePath(
+  organizationSlug: string | undefined,
+  storeSlug: string | undefined,
+): string | null {
+  const normalizedOrganizationSlug = organizationSlug?.trim();
+  const normalizedStoreSlug = storeSlug?.trim();
+
+  if (!normalizedOrganizationSlug || !normalizedStoreSlug) {
+    return null;
+  }
+
+  return `/store/${normalizedOrganizationSlug}/${normalizedStoreSlug}`;
+}
+
 function formatUpdatedDate(timestamp: number): string {
   return new Intl.DateTimeFormat("en-US", {
     month: "short",
@@ -217,6 +231,11 @@ export default function AccountPage() {
                   draft.organizationName,
                 );
 
+                const draftStorePath = getStorePath(
+                  draft.organizationSlug,
+                  draft.slug,
+                );
+
                 const isDeleting = deletingDraftId === draft._id;
 
                 return (
@@ -233,10 +252,10 @@ export default function AccountPage() {
                         Updated {formatUpdatedDate(draft.updatedAt)}
                       </p>
 
-                      {draft.slug && (
+                      {draftStorePath && (
                         <p className={styles.storeSlug}>
-                          teamstore.com/store/
-                          {draft.slug}
+                          teamstore.com
+                          {draftStorePath}
                         </p>
                       )}
                     </div>
@@ -301,6 +320,11 @@ export default function AccountPage() {
                   store.organizationName,
                 );
 
+                const storePath = getStorePath(
+                  store.organizationSlug,
+                  store.slug,
+                );
+
                 const isArchiving = archivingStoreId === store._id;
 
                 return (
@@ -318,10 +342,10 @@ export default function AccountPage() {
                         Updated {formatUpdatedDate(store.updatedAt)}
                       </p>
 
-                      {store.slug && (
+                      {storePath && (
                         <p className={styles.storeSlug}>
-                          teamstore.com/store/
-                          {store.slug}
+                          teamstore.com
+                          {storePath}
                         </p>
                       )}
                     </div>
@@ -338,11 +362,11 @@ export default function AccountPage() {
                         Edit Store
                       </button>
 
-                      {store.slug && (
+                      {storePath && (
                         <button
                           type="button"
                           className={styles.secondaryAction}
-                          onClick={() => navigate(`/store/${store.slug}`)}
+                          onClick={() => navigate(storePath)}
                           disabled={isArchiving}
                         >
                           View Store

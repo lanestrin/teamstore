@@ -7,6 +7,24 @@ import type { Id } from "../../../../convex/_generated/dataModel";
 
 import { useCreateStore } from "../context/CreateStoreContext";
 
+const STORE_ACTIVITIES = [
+  "basketball",
+  "baseball",
+  "football",
+  "soccer",
+  "softball",
+  "volleyball",
+  "wrestling",
+  "spirit-wear",
+  "other",
+] as const;
+
+type StoreActivity = (typeof STORE_ACTIVITIES)[number];
+
+function isStoreActivity(value: string): value is StoreActivity {
+  return STORE_ACTIVITIES.some((activity) => activity === value);
+}
+
 function normalizeOptionalText(value: string): string | undefined {
   const normalizedValue = value.trim();
 
@@ -127,6 +145,11 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
         storeId: storeId ?? undefined,
         organizationName: normalizeOptionalText(storeDraft.organizationName),
         organizationSlug: normalizeOptionalText(organizationSlug),
+
+        activity: isStoreActivity(storeDraft.activity)
+          ? storeDraft.activity
+          : undefined,
+
         storeName: normalizeOptionalText(storeDraft.storeName),
         storeSlug: normalizeOptionalText(storeDraft.storeSlug),
         storeDescription: normalizeOptionalText(storeDraft.storeDescription),
@@ -153,6 +176,7 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
     const organizationName = storeDraft.organizationName.trim();
     const organizationSlug =
       storeDraft.organizationSlug.trim() || slugify(organizationName);
+    const activity = storeDraft.activity.trim();
     const storeName = storeDraft.storeName.trim();
     const storeSlug = storeDraft.storeSlug.trim();
 
@@ -171,6 +195,11 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
       return;
     }
 
+    if (!isStoreActivity(activity)) {
+      window.alert("Store activity is required.");
+      return;
+    }
+
     setIsFinalizing(true);
 
     try {
@@ -178,6 +207,7 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
         storeId: storeId ?? undefined,
         organizationName,
         organizationSlug,
+        activity,
         storeName,
         storeSlug,
         storeDescription: normalizeOptionalText(storeDraft.storeDescription),
@@ -188,7 +218,7 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
       });
 
       resetStoreDraft();
-      navigate(`/store/${result.storeSlug}`);
+      navigate(`/store/${result.organizationSlug}/${result.storeSlug}`);
     } catch (error) {
       window.alert(getErrorMessage(error));
     } finally {
@@ -202,4 +232,5 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
     isFinalizing,
     saveAndExit,
     createStore,
-  }}
+  };
+}

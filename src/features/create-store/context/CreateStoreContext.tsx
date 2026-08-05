@@ -34,6 +34,8 @@ export interface CreateStoreDraft {
   organizationName: string;
   organizationSlug: string;
 
+  activity: string;
+
   storeName: string;
   storeSlug: string;
   storeDescription: string;
@@ -76,6 +78,8 @@ function createDefaultStoreDraft(): CreateStoreDraft {
   return {
     organizationName: "",
     organizationSlug: "",
+
+    activity: "",
 
     storeName: "",
     storeSlug: "",
@@ -161,8 +165,9 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
 
     setStoreDraft({
       organizationName: draft.organizationName ?? "",
-
       organizationSlug: draft.organizationSlug ?? "",
+
+      activity: draft.activity ?? "",
 
       storeName: draft.name ?? "",
       storeSlug: draft.slug ?? "",
