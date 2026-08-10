@@ -18,6 +18,8 @@ type ResolvedProductImage = Doc<"productImages"> & {
   imageUrl: string;
 };
 
+type ProductCardPreferredImageView = "leftQuarter" | "front";
+
 function normalizeRequiredText(value: string, label: string) {
   const normalized = value.trim();
 
@@ -279,6 +281,7 @@ function buildProductCardColorOptions(
   variants: Doc<"productVariants">[],
   productImages: ResolvedProductImage[],
   productColors: Doc<"productColors">[],
+  preferredImageView: ProductCardPreferredImageView,
 ) {
   const purchasableVariants = variants.filter(
     (variant) =>
@@ -298,47 +301,72 @@ function buildProductCardColorOptions(
     colorNames.set(variant.colorKey, color);
   }
 
-  return [...colorNames.entries()].flatMap(([colorKey, color]) => {
-    const colorImages = productImages.filter(
-      (image) => image.colorKey === colorKey,
-    );
+  const fallbackImageView =
+    preferredImageView === "front" ? "leftQuarter" : "front";
 
-    const previewImage =
-      colorImages.find((image) => image.view === "leftQuarter") ??
-      colorImages.find((image) => image.view === "front") ??
-      colorImages[0];
+  return [...colorNames.entries()]
+    .flatMap(([colorKey, color]) => {
+      const colorImages = productImages.filter(
+        (image) => image.colorKey === colorKey,
+      );
 
-    if (!previewImage) {
-      return [];
-    }
+      const previewImage =
+        colorImages.find((image) => image.view === preferredImageView) ??
+        colorImages.find((image) => image.view === fallbackImageView) ??
+        colorImages[0];
 
-    const productColor = productColors.find(
-      (candidate) => candidate.colorKey === colorKey,
-    );
+      if (!previewImage) {
+        return [];
+      }
 
-    const colorFamilies = productColor
-      ? [
-          ...new Set([
-            productColor.primaryFamily,
-            ...productColor.accents.map((accent) => accent.family),
-          ]),
-        ].filter((family) => family !== "unknown")
-      : [];
+      const productColor = productColors.find(
+        (candidate) => candidate.colorKey === colorKey,
+      );
 
-    return [
-      {
-        color,
-        colorKey,
-        imageUrl: previewImage.imageUrl,
-        colorFamilies,
-      },
-    ];
-  });
+      const colorFamilies = productColor
+        ? [
+            ...new Set([
+              productColor.primaryFamily,
+              ...productColor.accents.map((accent) => accent.family),
+            ]),
+          ].filter((family) => family !== "unknown")
+        : [];
+
+      return [
+        {
+          color,
+          colorKey,
+          providerColor: productColor?.providerColor,
+          normalizedProviderColor: productColor?.normalizedProviderColor,
+          supplierHexValues: productColor?.supplierHexValues ?? [],
+
+          imageUrl: previewImage.imageUrl,
+          imageView: previewImage.view,
+
+          colorFamilies,
+          primaryFamily: productColor?.primaryFamily ?? "unknown",
+          primaryCategory: productColor?.primaryCategory ?? "unknown",
+          primaryHexValue: productColor?.primaryHexValue,
+          accents: productColor?.accents ?? [],
+          tone: productColor?.tone ?? "unknown",
+          pattern: productColor?.pattern ?? "unknown",
+          composition: productColor?.composition ?? "unknown",
+
+          classificationSource: productColor?.classificationSource,
+          classificationConfidence:
+            productColor?.classificationConfidence ?? 0,
+          needsReview: productColor?.needsReview ?? true,
+          reviewReasons: productColor?.reviewReasons ?? [],
+        },
+      ];
+    })
+    .sort((first, second) => first.color.localeCompare(second.color));
 }
 
 async function decorateProductCard(
   ctx: CatalogReadCtx,
   product: Doc<"products">,
+  preferredImageView: ProductCardPreferredImageView = "leftQuarter",
 ) {
   const [variants, images, productColors] = await Promise.all([
     getVariantsForProduct(ctx, product._id),
@@ -355,6 +383,7 @@ async function decorateProductCard(
       variants,
       images,
       productColors,
+      preferredImageView,
     ),
 
     availableColorFamilies: getAvailableColorFamilies(
@@ -396,6 +425,74 @@ export const listActive = query({
     return decoratedProducts.filter(
       (product) =>
         product.imageUrls.length > 0 && product.availableVariantCount > 0,
+    );
+  },
+});
+
+/**
+ * Loads active catalog products as selectable options during store setup.
+ * This query does not add products to a store or modify store data.
+ */
+export const listProductOptionsByProviderIds = query({
+  args: {
+    provider: v.string(),
+    providerProductIds: v.array(v.string()),
+  },
+
+  handler: async (ctx, args) => {
+    const provider = normalizeRequiredText(
+      args.provider,
+      "Provider",
+    ).toLowerCase();
+
+    const providerProductIds = [
+      ...new Set(
+        args.providerProductIds
+          .map((providerProductId) =>
+            providerProductId.trim(),
+          )
+          .filter(Boolean),
+      ),
+    ];
+
+    if (providerProductIds.length > 50) {
+      throw new ConvexError(
+        "A maximum of 50 products can be requested at once.",
+      );
+    }
+
+    const products = await Promise.all(
+      providerProductIds.map(
+        async (providerProductId) =>
+          await ctx.db
+            .query("products")
+            .withIndex("by_provider_product", (q) =>
+              q
+                .eq("provider", provider)
+                .eq(
+                  "providerProductId",
+                  providerProductId,
+                ),
+            )
+            .unique(),
+      ),
+    );
+
+    const activeProducts = products.flatMap(
+      (product) =>
+        product?.status === "active" ? [product] : [],
+    );
+
+    const decoratedProducts = await Promise.all(
+      activeProducts.map((product) =>
+        decorateProductCard(ctx, product, "front"),
+      ),
+    );
+
+    return decoratedProducts.filter(
+      (product) =>
+        product.imageUrls.length > 0 &&
+        product.availableVariantCount > 0,
     );
   },
 });

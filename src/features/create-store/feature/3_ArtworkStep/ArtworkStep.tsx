@@ -355,7 +355,7 @@ function formatFileSize(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export default function SelectArtStep() {
+export default function SelectArtworksStep() {
   const {
     currentStep,
     setCurrentStep,
@@ -484,6 +484,7 @@ export default function SelectArtStep() {
         title="Choose Your Artwork"
         description="Customize the previews, then select every artwork template you want to use."
         onBack={() => setCurrentStep(2)}
+        onNext={() => setCurrentStep(4)}
         nextDisabled={selectedTemplateCount === 0}
         width="wide"
       >
