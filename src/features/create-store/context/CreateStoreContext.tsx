@@ -3,6 +3,7 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useState,
   type Dispatch,
   type ReactNode,
@@ -15,6 +16,21 @@ import type { ArtworkAdjustments } from "../feature/3_ArtworkStep/artworkEditor"
 
 const DEFAULT_PRIMARY_COLOR = "#111827";
 const DEFAULT_SECONDARY_COLOR = "#DC2626";
+const DEFAULT_PRODUCT_GENERATION_SEED = 1;
+
+export type ProductColorFamily =
+  | "black"
+  | "white"
+  | "gray"
+  | "silver"
+  | "red"
+  | "orange"
+  | "yellow"
+  | "green"
+  | "blue"
+  | "purple"
+  | "pink"
+  | "brown";
 
 export interface ArtworkTextDraft {
   organizationName: string;
@@ -29,6 +45,23 @@ export interface ArtworkTemplateDraft {
 }
 
 export type ArtworkTemplatesDraft = Record<string, ArtworkTemplateDraft>;
+
+export interface ProductSelectionInput {
+  providerProductId: string;
+  colorKey: string;
+  artworkTemplateId: string;
+  isRequired?: boolean;
+}
+
+export interface ProductSelectionDraft {
+  combinationKey: string;
+  providerProductId: string;
+  colorKey: string;
+  artworkTemplateId: string;
+  isRequired: boolean;
+}
+
+export type ProductSelectionsDraft = Record<string, ProductSelectionDraft>;
 
 export interface CreateStoreDraft {
   organizationName: string;
@@ -45,19 +78,27 @@ export interface CreateStoreDraft {
 
   artworkTemplates: ArtworkTemplatesDraft;
   artworkText: ArtworkTextDraft;
+
+  productColorFamily: ProductColorFamily | "";
+
+  productGenerationSeed: number;
+  productSelections: ProductSelectionsDraft;
 }
 
 interface CreateStoreContextValue {
   storeId: Id<"stores"> | null;
+
   setStoreId: Dispatch<SetStateAction<Id<"stores"> | null>>;
 
   currentStep: number;
+
   setCurrentStep: Dispatch<SetStateAction<number>>;
 
   primaryColor: string;
   secondaryColor: string;
 
   setPrimaryColor: Dispatch<SetStateAction<string>>;
+
   setSecondaryColor: Dispatch<SetStateAction<string>>;
 
   storeDraft: CreateStoreDraft;
@@ -69,9 +110,119 @@ interface CreateStoreContextValue {
     updates: Partial<Omit<ArtworkTemplateDraft, "selectedArtTemplateId">>,
   ) => void;
 
+  selectProduct: (selection: ProductSelectionInput) => void;
+
+  removeProduct: (combinationKey: string) => void;
+
+  toggleProductRequired: (combinationKey: string) => void;
+
+  updateProductSelection: (
+    combinationKey: string,
+    updates: {
+      colorKey?: string;
+      artworkTemplateId?: string;
+    },
+  ) => void;
+
+  regenerateProductSuggestions: () => void;
+
   loadStoreDraft: (draft: Doc<"stores">) => void;
 
   resetStoreDraft: () => void;
+}
+
+export function createProductCombinationKey(
+  providerProductId: string,
+  colorKey: string,
+  artworkTemplateId: string,
+): string {
+  return [providerProductId.trim(), colorKey.trim(), artworkTemplateId.trim()]
+    .map((value) => encodeURIComponent(value))
+    .join("__");
+}
+
+function classifyHexColorFamily(hexColor: string): ProductColorFamily {
+  const normalized = hexColor.trim().replace("#", "");
+
+  if (!/^[0-9a-fA-F]{6}$/.test(normalized)) {
+    return "black";
+  }
+
+  const red = Number.parseInt(normalized.slice(0, 2), 16) / 255;
+
+  const green = Number.parseInt(normalized.slice(2, 4), 16) / 255;
+
+  const blue = Number.parseInt(normalized.slice(4, 6), 16) / 255;
+
+  const maximum = Math.max(red, green, blue);
+
+  const minimum = Math.min(red, green, blue);
+
+  const lightness = (maximum + minimum) / 2;
+
+  const difference = maximum - minimum;
+
+  if (lightness <= 0.12) {
+    return "black";
+  }
+
+  if (lightness >= 0.9 && difference <= 0.12) {
+    return "white";
+  }
+
+  if (difference <= 0.1) {
+    if (lightness >= 0.7) {
+      return "silver";
+    }
+
+    return "gray";
+  }
+
+  let hue = 0;
+
+  if (maximum === red) {
+    hue = ((green - blue) / difference) % 6;
+  } else if (maximum === green) {
+    hue = (blue - red) / difference + 2;
+  } else {
+    hue = (red - green) / difference + 4;
+  }
+
+  hue *= 60;
+
+  if (hue < 0) {
+    hue += 360;
+  }
+
+  if (hue >= 345 || hue < 15) {
+    return "red";
+  }
+
+  if (hue < 45) {
+    if (lightness < 0.35) {
+      return "brown";
+    }
+
+    return "orange";
+  }
+
+  if (hue < 70) {
+    return "yellow";
+  }
+
+  if (hue < 170) {
+    return "green";
+  }
+
+  if (hue < 260) {
+    return "blue";
+  }
+
+  if (hue < 320) {
+    return "purple";
+  }
+
+  return "pink";
 }
 
 function createDefaultStoreDraft(): CreateStoreDraft {
@@ -95,6 +246,17 @@ function createDefaultStoreDraft(): CreateStoreDraft {
       yearEstablished: "2026",
       mascotName: "Crows",
     },
+
+    /*
+     * Empty until Step 4 is reached.
+     * At that point it is initialized from
+     * the user's primary team color.
+     */
+    productColorFamily: "",
+
+    productGenerationSeed: DEFAULT_PRODUCT_GENERATION_SEED,
+
+    productSelections: {},
   };
 }
 
@@ -117,6 +279,29 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
     createDefaultStoreDraft,
   );
 
+  /*
+   * Step 4 starts with the primary team
+   * color, but after initialization the
+   * product color filter is independent.
+   */
+  useEffect(() => {
+    if (currentStep !== 4 || storeDraft.productColorFamily) {
+      return;
+    }
+
+    setStoreDraft((currentDraft) => {
+      if (currentDraft.productColorFamily) {
+        return currentDraft;
+      }
+
+      return {
+        ...currentDraft,
+
+        productColorFamily: classifyHexColorFamily(primaryColor),
+      };
+    });
+  }, [currentStep, primaryColor, storeDraft.productColorFamily]);
+
   function updateStoreDraft(updates: Partial<CreateStoreDraft>) {
     setStoreDraft((currentDraft) => ({
       ...currentDraft,
@@ -133,22 +318,204 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
         templateId
       ] ?? {
         selectedArtTemplateId: templateId,
+
         isSelected: false,
+
         artworkAdjustments: {},
       };
 
       return {
         ...currentDraft,
+
         artworkTemplates: {
           ...currentDraft.artworkTemplates,
+
           [templateId]: {
             ...currentTemplateDraft,
             ...updates,
+
             selectedArtTemplateId: templateId,
           },
         },
       };
     });
+  }
+
+  function selectProduct(selection: ProductSelectionInput) {
+    const providerProductId = selection.providerProductId.trim();
+
+    const colorKey = selection.colorKey.trim();
+
+    const artworkTemplateId = selection.artworkTemplateId.trim();
+
+    if (!providerProductId || !colorKey || !artworkTemplateId) {
+      return;
+    }
+
+    const combinationKey = createProductCombinationKey(
+      providerProductId,
+      colorKey,
+      artworkTemplateId,
+    );
+
+    setStoreDraft((currentDraft) => {
+      const existingSelection = currentDraft.productSelections[combinationKey];
+
+      return {
+        ...currentDraft,
+
+        productSelections: {
+          ...currentDraft.productSelections,
+
+          [combinationKey]: {
+            combinationKey,
+            providerProductId,
+            colorKey,
+            artworkTemplateId,
+
+            isRequired:
+              existingSelection?.isRequired ?? selection.isRequired ?? false,
+          },
+        },
+      };
+    });
+  }
+
+  function removeProduct(combinationKey: string) {
+    const normalizedCombinationKey = combinationKey.trim();
+
+    if (!normalizedCombinationKey) {
+      return;
+    }
+
+    setStoreDraft((currentDraft) => {
+      const {
+        [normalizedCombinationKey]: removedSelection,
+
+        ...remainingSelections
+      } = currentDraft.productSelections;
+
+      if (!removedSelection) {
+        return currentDraft;
+      }
+
+      return {
+        ...currentDraft,
+
+        productSelections: remainingSelections,
+      };
+    });
+  }
+
+  function toggleProductRequired(combinationKey: string) {
+    const normalizedCombinationKey = combinationKey.trim();
+
+    if (!normalizedCombinationKey) {
+      return;
+    }
+
+    setStoreDraft((currentDraft) => {
+      const currentSelection =
+        currentDraft.productSelections[normalizedCombinationKey];
+
+      if (!currentSelection) {
+        return currentDraft;
+      }
+
+      return {
+        ...currentDraft,
+
+        productSelections: {
+          ...currentDraft.productSelections,
+
+          [normalizedCombinationKey]: {
+            ...currentSelection,
+
+            isRequired: !currentSelection.isRequired,
+          },
+        },
+      };
+    });
+  }
+
+  function updateProductSelection(
+    combinationKey: string,
+    updates: {
+      colorKey?: string;
+      artworkTemplateId?: string;
+    },
+  ) {
+    const normalizedCombinationKey = combinationKey.trim();
+
+    if (!normalizedCombinationKey) {
+      return;
+    }
+
+    setStoreDraft((currentDraft) => {
+      const currentSelection =
+        currentDraft.productSelections[normalizedCombinationKey];
+
+      if (!currentSelection) {
+        return currentDraft;
+      }
+
+      const nextColorKey =
+        updates.colorKey?.trim() || currentSelection.colorKey;
+
+      const nextArtworkTemplateId =
+        updates.artworkTemplateId?.trim() || currentSelection.artworkTemplateId;
+
+      const nextCombinationKey = createProductCombinationKey(
+        currentSelection.providerProductId,
+        nextColorKey,
+        nextArtworkTemplateId,
+      );
+
+      if (nextCombinationKey === normalizedCombinationKey) {
+        return currentDraft;
+      }
+
+      const existingNextSelection =
+        currentDraft.productSelections[nextCombinationKey];
+
+      const {
+        [normalizedCombinationKey]: removedSelection,
+
+        ...remainingSelections
+      } = currentDraft.productSelections;
+
+      void removedSelection;
+
+      return {
+        ...currentDraft,
+
+        productSelections: {
+          ...remainingSelections,
+
+          [nextCombinationKey]: {
+            combinationKey: nextCombinationKey,
+
+            providerProductId: currentSelection.providerProductId,
+
+            colorKey: nextColorKey,
+
+            artworkTemplateId: nextArtworkTemplateId,
+
+            isRequired:
+              currentSelection.isRequired ||
+              existingNextSelection?.isRequired === true,
+          },
+        },
+      };
+    });
+  }
+
+  function regenerateProductSuggestions() {
+    setStoreDraft((currentDraft) => ({
+      ...currentDraft,
+
+      productGenerationSeed: currentDraft.productGenerationSeed + 1,
+    }));
   }
 
   function loadStoreDraft(draft: Doc<"stores">) {
@@ -165,11 +532,13 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
 
     setStoreDraft({
       organizationName: draft.organizationName ?? "",
+
       organizationSlug: draft.organizationSlug ?? "",
 
       activity: draft.activity ?? "",
 
       storeName: draft.name ?? "",
+
       storeSlug: draft.slug ?? "",
 
       storeDescription: draft.description ?? "",
@@ -182,9 +551,20 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
 
       artworkText: {
         organizationName: draft.organizationName ?? "",
+
         yearEstablished: "2020",
         mascotName: "MUSTANGS",
       },
+
+      /*
+       * Reinitialize from the stored primary
+       * color when Step 4 is reached.
+       */
+      productColorFamily: "",
+
+      productGenerationSeed: DEFAULT_PRODUCT_GENERATION_SEED,
+
+      productSelections: {},
     });
   }
 
@@ -216,7 +596,14 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
 
         storeDraft,
         updateStoreDraft,
+
         updateArtworkTemplateDraft,
+
+        selectProduct,
+        removeProduct,
+        toggleProductRequired,
+        updateProductSelection,
+        regenerateProductSuggestions,
 
         loadStoreDraft,
         resetStoreDraft,
