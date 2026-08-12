@@ -9,9 +9,8 @@ import LivePreview from "../components/LivePreview/LivePreview";
 import ProgressSidebar from "../components/ProgressSidebar/ProgressSidebar";
 import ResizablePanel from "../components/ResizablePanel/ResizablePanel";
 
-import { useCreateStoreWorkflow } from "./useCreateStoreWorkflow";
-
 import styles from "./CreateStoreLayout.module.scss";
+import { useCreateStoreWorkflow } from "../hooks/useCreateStoreWorkflow";
 
 function CreateStoreContent() {
   const { currentStep } = useCreateStore();

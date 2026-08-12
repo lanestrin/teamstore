@@ -235,6 +235,25 @@ export default defineSchema({
     .index("by_status_category", ["status", "category"])
     .index("by_provider_product", ["provider", "providerProductId"]),
 
+  // Products explicitly selected for a store.
+  // Catalog product details remain in the shared products table.
+  storeProducts: defineTable({
+    storeId: v.id("stores"),
+    productId: v.id("products"),
+
+    isRequired: v.boolean(),
+    sortOrder: v.number(),
+
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_store", ["storeId"])
+    .index("by_product", ["productId"])
+    .index("by_store_product", [
+      "storeId",
+      "productId",
+    ]),
+
   // Canonical color options for blank products.
   // One row represents one productId + colorKey pair and stores the
   // deterministic color classification used by catalog filtering.

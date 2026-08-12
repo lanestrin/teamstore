@@ -1,67 +1,15 @@
 import { LuRefreshCw } from "react-icons/lu";
 
-import { type ProductColorFamily } from "../../../context/CreateStoreContext";
+import type { ProductColorFamily } from "../../../context/CreateStoreContext";
 
 import {
   PRODUCT_COLLECTIONS,
   type ProductCollectionActivity,
 } from "../productCollections";
 
-import styles from "../ProductsStep.module.scss";
+import { PRODUCT_COLOR_OPTIONS } from "./productColorOptions";
 
-export const PRODUCT_COLOR_OPTIONS: readonly {
-  value: ProductColorFamily;
-  label: string;
-}[] = [
-  {
-    value: "black",
-    label: "Black",
-  },
-  {
-    value: "white",
-    label: "White",
-  },
-  {
-    value: "gray",
-    label: "Gray",
-  },
-  {
-    value: "silver",
-    label: "Silver",
-  },
-  {
-    value: "red",
-    label: "Red",
-  },
-  {
-    value: "orange",
-    label: "Orange",
-  },
-  {
-    value: "yellow",
-    label: "Yellow",
-  },
-  {
-    value: "green",
-    label: "Green",
-  },
-  {
-    value: "blue",
-    label: "Blue",
-  },
-  {
-    value: "purple",
-    label: "Purple",
-  },
-  {
-    value: "pink",
-    label: "Pink",
-  },
-  {
-    value: "brown",
-    label: "Brown",
-  },
-];
+import styles from "../ProductsStep.module.scss";
 
 interface ProductSuggestionControlsProps {
   activity: string;

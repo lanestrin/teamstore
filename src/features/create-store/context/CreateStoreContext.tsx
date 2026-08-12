@@ -4,6 +4,7 @@ import {
   createContext,
   useContext,
   useEffect,
+  useMemo,
   useState,
   type Dispatch,
   type ReactNode,
@@ -12,7 +13,14 @@ import {
 
 import type { Doc, Id } from "../../../../convex/_generated/dataModel";
 
+import { ART_TEMPLATE_LIST } from "../../../assets/art-templates";
+
 import type { ArtworkAdjustments } from "../feature/3_ArtworkStep/artworkEditor";
+import {
+  applySavedArtworkAdjustments,
+  createCustomizedSvg,
+} from "../feature/3_ArtworkStep/artworkSvg";
+import useFileDataUrl from "../hooks/useFileDataUrl";
 
 const DEFAULT_PRIMARY_COLOR = "#111827";
 const DEFAULT_SECONDARY_COLOR = "#DC2626";
@@ -45,6 +53,8 @@ export interface ArtworkTemplateDraft {
 }
 
 export type ArtworkTemplatesDraft = Record<string, ArtworkTemplateDraft>;
+
+export type ArtworkSvgMap = Readonly<Record<string, string>>;
 
 export interface ProductSelectionInput {
   providerProductId: string;
@@ -102,6 +112,11 @@ interface CreateStoreContextValue {
   setSecondaryColor: Dispatch<SetStateAction<string>>;
 
   storeDraft: CreateStoreDraft;
+
+  resolvedArtworkText: ArtworkTextDraft;
+  mascotDataUrl: string | null;
+  artworkBaseSvgsByTemplateId: ArtworkSvgMap;
+  artworkSvgsByTemplateId: ArtworkSvgMap;
 
   updateStoreDraft: (updates: Partial<CreateStoreDraft>) => void;
 
@@ -178,7 +193,7 @@ function classifyHexColorFamily(hexColor: string): ProductColorFamily {
     return "gray";
   }
 
-  let hue = 0;
+  let hue: number;
 
   if (maximum === red) {
     hue = ((green - blue) / difference) % 6;
@@ -278,6 +293,84 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
   const [storeDraft, setStoreDraft] = useState<CreateStoreDraft>(
     createDefaultStoreDraft,
   );
+
+  const mascotDataUrl = useFileDataUrl(storeDraft.logoFile);
+
+  const [fontLoadVersion, setFontLoadVersion] = useState(0);
+
+  const resolvedArtworkText = useMemo<ArtworkTextDraft>(
+    () => ({
+      ...storeDraft.artworkText,
+
+      organizationName:
+        storeDraft.artworkText.organizationName || storeDraft.organizationName,
+    }),
+    [storeDraft.artworkText, storeDraft.organizationName],
+  );
+
+  /*
+   * Text fitting depends on the final loaded font metrics.
+   * Rebuild the derived SVG maps once browser fonts are ready.
+   */
+  useEffect(() => {
+    if (typeof document === "undefined" || !document.fonts) {
+      return;
+    }
+
+    let isCancelled = false;
+
+    void document.fonts.ready.then(() => {
+      if (!isCancelled) {
+        setFontLoadVersion((currentVersion) => currentVersion + 1);
+      }
+    });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
+
+  const { artworkBaseSvgsByTemplateId, artworkSvgsByTemplateId } =
+    useMemo(() => {
+      /*
+       * Font loading affects SVG text measurement even
+       * though the version value itself is not rendered.
+       * Referencing it here intentionally invalidates
+       * this memo when fonts finish loading.
+       */
+      void fontLoadVersion;
+
+      const baseSvgs: Record<string, string> = {};
+      const finalSvgs: Record<string, string> = {};
+
+      for (const template of ART_TEMPLATE_LIST) {
+        const templateDraft = storeDraft.artworkTemplates[template.id];
+
+        const baseSvg = createCustomizedSvg(
+          template,
+          resolvedArtworkText,
+          mascotDataUrl,
+        );
+
+        baseSvgs[template.id] = baseSvg;
+
+        finalSvgs[template.id] = applySavedArtworkAdjustments(
+          baseSvg,
+          template.editableElements,
+          templateDraft?.artworkAdjustments ?? {},
+        );
+      }
+
+      return {
+        artworkBaseSvgsByTemplateId: baseSvgs,
+        artworkSvgsByTemplateId: finalSvgs,
+      };
+    }, [
+      fontLoadVersion,
+      mascotDataUrl,
+      resolvedArtworkText,
+      storeDraft.artworkTemplates,
+    ]);
 
   /*
    * Step 4 starts with the primary team
@@ -595,6 +688,12 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
         setSecondaryColor,
 
         storeDraft,
+
+        resolvedArtworkText,
+        mascotDataUrl,
+        artworkBaseSvgsByTemplateId,
+        artworkSvgsByTemplateId,
+
         updateStoreDraft,
 
         updateArtworkTemplateDraft,

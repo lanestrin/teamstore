@@ -12,10 +12,8 @@ import {
 
 import ProductEditorModal from "./components/ProductEditorModal";
 import ProductSuggestionCard from "./components/ProductSuggestionCard";
-
-import ProductSuggestionControls, {
-  PRODUCT_COLOR_OPTIONS,
-} from "./components/ProductSuggestionControls";
+import ProductSuggestionControls from "./components/ProductSuggestionControls";
+import { PRODUCT_COLOR_OPTIONS } from "./components/productColorOptions";
 
 import {
   getAvailableProductColorFamilies,
@@ -35,7 +33,6 @@ import type {
   ProductColorOption,
   ProductOption,
 } from "./productStep.types";
-
 import styles from "./ProductsStep.module.scss";
 
 function isProductCollectionActivity(
@@ -66,15 +63,13 @@ export default function SelectProductsStep() {
   const {
     currentStep,
     setCurrentStep,
-
     storeDraft,
     updateStoreDraft,
-
+    artworkSvgsByTemplateId,
     selectProduct,
     removeProduct,
     toggleProductRequired,
     updateProductSelection,
-
     regenerateProductSuggestions,
   } = useCreateStore();
 
@@ -515,6 +510,10 @@ export default function SelectProductsStep() {
                   suggestion={suggestion}
                   color={color}
                   artworkName={getArtworkName(suggestion.artworkTemplateId)}
+                  artworkSvg={
+                    artworkSvgsByTemplateId[suggestion.artworkTemplateId] ??
+                    null
+                  }
                   isSelected={selection !== undefined}
                   isRequired={selection?.isRequired ?? false}
                   onSelectionChange={(checked) =>
