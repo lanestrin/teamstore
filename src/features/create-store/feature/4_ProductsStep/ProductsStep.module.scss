@@ -192,10 +192,7 @@
 
 .productGrid {
   display: grid;
-  grid-template-columns: repeat(
-    3,
-    minmax(0, 1fr)
-  );
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: $space-5;
 }
 
@@ -252,8 +249,8 @@
   transition: transform $transition-base;
 }
 
-.productCard:hover .productImage {
-  transform: scale(1.025);
+.productCard:hover .garmentArtworkPreview {
+    transform: scale(1.025);
 }
 
 /*
@@ -391,7 +388,6 @@
   color: $text-secondary;
 
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
 }
 
 .productPrice {
@@ -752,10 +748,7 @@
 
 .colorGrid {
   display: grid;
-  grid-template-columns: repeat(
-    2,
-    minmax(0, 1fr)
-  );
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: $space-3;
 }
 
@@ -894,10 +887,7 @@
 
 @media (min-width: 1500px) {
   .productGrid {
-    grid-template-columns: repeat(
-      4,
-      minmax(0, 1fr)
-    );
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
@@ -915,10 +905,7 @@
 
 @media (max-width: 1100px) {
   .productGrid {
-    grid-template-columns: repeat(
-      2,
-      minmax(0, 1fr)
-    );
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .modalBody {
@@ -1021,4 +1008,72 @@
   .modalSaveButton {
     width: 100%;
   }
+}
+
+/*
+ * Garment artwork preview
+ *
+ * The garment image is the visual background.
+ * The decoration zone is positioned relative
+ * to the preview area, while the artwork is
+ * positioned relative to that decoration zone.
+ */
+
+.garmentArtworkPreview {
+  position: relative;
+
+  width: 100%;
+  height: 100%;
+
+  overflow: hidden;
+
+  transition: transform $transition-base;
+}
+
+.garmentArtworkImage {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+
+  pointer-events: none;
+  user-select: none;
+}
+
+.decorationZone {
+  position: absolute;
+
+  /*
+   * left / top / width / height are supplied
+   * by the selected DecorationProfile.
+   */
+  pointer-events: none;
+}
+
+.decorationZoneVisible {
+  border: 1px dashed rgba(17, 24, 39, 0.4);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.garmentArtworkOverlay {
+  position: absolute;
+
+  /*
+   * x and y represent the center of the artwork
+   * inside the decoration zone.
+   */
+  transform: translate(-50%, -50%);
+
+  pointer-events: none;
+}
+
+.garmentArtworkOverlay>svg {
+  display: block;
+
+  width: 100%;
+  height: auto;
+
+  overflow: visible;
 }

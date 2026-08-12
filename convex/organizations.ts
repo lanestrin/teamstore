@@ -1,10 +1,19 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+
+import {
+  mutation,
+  query,
+  type MutationCtx,
+} from "./_generated/server";
+
 import type { Id } from "./_generated/dataModel";
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const HEX_COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/;
+
+const CATALOG_PROVIDER = "augusta-csv";
+const MAX_STORE_PRODUCTS = 50;
 
 const storeActivity = v.union(
   v.literal("basketball"),
@@ -18,13 +27,33 @@ const storeActivity = v.union(
   v.literal("other"),
 );
 
-function normalizeOptionalText(value: string | undefined): string | undefined {
+const storeProductSelection = v.object({
+  providerProductId: v.string(),
+  isRequired: v.boolean(),
+});
+
+interface StoreProductSelectionInput {
+  providerProductId: string;
+  isRequired: boolean;
+}
+
+interface ResolvedStoreProductSelection {
+  productId: Id<"products">;
+  isRequired: boolean;
+  sortOrder: number;
+}
+
+function normalizeOptionalText(
+  value: string | undefined,
+): string | undefined {
   const normalizedValue = value?.trim();
 
   return normalizedValue || undefined;
 }
 
-function normalizeOptionalSlug(value: string | undefined): string | undefined {
+function normalizeOptionalSlug(
+  value: string | undefined,
+): string | undefined {
   const normalizedValue = value?.trim().toLowerCase();
 
   return normalizedValue || undefined;
@@ -40,7 +69,138 @@ function validateSlug(slug: string, label: string): void {
 
 function validateColor(color: string, label: string): void {
   if (!HEX_COLOR_PATTERN.test(color)) {
-    throw new ConvexError(`${label} must be a valid six-digit hex color.`);
+    throw new ConvexError(
+      `${label} must be a valid six-digit hex color.`,
+    );
+  }
+}
+
+function normalizeStoreProductSelections(
+  selections: StoreProductSelectionInput[],
+): StoreProductSelectionInput[] {
+  if (selections.length === 0) {
+    throw new ConvexError(
+      "Select at least one product for the store.",
+    );
+  }
+
+  if (selections.length > MAX_STORE_PRODUCTS) {
+    throw new ConvexError(
+      `A store can contain a maximum of ${MAX_STORE_PRODUCTS} products during setup.`,
+    );
+  }
+
+  const seenProviderProductIds = new Set<string>();
+
+  return selections.map((selection) => {
+    const providerProductId =
+      selection.providerProductId.trim();
+
+    if (!providerProductId) {
+      throw new ConvexError(
+        "Every selected product must have a provider product ID.",
+      );
+    }
+
+    if (seenProviderProductIds.has(providerProductId)) {
+      throw new ConvexError(
+        `Product ${providerProductId} was selected more than once.`,
+      );
+    }
+
+    seenProviderProductIds.add(providerProductId);
+
+    return {
+      providerProductId,
+      isRequired: selection.isRequired,
+    };
+  });
+}
+
+async function resolveStoreProductSelections(
+  ctx: MutationCtx,
+  selections: StoreProductSelectionInput[],
+): Promise<ResolvedStoreProductSelection[]> {
+  const normalizedSelections =
+    normalizeStoreProductSelections(selections);
+
+  return await Promise.all(
+    normalizedSelections.map(
+      async (selection, sortOrder) => {
+        const product = await ctx.db
+          .query("products")
+          .withIndex("by_provider_product", (q) =>
+            q
+              .eq("provider", CATALOG_PROVIDER)
+              .eq(
+                "providerProductId",
+                selection.providerProductId,
+              ),
+          )
+          .unique();
+
+        if (!product || product.status !== "active") {
+          throw new ConvexError(
+            `Selected product ${selection.providerProductId} is not available.`,
+          );
+        }
+
+        const activeVariants = await ctx.db
+          .query("productVariants")
+          .withIndex("by_product_status", (q) =>
+            q
+              .eq("productId", product._id)
+              .eq("status", "active"),
+          )
+          .collect();
+
+        const hasAvailableVariant = activeVariants.some(
+          (variant) =>
+            variant.availability === "available",
+        );
+
+        if (!hasAvailableVariant) {
+          throw new ConvexError(
+            `${product.name} currently has no available variants.`,
+          );
+        }
+
+        return {
+          productId: product._id,
+          isRequired: selection.isRequired,
+          sortOrder,
+        };
+      },
+    ),
+  );
+}
+
+async function replaceStoreProductSelections(
+  ctx: MutationCtx,
+  storeId: Id<"stores">,
+  selections: ResolvedStoreProductSelection[],
+  now: number,
+): Promise<void> {
+  const existingStoreProducts = await ctx.db
+    .query("storeProducts")
+    .withIndex("by_store", (q) =>
+      q.eq("storeId", storeId),
+    )
+    .collect();
+
+  for (const storeProduct of existingStoreProducts) {
+    await ctx.db.delete(storeProduct._id);
+  }
+
+  for (const selection of selections) {
+    await ctx.db.insert("storeProducts", {
+      storeId,
+      productId: selection.productId,
+      isRequired: selection.isRequired,
+      sortOrder: selection.sortOrder,
+      createdAt: now,
+      updatedAt: now,
+    });
   }
 }
 
@@ -71,29 +231,50 @@ export const saveDraft = mutation({
 
     currentStep: v.number(),
   },
+
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
 
     if (userId === null) {
-      throw new ConvexError("You must be signed in to save a draft.");
+      throw new ConvexError(
+        "You must be signed in to save a draft.",
+      );
     }
 
-    if (!Number.isInteger(args.currentStep) || args.currentStep < 1) {
-      throw new ConvexError("Current step must be a positive whole number.");
+    if (
+      !Number.isInteger(args.currentStep) ||
+      args.currentStep < 1
+    ) {
+      throw new ConvexError(
+        "Current step must be a positive whole number.",
+      );
     }
 
-    const organizationName = normalizeOptionalText(args.organizationName);
+    const organizationName = normalizeOptionalText(
+      args.organizationName,
+    );
 
-    const organizationSlug = normalizeOptionalSlug(args.organizationSlug);
+    const organizationSlug = normalizeOptionalSlug(
+      args.organizationSlug,
+    );
 
-    const storeName = normalizeOptionalText(args.storeName);
+    const storeName = normalizeOptionalText(
+      args.storeName,
+    );
 
-    const storeSlug = normalizeOptionalSlug(args.storeSlug);
+    const storeSlug = normalizeOptionalSlug(
+      args.storeSlug,
+    );
 
-    const storeDescription = normalizeOptionalText(args.storeDescription);
+    const storeDescription = normalizeOptionalText(
+      args.storeDescription,
+    );
 
     if (organizationSlug) {
-      validateSlug(organizationSlug, "Organization slug");
+      validateSlug(
+        organizationSlug,
+        "Organization slug",
+      );
     }
 
     if (storeSlug) {
@@ -101,24 +282,34 @@ export const saveDraft = mutation({
     }
 
     if (args.primaryColor) {
-      validateColor(args.primaryColor, "Primary color");
+      validateColor(
+        args.primaryColor,
+        "Primary color",
+      );
     }
 
     if (args.secondaryColor) {
-      validateColor(args.secondaryColor, "Secondary color");
+      validateColor(
+        args.secondaryColor,
+        "Secondary color",
+      );
     }
 
     const now = Date.now();
 
     if (args.storeId) {
-      const existingStore = await ctx.db.get(args.storeId);
+      const existingStore = await ctx.db.get(
+        args.storeId,
+      );
 
       if (
         existingStore === null ||
         existingStore.createdBy !== userId ||
         existingStore.status !== "draft"
       ) {
-        throw new ConvexError("Draft store not found.");
+        throw new ConvexError(
+          "Draft store not found.",
+        );
       }
 
       await ctx.db.patch(args.storeId, {
@@ -133,13 +324,15 @@ export const saveDraft = mutation({
 
         ...(args.logoStorageId !== undefined
           ? {
-              logoStorageId: args.logoStorageId,
+              logoStorageId:
+                args.logoStorageId,
             }
           : {}),
 
         ...(args.bannerStorageId !== undefined
           ? {
-              bannerStorageId: args.bannerStorageId,
+              bannerStorageId:
+                args.bannerStorageId,
             }
           : {}),
 
@@ -156,30 +349,34 @@ export const saveDraft = mutation({
       };
     }
 
-    const storeId = await ctx.db.insert("stores", {
-      createdBy: userId,
+    const storeId = await ctx.db.insert(
+      "stores",
+      {
+        createdBy: userId,
 
-      organizationName,
-      organizationSlug,
+        organizationName,
+        organizationSlug,
 
-      activity: args.activity,
+        activity: args.activity,
 
-      name: storeName,
-      slug: storeSlug,
-      description: storeDescription,
+        name: storeName,
+        slug: storeSlug,
+        description: storeDescription,
 
-      logoStorageId: args.logoStorageId,
-      bannerStorageId: args.bannerStorageId,
+        logoStorageId: args.logoStorageId,
+        bannerStorageId: args.bannerStorageId,
 
-      primaryColor: args.primaryColor,
-      secondaryColor: args.secondaryColor,
+        primaryColor: args.primaryColor,
+        secondaryColor:
+          args.secondaryColor,
 
-      currentStep: args.currentStep,
-      status: "draft",
+        currentStep: args.currentStep,
+        status: "draft",
 
-      createdAt: now,
-      updatedAt: now,
-    });
+        createdAt: now,
+        updatedAt: now,
+      },
+    );
 
     return {
       storeId,
@@ -195,6 +392,7 @@ export const getDraft = query({
   args: {
     storeId: v.id("stores"),
   },
+
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
 
@@ -221,6 +419,7 @@ export const getDraft = query({
  */
 export const listMyDrafts = query({
   args: {},
+
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
 
@@ -231,7 +430,9 @@ export const listMyDrafts = query({
     return await ctx.db
       .query("stores")
       .withIndex("by_creator_status", (q) =>
-        q.eq("createdBy", userId).eq("status", "draft"),
+        q
+          .eq("createdBy", userId)
+          .eq("status", "draft"),
       )
       .order("desc")
       .collect();
@@ -243,6 +444,7 @@ export const listMyDrafts = query({
  */
 export const listMyActiveStores = query({
   args: {},
+
   handler: async (ctx) => {
     const userId = await getAuthUserId(ctx);
 
@@ -253,7 +455,9 @@ export const listMyActiveStores = query({
     return await ctx.db
       .query("stores")
       .withIndex("by_creator_status", (q) =>
-        q.eq("createdBy", userId).eq("status", "active"),
+        q
+          .eq("createdBy", userId)
+          .eq("status", "active"),
       )
       .order("desc")
       .collect();
@@ -269,11 +473,14 @@ export const deleteDraft = mutation({
   args: {
     storeId: v.id("stores"),
   },
+
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
 
     if (userId === null) {
-      throw new ConvexError("You must be signed in to delete a draft.");
+      throw new ConvexError(
+        "You must be signed in to delete a draft.",
+      );
     }
 
     const store = await ctx.db.get(args.storeId);
@@ -283,7 +490,20 @@ export const deleteDraft = mutation({
       store.createdBy !== userId ||
       store.status !== "draft"
     ) {
-      throw new ConvexError("Draft store not found.");
+      throw new ConvexError(
+        "Draft store not found.",
+      );
+    }
+
+    const storeProducts = await ctx.db
+      .query("storeProducts")
+      .withIndex("by_store", (q) =>
+        q.eq("storeId", args.storeId),
+      )
+      .collect();
+
+    for (const storeProduct of storeProducts) {
+      await ctx.db.delete(storeProduct._id);
     }
 
     await ctx.db.delete(args.storeId);
@@ -304,11 +524,14 @@ export const archiveStore = mutation({
   args: {
     storeId: v.id("stores"),
   },
+
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
 
     if (userId === null) {
-      throw new ConvexError("You must be signed in to archive a store.");
+      throw new ConvexError(
+        "You must be signed in to archive a store.",
+      );
     }
 
     const store = await ctx.db.get(args.storeId);
@@ -318,7 +541,9 @@ export const archiveStore = mutation({
       store.createdBy !== userId ||
       store.status !== "active"
     ) {
-      throw new ConvexError("Active store not found.");
+      throw new ConvexError(
+        "Active store not found.",
+      );
     }
 
     await ctx.db.patch(args.storeId, {
@@ -339,220 +564,331 @@ export const archiveStore = mutation({
  * - an existing saved draft, or
  * - a store that has not previously been saved.
  *
- * The organization, owner membership, and active store are
- * created in one transaction.
+ * Only products explicitly selected by the user are attached
+ * to the store.
+ *
+ * The organization, owner membership, active store, and selected
+ * store products are created in one transaction.
  */
-export const createOrganizationWithStore = mutation({
-  args: {
-    storeId: v.optional(v.id("stores")),
+export const createOrganizationWithStore =
+  mutation({
+    args: {
+      storeId: v.optional(v.id("stores")),
 
-    organizationName: v.string(),
-    organizationSlug: v.string(),
+      organizationName: v.string(),
+      organizationSlug: v.string(),
 
-    activity: storeActivity,
+      activity: storeActivity,
 
-    storeName: v.string(),
-    storeSlug: v.string(),
-    storeDescription: v.optional(v.string()),
+      storeName: v.string(),
+      storeSlug: v.string(),
+      storeDescription: v.optional(
+        v.string(),
+      ),
 
-    logoStorageId: v.optional(v.id("_storage")),
-    bannerStorageId: v.optional(v.id("_storage")),
+      logoStorageId: v.optional(
+        v.id("_storage"),
+      ),
 
-    primaryColor: v.string(),
-    secondaryColor: v.string(),
+      bannerStorageId: v.optional(
+        v.id("_storage"),
+      ),
 
-    currentStep: v.number(),
-  },
-  handler: async (ctx, args) => {
-    const userId = await getAuthUserId(ctx);
+      primaryColor: v.string(),
+      secondaryColor: v.string(),
 
-    if (userId === null) {
-      throw new ConvexError("You must be signed in to create a store.");
-    }
+      currentStep: v.number(),
 
-    const organizationName = args.organizationName.trim();
-    const organizationSlug = args.organizationSlug.trim().toLowerCase();
-    const storeName = args.storeName.trim();
-    const storeSlug = args.storeSlug.trim().toLowerCase();
-    const storeDescription = normalizeOptionalText(args.storeDescription);
+      productSelections: v.array(
+        storeProductSelection,
+      ),
+    },
 
-    if (!organizationName) {
-      throw new ConvexError("Organization name is required.");
-    }
+    handler: async (ctx, args) => {
+      const userId = await getAuthUserId(ctx);
 
-    if (!organizationSlug) {
-      throw new ConvexError("Organization slug is required.");
-    }
-
-    if (!storeName) {
-      throw new ConvexError("Store name is required.");
-    }
-
-    if (!storeSlug) {
-      throw new ConvexError("Store slug is required.");
-    }
-
-    validateSlug(organizationSlug, "Organization slug");
-    validateSlug(storeSlug, "Store slug");
-
-    validateColor(args.primaryColor, "Primary color");
-    validateColor(args.secondaryColor, "Secondary color");
-
-    if (args.storeId) {
-      const existingDraft = await ctx.db.get(args.storeId);
-
-      if (
-        existingDraft === null ||
-        existingDraft.createdBy !== userId ||
-        existingDraft.status !== "draft"
-      ) {
-        throw new ConvexError("Draft store not found.");
-      }
-    }
-
-    const existingOrganization = await ctx.db
-      .query("organizations")
-      .withIndex("by_slug", (q) => q.eq("slug", organizationSlug))
-      .unique();
-
-    const storesWithSlug = await ctx.db
-      .query("stores")
-      .withIndex("by_organization_slug_and_slug", (q) =>
-        q
-          .eq("organizationSlug", organizationSlug)
-          .eq("slug", storeSlug),
-      )
-      .collect();
-
-    const conflictingStore = storesWithSlug.find(
-      (store) =>
-        store.status === "active" &&
-        store._id !== args.storeId,
-    );
-
-    if (conflictingStore) {
-      throw new ConvexError(
-        "That store URL is already in use for this organization.",
-      );
-    }
-
-    const now = Date.now();
-
-    let organizationId: Id<"organizations">;
-
-    if (existingOrganization) {
-      const membership = await ctx.db
-        .query("organizationMembers")
-        .withIndex("by_organization_user", (q) =>
-          q
-            .eq("organizationId", existingOrganization._id)
-            .eq("userId", userId),
-        )
-        .unique();
-
-      if (
-        membership === null ||
-        (membership.role !== "owner" &&
-          membership.role !== "admin")
-      ) {
+      if (userId === null) {
         throw new ConvexError(
-          "That organization URL is already in use.",
+          "You must be signed in to create a store.",
         );
       }
 
-      organizationId = existingOrganization._id;
-    } else {
-      organizationId = await ctx.db.insert("organizations", {
-        name: organizationName,
-        slug: organizationSlug,
-        createdBy: userId,
-        createdAt: now,
-        updatedAt: now,
-      });
+      const organizationName =
+        args.organizationName.trim();
 
-      await ctx.db.insert("organizationMembers", {
-        organizationId,
-        userId,
-        role: "owner",
-        createdAt: now,
-      });
-    }
+      const organizationSlug =
+        args.organizationSlug
+          .trim()
+          .toLowerCase();
 
-    if (args.storeId) {
-      await ctx.db.patch(args.storeId, {
-        organizationId,
+      const storeName =
+        args.storeName.trim();
 
-        organizationName,
+      const storeSlug = args.storeSlug
+        .trim()
+        .toLowerCase();
+
+      const storeDescription =
+        normalizeOptionalText(
+          args.storeDescription,
+        );
+
+      if (!organizationName) {
+        throw new ConvexError(
+          "Organization name is required.",
+        );
+      }
+
+      if (!organizationSlug) {
+        throw new ConvexError(
+          "Organization slug is required.",
+        );
+      }
+
+      if (!storeName) {
+        throw new ConvexError(
+          "Store name is required.",
+        );
+      }
+
+      if (!storeSlug) {
+        throw new ConvexError(
+          "Store slug is required.",
+        );
+      }
+
+      validateSlug(
         organizationSlug,
+        "Organization slug",
+      );
 
-        activity: args.activity,
+      validateSlug(storeSlug, "Store slug");
 
-        name: storeName,
-        slug: storeSlug,
-        description: storeDescription,
+      validateColor(
+        args.primaryColor,
+        "Primary color",
+      );
 
-        ...(args.logoStorageId !== undefined
-          ? {
-              logoStorageId: args.logoStorageId,
-            }
-          : {}),
+      validateColor(
+        args.secondaryColor,
+        "Secondary color",
+      );
 
-        ...(args.bannerStorageId !== undefined
-          ? {
-              bannerStorageId: args.bannerStorageId,
-            }
-          : {}),
+      if (args.storeId) {
+        const existingDraft =
+          await ctx.db.get(args.storeId);
 
-        primaryColor: args.primaryColor,
-        secondaryColor: args.secondaryColor,
+        if (
+          existingDraft === null ||
+          existingDraft.createdBy !== userId ||
+          existingDraft.status !== "draft"
+        ) {
+          throw new ConvexError(
+            "Draft store not found.",
+          );
+        }
+      }
 
-        currentStep: args.currentStep,
-        status: "active",
-        updatedAt: now,
-      });
+      const selectedProducts =
+        await resolveStoreProductSelections(
+          ctx,
+          args.productSelections,
+        );
+
+      const existingOrganization =
+        await ctx.db
+          .query("organizations")
+          .withIndex("by_slug", (q) =>
+            q.eq("slug", organizationSlug),
+          )
+          .unique();
+
+      const storesWithSlug = await ctx.db
+        .query("stores")
+        .withIndex(
+          "by_organization_slug_and_slug",
+          (q) =>
+            q
+              .eq(
+                "organizationSlug",
+                organizationSlug,
+              )
+              .eq("slug", storeSlug),
+        )
+        .collect();
+
+      const conflictingStore =
+        storesWithSlug.find(
+          (store) =>
+            store.status === "active" &&
+            store._id !== args.storeId,
+        );
+
+      if (conflictingStore) {
+        throw new ConvexError(
+          "That store URL is already in use for this organization.",
+        );
+      }
+
+      const now = Date.now();
+
+      let organizationId: Id<"organizations">;
+
+      if (existingOrganization) {
+        const membership = await ctx.db
+          .query("organizationMembers")
+          .withIndex(
+            "by_organization_user",
+            (q) =>
+              q
+                .eq(
+                  "organizationId",
+                  existingOrganization._id,
+                )
+                .eq("userId", userId),
+          )
+          .unique();
+
+        if (
+          membership === null ||
+          (membership.role !== "owner" &&
+            membership.role !== "admin")
+        ) {
+          throw new ConvexError(
+            "That organization URL is already in use.",
+          );
+        }
+
+        organizationId =
+          existingOrganization._id;
+      } else {
+        organizationId =
+          await ctx.db.insert(
+            "organizations",
+            {
+              name: organizationName,
+              slug: organizationSlug,
+              createdBy: userId,
+              createdAt: now,
+              updatedAt: now,
+            },
+          );
+
+        await ctx.db.insert(
+          "organizationMembers",
+          {
+            organizationId,
+            userId,
+            role: "owner",
+            createdAt: now,
+          },
+        );
+      }
+
+      if (args.storeId) {
+        await ctx.db.patch(args.storeId, {
+          organizationId,
+
+          organizationName,
+          organizationSlug,
+
+          activity: args.activity,
+
+          name: storeName,
+          slug: storeSlug,
+          description: storeDescription,
+
+          ...(args.logoStorageId !== undefined
+            ? {
+                logoStorageId:
+                  args.logoStorageId,
+              }
+            : {}),
+
+          ...(args.bannerStorageId !==
+          undefined
+            ? {
+                bannerStorageId:
+                  args.bannerStorageId,
+              }
+            : {}),
+
+          primaryColor:
+            args.primaryColor,
+
+          secondaryColor:
+            args.secondaryColor,
+
+          currentStep: args.currentStep,
+          status: "active",
+          updatedAt: now,
+        });
+
+        await replaceStoreProductSelections(
+          ctx,
+          args.storeId,
+          selectedProducts,
+          now,
+        );
+
+        return {
+          organizationId,
+          storeId: args.storeId,
+          organizationSlug,
+          storeSlug,
+        };
+      }
+
+      const storeId = await ctx.db.insert(
+        "stores",
+        {
+          organizationId,
+          createdBy: userId,
+
+          organizationName,
+          organizationSlug,
+
+          activity: args.activity,
+
+          name: storeName,
+          slug: storeSlug,
+          description: storeDescription,
+
+          logoStorageId:
+            args.logoStorageId,
+
+          bannerStorageId:
+            args.bannerStorageId,
+
+          primaryColor:
+            args.primaryColor,
+
+          secondaryColor:
+            args.secondaryColor,
+
+          currentStep: args.currentStep,
+          status: "active",
+
+          createdAt: now,
+          updatedAt: now,
+        },
+      );
+
+      await replaceStoreProductSelections(
+        ctx,
+        storeId,
+        selectedProducts,
+        now,
+      );
 
       return {
         organizationId,
-        storeId: args.storeId,
+        storeId,
         organizationSlug,
         storeSlug,
       };
-    }
-
-    const storeId = await ctx.db.insert("stores", {
-      organizationId,
-      createdBy: userId,
-
-      organizationName,
-      organizationSlug,
-
-      activity: args.activity,
-
-      name: storeName,
-      slug: storeSlug,
-      description: storeDescription,
-
-      logoStorageId: args.logoStorageId,
-      bannerStorageId: args.bannerStorageId,
-
-      primaryColor: args.primaryColor,
-      secondaryColor: args.secondaryColor,
-
-      currentStep: args.currentStep,
-      status: "active",
-
-      createdAt: now,
-      updatedAt: now,
-    });
-
-    return {
-      organizationId,
-      storeId,
-      organizationSlug,
-      storeSlug,
-    };
-  },
-});
+    },
+  });
 
 /**
  * Checks whether a public store URL is available
@@ -560,95 +896,120 @@ export const createOrganizationWithStore = mutation({
  *
  * Draft stores do not reserve a public URL.
  */
-export const checkStoreSlugAvailability = query({
-  args: {
-    organizationSlug: v.string(),
-    storeSlug: v.string(),
-    excludeStoreId: v.optional(v.id("stores")),
-  },
+export const checkStoreSlugAvailability =
+  query({
+    args: {
+      organizationSlug: v.string(),
+      storeSlug: v.string(),
 
-  handler: async (ctx, args) => {
-    const organizationSlug = args.organizationSlug
-      .trim()
-      .toLowerCase();
+      excludeStoreId: v.optional(
+        v.id("stores"),
+      ),
+    },
 
-    const storeSlug = args.storeSlug
-      .trim()
-      .toLowerCase();
+    handler: async (ctx, args) => {
+      const organizationSlug =
+        args.organizationSlug
+          .trim()
+          .toLowerCase();
 
-    if (
-      !organizationSlug ||
-      !storeSlug ||
-      !SLUG_PATTERN.test(organizationSlug) ||
-      !SLUG_PATTERN.test(storeSlug)
-    ) {
+      const storeSlug = args.storeSlug
+        .trim()
+        .toLowerCase();
+
+      if (
+        !organizationSlug ||
+        !storeSlug ||
+        !SLUG_PATTERN.test(
+          organizationSlug,
+        ) ||
+        !SLUG_PATTERN.test(storeSlug)
+      ) {
+        return {
+          available: false,
+        };
+      }
+
+      const matchingStores = await ctx.db
+        .query("stores")
+        .withIndex(
+          "by_organization_slug_and_slug",
+          (q) =>
+            q
+              .eq(
+                "organizationSlug",
+                organizationSlug,
+              )
+              .eq("slug", storeSlug),
+        )
+        .collect();
+
+      const conflictingStore =
+        matchingStores.find(
+          (store) =>
+            store.status === "active" &&
+            store._id !==
+              args.excludeStoreId,
+        );
+
       return {
-        available: false,
+        available:
+          conflictingStore === undefined,
       };
-    }
-
-    const matchingStores = await ctx.db
-      .query("stores")
-      .withIndex("by_organization_slug_and_slug", (q) =>
-        q
-          .eq("organizationSlug", organizationSlug)
-          .eq("slug", storeSlug),
-      )
-      .collect();
-
-    const conflictingStore = matchingStores.find(
-      (store) =>
-        store.status === "active" &&
-        store._id !== args.excludeStoreId,
-    );
-
-    return {
-      available: conflictingStore === undefined,
-    };
-  },
-});
+    },
+  });
 
 /**
  * Returns an active public store using its organization
  * and store URL slugs.
  */
-export const getActiveStoreBySlugs = query({
-  args: {
-    organizationSlug: v.string(),
-    storeSlug: v.string(),
-  },
+export const getActiveStoreBySlugs =
+  query({
+    args: {
+      organizationSlug: v.string(),
+      storeSlug: v.string(),
+    },
 
-  handler: async (ctx, args) => {
-    const organizationSlug = args.organizationSlug
-      .trim()
-      .toLowerCase();
+    handler: async (ctx, args) => {
+      const organizationSlug =
+        args.organizationSlug
+          .trim()
+          .toLowerCase();
 
-    const storeSlug = args.storeSlug
-      .trim()
-      .toLowerCase();
+      const storeSlug = args.storeSlug
+        .trim()
+        .toLowerCase();
 
-    if (
-      !organizationSlug ||
-      !storeSlug ||
-      !SLUG_PATTERN.test(organizationSlug) ||
-      !SLUG_PATTERN.test(storeSlug)
-    ) {
-      return null;
-    }
+      if (
+        !organizationSlug ||
+        !storeSlug ||
+        !SLUG_PATTERN.test(
+          organizationSlug,
+        ) ||
+        !SLUG_PATTERN.test(storeSlug)
+      ) {
+        return null;
+      }
 
-    const matchingStores = await ctx.db
-      .query("stores")
-      .withIndex("by_organization_slug_and_slug", (q) =>
-        q
-          .eq("organizationSlug", organizationSlug)
-          .eq("slug", storeSlug),
-      )
-      .collect();
+      const matchingStores = await ctx.db
+        .query("stores")
+        .withIndex(
+          "by_organization_slug_and_slug",
+          (q) =>
+            q
+              .eq(
+                "organizationSlug",
+                organizationSlug,
+              )
+              .eq("slug", storeSlug),
+        )
+        .collect();
 
-    return (
-      matchingStores.find(
-        (store) => store.status === "active",
-      ) ?? null
-    );
-  },
-});
+      return (
+        matchingStores.find(
+          (store) =>
+            store.status === "active",
+        ) ?? null
+      );
+    },
+  });

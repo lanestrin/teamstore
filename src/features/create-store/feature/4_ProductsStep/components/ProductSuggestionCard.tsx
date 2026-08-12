@@ -1,133 +1,130 @@
 import { LuCheck, LuPencil, LuStar } from "react-icons/lu";
 
-import styles from "../ProductsStep.module.scss";
+import GarmentArtworkPreview from "./GarmentArtworkPreview";
+
 import type {
   GeneratedSuggestion,
   ProductColorOption,
 } from "../productStep.types";
 
+import styles from "../ProductsStep.module.scss";
+
 interface ProductSuggestionCardProps {
   suggestion: GeneratedSuggestion;
+
   color: ProductColorOption;
+
   artworkName: string;
+
+  artworkSvg: string | null;
+
   isSelected: boolean;
+
   isRequired: boolean;
+
   onSelectionChange: (checked: boolean) => void;
+
   onRequiredClick: () => void;
+
   onEdit: () => void;
-}
-
-function formatPriceRange(
-  minimumInCents: number | null,
-  maximumInCents: number | null,
-): string {
-  if (minimumInCents === null) {
-    return "Price unavailable";
-  }
-
-  const minimum = minimumInCents / 100;
-
-  if (maximumInCents === null || maximumInCents === minimumInCents) {
-    return minimum.toLocaleString("en-US", {
-      style: "currency",
-      currency: "USD",
-    });
-  }
-
-  const maximum = maximumInCents / 100;
-
-  return `${minimum.toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD",
-  })}–${maximum.toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD",
-  })}`;
 }
 
 export default function ProductSuggestionCard({
   suggestion,
   color,
   artworkName,
+  artworkSvg,
   isSelected,
   isRequired,
   onSelectionChange,
   onRequiredClick,
   onEdit,
 }: ProductSuggestionCardProps) {
-  return (
-    <article
-      className={[
-        styles.productCard,
+  const productName = suggestion.product.name ?? suggestion.providerProductId;
 
-        isSelected ? styles.productCardSelected : "",
-      ]
-        .filter(Boolean)
-        .join(" ")}
-    >
+  return (
+    <article className={styles.productCard} data-selected={isSelected}>
       <div className={styles.productImageArea}>
-        <img
-          src={color.imageUrl}
-          alt={`${suggestion.product.name} in ${color.color}`}
-          className={styles.productImage}
-        />
+        {color.imageUrl ? (
+          artworkSvg ? (
+            <GarmentArtworkPreview
+              garmentImageUrl={color.imageUrl}
+              garmentName={productName}
+              artworkSvg={artworkSvg}
+              decorationProfileId={suggestion.decorationProfileId}
+            />
+          ) : (
+            <img
+              src={color.imageUrl}
+              alt={productName}
+              className={styles.productImage}
+            />
+          )
+        ) : (
+          <div className={styles.productImagePlaceholder}>No image</div>
+        )}
 
         <button
           type="button"
-          className={[
-            styles.requiredButton,
-
-            isRequired ? styles.requiredButtonActive : "",
-          ]
-            .filter(Boolean)
-            .join(" ")}
+          className={styles.requiredButton}
+          data-required={isRequired}
           aria-label={
-            isRequired ? "Mark product as optional" : "Mark product as required"
+            isRequired
+              ? `Make ${productName} optional`
+              : `Require ${productName}`
           }
           aria-pressed={isRequired}
-          title={isRequired ? "Required product" : "Mark as required"}
           onClick={onRequiredClick}
         >
-          <LuStar
-            aria-hidden="true"
-            fill={isRequired ? "currentColor" : "none"}
-          />
+          <LuStar aria-hidden="true" />
         </button>
 
         {isSelected && (
-          <span className={styles.selectedBadge}>
+          <div className={styles.selectedBadge}>
             <LuCheck aria-hidden="true" />
             Selected
-          </span>
+          </div>
         )}
       </div>
 
-      <div className={styles.productContent}>
-        <div className={styles.productHeading}>
+      <div className={styles.productCardBody}>
+        <div className={styles.productCardHeading}>
           <div>
-            <h3>{suggestion.product.name}</h3>
+            <h3>{productName}</h3>
 
-            <p className={styles.productCategory}>
-              {suggestion.product.category}
-            </p>
+            {suggestion.product.category && (
+              <p>{suggestion.product.category}</p>
+            )}
           </div>
 
-          <strong className={styles.productPrice}>
-            {formatPriceRange(
-              suggestion.product.minPriceInCents,
-
-              suggestion.product.maxPriceInCents,
-            )}
-          </strong>
+          {suggestion.product.minPriceInCents !== null && (
+            <strong className={styles.productPrice}>
+              {suggestion.product.maxPriceInCents !== null &&
+              suggestion.product.maxPriceInCents !==
+                suggestion.product.minPriceInCents
+                ? `$${(suggestion.product.minPriceInCents / 100).toFixed(
+                    2,
+                  )}–$${(suggestion.product.maxPriceInCents / 100).toFixed(2)}`
+                : `$${(suggestion.product.minPriceInCents / 100).toFixed(2)}`}
+            </strong>
+          )}
         </div>
 
-        <div className={styles.productMeta}>
-          <span>{color.color}</span>
+        <dl className={styles.productDetails}>
+          <div>
+            <dt>Color</dt>
 
-          <span>Artwork: {artworkName}</span>
-        </div>
+            <dd>{color.color}</dd>
+          </div>
 
-        <div className={styles.productActions}>
+          <div>
+            <dt>Artwork</dt>
+
+            <dd>{artworkName}</dd>
+          </div>
+        </dl>
+
+        <div className={styles.productCardActions}>
           <label className={styles.productCheckbox}>
             <input
               type="checkbox"
@@ -137,7 +134,7 @@ export default function ProductSuggestionCard({
               }
             />
 
-            <span>{isSelected ? "Selected" : "Use this product"}</span>
+            <span>Use this product</span>
           </label>
 
           <button
@@ -146,8 +143,7 @@ export default function ProductSuggestionCard({
             onClick={onEdit}
           >
             <LuPencil aria-hidden="true" />
-
-            <span>Edit Product</span>
+            Edit Product
           </button>
         </div>
       </div>
