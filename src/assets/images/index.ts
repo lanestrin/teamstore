@@ -13,7 +13,7 @@ import jaguarsLogo from "./images/jaguars_logo.png";
 import knightsLogo from "./images/knights_logo.png";
 import lionsLogo from "./images/lions_logo.png";
 import teamstoreLogo from "./images/teamstore_logo.png";
-import teamstoreLogoDark from "./images/teamstore-logo-dark.png"
+import teamstoreLogoDark from "./images/teamstore-logo-dark.png";
 import tee from "./images/tee.png";
 import tigersLogo from "./images/tigers_logo.png";
 import trojanLogo from "./images/trojan_logo.png";
@@ -21,37 +21,36 @@ import trojanLogo from "./images/trojan_logo.png";
 import polyBG from "./images/poly-bg.webp";
 import ribbonBg from "./images/flowy-bg.webp";
 
-
 export const images = {
-	account: {
-		heart: accountHeart,
-		package: accountPackage,
-	},
+  account: {
+    heart: accountHeart,
+    package: accountPackage,
+  },
 
-	products: {
-		hoodie,
-		hoodie2,
-		backpack,
-		cap,
-		tee,
-	},
+  products: {
+    hoodie,
+    hoodie2,
+    backpack,
+    cap,
+    tee,
+  },
 
-	logos: {
-		jaguars: jaguarsLogo,
-		knights: knightsLogo,
-		lions: lionsLogo,
-		tigers: tigersLogo,
-		trojan: trojanLogo,
-	},
+  logos: {
+    jaguars: jaguarsLogo,
+    knights: knightsLogo,
+    lions: lionsLogo,
+    tigers: tigersLogo,
+    trojan: trojanLogo,
+  },
 
-	hero: heroBanner,
-	teamstore: {
-		teamstoreLogo,
-		teamstoreLogoDark,
-	},
+  hero: heroBanner,
+  teamstore: {
+    teamstoreLogo,
+    teamstoreLogoDark,
+  },
 
-	heroBg: {
-		polyBG,
-		ribbonBg
-	},
+  heroBg: {
+    polyBG,
+    ribbonBg,
+  },
 };

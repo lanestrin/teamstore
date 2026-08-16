@@ -1,12 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  LuChevronRight,
-  LuGrid2X2,
-  LuList,
-  LuMapPin,
-  LuSearch,
-} from "react-icons/lu";
+import { LuChevronRight, LuGrid2X2, LuList, LuMapPin, LuSearch } from "react-icons/lu";
 
 import styles from "./StoresPage.module.scss";
 
@@ -100,17 +94,12 @@ export default function StoresPage() {
       <section className={styles.hero}>
         <h1>Find Your Team Store</h1>
 
-        <p>
-          Search by school, team, mascot, club, or city.
-        </p>
+        <p>Search by school, team, mascot, club, or city.</p>
 
         <div className={styles.search}>
           <LuSearch />
 
-          <input
-            type="search"
-            placeholder="Search team, school, mascot, club, or city..."
-          />
+          <input type="search" placeholder="Search team, school, mascot, club, or city..." />
         </div>
       </section>
 
@@ -170,28 +159,12 @@ export default function StoresPage() {
           </h2>
 
           <div className={styles.viewToggle}>
-            <button
-              type="button"
-              className={
-                view === "grid"
-                  ? styles.activeView
-                  : ""
-              }
-              onClick={() => setView("grid")}
-            >
+            <button type="button" className={view === "grid" ? styles.activeView : ""} onClick={() => setView("grid")}>
               <LuGrid2X2 />
               Grid View
             </button>
 
-            <button
-              type="button"
-              className={
-                view === "list"
-                  ? styles.activeView
-                  : ""
-              }
-              onClick={() => setView("list")}
-            >
+            <button type="button" className={view === "list" ? styles.activeView : ""} onClick={() => setView("list")}>
               <LuList />
               List View
             </button>
@@ -201,15 +174,8 @@ export default function StoresPage() {
         {view === "list" ? (
           <div className={styles.storeList}>
             {stores.map((store) => (
-              <Link
-                key={store.slug}
-                to={`/store/${store.slug}`}
-                className={styles.storeRow}
-              >
-                <img
-                  src={store.logo}
-                  alt={store.name}
-                />
+              <Link key={store.slug} to={`/store/${store.slug}`} className={styles.storeRow}>
+                <img src={store.logo} alt={store.name} />
 
                 <strong>{store.name}</strong>
 
@@ -219,36 +185,21 @@ export default function StoresPage() {
                   <span>{store.state}</span>
                 </div>
 
-                <small>
-                  {store.products} Products
-                </small>
+                <small>{store.products} Products</small>
 
-                <LuChevronRight
-                  className={styles.rowIcon}
-                />
+                <LuChevronRight className={styles.rowIcon} />
               </Link>
             ))}
           </div>
         ) : (
           <div className={styles.gridView}>
             {stores.map((store) => (
-              <Link
-                key={store.slug}
-                to={`/store/${store.slug}`}
-                className={styles.gridCard}
-              >
-                <div
-                  className={styles.gridCardImage}
-                >
-                  <img
-                    src={store.logo}
-                    alt={store.name}
-                  />
+              <Link key={store.slug} to={`/store/${store.slug}`} className={styles.gridCard}>
+                <div className={styles.gridCardImage}>
+                  <img src={store.logo} alt={store.name} />
                 </div>
 
-                <div
-                  className={styles.gridCardContent}
-                >
+                <div className={styles.gridCardContent}>
                   <strong>{store.name}</strong>
 
                   <div className={styles.gridTags}>
@@ -256,9 +207,7 @@ export default function StoresPage() {
                     <span>{store.level}</span>
                   </div>
 
-                  <small>
-                    {store.products} Products
-                  </small>
+                  <small>{store.products} Products</small>
                 </div>
               </Link>
             ))}
@@ -266,9 +215,7 @@ export default function StoresPage() {
         )}
 
         <div className={styles.pagination}>
-          <button className={styles.currentPage}>
-            1
-          </button>
+          <button className={styles.currentPage}>1</button>
 
           <button>2</button>
 
@@ -303,14 +250,8 @@ export default function StoresPage() {
 
         <div className={styles.nearbyGrid}>
           {nearbyStores.map((store) => (
-            <div
-              key={store.name}
-              className={styles.nearbyCard}
-            >
-              <img
-                src={store.logo}
-                alt={store.name}
-              />
+            <div key={store.name} className={styles.nearbyCard}>
+              <img src={store.logo} alt={store.name} />
 
               <strong>{store.name}</strong>
 
@@ -324,15 +265,10 @@ export default function StoresPage() {
         <div>
           <h2>Don't See Your Team?</h2>
 
-          <p>
-            Create a TeamStore in minutes and
-            start your own team shop today.
-          </p>
+          <p>Create a TeamStore in minutes and start your own team shop today.</p>
         </div>
 
-        <Link to="/create-store">
-          Create Your Store
-        </Link>
+        <Link to="/create-store">Create Your Store</Link>
       </section>
     </div>
   );

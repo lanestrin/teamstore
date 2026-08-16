@@ -1,336 +1,336 @@
 .info {
-	display: flex;
-	flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .info h1 {
-	margin: 0;
-	color: $text-primary;
-	font-size: 2.35rem;
-	line-height: 1.05;
+  margin: 0;
+  color: $text-primary;
+  font-size: 2.35rem;
+  line-height: 1.05;
 }
 
 .teamName {
-	margin: $space-2 0 $space-4;
-	color: $text-secondary;
-	font-size: 1.1rem;
-	font-weight: $font-medium;
+  margin: $space-2 0 $space-4;
+  color: $text-secondary;
+  font-size: 1.1rem;
+  font-weight: $font-medium;
 }
 
 .price {
-	margin-bottom: $space-5;
-	color: $text-primary;
-	font-size: 1.9rem;
-	font-weight: $font-bold;
+  margin-bottom: $space-5;
+  color: $text-primary;
+  font-size: 1.9rem;
+  font-weight: $font-bold;
 }
 
 .optionSection {
-	margin-bottom: $space-5;
+  margin-bottom: $space-5;
 }
 
 .sectionLabel {
-	display: flex;
-	align-items: center;
-	gap: $space-2;
-	margin-bottom: $space-3;
-	color: $text-secondary;
-	font-size: 0.8rem;
-	font-weight: $font-bold;
-	letter-spacing: 0.08em;
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  margin-bottom: $space-3;
+  color: $text-secondary;
+  font-size: 0.8rem;
+  font-weight: $font-bold;
+  letter-spacing: 0.08em;
 }
 
 .selectedOption {
-	color: $text-primary;
-	font-size: 0.85rem;
-	font-weight: $font-semibold;
-	letter-spacing: normal;
-	text-transform: none;
+  color: $text-primary;
+  font-size: 0.85rem;
+  font-weight: $font-semibold;
+  letter-spacing: normal;
+  text-transform: none;
 
-	&::before {
-		content: "—";
-		margin-right: $space-2;
-		color: $text-secondary;
-	}
+  &::before {
+    content: "—";
+    margin-right: $space-2;
+    color: $text-secondary;
+  }
 }
 
 .groupLabel {
-	color: $text-secondary;
-	font-size: 0.95rem;
-	line-height: 1.5;
+  color: $text-secondary;
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
 
 /* Color variants */
 
 .colorGrid {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	gap: $space-2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $space-2;
 }
 
 .colorOption {
-	@include flex-center;
-	flex: 0 0 38px;
-	width: 38px;
-	height: 38px;
-	padding: 2px;
-	overflow: hidden;
-	background: $gray-100;
-	border: 1px solid $border-medium;
-	border-radius: 50%;
-	cursor: pointer;
-	transition:
-		border-color $transition-base,
-		box-shadow $transition-base,
-		transform $transition-base;
+  @include flex-center;
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  padding: 2px;
+  overflow: hidden;
+  background: $gray-100;
+  border: 1px solid $border-medium;
+  border-radius: 50%;
+  cursor: pointer;
+  transition:
+    border-color $transition-base,
+    box-shadow $transition-base,
+    transform $transition-base;
 
-	&:hover {
-		border-color: $brand-red;
-		transform: translateY(-1px);
-	}
+  &:hover {
+    border-color: $brand-red;
+    transform: translateY(-1px);
+  }
 
-	&:focus-visible {
-		outline: 2px solid $brand-red;
-		outline-offset: 2px;
-	}
+  &:focus-visible {
+    outline: 2px solid $brand-red;
+    outline-offset: 2px;
+  }
 }
 
 .activeColor {
-	border-color: $brand-red;
-	box-shadow: 0 0 0 1px $brand-red;
+  border-color: $brand-red;
+  box-shadow: 0 0 0 1px $brand-red;
 }
 
 .colorThumbnail {
-	display: block;
-	width: 100%;
-	height: 100%;
-	background: $gray-100;
-	border-radius: inherit;
-	object-fit: contain;
-	mix-blend-mode: darken;
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: $gray-100;
+  border-radius: inherit;
+  object-fit: contain;
+  mix-blend-mode: darken;
 }
 
 /* Size variants */
 
 .sizeGrid {
-	display: flex;
-	flex-wrap: wrap;
-	gap: $space-3;
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-3;
 }
 
 .sizeGrid button {
-	@include flex-center;
-	flex-direction: column;
-	gap: $space-1;
-	width: 78px;
-	height: 68px;
-	background: $white;
-	border: 1px solid $border-medium;
-	border-radius: $radius-md;
-	cursor: pointer;
-	transition:
-		background-color $transition-base,
-		border-color $transition-base,
-		color $transition-base,
-		box-shadow $transition-base;
+  @include flex-center;
+  flex-direction: column;
+  gap: $space-1;
+  width: 78px;
+  height: 68px;
+  background: $white;
+  border: 1px solid $border-medium;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition:
+    background-color $transition-base,
+    border-color $transition-base,
+    color $transition-base,
+    box-shadow $transition-base;
 
-	&:hover {
-		border-color: $brand-red;
-	}
+  &:hover {
+    border-color: $brand-red;
+  }
 
-	&:focus-visible {
-		outline: none;
-		border-color: $brand-red;
-		box-shadow: 0 0 0 3px rgba($brand-red, 0.12);
-	}
+  &:focus-visible {
+    outline: none;
+    border-color: $brand-red;
+    box-shadow: 0 0 0 3px rgba($brand-red, 0.12);
+  }
 }
 
 .sizeGrid span {
-	color: $text-primary;
-	font-size: 1rem;
-	font-weight: $font-bold;
+  color: $text-primary;
+  font-size: 1rem;
+  font-weight: $font-bold;
 }
 
 .sizeGrid small {
-	color: $success;
-	font-size: 0.72rem;
+  color: $success;
+  font-size: 0.72rem;
 }
 
 .activeSize {
-	background: $brand-red !important;
-	border-color: $brand-red !important;
+  background: $brand-red !important;
+  border-color: $brand-red !important;
 }
 
 .activeSize span,
 .activeSize small {
-	color: $white !important;
+  color: $white !important;
 }
 
 /* Quantity */
 
 .quantitySection {
-	margin-bottom: $space-4;
+  margin-bottom: $space-4;
 }
 
 .quantitySection label {
-	display: block;
-	margin-bottom: $space-2;
-	color: $text-primary;
-	font-weight: $font-semibold;
+  display: block;
+  margin-bottom: $space-2;
+  color: $text-primary;
+  font-weight: $font-semibold;
 }
 
 .quantityControls {
-	display: inline-flex;
-	align-items: center;
-	overflow: hidden;
-	border: 1px solid $border-medium;
-	border-radius: $radius-md;
+  display: inline-flex;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid $border-medium;
+  border-radius: $radius-md;
 }
 
 .quantityControls button {
-	@include flex-center;
-	width: 48px;
-	height: 48px;
-	background: $white;
-	border: 0;
-	cursor: pointer;
-	transition: background-color $transition-base;
+  @include flex-center;
+  width: 48px;
+  height: 48px;
+  background: $white;
+  border: 0;
+  cursor: pointer;
+  transition: background-color $transition-base;
 
-	&:hover:not(:disabled) {
-		background: $gray-100;
-	}
+  &:hover:not(:disabled) {
+    background: $gray-100;
+  }
 
-	&:focus-visible {
-		position: relative;
-		outline: 2px solid $brand-red;
-		outline-offset: -2px;
-	}
+  &:focus-visible {
+    position: relative;
+    outline: 2px solid $brand-red;
+    outline-offset: -2px;
+  }
 
-	&:disabled {
-		cursor: not-allowed;
-		opacity: 0.4;
-	}
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
 }
 
 .quantityControls span {
-	width: 60px;
-	text-align: center;
-	font-weight: $font-bold;
+  width: 60px;
+  text-align: center;
+  font-weight: $font-bold;
 }
 
 /* Cart */
 
 .addToCart {
-	@include button-red;
-	display: inline-flex;
-	width: 100%;
-	height: 52px;
-	align-items: center;
-	justify-content: center;
-	gap: $space-2;
-	margin-top: $space-2;
-	font-family: "Barlow Condensed", sans-serif;
-	font-size: 1.1rem;
-	font-weight: $font-bold;
-	letter-spacing: 0.04em;
-	text-transform: uppercase;
+  @include button-red;
+  display: inline-flex;
+  width: 100%;
+  height: 52px;
+  align-items: center;
+  justify-content: center;
+  gap: $space-2;
+  margin-top: $space-2;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 1.1rem;
+  font-weight: $font-bold;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 
-	svg {
-		width: 1.05rem;
-		height: 1.05rem;
-		flex-shrink: 0;
-	}
+  svg {
+    width: 1.05rem;
+    height: 1.05rem;
+    flex-shrink: 0;
+  }
 }
 
 .addToCart:disabled {
-	cursor: not-allowed;
-	opacity: 0.6;
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .addedToCart {
-	background: $success;
-	border-color: $success;
-	color: $white;
+  background: $success;
+  border-color: $success;
+  color: $white;
 
-	&:hover:not(:disabled) {
-		background: $success;
-		border-color: $success;
-	}
+  &:hover:not(:disabled) {
+    background: $success;
+    border-color: $success;
+  }
 }
 
 .cartConfirmation {
-	display: flex;
-	min-height: 42px;
-	align-items: center;
-	justify-content: space-between;
-	gap: $space-4;
-	margin-top: $space-3;
-	padding: $space-3 $space-4;
-	border: 1px solid rgba($success, 0.25);
-	border-radius: $radius-md;
-	background: rgba($success, 0.08);
-	color: $text-primary;
-	font-size: 0.84rem;
-	line-height: 1.4;
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-4;
+  margin-top: $space-3;
+  padding: $space-3 $space-4;
+  border: 1px solid rgba($success, 0.25);
+  border-radius: $radius-md;
+  background: rgba($success, 0.08);
+  color: $text-primary;
+  font-size: 0.84rem;
+  line-height: 1.4;
 
-	a {
-		flex-shrink: 0;
-		color: $success;
-		font-weight: $font-bold;
-		text-decoration: none;
+  a {
+    flex-shrink: 0;
+    color: $success;
+    font-weight: $font-bold;
+    text-decoration: none;
 
-		&:hover {
-			text-decoration: underline;
-			text-underline-offset: 3px;
-		}
+    &:hover {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
 
-		&:focus-visible {
-			outline: 3px solid rgba($success, 0.2);
-			outline-offset: 3px;
-			border-radius: $radius-sm;
-		}
-	}
+    &:focus-visible {
+      outline: 3px solid rgba($success, 0.2);
+      outline-offset: 3px;
+      border-radius: $radius-sm;
+    }
+  }
 }
 
 @media (max-width: 992px) {
-	.info h1 {
-		font-size: 2.2rem;
-	}
+  .info h1 {
+    font-size: 2.2rem;
+  }
 }
 
 @media (max-width: 660px) {
-	.info h1 {
-		font-size: 1.9rem;
-	}
+  .info h1 {
+    font-size: 1.9rem;
+  }
 
-	.price {
-		font-size: 1.75rem;
-	}
+  .price {
+    font-size: 1.75rem;
+  }
 
-	.colorOption {
-		flex-basis: 44px;
-		width: 44px;
-		height: 44px;
-	}
+  .colorOption {
+    flex-basis: 44px;
+    width: 44px;
+    height: 44px;
+  }
 
-	.sizeGrid button {
-		width: 80px;
-		height: 74px;
-	}
+  .sizeGrid button {
+    width: 80px;
+    height: 74px;
+  }
 }
 
 @media (max-width: 576px) {
-	.colorOption {
-		flex-basis: 36px;
-		width: 36px;
-		height: 36px;
-	}
+  .colorOption {
+    flex-basis: 36px;
+    width: 36px;
+    height: 36px;
+  }
 }
 
 @media (max-width: 480px) {
-	.cartConfirmation {
-		align-items: flex-start;
-		flex-direction: column;
-		gap: $space-1;
-	}
+  .cartConfirmation {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: $space-1;
+  }
 }

@@ -4,16 +4,9 @@ import type { Doc, Id } from "./_generated/dataModel";
 import { mutation, query, type MutationCtx } from "./_generated/server";
 import { requirePlatformAdmin } from "./lib/authz";
 
-const variantStatusValidator = v.union(
-  v.literal("active"),
-  v.literal("inactive"),
-);
+const variantStatusValidator = v.union(v.literal("active"), v.literal("inactive"));
 
-const availabilityValidator = v.union(
-  v.literal("available"),
-  v.literal("unavailable"),
-  v.literal("discontinued"),
-);
+const availabilityValidator = v.union(v.literal("available"), v.literal("unavailable"), v.literal("discontinued"));
 
 const DEFAULT_CURRENCY = "USD";
 
@@ -81,27 +74,16 @@ function normalizeColorKey(color: string) {
 }
 
 function normalizeCurrency(currency?: string) {
-  return normalizeRequiredText(
-    currency ?? DEFAULT_CURRENCY,
-    "Currency",
-  ).toUpperCase();
+  return normalizeRequiredText(currency ?? DEFAULT_CURRENCY, "Currency").toUpperCase();
 }
 
-function normalizeProviderIdentity(
-  provider?: string,
-  providerVariantId?: string,
-) {
+function normalizeProviderIdentity(provider?: string, providerVariantId?: string) {
   const normalizedProvider = normalizeOptionalText(provider)?.toLowerCase();
 
   const normalizedProviderVariantId = normalizeOptionalText(providerVariantId);
 
-  if (
-    (normalizedProvider && !normalizedProviderVariantId) ||
-    (!normalizedProvider && normalizedProviderVariantId)
-  ) {
-    throw new ConvexError(
-      "Provider and provider variant ID must be supplied together.",
-    );
+  if ((normalizedProvider && !normalizedProviderVariantId) || (!normalizedProvider && normalizedProviderVariantId)) {
+    throw new ConvexError("Provider and provider variant ID must be supplied together.");
   }
 
   return {
@@ -116,11 +98,7 @@ function validateMoney(value: number, label: string) {
   }
 }
 
-function validatePricing(
-  baseCostInCents: number,
-  directPriceInCents: number,
-  compareAtPriceInCents?: number,
-) {
+function validatePricing(baseCostInCents: number, directPriceInCents: number, compareAtPriceInCents?: number) {
   validateMoney(baseCostInCents, "Base cost");
 
   validateMoney(directPriceInCents, "Direct price");
@@ -133,18 +111,12 @@ function validatePricing(
     validateMoney(compareAtPriceInCents, "Compare-at price");
 
     if (compareAtPriceInCents <= directPriceInCents) {
-      throw new ConvexError(
-        "Compare-at price must be greater than direct price.",
-      );
+      throw new ConvexError("Compare-at price must be greater than direct price.");
     }
   }
 }
 
-async function assertUniqueSku(
-  ctx: MutationCtx,
-  sku: string,
-  excludeVariantId?: Id<"productVariants">,
-) {
+async function assertUniqueSku(ctx: MutationCtx, sku: string, excludeVariantId?: Id<"productVariants">) {
   const existing = await ctx.db
     .query("productVariants")
     .withIndex("by_sku", (q) => q.eq("sku", sku))
@@ -167,9 +139,7 @@ async function assertUniqueProviderVariant(
 
   const existing = await ctx.db
     .query("productVariants")
-    .withIndex("by_provider_variant", (q) =>
-      q.eq("provider", provider).eq("providerVariantId", providerVariantId),
-    )
+    .withIndex("by_provider_variant", (q) => q.eq("provider", provider).eq("providerVariantId", providerVariantId))
     .unique();
 
   if (existing && existing._id !== excludeVariantId) {
@@ -188,17 +158,10 @@ async function getRequiredProduct(ctx: MutationCtx, productId: Id<"products">) {
 }
 
 function productImageHasSource(image: Doc<"productImages">) {
-  return (
-    image.imageStorageId !== undefined ||
-    Boolean(image.externalImageUrl?.trim())
-  );
+  return image.imageStorageId !== undefined || Boolean(image.externalImageUrl?.trim());
 }
 
-async function assertPurchasableColorsHaveImages(
-  ctx: MutationCtx,
-  product: Doc<"products">,
-  variants: PurchasableVariantState[],
-) {
+async function assertPurchasableColorsHaveImages(ctx: MutationCtx, product: Doc<"products">, variants: PurchasableVariantState[]) {
   if (product.status !== "active") {
     return;
   }
@@ -224,20 +187,12 @@ async function assertPurchasableColorsHaveImages(
     .withIndex("by_product", (q) => q.eq("productId", product._id))
     .collect();
 
-  const colorsWithImages = new Set(
-    images
-      .filter(productImageHasSource)
-      .map((image) => image.colorKey),
-  );
+  const colorsWithImages = new Set(images.filter(productImageHasSource).map((image) => image.colorKey));
 
-  const missingColor = [...requiredColors.entries()].find(
-    ([colorKey]) => !colorsWithImages.has(colorKey),
-  );
+  const missingColor = [...requiredColors.entries()].find(([colorKey]) => !colorsWithImages.has(colorKey));
 
   if (missingColor) {
-    throw new ConvexError(
-      `Add at least one product image for ${missingColor[1]} before making that variant purchasable.`,
-    );
+    throw new ConvexError(`Add at least one product image for ${missingColor[1]} before making that variant purchasable.`);
   }
 }
 
@@ -253,8 +208,7 @@ async function assertProductKeepsPurchasableVariant(
     return;
   }
 
-  const remainsPurchasable =
-    nextStatus === "active" && nextAvailability === "available";
+  const remainsPurchasable = nextStatus === "active" && nextAvailability === "available";
 
   if (remainsPurchasable) {
     return;
@@ -262,31 +216,20 @@ async function assertProductKeepsPurchasableVariant(
 
   const activeVariants = await ctx.db
     .query("productVariants")
-    .withIndex("by_product_status", (q) =>
-      q.eq("productId", variant.productId).eq("status", "active"),
-    )
+    .withIndex("by_product_status", (q) => q.eq("productId", variant.productId).eq("status", "active"))
     .collect();
 
   const hasOtherPurchasableVariant = activeVariants.some(
-    (candidate) =>
-      candidate._id !== variant._id && candidate.availability === "available",
+    (candidate) => candidate._id !== variant._id && candidate.availability === "available",
   );
 
   if (!hasOtherPurchasableVariant) {
-    throw new ConvexError(
-      "Unpublish the product before removing its final purchasable variant.",
-    );
+    throw new ConvexError("Unpublish the product before removing its final purchasable variant.");
   }
 }
 
-function buildVariantInsert(
-  productId: Id<"products">,
-  variant: NewVariantInput,
-) {
-  const providerIdentity = normalizeProviderIdentity(
-    variant.provider,
-    variant.providerVariantId,
-  );
+function buildVariantInsert(productId: Id<"products">, variant: NewVariantInput) {
+  const providerIdentity = normalizeProviderIdentity(variant.provider, variant.providerVariantId);
 
   const sku = normalizeSku(variant.sku);
 
@@ -300,11 +243,7 @@ function buildVariantInsert(
 
   const currency = normalizeCurrency(variant.currency);
 
-  validatePricing(
-    variant.baseCostInCents,
-    variant.directPriceInCents,
-    variant.compareAtPriceInCents,
-  );
+  validatePricing(variant.baseCostInCents, variant.directPriceInCents, variant.compareAtPriceInCents);
 
   const now = Date.now();
 
@@ -359,9 +298,7 @@ export const listActiveByProduct = query({
 
     return await ctx.db
       .query("productVariants")
-      .withIndex("by_product_status", (q) =>
-        q.eq("productId", args.productId).eq("status", "active"),
-      )
+      .withIndex("by_product_status", (q) => q.eq("productId", args.productId).eq("status", "active"))
       .collect();
   },
 });
@@ -425,11 +362,7 @@ export const create = mutation({
 
     await assertUniqueSku(ctx, insert.sku);
 
-    await assertUniqueProviderVariant(
-      ctx,
-      insert.provider,
-      insert.providerVariantId,
-    );
+    await assertUniqueProviderVariant(ctx, insert.provider, insert.providerVariantId);
 
     await assertPurchasableColorsHaveImages(ctx, product, [insert]);
 
@@ -456,9 +389,7 @@ export const createMany = mutation({
       throw new ConvexError("Create no more than 100 variants at a time.");
     }
 
-    const inserts = args.variants.map((variant) =>
-      buildVariantInsert(args.productId, variant),
-    );
+    const inserts = args.variants.map((variant) => buildVariantInsert(args.productId, variant));
 
     const skuSet = new Set<string>();
 
@@ -475,9 +406,7 @@ export const createMany = mutation({
         const key = `${insert.provider}:${insert.providerVariantId}`;
 
         if (providerSet.has(key)) {
-          throw new ConvexError(
-            `Duplicate provider variant in request: ${key}`,
-          );
+          throw new ConvexError(`Duplicate provider variant in request: ${key}`);
         }
 
         providerSet.add(key);
@@ -487,11 +416,7 @@ export const createMany = mutation({
     for (const insert of inserts) {
       await assertUniqueSku(ctx, insert.sku);
 
-      await assertUniqueProviderVariant(
-        ctx,
-        insert.provider,
-        insert.providerVariantId,
-      );
+      await assertUniqueProviderVariant(ctx, insert.provider, insert.providerVariantId);
     }
 
     await assertPurchasableColorsHaveImages(ctx, product, inserts);
@@ -530,13 +455,9 @@ export const update = mutation({
 
     const product = await getRequiredProduct(ctx, variant.productId);
 
-    const nextSku =
-      args.sku !== undefined ? normalizeSku(args.sku) : variant.sku;
+    const nextSku = args.sku !== undefined ? normalizeSku(args.sku) : variant.sku;
 
-    const nextColor =
-      args.color !== undefined
-        ? normalizeRequiredText(args.color, "Color")
-        : variant.color;
+    const nextColor = args.color !== undefined ? normalizeRequiredText(args.color, "Color") : variant.color;
 
     const nextProviderColor =
       args.providerColor === null
@@ -547,20 +468,13 @@ export const update = mutation({
 
     const nextColorKey = normalizeColorKey(nextProviderColor ?? nextColor);
 
-    const nextCurrency =
-      args.currency !== undefined
-        ? normalizeCurrency(args.currency)
-        : variant.currency;
+    const nextCurrency = args.currency !== undefined ? normalizeCurrency(args.currency) : variant.currency;
 
     const nextBaseCost = args.baseCostInCents ?? variant.baseCostInCents;
 
-    const nextDirectPrice =
-      args.directPriceInCents ?? variant.directPriceInCents;
+    const nextDirectPrice = args.directPriceInCents ?? variant.directPriceInCents;
 
-    const nextCompareAt =
-      args.compareAtPriceInCents === null
-        ? undefined
-        : (args.compareAtPriceInCents ?? variant.compareAtPriceInCents);
+    const nextCompareAt = args.compareAtPriceInCents === null ? undefined : (args.compareAtPriceInCents ?? variant.compareAtPriceInCents);
 
     validatePricing(nextBaseCost, nextDirectPrice, nextCompareAt);
 
@@ -639,12 +553,7 @@ export const setAvailability = mutation({
 
     const product = await getRequiredProduct(ctx, variant.productId);
 
-    await assertProductKeepsPurchasableVariant(
-      ctx,
-      variant,
-      variant.status,
-      args.availability,
-    );
+    await assertProductKeepsPurchasableVariant(ctx, variant, variant.status, args.availability);
 
     await assertPurchasableColorsHaveImages(ctx, product, [
       {
@@ -712,12 +621,7 @@ export const deactivate = mutation({
       throw new ConvexError("Product variant not found.");
     }
 
-    await assertProductKeepsPurchasableVariant(
-      ctx,
-      variant,
-      "inactive",
-      variant.availability,
-    );
+    await assertProductKeepsPurchasableVariant(ctx, variant, "inactive", variant.availability);
 
     await ctx.db.patch(variant._id, {
       status: "inactive",

@@ -3,15 +3,15 @@ import { Navigate } from "react-router-dom";
 import AuthForm from "./AuthForm";
 
 export default function LoginPage() {
-	return (
-		<>
-			<Authenticated>
-				<Navigate to="/account" replace />
-			</Authenticated>
+  return (
+    <>
+      <Authenticated>
+        <Navigate to="/account" replace />
+      </Authenticated>
 
-			<Unauthenticated>
-				<AuthForm />
-			</Unauthenticated>
-		</>
-	);
+      <Unauthenticated>
+        <AuthForm />
+      </Unauthenticated>
+    </>
+  );
 }

@@ -15,6 +15,7 @@ export type ProductColorFamily =
   | "yellow"
   | "green"
   | "blue"
+  | "navy"
   | "purple"
   | "pink"
   | "brown"
@@ -56,32 +57,13 @@ export type ProductColorCategory =
   | "multicolor"
   | "unknown";
 
-export type ProductColorTone =
-  | "light"
-  | "medium"
-  | "dark"
-  | "unknown";
+export type ProductColorTone = "light" | "medium" | "dark" | "unknown";
 
-export type ProductColorPattern =
-  | "solid"
-  | "heather"
-  | "digital"
-  | "camo"
-  | "patterned"
-  | "unknown";
+export type ProductColorPattern = "solid" | "heather" | "digital" | "camo" | "patterned" | "unknown";
 
-export type ProductColorComposition =
-  | "single"
-  | "two-tone"
-  | "three-tone"
-  | "multicolor"
-  | "unknown";
+export type ProductColorComposition = "single" | "two-tone" | "three-tone" | "multicolor" | "unknown";
 
-export type ProductColorClassificationSource =
-  | "supplier-hex"
-  | "name-rule"
-  | "ai"
-  | "manual";
+export type ProductColorClassificationSource = "supplier-hex" | "name-rule" | "ai" | "manual";
 
 export type ProductColorReviewReason =
   | "missing-hex"

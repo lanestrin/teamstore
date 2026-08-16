@@ -1,0 +1,81 @@
+.productsStep {
+  display: flex;
+  flex-direction: column;
+  gap: $space-8;
+}
+
+/*
+ * Step-level loading / warning states
+ */
+
+.warning,
+.emptyState {
+  display: flex;
+  align-items: flex-start;
+  gap: $space-3;
+
+  padding: $space-4;
+
+  border-radius: $radius-lg;
+}
+
+.warning {
+  background: $gray-50;
+  border: 1px solid $border-light;
+
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: $text-secondary;
+}
+
+.warning svg {
+  flex: 0 0 auto;
+
+  width: 19px;
+  height: 19px;
+
+  color: $text-primary;
+}
+
+.emptyState {
+  min-height: 180px;
+
+  align-items: center;
+  justify-content: center;
+
+  background: $gray-50;
+  border: 1px dashed $border-light;
+
+  text-align: left;
+}
+
+.emptyState > svg {
+  flex: 0 0 auto;
+
+  width: 28px;
+  height: 28px;
+
+  color: $text-secondary;
+}
+
+.emptyState h2 {
+  margin: 0;
+
+  font-size: 1rem;
+  font-weight: $font-semibold;
+  color: $text-primary;
+}
+
+.emptyState p {
+  margin: $space-1 0 0;
+
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: $text-secondary;
+}
+
+@media (max-width: 640px) {
+  .productsStep {
+    gap: $space-6;
+  }
+}

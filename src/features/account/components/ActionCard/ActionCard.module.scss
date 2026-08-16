@@ -1,119 +1,121 @@
 .card {
-    @include card;
-    display: flex;
-    align-items: center;
-    gap: $space-6;
-    padding: $space-6;
-    cursor: pointer;
-    transition: transform $transition-base, box-shadow $transition-base;
+  @include card;
+  display: flex;
+  align-items: center;
+  gap: $space-6;
+  padding: $space-6;
+  cursor: pointer;
+  transition:
+    transform $transition-base,
+    box-shadow $transition-base;
 
-    &:hover {
-        transform: translateY(-2px);
-        box-shadow: $shadow-md;
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-md;
 
-        .icon {
-            transform: scale(1.05);
-        }
-
-        .action svg {
-            transform: translateX(4px);
-        }
+    .icon {
+      transform: scale(1.05);
     }
 
-    &:focus-visible {
-        outline: 2px solid $brand-red;
-        outline-offset: 2px;
+    .action svg {
+      transform: translateX(4px);
     }
+  }
+
+  &:focus-visible {
+    outline: 2px solid $brand-red;
+    outline-offset: 2px;
+  }
 }
 
 .featured {
-    position: relative;
+  position: relative;
 
-    &::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        width: 5px;
-        background: $brand-red;
-        border-radius: $radius-lg 0 0 $radius-lg;
-    }
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 5px;
+    background: $brand-red;
+    border-radius: $radius-lg 0 0 $radius-lg;
+  }
 }
 
 .icon {
-    @include flex-center;
-    flex-shrink: 0;
-    width: 84px;
-    height: 84px;
-    border-radius: $radius-round;
-    background: $gray-100;
-    color: $brand-red;
-    transition: transform $transition-base;
+  @include flex-center;
+  flex-shrink: 0;
+  width: 84px;
+  height: 84px;
+  border-radius: $radius-round;
+  background: $gray-100;
+  color: $brand-red;
+  transition: transform $transition-base;
 
-    svg {
-        font-size: 2rem;
-    }
+  svg {
+    font-size: 2rem;
+  }
 }
 
 .content {
-    @include flex-column;
-    flex: 1;
-    gap: $space-3;
+  @include flex-column;
+  flex: 1;
+  gap: $space-3;
 
-    h3 {
-        font-family: $font-heading;
-        font-size: 2rem;
-        font-weight: $font-semibold;
-        line-height: $line-height-heading;
-        letter-spacing: $letter-spacing-heading;
-        color: $text-primary;
-    }
+  h3 {
+    font-family: $font-heading;
+    font-size: 2rem;
+    font-weight: $font-semibold;
+    line-height: $line-height-heading;
+    letter-spacing: $letter-spacing-heading;
+    color: $text-primary;
+  }
 
-    p {
-        max-width: 340px;
-        color: $text-secondary;
-        line-height: $line-height-body;
-    }
+  p {
+    max-width: 340px;
+    color: $text-secondary;
+    line-height: $line-height-body;
+  }
 }
 
 .action {
-    display: inline-flex;
-    align-items: center;
-    gap: $space-2;
-    margin-top: $space-2;
-    font-weight: $font-semibold;
-    color: $brand-red;
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  margin-top: $space-2;
+  font-weight: $font-semibold;
+  color: $brand-red;
 
-    svg {
-        font-size: 1rem;
-        transition: transform $transition-base;
-    }
+  svg {
+    font-size: 1rem;
+    transition: transform $transition-base;
+  }
 }
 
 @media (max-width: 768px) {
-    .card {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: $space-5;
+  .card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $space-5;
+  }
+
+  .icon {
+    width: 68px;
+    height: 68px;
+
+    svg {
+      font-size: 1.75rem;
+    }
+  }
+
+  .content {
+    h3 {
+      font-size: 1.6rem;
     }
 
-    .icon {
-        width: 68px;
-        height: 68px;
-
-        svg {
-            font-size: 1.75rem;
-        }
+    p {
+      max-width: none;
     }
-
-    .content {
-        h3 {
-            font-size: 1.6rem;
-        }
-
-        p {
-            max-width: none;
-        }
-    }
+  }
 }

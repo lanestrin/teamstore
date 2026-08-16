@@ -2,53 +2,53 @@
 @use "../../../../styles/mixins" as *;
 
 .features {
-	position: relative;
-	z-index: 10;
-	background: rgba(0, 0, 0, 0.35);
-	backdrop-filter: blur(12px);
-	-webkit-backdrop-filter: blur(12px);
-	border-top: 1px solid rgba(255, 255, 255, 0.08);
-	border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .container {
-	@include page-container;
-	display: grid;
-	grid-template-columns: repeat(4, 1fr);
-	gap: $space-6;
-	padding-top: $space-6;
-	padding-bottom: $space-6;
+  @include page-container;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $space-6;
+  padding-top: $space-6;
+  padding-bottom: $space-6;
 }
 
 .feature {
-	display: flex;
-	align-items: center;
-	gap: $space-4;
+  display: flex;
+  align-items: center;
+  gap: $space-4;
 }
 
 .icon {
-	@include flex-center;
-	color: $text-inverse;
-	font-size: 2rem;
+  @include flex-center;
+  color: $text-inverse;
+  font-size: 2rem;
 }
 
 .feature h3 {
-	margin: 0 0 $space-1;
-	color: $text-inverse;
-	font-family: "Barlow Condensed", sans-serif;
-	font-size: 1rem;
-	font-weight: $font-bold;
+  margin: 0 0 $space-1;
+  color: $text-inverse;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 1rem;
+  font-weight: $font-bold;
 }
 
 .feature p {
-	margin: 0;
-	color: $text-muted;
-	font-size: 0.875rem;
-	line-height: 1.4;
+  margin: 0;
+  color: $text-muted;
+  font-size: 0.875rem;
+  line-height: 1.4;
 }
 
 @media (max-width: 900px) {
-	.features {
-		display: none;
-	}
+  .features {
+    display: none;
+  }
 }

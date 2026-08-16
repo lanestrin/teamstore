@@ -1,19 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
-import {
-  useNavigate,
-  useSearchParams,
-} from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import { api } from "../../../../convex/_generated/api";
 import type { Id } from "../../../../convex/_generated/dataModel";
 
-import {
-  useCreateStore,
-  type ProductSelectionsDraft,
-} from "../context/CreateStoreContext";
+import { useCreateStore, type ProductSelectionsDraft } from "../context/CreateStoreContext";
 
-import { PRODUCT_COLLECTIONS } from "../feature/4_ProductsStep/productCollections";
+import { PRODUCT_COLLECTIONS } from "../steps/4_ProductsStep/lib/productCollections";
 
 const STORE_ACTIVITIES = [
   "basketball",
@@ -27,20 +21,13 @@ const STORE_ACTIVITIES = [
   "other",
 ] as const;
 
-type StoreActivity =
-  (typeof STORE_ACTIVITIES)[number];
+type StoreActivity = (typeof STORE_ACTIVITIES)[number];
 
-function isStoreActivity(
-  value: string,
-): value is StoreActivity {
-  return STORE_ACTIVITIES.some(
-    (activity) => activity === value,
-  );
+function isStoreActivity(value: string): value is StoreActivity {
+  return STORE_ACTIVITIES.some((activity) => activity === value);
 }
 
-function normalizeOptionalText(
-  value: string,
-): string | undefined {
+function normalizeOptionalText(value: string): string | undefined {
   const normalizedValue = value.trim();
 
   return normalizedValue || undefined;
@@ -62,61 +49,35 @@ function getErrorMessage(error: unknown): string {
   return "Something went wrong. Please try again.";
 }
 
-function buildProductSelections(
-  activity: StoreActivity,
-  selections: ProductSelectionsDraft,
-) {
+function buildProductSelections(activity: StoreActivity, selections: ProductSelectionsDraft) {
   const collection = PRODUCT_COLLECTIONS[activity];
 
-  const collectionProductIds = new Set(
-    collection.map(
-      (item) => item.providerProductId,
-    ),
-  );
+  const collectionProductIds = new Set(collection.map((item) => item.providerProductId));
 
-  const collectionSelections = collection.flatMap(
-    (item) => {
-      const selection =
-        selections[item.providerProductId];
+  const collectionSelections = collection.flatMap((item) => {
+    const selection = selections[item.providerProductId];
 
-      if (!selection) {
-        return [];
-      }
+    if (!selection) {
+      return [];
+    }
 
-      return [
-        {
-          providerProductId:
-            selection.providerProductId,
-          isRequired: selection.isRequired,
-        },
-      ];
-    },
-  );
+    return [
+      {
+        providerProductId: selection.providerProductId,
+        isRequired: selection.isRequired,
+      },
+    ];
+  });
 
-  const additionalSelections = Object.values(
-    selections,
-  )
-    .filter(
-      (selection) =>
-        !collectionProductIds.has(
-          selection.providerProductId,
-        ),
-    )
-    .sort((first, second) =>
-      first.providerProductId.localeCompare(
-        second.providerProductId,
-      ),
-    )
+  const additionalSelections = Object.values(selections)
+    .filter((selection) => !collectionProductIds.has(selection.providerProductId))
+    .sort((first, second) => first.providerProductId.localeCompare(second.providerProductId))
     .map((selection) => ({
-      providerProductId:
-        selection.providerProductId,
+      providerProductId: selection.providerProductId,
       isRequired: selection.isRequired,
     }));
 
-  return [
-    ...collectionSelections,
-    ...additionalSelections,
-  ];
+  return [...collectionSelections, ...additionalSelections];
 }
 
 interface CreateStoreWorkflow {
@@ -131,23 +92,11 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const {
-    storeId,
-    setStoreId,
-    currentStep,
-    primaryColor,
-    secondaryColor,
-    storeDraft,
-    loadStoreDraft,
-    resetStoreDraft,
-  } = useCreateStore();
+  const { storeId, setStoreId, currentStep, primaryColor, secondaryColor, storeDraft, loadStoreDraft, resetStoreDraft } = useCreateStore();
 
-  const draftIdParam =
-    searchParams.get("draftId");
+  const draftIdParam = searchParams.get("draftId");
 
-  const draftId = draftIdParam
-    ? (draftIdParam as Id<"stores">)
-    : null;
+  const draftId = draftIdParam ? (draftIdParam as Id<"stores">) : null;
 
   const savedDraft = useQuery(
     api.organizations.getDraft,
@@ -158,27 +107,17 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
       : "skip",
   );
 
-  const saveDraftMutation = useMutation(
-    api.organizations.saveDraft,
-  );
+  const saveDraftMutation = useMutation(api.organizations.saveDraft);
 
-  const createOrganizationWithStore =
-    useMutation(
-      api.organizations
-        .createOrganizationWithStore,
-    );
+  const createOrganizationWithStore = useMutation(api.organizations.createOrganizationWithStore);
 
-  const loadedDraftIdRef =
-    useRef<Id<"stores"> | null>(null);
+  const loadedDraftIdRef = useRef<Id<"stores"> | null>(null);
 
-  const handledMissingDraftRef =
-    useRef(false);
+  const handledMissingDraftRef = useRef(false);
 
-  const [isSaving, setIsSaving] =
-    useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const [isFinalizing, setIsFinalizing] =
-    useState(false);
+  const [isFinalizing, setIsFinalizing] = useState(false);
 
   useEffect(() => {
     loadedDraftIdRef.current = null;
@@ -197,9 +136,7 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
 
       handledMissingDraftRef.current = true;
 
-      window.alert(
-        "This draft could not be found or you do not have access to it.",
-      );
+      window.alert("This draft could not be found or you do not have access to it.");
 
       navigate("/account", {
         replace: true,
@@ -208,23 +145,14 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
       return;
     }
 
-    if (
-      loadedDraftIdRef.current ===
-      savedDraft._id
-    ) {
+    if (loadedDraftIdRef.current === savedDraft._id) {
       return;
     }
 
     loadStoreDraft(savedDraft);
 
-    loadedDraftIdRef.current =
-      savedDraft._id;
-  }, [
-    draftId,
-    savedDraft,
-    loadStoreDraft,
-    navigate,
-  ]);
+    loadedDraftIdRef.current = savedDraft._id;
+  }, [draftId, savedDraft, loadStoreDraft, navigate]);
 
   async function saveAndExit(): Promise<void> {
     if (isSaving) {
@@ -234,61 +162,35 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
     setIsSaving(true);
 
     try {
-      const organizationSlug =
-        storeDraft.organizationSlug ||
-        slugify(
-          storeDraft.organizationName,
-        );
+      const organizationSlug = storeDraft.organizationSlug || slugify(storeDraft.organizationName);
 
-      const result =
-        await saveDraftMutation({
-          storeId: storeId ?? undefined,
+      const result = await saveDraftMutation({
+        storeId: storeId ?? undefined,
 
-          organizationName:
-            normalizeOptionalText(
-              storeDraft.organizationName,
-            ),
+        organizationName: normalizeOptionalText(storeDraft.organizationName),
 
-          organizationSlug:
-            normalizeOptionalText(
-              organizationSlug,
-            ),
+        organizationSlug: normalizeOptionalText(organizationSlug),
 
-          activity: isStoreActivity(
-            storeDraft.activity,
-          )
-            ? storeDraft.activity
-            : undefined,
+        activity: isStoreActivity(storeDraft.activity) ? storeDraft.activity : undefined,
 
-          storeName: normalizeOptionalText(
-            storeDraft.storeName,
-          ),
+        storeName: normalizeOptionalText(storeDraft.storeName),
 
-          storeSlug: normalizeOptionalText(
-            storeDraft.storeSlug,
-          ),
+        storeSlug: normalizeOptionalText(storeDraft.storeSlug),
 
-          storeDescription:
-            normalizeOptionalText(
-              storeDraft.storeDescription,
-            ),
+        storeDescription: normalizeOptionalText(storeDraft.storeDescription),
 
-          logoStorageId:
-            storeDraft.logoStorageId ??
-            undefined,
+        logoStorageId: storeDraft.logoStorageId ?? undefined,
 
-          primaryColor,
-          secondaryColor,
-          currentStep,
-        });
+        primaryColor,
+        secondaryColor,
+        currentStep,
+      });
 
       setStoreId(result.storeId);
 
       navigate("/account");
     } catch (error) {
-      window.alert(
-        getErrorMessage(error),
-      );
+      window.alert(getErrorMessage(error));
     } finally {
       setIsSaving(false);
     }
@@ -299,64 +201,44 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
       return;
     }
 
-    const organizationName =
-      storeDraft.organizationName.trim();
+    const organizationName = storeDraft.organizationName.trim();
 
-    const organizationSlug =
-      storeDraft.organizationSlug.trim() ||
-      slugify(organizationName);
+    const organizationSlug = storeDraft.organizationSlug.trim() || slugify(organizationName);
 
-    const activity =
-      storeDraft.activity.trim();
+    const activity = storeDraft.activity.trim();
 
-    const storeName =
-      storeDraft.storeName.trim();
+    const storeName = storeDraft.storeName.trim();
 
-    const storeSlug =
-      storeDraft.storeSlug.trim();
+    const storeSlug = storeDraft.storeSlug.trim();
 
     if (!organizationName) {
-      window.alert(
-        "Organization name is required.",
-      );
+      window.alert("Organization name is required.");
 
       return;
     }
 
     if (!storeName) {
-      window.alert(
-        "Store name is required.",
-      );
+      window.alert("Store name is required.");
 
       return;
     }
 
     if (!storeSlug) {
-      window.alert(
-        "Store address is required.",
-      );
+      window.alert("Store address is required.");
 
       return;
     }
 
     if (!isStoreActivity(activity)) {
-      window.alert(
-        "Store activity is required.",
-      );
+      window.alert("Store activity is required.");
 
       return;
     }
 
-    const productSelections =
-      buildProductSelections(
-        activity,
-        storeDraft.productSelections,
-      );
+    const productSelections = buildProductSelections(activity, storeDraft.productSelections);
 
     if (productSelections.length === 0) {
-      window.alert(
-        "Select at least one product for your store.",
-      );
+      window.alert("Select at least one product for your store.");
 
       return;
     }
@@ -364,51 +246,39 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
     setIsFinalizing(true);
 
     try {
-      const result =
-        await createOrganizationWithStore({
-          storeId: storeId ?? undefined,
+      const result = await createOrganizationWithStore({
+        storeId: storeId ?? undefined,
 
-          organizationName,
-          organizationSlug,
-          activity,
+        organizationName,
+        organizationSlug,
+        activity,
 
-          storeName,
-          storeSlug,
+        storeName,
+        storeSlug,
 
-          storeDescription:
-            normalizeOptionalText(
-              storeDraft.storeDescription,
-            ),
+        storeDescription: normalizeOptionalText(storeDraft.storeDescription),
 
-          logoStorageId:
-            storeDraft.logoStorageId ??
-            undefined,
+        logoStorageId: storeDraft.logoStorageId ?? undefined,
 
-          primaryColor,
-          secondaryColor,
-          currentStep,
+        primaryColor,
+        secondaryColor,
+        currentStep,
 
-          productSelections,
-        });
+        productSelections,
+      });
 
       resetStoreDraft();
 
-      navigate(
-        `/store/${result.organizationSlug}/${result.storeSlug}`,
-      );
+      navigate(`/store/${result.organizationSlug}/${result.storeSlug}`);
     } catch (error) {
-      window.alert(
-        getErrorMessage(error),
-      );
+      window.alert(getErrorMessage(error));
     } finally {
       setIsFinalizing(false);
     }
   }
 
   return {
-    isLoadingDraft:
-      draftId !== null &&
-      savedDraft === undefined,
+    isLoadingDraft: draftId !== null && savedDraft === undefined,
 
     isSaving,
     isFinalizing,

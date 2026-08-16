@@ -5,20 +5,17 @@ const steps = [
   {
     number: "01",
     title: "Choose your products",
-    description:
-      "Browse the catalog and select the apparel and accessories that make sense for your team, organization, or event.",
+    description: "Browse the catalog and select the apparel and accessories that make sense for your team, organization, or event.",
   },
   {
     number: "02",
     title: "Build your team store",
-    description:
-      "Create a customized storefront where your group can view products, select sizes, and place individual orders.",
+    description: "Create a customized storefront where your group can view products, select sizes, and place individual orders.",
   },
   {
     number: "03",
     title: "Share and order",
-    description:
-      "Send your store link to the team. Everyone orders directly through the store without collecting paper forms or payments.",
+    description: "Send your store link to the team. Everyone orders directly through the store without collecting paper forms or payments.",
   },
 ];
 
@@ -37,10 +34,7 @@ export function HowItWorksPage() {
 
         <h1>A simpler way to outfit your team</h1>
 
-        <p>
-          TeamStore gives your organization one place to browse products, manage
-          selections, and collect individual orders.
-        </p>
+        <p>TeamStore gives your organization one place to browse products, manage selections, and collect individual orders.</p>
 
         <div className={styles.heroActions}>
           <Link className={styles.primaryButton} to="/catalog">
@@ -78,8 +72,7 @@ export function HowItWorksPage() {
           <h2>Less coordination. Fewer headaches.</h2>
 
           <p>
-            Instead of managing spreadsheets, payment reminders, and individual
-            order forms, your team gets a single shopping experience.
+            Instead of managing spreadsheets, payment reminders, and individual order forms, your team gets a single shopping experience.
           </p>
         </div>
 

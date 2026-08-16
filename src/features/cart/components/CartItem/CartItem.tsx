@@ -56,14 +56,10 @@ export default function CartItem({
               Size: {size}
             </p>
 
-            <p className={styles.unitPrice}>
-              {formatCurrency(unitPriceInCents)} each
-            </p>
+            <p className={styles.unitPrice}>{formatCurrency(unitPriceInCents)} each</p>
           </div>
 
-          <strong className={styles.price}>
-            {formatCurrency(lineTotalInCents)}
-          </strong>
+          <strong className={styles.price}>{formatCurrency(lineTotalInCents)}</strong>
         </div>
 
         <div className={styles.bottomRow}>
@@ -71,32 +67,19 @@ export default function CartItem({
             <span className={styles.quantityLabel}>Quantity</span>
 
             <div className={styles.quantityControls}>
-              <button
-                type="button"
-                aria-label={`Decrease quantity of ${name}`}
-                disabled={quantity <= 1}
-                onClick={onDecrease}
-              >
+              <button type="button" aria-label={`Decrease quantity of ${name}`} disabled={quantity <= 1} onClick={onDecrease}>
                 <LuMinus />
               </button>
 
               <span aria-live="polite">{quantity}</span>
 
-              <button
-                type="button"
-                aria-label={`Increase quantity of ${name}`}
-                onClick={onIncrease}
-              >
+              <button type="button" aria-label={`Increase quantity of ${name}`} onClick={onIncrease}>
                 <LuPlus />
               </button>
             </div>
           </div>
 
-          <button
-            type="button"
-            className={styles.removeButton}
-            onClick={onRemove}
-          >
+          <button type="button" className={styles.removeButton} onClick={onRemove}>
             <LuTrash2 />
             <span>Remove</span>
           </button>

@@ -21,13 +21,7 @@ import process from "node:process";
  *   unique-colors.csv
  */
 
-type HexStatus =
-  | "valid"
-  | "partial"
-  | "missing"
-  | "invalid"
-  | "multiple"
-  | "conflicting";
+type HexStatus = "valid" | "partial" | "missing" | "invalid" | "multiple" | "conflicting";
 
 type ColorFlag = "compound" | "heather" | "camo" | "patterned";
 
@@ -92,10 +86,7 @@ interface AuditedColor {
   }>;
 }
 
-const DEFAULT_INPUT_PATH = path.resolve(
-  process.cwd(),
-  "scripts/output/catalog-audit/selected-products.json",
-);
+const DEFAULT_INPUT_PATH = path.resolve(process.cwd(), "scripts/output/catalog-audit/selected-products.json");
 
 function parseArgs(argv: string[]): CliOptions {
   let inputPath = DEFAULT_INPUT_PATH;
@@ -187,37 +178,23 @@ function parseSelectedProducts(value: unknown): SelectedProduct[] {
       throw new Error(`Product at index ${productIndex} must be an object.`);
     }
 
-    const providerProductId = getRequiredString(
-      productValue.providerProductId,
-      `Product ${productIndex} providerProductId`,
-    );
+    const providerProductId = getRequiredString(productValue.providerProductId, `Product ${productIndex} providerProductId`);
 
-    const name = getRequiredString(
-      productValue.name,
-      `Product ${providerProductId} name`,
-    );
+    const name = getRequiredString(productValue.name, `Product ${providerProductId} name`);
 
     if (!Array.isArray(productValue.colors)) {
-      throw new Error(
-        `Product ${providerProductId} must contain a colors array.`,
-      );
+      throw new Error(`Product ${providerProductId} must contain a colors array.`);
     }
 
     const colors = productValue.colors.map((colorValue, colorIndex) => {
       if (!isRecord(colorValue)) {
-        throw new Error(
-          `Color ${colorIndex} on product ${providerProductId} must be an object.`,
-        );
+        throw new Error(`Color ${colorIndex} on product ${providerProductId} must be an object.`);
       }
 
-      const color = getRequiredString(
-        colorValue.color,
-        `Product ${providerProductId} color ${colorIndex} color`,
-      );
+      const color = getRequiredString(colorValue.color, `Product ${providerProductId} color ${colorIndex} color`);
 
       const providerColor = getOptionalString(colorValue.providerColor) ?? color;
-      const colorKey =
-        getOptionalString(colorValue.colorKey) ?? normalizeColorKey(providerColor);
+      const colorKey = getOptionalString(colorValue.colorKey) ?? normalizeColorKey(providerColor);
 
       return {
         color,
@@ -274,13 +251,9 @@ function analyzeHex(value: string | null): HexAnalysis {
     };
   }
 
-  const tokenMatches =
-    rawValue.match(/#?(?:[0-9a-fA-F]{6}|[0-9a-fA-F]{3})(?![0-9a-fA-F])/g) ??
-    [];
+  const tokenMatches = rawValue.match(/#?(?:[0-9a-fA-F]{6}|[0-9a-fA-F]{3})(?![0-9a-fA-F])/g) ?? [];
 
-  const normalizedValues = [
-    ...new Set(tokenMatches.map((token) => normalizeHexToken(token))),
-  ];
+  const normalizedValues = [...new Set(tokenMatches.map((token) => normalizeHexToken(token)))];
 
   if (normalizedValues.length > 1 || tokenMatches.length > 1) {
     return {
@@ -305,11 +278,7 @@ function detectColorFlags(providerColor: string): ColorFlag[] {
     flags.push("compound");
   }
 
-  if (
-    /\b(?:heather|heath|hethr|hthr|triblend|tri-blend|marled|melange|mélange)\b/.test(
-      normalized,
-    )
-  ) {
+  if (/\b(?:heather|heath|hethr|hthr|triblend|tri-blend|marled|melange|mélange)\b/.test(normalized)) {
     flags.push("heather");
   }
 
@@ -317,11 +286,7 @@ function detectColorFlags(providerColor: string): ColorFlag[] {
     flags.push("camo");
   }
 
-  if (
-    /\b(?:stripe|striped|tie[- ]?dye|ombre|ombré|speckled|print|pattern|color[- ]?block|two[- ]?tone)\b/.test(
-      normalized,
-    )
-  ) {
+  if (/\b(?:stripe|striped|tie[- ]?dye|ombre|ombré|speckled|print|pattern|color[- ]?block|two[- ]?tone)\b/.test(normalized)) {
     flags.push("patterned");
   }
 
@@ -330,9 +295,7 @@ function detectColorFlags(providerColor: string): ColorFlag[] {
 
 function getGroupHexStatus(occurrences: ColorOccurrence[]): HexStatus {
   const analyses = occurrences.map((occurrence) => occurrence.hexAnalysis);
-  const normalizedValues = [
-    ...new Set(analyses.flatMap((analysis) => analysis.normalizedValues)),
-  ];
+  const normalizedValues = [...new Set(analyses.flatMap((analysis) => analysis.normalizedValues))];
 
   if (normalizedValues.length > 1) {
     return "conflicting";
@@ -357,11 +320,7 @@ function getGroupHexStatus(occurrences: ColorOccurrence[]): HexStatus {
   return "valid";
 }
 
-function buildReviewReasons(
-  hexStatus: HexStatus,
-  flags: ColorFlag[],
-  swatchCount: number,
-): string[] {
+function buildReviewReasons(hexStatus: HexStatus, flags: ColorFlag[], swatchCount: number): string[] {
   const reasons: string[] = [];
 
   switch (hexStatus) {
@@ -400,10 +359,7 @@ function buildReviewReasons(
     reasons.push("patterned-color");
   }
 
-  if (
-    swatchCount === 0 &&
-    (hexStatus === "missing" || hexStatus === "invalid")
-  ) {
+  if (swatchCount === 0 && (hexStatus === "missing" || hexStatus === "invalid")) {
     reasons.push("missing-usable-hex-and-swatch");
   }
 
@@ -427,74 +383,46 @@ function auditColors(products: SelectedProduct[]): AuditedColor[] {
         hexAnalysis: analyzeHex(color.colorHexValue),
       };
 
-      const existingOccurrences =
-        occurrencesByProviderColor.get(normalizedProviderColor) ?? [];
+      const existingOccurrences = occurrencesByProviderColor.get(normalizedProviderColor) ?? [];
 
       existingOccurrences.push(occurrence);
-      occurrencesByProviderColor.set(
-        normalizedProviderColor,
-        existingOccurrences,
-      );
+      occurrencesByProviderColor.set(normalizedProviderColor, existingOccurrences);
     }
   }
 
   const auditedColors: AuditedColor[] = [];
 
   for (const [normalizedProviderColor, occurrences] of occurrencesByProviderColor) {
-    const providerColors = [
-      ...new Set(occurrences.map((occurrence) => occurrence.providerColor)),
-    ];
+    const providerColors = [...new Set(occurrences.map((occurrence) => occurrence.providerColor))];
 
-    const displayColors = [
-      ...new Set(occurrences.map((occurrence) => occurrence.displayColor)),
-    ].sort((first, second) => first.localeCompare(second));
-
-    const colorKeys = [
-      ...new Set(occurrences.map((occurrence) => occurrence.colorKey)),
-    ].sort((first, second) => first.localeCompare(second));
-
-    const productIds = new Set(
-      occurrences.map((occurrence) => occurrence.providerProductId),
+    const displayColors = [...new Set(occurrences.map((occurrence) => occurrence.displayColor))].sort((first, second) =>
+      first.localeCompare(second),
     );
 
+    const colorKeys = [...new Set(occurrences.map((occurrence) => occurrence.colorKey))].sort((first, second) =>
+      first.localeCompare(second),
+    );
+
+    const productIds = new Set(occurrences.map((occurrence) => occurrence.providerProductId));
+
     const rawHexValues = [
-      ...new Set(
-        occurrences.flatMap((occurrence) =>
-          occurrence.hexAnalysis.rawValue
-            ? [occurrence.hexAnalysis.rawValue]
-            : [],
-        ),
-      ),
+      ...new Set(occurrences.flatMap((occurrence) => (occurrence.hexAnalysis.rawValue ? [occurrence.hexAnalysis.rawValue] : []))),
     ].sort((first, second) => first.localeCompare(second));
 
-    const normalizedHexValues = [
-      ...new Set(
-        occurrences.flatMap(
-          (occurrence) => occurrence.hexAnalysis.normalizedValues,
-        ),
-      ),
-    ].sort((first, second) => first.localeCompare(second));
+    const normalizedHexValues = [...new Set(occurrences.flatMap((occurrence) => occurrence.hexAnalysis.normalizedValues))].sort(
+      (first, second) => first.localeCompare(second),
+    );
 
     const hexStatus = getGroupHexStatus(occurrences);
-    const swatchCount = occurrences.filter(
-      (occurrence) => occurrence.swatchImageUrl,
-    ).length;
+    const swatchCount = occurrences.filter((occurrence) => occurrence.swatchImageUrl).length;
 
-    const flags = [
-      ...new Set(
-        occurrences.flatMap((occurrence) =>
-          detectColorFlags(occurrence.providerColor),
-        ),
-      ),
-    ];
+    const flags = [...new Set(occurrences.flatMap((occurrence) => detectColorFlags(occurrence.providerColor)))];
 
     const reviewReasons = buildReviewReasons(hexStatus, flags, swatchCount);
 
     auditedColors.push({
       normalizedProviderColor,
-      providerColor: providerColors.sort((first, second) =>
-        first.localeCompare(second),
-      )[0],
+      providerColor: providerColors.sort((first, second) => first.localeCompare(second))[0],
       displayColors,
       colorKeys,
       productCount: productIds.size,
@@ -503,18 +431,14 @@ function auditColors(products: SelectedProduct[]): AuditedColor[] {
       normalizedHexValues,
       hexStatus,
       swatchCount,
-      swatchCoverage:
-        occurrences.length === 0
-          ? 0
-          : Number((swatchCount / occurrences.length).toFixed(4)),
+      swatchCoverage: occurrences.length === 0 ? 0 : Number((swatchCount / occurrences.length).toFixed(4)),
       flags,
       needsReview: reviewReasons.length > 0,
       reviewReasons,
       exampleProducts: occurrences
         .sort(
           (first, second) =>
-            first.productName.localeCompare(second.productName) ||
-            first.providerProductId.localeCompare(second.providerProductId),
+            first.productName.localeCompare(second.productName) || first.providerProductId.localeCompare(second.providerProductId),
         )
         .slice(0, 10)
         .map((occurrence) => ({
@@ -529,9 +453,7 @@ function auditColors(products: SelectedProduct[]): AuditedColor[] {
   }
 
   return auditedColors.sort(
-    (first, second) =>
-      second.productCount - first.productCount ||
-      first.providerColor.localeCompare(second.providerColor),
+    (first, second) => second.productCount - first.productCount || first.providerColor.localeCompare(second.providerColor),
   );
 }
 
@@ -546,10 +468,7 @@ function escapeCsvValue(value: unknown) {
 }
 
 function toCsv(headers: string[], rows: unknown[][]) {
-  return [
-    headers.map(escapeCsvValue).join(","),
-    ...rows.map((row) => row.map(escapeCsvValue).join(",")),
-  ].join("\n");
+  return [headers.map(escapeCsvValue).join(","), ...rows.map((row) => row.map(escapeCsvValue).join(","))].join("\n");
 }
 
 function countByHexStatus(colors: AuditedColor[]) {
@@ -586,22 +505,13 @@ function countByFlag(colors: AuditedColor[]) {
   return counts;
 }
 
-async function writeOutputs(
-  options: CliOptions,
-  products: SelectedProduct[],
-  auditedColors: AuditedColor[],
-) {
+async function writeOutputs(options: CliOptions, products: SelectedProduct[], auditedColors: AuditedColor[]) {
   await mkdir(options.outputDir, { recursive: true });
 
-  const totalColorOccurrences = products.reduce(
-    (total, product) => total + product.colors.length,
-    0,
-  );
+  const totalColorOccurrences = products.reduce((total, product) => total + product.colors.length, 0);
 
   const totalSwatchOccurrences = products.reduce(
-    (total, product) =>
-      total +
-      product.colors.filter((color) => Boolean(color.swatchImageUrl)).length,
+    (total, product) => total + product.colors.filter((color) => Boolean(color.swatchImageUrl)).length,
     0,
   );
 
@@ -630,10 +540,7 @@ async function writeOutputs(
     flagCounts: countByFlag(auditedColors),
     swatches: {
       occurrencesWithSwatches: totalSwatchOccurrences,
-      occurrenceCoverage:
-        totalColorOccurrences === 0
-          ? 0
-          : Number((totalSwatchOccurrences / totalColorOccurrences).toFixed(4)),
+      occurrenceCoverage: totalColorOccurrences === 0 ? 0 : Number((totalSwatchOccurrences / totalColorOccurrences).toFixed(4)),
     },
   };
 
@@ -652,11 +559,7 @@ async function writeOutputs(
     color.flags.join(" | "),
     color.needsReview,
     color.reviewReasons.join(" | "),
-    color.exampleProducts
-      .map(
-        (product) => `${product.productName} (${product.providerProductId})`,
-      )
-      .join(" | "),
+    color.exampleProducts.map((product) => `${product.productName} (${product.providerProductId})`).join(" | "),
   ]);
 
   await Promise.all([
@@ -714,23 +617,15 @@ async function main() {
 
   await writeOutputs(options, products, auditedColors);
 
-  const needsReviewCount = auditedColors.filter(
-    (color) => color.needsReview,
-  ).length;
+  const needsReviewCount = auditedColors.filter((color) => color.needsReview).length;
 
-  console.log(
-    `Found ${auditedColors.length.toLocaleString()} unique supplier colors.`,
-  );
-  console.log(
-    `${needsReviewCount.toLocaleString()} colors were flagged for review.`,
-  );
+  console.log(`Found ${auditedColors.length.toLocaleString()} unique supplier colors.`);
+  console.log(`${needsReviewCount.toLocaleString()} colors were flagged for review.`);
   console.log(`Output directory: ${options.outputDir}`);
 }
 
 main().catch((error) => {
-  console.error(
-    error instanceof Error ? (error.stack ?? error.message) : error,
-  );
+  console.error(error instanceof Error ? (error.stack ?? error.message) : error);
 
   process.exitCode = 1;
 });

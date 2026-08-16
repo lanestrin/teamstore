@@ -10,14 +10,8 @@ interface RequiredProgressProps {
   }[];
 }
 
-export default function RequiredProgress({
-  completed,
-  total,
-  items,
-}: RequiredProgressProps) {
-  const progressPercent = Math.round(
-    (completed / total) * 100
-  );
+export default function RequiredProgress({ completed, total, items }: RequiredProgressProps) {
+  const progressPercent = Math.round((completed / total) * 100);
 
   return (
     <div className={styles.progressCard}>
@@ -38,23 +32,12 @@ export default function RequiredProgress({
         />
       </div>
 
-      <div className={styles.progressPercent}>
-        {progressPercent}% Complete
-      </div>
+      <div className={styles.progressPercent}>{progressPercent}% Complete</div>
 
       <div className={styles.requiredChecklist}>
         {items.map((item) => (
-          <div
-            key={item.id}
-            className={
-              item.completed
-                ? styles.checklistComplete
-                : styles.checklistPending
-            }
-          >
-            <span>
-              {item.completed ? "✓" : "○"}
-            </span>
+          <div key={item.id} className={item.completed ? styles.checklistComplete : styles.checklistPending}>
+            <span>{item.completed ? "✓" : "○"}</span>
 
             {item.name}
           </div>

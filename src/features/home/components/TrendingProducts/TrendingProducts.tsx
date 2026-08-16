@@ -5,10 +5,7 @@ import { api } from "../../../../../convex/_generated/api";
 import ProductCard from "../../../../components/product-card/ProductCard";
 import styles from "./TrendingProducts.module.scss";
 
-function formatPrice(
-  minPriceInCents: number | null,
-  maxPriceInCents: number | null,
-) {
+function formatPrice(minPriceInCents: number | null, maxPriceInCents: number | null) {
   if (minPriceInCents === null) {
     return "Unavailable";
   }
@@ -54,10 +51,7 @@ export default function TrendingProducts() {
                 id: product._id,
                 name: product.name,
                 imageUrl,
-                priceLabel: formatPrice(
-                  product.minPriceInCents,
-                  product.maxPriceInCents,
-                ),
+                priceLabel: formatPrice(product.minPriceInCents, product.maxPriceInCents),
                 productUrl: `/product/${product.slug}`,
               }}
             />

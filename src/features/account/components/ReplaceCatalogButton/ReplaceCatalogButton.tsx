@@ -27,12 +27,9 @@ export default function ReplaceCatalogButton() {
   const [isReplacing, setIsReplacing] = useState(false);
   const [progressText, setProgressText] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
-  const [messageType, setMessageType] = useState<"success" | "error">(
-    "success",
-  );
+  const [messageType, setMessageType] = useState<"success" | "error">("success");
 
-  const canReplace =
-    confirmationText.trim() === REQUIRED_CONFIRMATION && !isReplacing;
+  const canReplace = confirmationText.trim() === REQUIRED_CONFIRMATION && !isReplacing;
 
   useEffect(() => {
     if (!isConfirmationOpen) {
@@ -138,10 +135,7 @@ export default function ReplaceCatalogButton() {
         imagesInserted += result.imagesInserted;
         nextIndex = result.nextIndex;
 
-        setProgressText(
-          `Importing catalog... ${nextIndex} of ` +
-            `${result.totalProducts} products complete.`,
-        );
+        setProgressText(`Importing catalog... ${nextIndex} of ` + `${result.totalProducts} products complete.`);
 
         if (result.done) {
           break;
@@ -180,8 +174,7 @@ export default function ReplaceCatalogButton() {
           </div>
 
           <p className={styles.description}>
-            Deletes the current catalog, then loads the audited Augusta catalog
-            with classified colors, product images, sizes, pricing, and
+            Deletes the current catalog, then loads the audited Augusta catalog with classified colors, product images, sizes, pricing, and
             variants.
           </p>
 
@@ -209,12 +202,7 @@ export default function ReplaceCatalogButton() {
         </div>
 
         <div className={styles.actions}>
-          <button
-            type="button"
-            className={styles.replaceButton}
-            onClick={openConfirmation}
-            disabled={isReplacing}
-          >
+          <button type="button" className={styles.replaceButton} onClick={openConfirmation} disabled={isReplacing}>
             {isReplacing ? "Replacing catalog..." : "Replace catalog"}
           </button>
 
@@ -222,15 +210,7 @@ export default function ReplaceCatalogButton() {
         </div>
 
         {message && (
-          <p
-            className={
-              messageType === "success"
-                ? styles.successMessage
-                : styles.errorMessage
-            }
-            role="status"
-            aria-live="polite"
-          >
+          <p className={messageType === "success" ? styles.successMessage : styles.errorMessage} role="status" aria-live="polite">
             {message}
           </p>
         )}
@@ -271,21 +251,13 @@ export default function ReplaceCatalogButton() {
               </button>
             </div>
 
-            <p
-              id="replace-catalog-description"
-              className={styles.modalDescription}
-            >
-              This permanently deletes the current catalog before inserting the
-              audited 60-product catalog. Existing manual catalog edits cannot
-              be recovered.
+            <p id="replace-catalog-description" className={styles.modalDescription}>
+              This permanently deletes the current catalog before inserting the audited 60-product catalog. Existing manual catalog edits
+              cannot be recovered.
             </p>
 
             {progressText && (
-              <p
-                className={styles.modalDescription}
-                role="status"
-                aria-live="polite"
-              >
+              <p className={styles.modalDescription} role="status" aria-live="polite">
                 {progressText}
               </p>
             )}
@@ -308,24 +280,12 @@ export default function ReplaceCatalogButton() {
             </label>
 
             <div className={styles.modalActions}>
-              <button
-                type="button"
-                className={styles.cancelButton}
-                onClick={closeConfirmation}
-                disabled={isReplacing}
-              >
+              <button type="button" className={styles.cancelButton} onClick={closeConfirmation} disabled={isReplacing}>
                 Cancel
               </button>
 
-              <button
-                type="button"
-                className={styles.confirmButton}
-                onClick={() => void handleReplace()}
-                disabled={!canReplace}
-              >
-                {isReplacing
-                  ? "Replacing catalog..."
-                  : "Replace all catalog data"}
+              <button type="button" className={styles.confirmButton} onClick={() => void handleReplace()} disabled={!canReplace}>
+                {isReplacing ? "Replacing catalog..." : "Replace all catalog data"}
               </button>
             </div>
           </section>

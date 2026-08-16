@@ -1,44 +1,19 @@
 /* eslint-disable react-refresh/only-export-components */
 
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-  type Dispatch,
-  type ReactNode,
-  type SetStateAction,
-} from "react";
+import { createContext, useContext, useEffect, useMemo, useState, type Dispatch, type ReactNode, type SetStateAction } from "react";
 
 import type { Doc, Id } from "../../../../convex/_generated/dataModel";
 
 import { ART_TEMPLATE_LIST } from "../../../assets/art-templates";
 
-import type { ArtworkAdjustments } from "../feature/3_ArtworkStep/artworkEditor";
-import {
-  applySavedArtworkAdjustments,
-  createCustomizedSvg,
-} from "../feature/3_ArtworkStep/artworkSvg";
 import useFileDataUrl from "../hooks/useFileDataUrl";
+import type { ProductColorFamily } from "../../../types/productColor.types";
+import type { ArtworkAdjustments } from "../steps/3_ArtworkStep/lib/artworkEditor";
+import { createCustomizedSvg, applySavedArtworkAdjustments } from "../steps/3_ArtworkStep/lib/artworkSvg";
 
 const DEFAULT_PRIMARY_COLOR = "#111827";
 const DEFAULT_SECONDARY_COLOR = "#DC2626";
 const DEFAULT_PRODUCT_GENERATION_SEED = 1;
-
-export type ProductColorFamily =
-  | "black"
-  | "white"
-  | "gray"
-  | "silver"
-  | "red"
-  | "orange"
-  | "yellow"
-  | "green"
-  | "blue"
-  | "purple"
-  | "pink"
-  | "brown";
 
 export interface ArtworkTextDraft {
   organizationName: string;
@@ -120,10 +95,7 @@ interface CreateStoreContextValue {
 
   updateStoreDraft: (updates: Partial<CreateStoreDraft>) => void;
 
-  updateArtworkTemplateDraft: (
-    templateId: string,
-    updates: Partial<Omit<ArtworkTemplateDraft, "selectedArtTemplateId">>,
-  ) => void;
+  updateArtworkTemplateDraft: (templateId: string, updates: Partial<Omit<ArtworkTemplateDraft, "selectedArtTemplateId">>) => void;
 
   selectProduct: (selection: ProductSelectionInput) => void;
 
@@ -146,14 +118,8 @@ interface CreateStoreContextValue {
   resetStoreDraft: () => void;
 }
 
-export function createProductCombinationKey(
-  providerProductId: string,
-  colorKey: string,
-  artworkTemplateId: string,
-): string {
-  return [providerProductId.trim(), colorKey.trim(), artworkTemplateId.trim()]
-    .map((value) => encodeURIComponent(value))
-    .join("__");
+export function createProductCombinationKey(providerProductId: string, colorKey: string, artworkTemplateId: string): string {
+  return [providerProductId.trim(), colorKey.trim(), artworkTemplateId.trim()].map((value) => encodeURIComponent(value)).join("__");
 }
 
 function classifyHexColorFamily(hexColor: string): ProductColorFamily {
@@ -233,6 +199,10 @@ function classifyHexColorFamily(hexColor: string): ProductColorFamily {
     return "blue";
   }
 
+  if (hue >= 195 && hue < 255 && lightness < 0.28) {
+    return "navy";
+  }
+
   if (hue < 320) {
     return "purple";
   }
@@ -290,9 +260,7 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
 
   const [secondaryColor, setSecondaryColor] = useState(DEFAULT_SECONDARY_COLOR);
 
-  const [storeDraft, setStoreDraft] = useState<CreateStoreDraft>(
-    createDefaultStoreDraft,
-  );
+  const [storeDraft, setStoreDraft] = useState<CreateStoreDraft>(createDefaultStoreDraft);
 
   const mascotDataUrl = useFileDataUrl(storeDraft.logoFile);
 
@@ -302,8 +270,7 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
     () => ({
       ...storeDraft.artworkText,
 
-      organizationName:
-        storeDraft.artworkText.organizationName || storeDraft.organizationName,
+      organizationName: storeDraft.artworkText.organizationName || storeDraft.organizationName,
     }),
     [storeDraft.artworkText, storeDraft.organizationName],
   );
@@ -330,47 +297,33 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
     };
   }, []);
 
-  const { artworkBaseSvgsByTemplateId, artworkSvgsByTemplateId } =
-    useMemo(() => {
-      /*
-       * Font loading affects SVG text measurement even
-       * though the version value itself is not rendered.
-       * Referencing it here intentionally invalidates
-       * this memo when fonts finish loading.
-       */
-      void fontLoadVersion;
+  const { artworkBaseSvgsByTemplateId, artworkSvgsByTemplateId } = useMemo(() => {
+    /*
+     * Font loading affects SVG text measurement even
+     * though the version value itself is not rendered.
+     * Referencing it here intentionally invalidates
+     * this memo when fonts finish loading.
+     */
+    void fontLoadVersion;
 
-      const baseSvgs: Record<string, string> = {};
-      const finalSvgs: Record<string, string> = {};
+    const baseSvgs: Record<string, string> = {};
+    const finalSvgs: Record<string, string> = {};
 
-      for (const template of ART_TEMPLATE_LIST) {
-        const templateDraft = storeDraft.artworkTemplates[template.id];
+    for (const template of ART_TEMPLATE_LIST) {
+      const templateDraft = storeDraft.artworkTemplates[template.id];
 
-        const baseSvg = createCustomizedSvg(
-          template,
-          resolvedArtworkText,
-          mascotDataUrl,
-        );
+      const baseSvg = createCustomizedSvg(template, resolvedArtworkText, mascotDataUrl);
 
-        baseSvgs[template.id] = baseSvg;
+      baseSvgs[template.id] = baseSvg;
 
-        finalSvgs[template.id] = applySavedArtworkAdjustments(
-          baseSvg,
-          template.editableElements,
-          templateDraft?.artworkAdjustments ?? {},
-        );
-      }
+      finalSvgs[template.id] = applySavedArtworkAdjustments(baseSvg, template.editableElements, templateDraft?.artworkAdjustments ?? {});
+    }
 
-      return {
-        artworkBaseSvgsByTemplateId: baseSvgs,
-        artworkSvgsByTemplateId: finalSvgs,
-      };
-    }, [
-      fontLoadVersion,
-      mascotDataUrl,
-      resolvedArtworkText,
-      storeDraft.artworkTemplates,
-    ]);
+    return {
+      artworkBaseSvgsByTemplateId: baseSvgs,
+      artworkSvgsByTemplateId: finalSvgs,
+    };
+  }, [fontLoadVersion, mascotDataUrl, resolvedArtworkText, storeDraft.artworkTemplates]);
 
   /*
    * Step 4 starts with the primary team
@@ -402,14 +355,9 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
     }));
   }
 
-  function updateArtworkTemplateDraft(
-    templateId: string,
-    updates: Partial<Omit<ArtworkTemplateDraft, "selectedArtTemplateId">>,
-  ) {
+  function updateArtworkTemplateDraft(templateId: string, updates: Partial<Omit<ArtworkTemplateDraft, "selectedArtTemplateId">>) {
     setStoreDraft((currentDraft) => {
-      const currentTemplateDraft = currentDraft.artworkTemplates[
-        templateId
-      ] ?? {
+      const currentTemplateDraft = currentDraft.artworkTemplates[templateId] ?? {
         selectedArtTemplateId: templateId,
 
         isSelected: false,
@@ -445,11 +393,7 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
       return;
     }
 
-    const combinationKey = createProductCombinationKey(
-      providerProductId,
-      colorKey,
-      artworkTemplateId,
-    );
+    const combinationKey = createProductCombinationKey(providerProductId, colorKey, artworkTemplateId);
 
     setStoreDraft((currentDraft) => {
       const existingSelection = currentDraft.productSelections[combinationKey];
@@ -466,8 +410,7 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
             colorKey,
             artworkTemplateId,
 
-            isRequired:
-              existingSelection?.isRequired ?? selection.isRequired ?? false,
+            isRequired: existingSelection?.isRequired ?? selection.isRequired ?? false,
           },
         },
       };
@@ -508,8 +451,7 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
     }
 
     setStoreDraft((currentDraft) => {
-      const currentSelection =
-        currentDraft.productSelections[normalizedCombinationKey];
+      const currentSelection = currentDraft.productSelections[normalizedCombinationKey];
 
       if (!currentSelection) {
         return currentDraft;
@@ -545,31 +487,23 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
     }
 
     setStoreDraft((currentDraft) => {
-      const currentSelection =
-        currentDraft.productSelections[normalizedCombinationKey];
+      const currentSelection = currentDraft.productSelections[normalizedCombinationKey];
 
       if (!currentSelection) {
         return currentDraft;
       }
 
-      const nextColorKey =
-        updates.colorKey?.trim() || currentSelection.colorKey;
+      const nextColorKey = updates.colorKey?.trim() || currentSelection.colorKey;
 
-      const nextArtworkTemplateId =
-        updates.artworkTemplateId?.trim() || currentSelection.artworkTemplateId;
+      const nextArtworkTemplateId = updates.artworkTemplateId?.trim() || currentSelection.artworkTemplateId;
 
-      const nextCombinationKey = createProductCombinationKey(
-        currentSelection.providerProductId,
-        nextColorKey,
-        nextArtworkTemplateId,
-      );
+      const nextCombinationKey = createProductCombinationKey(currentSelection.providerProductId, nextColorKey, nextArtworkTemplateId);
 
       if (nextCombinationKey === normalizedCombinationKey) {
         return currentDraft;
       }
 
-      const existingNextSelection =
-        currentDraft.productSelections[nextCombinationKey];
+      const existingNextSelection = currentDraft.productSelections[nextCombinationKey];
 
       const {
         [normalizedCombinationKey]: removedSelection,
@@ -594,9 +528,7 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
 
             artworkTemplateId: nextArtworkTemplateId,
 
-            isRequired:
-              currentSelection.isRequired ||
-              existingNextSelection?.isRequired === true,
+            isRequired: currentSelection.isRequired || existingNextSelection?.isRequired === true,
           },
         },
       };

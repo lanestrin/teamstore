@@ -9,8 +9,7 @@ interface ProductDetailsProps {
   description?: string;
 }
 
-const FALLBACK_DESCRIPTION =
-  "A quality product selected for everyday wear and performance.";
+const FALLBACK_DESCRIPTION = "A quality product selected for everyday wear and performance.";
 
 function getDescriptionFeatures(description?: string) {
   if (!description?.includes("*")) {
@@ -24,23 +23,18 @@ function getDescriptionFeatures(description?: string) {
 }
 
 export default function ProductDetails({ description }: ProductDetailsProps) {
-  const [openSections, setOpenSections] = useState<ProductDetailSection[]>([
-    "details",
-  ]);
+  const [openSections, setOpenSections] = useState<ProductDetailSection[]>(["details"]);
 
   const descriptionText = description?.trim() || FALLBACK_DESCRIPTION;
   const descriptionFeatures = getDescriptionFeatures(descriptionText);
 
   const toggleSection = (section: ProductDetailSection) => {
     setOpenSections((currentSections) =>
-      currentSections.includes(section)
-        ? currentSections.filter((item) => item !== section)
-        : [...currentSections, section],
+      currentSections.includes(section) ? currentSections.filter((item) => item !== section) : [...currentSections, section],
     );
   };
 
-  const isOpen = (section: ProductDetailSection) =>
-    openSections.includes(section);
+  const isOpen = (section: ProductDetailSection) => openSections.includes(section);
 
   return (
     <section className={styles.details}>
@@ -55,17 +49,11 @@ export default function ProductDetails({ description }: ProductDetailsProps) {
           >
             <span>Product Details</span>
 
-            <LuChevronDown
-              aria-hidden="true"
-              className={isOpen("details") ? styles.rotate : ""}
-            />
+            <LuChevronDown aria-hidden="true" className={isOpen("details") ? styles.rotate : ""} />
           </button>
 
           {isOpen("details") && (
-            <div
-              id="product-details-content"
-              className={styles.accordionContent}
-            >
+            <div id="product-details-content" className={styles.accordionContent}>
               {descriptionFeatures.length > 1 ? (
                 <ul>
                   {descriptionFeatures.map((feature, index) => (
@@ -89,21 +77,12 @@ export default function ProductDetails({ description }: ProductDetailsProps) {
           >
             <span>Sizing Information</span>
 
-            <LuChevronDown
-              aria-hidden="true"
-              className={isOpen("sizing") ? styles.rotate : ""}
-            />
+            <LuChevronDown aria-hidden="true" className={isOpen("sizing") ? styles.rotate : ""} />
           </button>
 
           {isOpen("sizing") && (
-            <div
-              id="product-sizing-content"
-              className={styles.accordionContent}
-            >
-              <p>
-                Review the available sizes before placing your order. Sizing may
-                vary by product and manufacturer.
-              </p>
+            <div id="product-sizing-content" className={styles.accordionContent}>
+              <p>Review the available sizes before placing your order. Sizing may vary by product and manufacturer.</p>
 
               <ul>
                 <li>Select from the currently available sizes</li>
@@ -124,18 +103,12 @@ export default function ProductDetails({ description }: ProductDetailsProps) {
           >
             <span>Care Instructions</span>
 
-            <LuChevronDown
-              aria-hidden="true"
-              className={isOpen("care") ? styles.rotate : ""}
-            />
+            <LuChevronDown aria-hidden="true" className={isOpen("care") ? styles.rotate : ""} />
           </button>
 
           {isOpen("care") && (
             <div id="product-care-content" className={styles.accordionContent}>
-              <p>
-                Follow the garment care label to protect the product, material,
-                and printed details.
-              </p>
+              <p>Follow the garment care label to protect the product, material, and printed details.</p>
 
               <ul>
                 <li>Wash with similar colors</li>
@@ -157,21 +130,12 @@ export default function ProductDetails({ description }: ProductDetailsProps) {
           >
             <span>Returns &amp; Exchanges</span>
 
-            <LuChevronDown
-              aria-hidden="true"
-              className={isOpen("returns") ? styles.rotate : ""}
-            />
+            <LuChevronDown aria-hidden="true" className={isOpen("returns") ? styles.rotate : ""} />
           </button>
 
           {isOpen("returns") && (
-            <div
-              id="product-returns-content"
-              className={styles.accordionContent}
-            >
-              <p>
-                Return eligibility depends on the product condition and the
-                applicable store policy.
-              </p>
+            <div id="product-returns-content" className={styles.accordionContent}>
+              <p>Return eligibility depends on the product condition and the applicable store policy.</p>
 
               <ul>
                 <li>Items must be unused and in their original condition</li>

@@ -38,24 +38,14 @@ const steps = [
   },
 ];
 
-export default function ProgressSidebar({
-  currentStep,
-  isSaving,
-  isFinalizing,
-  onSaveAndExit,
-  onCreateStore,
-}: ProgressSidebarProps) {
+export default function ProgressSidebar({ currentStep, isSaving, isFinalizing, onSaveAndExit, onCreateStore }: ProgressSidebarProps) {
   const isWorking = isSaving || isFinalizing;
 
   return (
     <aside className={styles.sidebar}>
       <div className={styles.header}>
         <Link to="/" className={styles.logo}>
-          <img
-            src={images.teamstore.teamstoreLogo}
-            alt="TeamStore"
-            className={styles.logoImage}
-          />
+          <img src={images.teamstore.teamstoreLogo} alt="TeamStore" className={styles.logoImage} />
         </Link>
 
         <span className={styles.label}>Create Your Store</span>
@@ -74,24 +64,10 @@ export default function ProgressSidebar({
           const isComplete = stepNumber < currentStep;
 
           return (
-            <div
-              key={step.title}
-              className={styles.step}
-              aria-current={isActive ? "step" : undefined}
-            >
-              {index < steps.length - 1 && (
-                <div
-                  className={`${styles.line} ${
-                    isComplete ? styles.lineComplete : ""
-                  }`}
-                />
-              )}
+            <div key={step.title} className={styles.step} aria-current={isActive ? "step" : undefined}>
+              {index < steps.length - 1 && <div className={`${styles.line} ${isComplete ? styles.lineComplete : ""}`} />}
 
-              <div
-                className={`${styles.circle} ${isActive ? styles.active : ""} ${
-                  isComplete ? styles.complete : ""
-                }`}
-              >
+              <div className={`${styles.circle} ${isActive ? styles.active : ""} ${isComplete ? styles.complete : ""}`}>
                 {isComplete ? <LuCheck aria-hidden="true" /> : stepNumber}
               </div>
 
@@ -106,12 +82,7 @@ export default function ProgressSidebar({
       </nav>
 
       <div className={styles.footer}>
-        <button
-          type="button"
-          className={styles.exitButton}
-          onClick={() => void onSaveAndExit()}
-          disabled={isWorking}
-        >
+        <button type="button" className={styles.exitButton} onClick={() => void onSaveAndExit()} disabled={isWorking}>
           <LuLogOut aria-hidden="true" />
 
           <div>
@@ -122,12 +93,7 @@ export default function ProgressSidebar({
         </button>
 
         {currentStep === 5 && (
-          <button
-            type="button"
-            className={styles.createButton}
-            onClick={() => void onCreateStore()}
-            disabled={isWorking}
-          >
+          <button type="button" className={styles.createButton} onClick={() => void onCreateStore()} disabled={isWorking}>
             {isFinalizing ? "Creating Store..." : "Create Store"}
           </button>
         )}

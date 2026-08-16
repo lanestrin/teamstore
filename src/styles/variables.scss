@@ -95,7 +95,6 @@ $radius-xl: 12px;
 $radius-round: 50%;
 $radius-pill: 999px;
 
-
 // ======================================================
 // BUTTONS
 // ======================================================
@@ -128,13 +127,13 @@ $button-radius: $radius-pill;
 $header-height: 72px;
 
 $header-background: $black;
-$header-border: rgba($white, .08);
+$header-border: rgba($white, 0.08);
 
 $header-link: $white;
 $header-link-hover: $brand-red;
 
 $header-icon-background: $charcoal;
-$header-icon-border: rgba($white,.12);
+$header-icon-border: rgba($white, 0.12);
 
 // ======================================================
 // CARDS
@@ -177,7 +176,6 @@ $card-gap: $space-5;
 $form-gap: $space-4;
 $list-gap: $space-3;
 
-
 // ======================================================
 // TYPOGRAPHY
 // ======================================================
@@ -204,8 +202,8 @@ $font-bold: 700;
 // SHADOWS
 // ======================================================
 
-$shadow-sm: 0 2px 8px rgba(0,0,0,.06);
-$shadow-md: 0 4px 8px rgba(0,0,0,.08);
+$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+$shadow-md: 0 4px 8px rgba(0, 0, 0, 0.08);
 
 // ======================================================
 // TRANSITIONS

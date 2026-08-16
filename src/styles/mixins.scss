@@ -5,9 +5,9 @@
 // ======================================================
 
 @mixin page-container($padding: $space-5) {
-    max-width: $container-width;
-    margin: 0 auto;
-    padding-inline: $padding;
+  max-width: $container-width;
+  margin: 0 auto;
+  padding-inline: $padding;
 }
 
 // ======================================================
@@ -15,20 +15,20 @@
 // ======================================================
 
 @mixin flex-center {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 @mixin flex-between {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 @mixin flex-column {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 // ======================================================
@@ -36,9 +36,9 @@
 // ======================================================
 
 @mixin card {
-    background: $card-background;
-    border: 1px solid $card-border;
-    border-radius: $card-radius;
+  background: $card-background;
+  border: 1px solid $card-border;
+  border-radius: $card-radius;
 }
 
 // ======================================================
@@ -46,62 +46,66 @@
 // ======================================================
 
 @mixin button-base {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: $button-radius;
-    cursor: pointer;
-    user-select: none;
-    text-decoration: none;
-    transition: background-color $transition-base, border-color $transition-base, color $transition-base, transform $transition-base;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $button-radius;
+  cursor: pointer;
+  user-select: none;
+  text-decoration: none;
+  transition:
+    background-color $transition-base,
+    border-color $transition-base,
+    color $transition-base,
+    transform $transition-base;
 }
 
 @mixin button-black {
-    @include button-base;
-    background: $button-black-bg;
-    border: none;
-    color: $button-black-text;
+  @include button-base;
+  background: $button-black-bg;
+  border: none;
+  color: $button-black-text;
 
-    &:hover {
-        background: $button-black-hover;
-        transform: translateY(-1px);
-    }
+  &:hover {
+    background: $button-black-hover;
+    transform: translateY(-1px);
+  }
 }
 
 @mixin button-white {
-    @include button-base;
-    background: $button-white-bg;
-    border: 1px solid $button-white-border;
-    color: $button-white-text;
+  @include button-base;
+  background: $button-white-bg;
+  border: 1px solid $button-white-border;
+  color: $button-white-text;
 
-    &:hover {
-        background: $button-white-hover;
-        transform: translateY(-1px);
-    }
+  &:hover {
+    background: $button-white-hover;
+    transform: translateY(-1px);
+  }
 }
 
 @mixin button-red {
-    @include button-base;
-    background: $button-red-bg;
-    border: none;
-    color: $button-red-text;
+  @include button-base;
+  background: $button-red-bg;
+  border: none;
+  color: $button-red-text;
 
-    &:hover {
-        background: $button-red-hover;
-        transform: translateY(-1px);
-    }
+  &:hover {
+    background: $button-red-hover;
+    transform: translateY(-1px);
+  }
 }
 
 @mixin button-ghost {
-    @include button-base;
-    background: $button-ghost-bg;
-    border: 2px solid $button-ghost-border;
-    color: $button-ghost-text;
+  @include button-base;
+  background: $button-ghost-bg;
+  border: 2px solid $button-ghost-border;
+  color: $button-ghost-text;
 
-    &:hover {
-        background: $button-ghost-hover;
-        border-color: $button-ghost-border-hover;
-        transform: translateY(-1px);
-        color: $brand-red;
-    }
+  &:hover {
+    background: $button-ghost-hover;
+    border-color: $button-ghost-border-hover;
+    transform: translateY(-1px);
+    color: $brand-red;
+  }
 }

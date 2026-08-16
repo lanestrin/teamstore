@@ -1,15 +1,8 @@
 import { ConvexError, v } from "convex/values";
 
 import { mutation } from "./_generated/server";
-import {
-  classifyProductColor,
-  extractProductColorHexValues,
-  normalizeProductColorName,
-} from "../src/lib/classifyProductColor";
-import {
-  selectedCatalogSummary,
-  selectedProducts,
-} from "./docs/selectedProductsData";
+import { classifyProductColor, extractProductColorHexValues, normalizeProductColorName } from "../src/lib/classifyProductColor";
+import { selectedCatalogSummary, selectedProducts } from "./docs/selectedProductsData";
 import { requirePlatformAdmin } from "./lib/authz";
 
 const PROVIDER = "augusta-csv";
@@ -43,10 +36,7 @@ export const clearCatalogBatch = mutation({
       throw new ConvexError(`Pass confirmation: "${CONFIRMATION}".`);
     }
 
-    const limit = Math.min(
-      Math.max(Math.floor(args.limit ?? DEFAULT_DELETE_LIMIT), 1),
-      250,
-    );
+    const limit = Math.min(Math.max(Math.floor(args.limit ?? DEFAULT_DELETE_LIMIT), 1), 250);
 
     const images = await ctx.db.query("productImages").take(limit);
 
@@ -112,6 +102,62 @@ export const clearCatalogBatch = mutation({
   },
 });
 
+export const reclassifyProductColorsBatch = mutation({
+  args: {
+    cursor: v.optional(v.string()),
+    limit: v.optional(v.number()),
+  },
+
+  handler: async (ctx, args) => {
+    await requirePlatformAdmin(ctx);
+
+    const limit = Math.min(Math.max(Math.floor(args.limit ?? 100), 1), 200);
+
+    const result = await ctx.db.query("productColors").paginate({
+      cursor: args.cursor ?? null,
+      numItems: limit,
+    });
+
+    for (const productColor of result.page) {
+      const classification = classifyProductColor({
+        providerColor: productColor.providerColor ?? productColor.color,
+
+        hexValue: productColor.supplierHexValues.length > 0 ? productColor.supplierHexValues.join("|") : undefined,
+      });
+
+      await ctx.db.patch(productColor._id, {
+        primaryFamily: classification.primary.family,
+        primaryCategory: classification.primary.category,
+        primaryHexValue: classification.primary.hexValue,
+
+        accents: classification.accents.map((accent) => ({
+          family: accent.family,
+          category: accent.category,
+          hexValue: accent.hexValue,
+        })),
+
+        tone: classification.tone,
+        pattern: classification.pattern,
+        composition: classification.composition,
+
+        classificationSource: classification.source,
+        classificationConfidence: classification.confidence,
+
+        needsReview: classification.needsReview,
+        reviewReasons: classification.reviewReasons,
+
+        updatedAt: Date.now(),
+      });
+    }
+
+    return {
+      updated: result.page.length,
+      done: result.isDone,
+      nextCursor: result.isDone ? null : result.continueCursor,
+    };
+  },
+});
+
 /**
  * Imports one audited product per call.
  *
@@ -148,17 +194,11 @@ export const importCatalogBatch = mutation({
 
     const existingProduct = await ctx.db
       .query("products")
-      .withIndex("by_provider_product", (q) =>
-        q
-          .eq("provider", PROVIDER)
-          .eq("providerProductId", product.providerProductId),
-      )
+      .withIndex("by_provider_product", (q) => q.eq("provider", PROVIDER).eq("providerProductId", product.providerProductId))
       .unique();
 
     if (existingProduct) {
-      throw new ConvexError(
-        `Product ${product.providerProductId} has already been imported.`,
-      );
+      throw new ConvexError(`Product ${product.providerProductId} has already been imported.`);
     }
 
     const now = Date.now();
@@ -191,9 +231,7 @@ export const importCatalogBatch = mutation({
         color: color.color,
         colorKey: normalizeColorKey(color.colorKey),
         providerColor: normalizeOptionalText(color.providerColor),
-        normalizedProviderColor: normalizeProductColorName(
-          color.providerColor,
-        ),
+        normalizedProviderColor: normalizeProductColorName(color.providerColor),
         supplierHexValues: extractProductColorHexValues(color.colorHexValue),
 
         primaryFamily: classification.primary.family,
@@ -239,12 +277,7 @@ export const importCatalogBatch = mutation({
     }
 
     for (const variant of product.variants) {
-      const weight =
-        variant.weight !== undefined &&
-        variant.weight !== null &&
-        variant.weight > 0
-          ? variant.weight
-          : undefined;
+      const weight = variant.weight !== undefined && variant.weight !== null && variant.weight > 0 ? variant.weight : undefined;
 
       await ctx.db.insert("productVariants", {
         productId,
@@ -260,10 +293,7 @@ export const importCatalogBatch = mutation({
         directPriceInCents: variant.directPriceInCents,
         currency: variant.currency,
         weight,
-        weightUnit:
-          weight !== undefined
-            ? normalizeOptionalText(variant.weightUnit)
-            : undefined,
+        weightUnit: weight !== undefined ? normalizeOptionalText(variant.weightUnit) : undefined,
         availability: "available",
         status: "active",
         createdAt: now,

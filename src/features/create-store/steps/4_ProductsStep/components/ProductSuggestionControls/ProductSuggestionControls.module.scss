@@ -1,0 +1,167 @@
+.selectionSummary {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: $space-6;
+
+  padding: $space-4 $space-5;
+
+  background: $gray-50;
+  border: 1px solid $border-light;
+  border-radius: $radius-lg;
+}
+
+.selectionSummaryText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: $space-1;
+  min-width: 220px;
+}
+
+.selectionSummaryText strong {
+  font-size: 1rem;
+  font-weight: $font-semibold;
+  color: $text-primary;
+}
+
+.selectionSummaryText span {
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: $text-secondary;
+}
+
+.summaryActions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: flex-end;
+  gap: $space-3;
+}
+
+.summaryControl {
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+}
+
+.summaryControlLabel {
+  font-size: 0.75rem;
+  font-weight: $font-semibold;
+  color: $text-secondary;
+}
+
+.summarySelect {
+  min-width: 150px;
+  height: 38px;
+  padding: 0 $space-8 0 $space-3;
+
+  background: $white;
+  border: 1px solid $border-light;
+  border-radius: $radius-md;
+
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: $font-semibold;
+  color: $text-primary;
+
+  cursor: pointer;
+
+  transition:
+    background-color $transition-base,
+    border-color $transition-base,
+    box-shadow $transition-base;
+}
+
+.summarySelect:hover {
+  border-color: $gray-300;
+}
+
+.summarySelect:focus {
+  border-color: $text-primary;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(17, 24, 39, 0.08);
+}
+
+.summarySelect option:disabled {
+  color: $text-secondary;
+}
+
+.regenerateButton {
+  @include button-base;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-2;
+
+  min-height: 38px;
+  padding: $space-2 $space-3;
+
+  background: $white;
+  border: 1px solid $border-light;
+  border-radius: $radius-md;
+
+  font-size: 0.8125rem;
+  font-weight: $font-semibold;
+  white-space: nowrap;
+  color: $text-primary;
+
+  cursor: pointer;
+
+  transition:
+    background-color $transition-base,
+    border-color $transition-base,
+    opacity $transition-base;
+}
+
+.regenerateButton:hover:not(:disabled) {
+  background: $gray-100;
+  border-color: $gray-300;
+}
+
+.regenerateButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.regenerateButton svg {
+  width: 16px;
+  height: 16px;
+}
+
+@media (max-width: 1200px) {
+  .selectionSummary {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .summaryActions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 760px) {
+  .summaryActions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .summaryControl {
+    width: 100%;
+  }
+
+  .summarySelect {
+    width: 100%;
+  }
+
+  .regenerateButton {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .selectionSummary {
+    padding: $space-4;
+  }
+}

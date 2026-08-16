@@ -64,7 +64,7 @@ const CATEGORY_FAMILY: Record<ProductColorCategory, ProductColorFamily> = {
   blue: "blue",
   "columbia-blue": "blue",
   royal: "blue",
-  navy: "blue",
+  navy: "navy",
   purple: "purple",
   pink: "pink",
   brown: "brown",
@@ -109,10 +109,7 @@ const DEFAULT_CATEGORY_TONE: Record<ProductColorCategory, ProductColorTone> = {
   unknown: "unknown",
 };
 
-const EXACT_NAME_RULES: Record<
-  string,
-  { category: ProductColorCategory; tone?: ProductColorTone }
-> = {
+const EXACT_NAME_RULES: Record<string, { category: ProductColorCategory; tone?: ProductColorTone }> = {
   BLACK: { category: "black" },
   WHITE: { category: "white" },
   "VINTAGE WHITE": { category: "vintage-white" },
@@ -178,19 +175,14 @@ export function normalizeProductColorName(value: string): string {
 }
 
 /** Returns every normalized six-digit hex value found in supplier data. */
-export function extractProductColorHexValues(
-  value?: string | null,
-): string[] {
+export function extractProductColorHexValues(value?: string | null): string[] {
   const normalizedInput = value?.trim();
 
   if (!normalizedInput) {
     return [];
   }
 
-  const matches =
-    normalizedInput.match(
-      /#?(?:[0-9a-fA-F]{6}|[0-9a-fA-F]{3})(?![0-9a-fA-F])/g,
-    ) ?? [];
+  const matches = normalizedInput.match(/#?(?:[0-9a-fA-F]{6}|[0-9a-fA-F]{3})(?![0-9a-fA-F])/g) ?? [];
 
   return [
     ...new Set(
@@ -223,11 +215,7 @@ function detectPattern(normalizedName: string): ProductColorPattern {
     return "camo";
   }
 
-  if (
-    /\bPATTERN(?:ED)?\b|\bSTRIPE(?:D)?\b|\bTIE[- ]?DYE\b|\bOMBRE\b|\bSPECKLED\b/.test(
-      normalizedName,
-    )
-  ) {
+  if (/\bPATTERN(?:ED)?\b|\bSTRIPE(?:D)?\b|\bTIE[- ]?DYE\b|\bOMBRE\b|\bSPECKLED\b/.test(normalizedName)) {
     return "patterned";
   }
 
@@ -253,10 +241,7 @@ function splitColorComponents(normalizedName: string): string[] {
     .filter(Boolean);
 }
 
-function componentFromCategory(
-  category: ProductColorCategory,
-  hexValue?: string,
-): ProductColorComponent {
+function componentFromCategory(category: ProductColorCategory, hexValue?: string): ProductColorComponent {
   return {
     family: CATEGORY_FAMILY[category],
     category,
@@ -310,8 +295,7 @@ function rgbToHsl(red: number, green: number, blue: number): HslColor {
     };
   }
 
-  const saturation =
-    delta / (1 - Math.abs(2 * lightness - 1));
+  const saturation = delta / (1 - Math.abs(2 * lightness - 1));
 
   let hue: number;
 
@@ -337,19 +321,13 @@ function rgbToHsl(red: number, green: number, blue: number): HslColor {
 function channelToLinear(channel: number) {
   const normalized = channel / 255;
 
-  return normalized <= 0.04045
-    ? normalized / 12.92
-    : ((normalized + 0.055) / 1.055) ** 2.4;
+  return normalized <= 0.04045 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4;
 }
 
 function getRelativeLuminance(hexValue: string) {
   const { red, green, blue } = hexToRgb(hexValue);
 
-  return (
-    0.2126 * channelToLinear(red) +
-    0.7152 * channelToLinear(green) +
-    0.0722 * channelToLinear(blue)
-  );
+  return 0.2126 * channelToLinear(red) + 0.7152 * channelToLinear(green) + 0.0722 * channelToLinear(blue);
 }
 
 function getToneFromHex(hexValue: string): ProductColorTone {
@@ -369,8 +347,7 @@ function getToneFromHex(hexValue: string): ProductColorTone {
 function classifyHexComponent(hexValue: string): ProductColorComponent {
   const { red, green, blue } = hexToRgb(hexValue);
   const { hue, saturation, lightness } = rgbToHsl(red, green, blue);
-  const chroma =
-    (Math.max(red, green, blue) - Math.min(red, green, blue)) / 255;
+  const chroma = (Math.max(red, green, blue) - Math.min(red, green, blue)) / 255;
 
   /**
    * Very dark near-neutral colors should be treated as black before hue is
@@ -406,35 +383,19 @@ function classifyHexComponent(hexValue: string): ProductColorComponent {
   }
 
   if (hue >= 345 || hue < 12) {
-    return componentFromCategory(
-      lightness < 0.32 ? "maroon" : "red",
-      hexValue,
-    );
+    return componentFromCategory(lightness < 0.32 ? "maroon" : "red", hexValue);
   }
 
   if (hue < 45) {
-    return componentFromCategory(
-      lightness < 0.28 ? "brown" : "orange",
-      hexValue,
-    );
+    return componentFromCategory(lightness < 0.28 ? "brown" : "orange", hexValue);
   }
 
   if (hue < 70) {
-    return componentFromCategory(
-      lightness < 0.58 ? "gold" : "yellow",
-      hexValue,
-    );
+    return componentFromCategory(lightness < 0.58 ? "gold" : "yellow", hexValue);
   }
 
   if (hue < 165) {
-    return componentFromCategory(
-      lightness < 0.28
-        ? "forest"
-        : hue < 95 && lightness > 0.55
-          ? "lime"
-          : "green",
-      hexValue,
-    );
+    return componentFromCategory(lightness < 0.28 ? "forest" : hue < 95 && lightness > 0.55 ? "lime" : "green", hexValue);
   }
 
   if (hue < 195) {
@@ -468,10 +429,7 @@ function classifyHexComponent(hexValue: string): ProductColorComponent {
   return componentFromCategory("red", hexValue);
 }
 
-function areFamiliesCompatible(
-  nameFamily: ProductColorFamily,
-  hexFamily: ProductColorFamily,
-) {
+function areFamiliesCompatible(nameFamily: ProductColorFamily, hexFamily: ProductColorFamily) {
   if (nameFamily === hexFamily) {
     return true;
   }
@@ -491,50 +449,31 @@ function areFamiliesCompatible(
   ];
 
   return compatiblePairs.some(
-    ([first, second]) =>
-      (nameFamily === first && hexFamily === second) ||
-      (nameFamily === second && hexFamily === first),
+    ([first, second]) => (nameFamily === first && hexFamily === second) || (nameFamily === second && hexFamily === first),
   );
 }
 
-function isHexPlausibleForNamedComponent(
-  nameComponent: ProductColorComponent,
-  hexValue: string,
-) {
+function isHexPlausibleForNamedComponent(nameComponent: ProductColorComponent, hexValue: string) {
   const hexComponent = classifyHexComponent(hexValue);
 
-  if (
-    areFamiliesCompatible(
-      nameComponent.family,
-      hexComponent.family,
-    )
-  ) {
+  if (areFamiliesCompatible(nameComponent.family, hexComponent.family)) {
     return true;
   }
 
   const { red, green, blue } = hexToRgb(hexValue);
   const { saturation, lightness } = rgbToHsl(red, green, blue);
-  const chroma =
-    (Math.max(red, green, blue) - Math.min(red, green, blue)) / 255;
+  const chroma = (Math.max(red, green, blue) - Math.min(red, green, blue)) / 255;
 
   /**
    * Supplier names are authoritative when the hex is still visually
    * plausible. This protects near-black and near-white values from noisy hue
    * calculations without allowing clearly unrelated colors through.
    */
-  if (
-    nameComponent.family === "black" &&
-    lightness <= 0.18 &&
-    chroma <= 0.1
-  ) {
+  if (nameComponent.family === "black" && lightness <= 0.18 && chroma <= 0.1) {
     return true;
   }
 
-  if (
-    nameComponent.family === "white" &&
-    lightness >= 0.85 &&
-    saturation <= 0.25
-  ) {
+  if (nameComponent.family === "white" && lightness >= 0.85 && saturation <= 0.25) {
     return true;
   }
 
@@ -561,10 +500,7 @@ function getComposition(componentCount: number) {
   return "multicolor" as const;
 }
 
-function addReviewReason(
-  reasons: ProductColorReviewReason[],
-  reason: ProductColorReviewReason,
-) {
+function addReviewReason(reasons: ProductColorReviewReason[], reason: ProductColorReviewReason) {
   if (!reasons.includes(reason)) {
     reasons.push(reason);
   }
@@ -575,10 +511,7 @@ function addReviewReason(
  * Known supplier names are handled by explicit rules. Hex color math is used
  * only as supporting evidence or as a fallback for an unknown name.
  */
-export function classifyProductColor({
-  providerColor,
-  hexValue,
-}: ClassifyProductColorInput): ProductColorClassification {
+export function classifyProductColor({ providerColor, hexValue }: ClassifyProductColorInput): ProductColorClassification {
   const normalizedName = normalizeProductColorName(providerColor);
   const pattern = detectPattern(normalizedName);
   const nameParts = splitColorComponents(normalizedName);
@@ -609,13 +542,7 @@ export function classifyProductColor({
     }
 
     if (nameResult.recognized) {
-      if (
-        componentHex &&
-        !isHexPlausibleForNamedComponent(
-          nameResult.component,
-          componentHex,
-        )
-      ) {
+      if (componentHex && !isHexPlausibleForNamedComponent(nameResult.component, componentHex)) {
         addReviewReason(reviewReasons, "conflicting-hex");
       }
 
@@ -677,9 +604,7 @@ export function classifyProductColor({
     addReviewReason(reviewReasons, "low-confidence");
   }
 
-  const tone = primary.hexValue
-    ? getToneFromHex(primary.hexValue)
-    : (primaryToneOverride ?? DEFAULT_CATEGORY_TONE[primary.category]);
+  const tone = primary.hexValue ? getToneFromHex(primary.hexValue) : (primaryToneOverride ?? DEFAULT_CATEGORY_TONE[primary.category]);
 
   return {
     primary,

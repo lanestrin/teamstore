@@ -11,32 +11,21 @@ interface MobileDrawerProps {
   cartCount: number;
 }
 
-export default function MobileDrawer({
-  isOpen,
-  onClose,
-  cartCount,
-}: MobileDrawerProps) {
-  const getLinkClassName = ({ isActive }: { isActive: boolean }) =>
-    isActive ? styles.activeDrawerLink : undefined;
+export default function MobileDrawer({ isOpen, onClose, cartCount }: MobileDrawerProps) {
+  const getLinkClassName = ({ isActive }: { isActive: boolean }) => (isActive ? styles.activeDrawerLink : undefined);
 
   return (
     <>
       <button
         aria-label="Close navigation overlay"
-        className={[
-          styles.mobileDrawerOverlay,
-          isOpen ? styles.mobileDrawerOverlayVisible : "",
-        ].join(" ")}
+        className={[styles.mobileDrawerOverlay, isOpen ? styles.mobileDrawerOverlayVisible : ""].join(" ")}
         onClick={onClose}
         type="button"
       />
 
       <aside
         id="mobile-navigation-drawer"
-        className={[
-          styles.mobileDrawer,
-          isOpen ? styles.mobileDrawerOpen : "",
-        ].join(" ")}
+        className={[styles.mobileDrawer, isOpen ? styles.mobileDrawerOpen : ""].join(" ")}
         aria-hidden={!isOpen}
       >
         <div className={styles.mobileDrawerHeader}>
@@ -44,44 +33,27 @@ export default function MobileDrawer({
             <img src={images.teamstore.teamstoreLogoDark} alt="TeamStore" />
           </Link>
 
-          <button
-            aria-label="Close menu"
-            onClick={onClose}
-            type="button"
-            className={styles.closeButton}
-          >
+          <button aria-label="Close menu" onClick={onClose} type="button" className={styles.closeButton}>
             <LuX />
           </button>
         </div>
 
         <div className={styles.mobileDrawerAccountActions}>
           <Unauthenticated>
-            <Link
-              to="/login"
-              className={`${styles.drawerButton} ${styles.drawerButtonGhost}`}
-              onClick={onClose}
-            >
+            <Link to="/login" className={`${styles.drawerButton} ${styles.drawerButtonGhost}`} onClick={onClose}>
               <LuUser />
               <span>Login</span>
             </Link>
           </Unauthenticated>
 
           <Authenticated>
-            <Link
-              to="/account"
-              className={`${styles.drawerButton} ${styles.drawerButtonPrimary}`}
-              onClick={onClose}
-            >
+            <Link to="/account" className={`${styles.drawerButton} ${styles.drawerButtonPrimary}`} onClick={onClose}>
               <LuUser />
               <span>My Account</span>
             </Link>
           </Authenticated>
 
-          <Link
-            to="/cart"
-            className={`${styles.drawerButton} ${styles.drawerButtonRed}`}
-            onClick={onClose}
-          >
+          <Link to="/cart" className={`${styles.drawerButton} ${styles.drawerButtonRed}`} onClick={onClose}>
             <span>My Cart</span>
 
             <span className={styles.mobileDrawerCartMeta}>
@@ -96,11 +68,7 @@ export default function MobileDrawer({
             Home
           </NavLink>
 
-          <NavLink
-            to="/products"
-            className={getLinkClassName}
-            onClick={onClose}
-          >
+          <NavLink to="/products" className={getLinkClassName} onClick={onClose}>
             Shop Blanks
           </NavLink>
 
@@ -108,11 +76,7 @@ export default function MobileDrawer({
             Stores
           </NavLink>
 
-          <NavLink
-            to="/how-it-works"
-            className={getLinkClassName}
-            onClick={onClose}
-          >
+          <NavLink to="/how-it-works" className={getLinkClassName} onClick={onClose}>
             How It Works
           </NavLink>
         </nav>

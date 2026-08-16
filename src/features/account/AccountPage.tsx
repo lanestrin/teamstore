@@ -16,10 +16,7 @@ import { favoriteStores, recentOrders } from "../../mocks/account";
 
 import styles from "./AccountPage.module.scss";
 
-function getFirstName(
-  name: string | undefined,
-  email: string | undefined,
-): string {
+function getFirstName(name: string | undefined, email: string | undefined): string {
   const normalizedName = name?.trim();
 
   if (normalizedName) {
@@ -33,17 +30,11 @@ function getFirstName(
   return "there";
 }
 
-function getStoreName(
-  name: string | undefined,
-  organizationName: string | undefined,
-): string {
+function getStoreName(name: string | undefined, organizationName: string | undefined): string {
   return name?.trim() || organizationName?.trim() || "Untitled store";
 }
 
-function getStorePath(
-  organizationSlug: string | undefined,
-  storeSlug: string | undefined,
-): string | null {
+function getStorePath(organizationSlug: string | undefined, storeSlug: string | undefined): string | null {
   const normalizedOrganizationSlug = organizationSlug?.trim();
   const normalizedStoreSlug = storeSlug?.trim();
 
@@ -83,27 +74,20 @@ export default function AccountPage() {
 
   const archiveStore = useMutation(api.organizations.archiveStore);
 
-  const [deletingDraftId, setDeletingDraftId] = useState<Id<"stores"> | null>(
-    null,
-  );
+  const [deletingDraftId, setDeletingDraftId] = useState<Id<"stores"> | null>(null);
 
-  const [archivingStoreId, setArchivingStoreId] = useState<Id<"stores"> | null>(
-    null,
-  );
+  const [archivingStoreId, setArchivingStoreId] = useState<Id<"stores"> | null>(null);
 
   const displayName = getFirstName(currentUser?.name, currentUser?.email);
 
-  const hasStores =
-    (drafts?.length ?? 0) > 0 || (activeStores?.length ?? 0) > 0;
+  const hasStores = (drafts?.length ?? 0) > 0 || (activeStores?.length ?? 0) > 0;
 
   async function handleDeleteDraft(storeId: Id<"stores">): Promise<void> {
     if (deletingDraftId !== null) {
       return;
     }
 
-    const shouldDelete = window.confirm(
-      "Delete this store draft? This cannot be undone.",
-    );
+    const shouldDelete = window.confirm("Delete this store draft? This cannot be undone.");
 
     if (!shouldDelete) {
       return;
@@ -127,9 +111,7 @@ export default function AccountPage() {
       return;
     }
 
-    const shouldArchive = window.confirm(
-      "Archive this store? It will no longer appear as an active store.",
-    );
+    const shouldArchive = window.confirm("Archive this store? It will no longer appear as an active store.");
 
     if (!shouldArchive) {
       return;
@@ -178,18 +160,12 @@ export default function AccountPage() {
         </section>
 
         {currentUser?.isPlatformAdmin === true && (
-          <section
-            className={styles.storeSection}
-            aria-labelledby="catalog-tools-heading"
-          >
+          <section className={styles.storeSection} aria-labelledby="catalog-tools-heading">
             <div className={styles.sectionHeader}>
               <div>
                 <h2 id="catalog-tools-heading">Platform Catalog Tools</h2>
 
-                <p>
-                  Replace the existing catalog with the curated CSV-only demo
-                  catalog.
-                </p>
+                <p>Replace the existing catalog with the curated CSV-only demo catalog.</p>
               </div>
 
               <span className={styles.activeStatus}>Admin</span>
@@ -199,10 +175,7 @@ export default function AccountPage() {
           </section>
         )}
 
-        <section
-          className={styles.storeSection}
-          aria-labelledby="store-drafts-heading"
-        >
+        <section className={styles.storeSection} aria-labelledby="store-drafts-heading">
           <div className={styles.sectionHeader}>
             <div>
               <h2 id="store-drafts-heading">Store Drafts</h2>
@@ -210,9 +183,7 @@ export default function AccountPage() {
               <p>Continue or delete stores that have not been published.</p>
             </div>
 
-            {drafts !== undefined && (
-              <span className={styles.countBadge}>{drafts.length}</span>
-            )}
+            {drafts !== undefined && <span className={styles.countBadge}>{drafts.length}</span>}
           </div>
 
           {drafts === undefined ? (
@@ -226,15 +197,9 @@ export default function AccountPage() {
           ) : (
             <div className={styles.storeList}>
               {drafts.map((draft) => {
-                const draftName = getStoreName(
-                  draft.name,
-                  draft.organizationName,
-                );
+                const draftName = getStoreName(draft.name, draft.organizationName);
 
-                const draftStorePath = getStorePath(
-                  draft.organizationSlug,
-                  draft.slug,
-                );
+                const draftStorePath = getStorePath(draft.organizationSlug, draft.slug);
 
                 const isDeleting = deletingDraftId === draft._id;
 
@@ -264,9 +229,7 @@ export default function AccountPage() {
                       <button
                         type="button"
                         className={styles.primaryAction}
-                        onClick={() =>
-                          navigate(`/create-store?draftId=${draft._id}`)
-                        }
+                        onClick={() => navigate(`/create-store?draftId=${draft._id}`)}
                         disabled={isDeleting}
                       >
                         Continue Setup
@@ -288,10 +251,7 @@ export default function AccountPage() {
           )}
         </section>
 
-        <section
-          className={styles.storeSection}
-          aria-labelledby="active-stores-heading"
-        >
+        <section className={styles.storeSection} aria-labelledby="active-stores-heading">
           <div className={styles.sectionHeader}>
             <div>
               <h2 id="active-stores-heading">Active Stores</h2>
@@ -299,9 +259,7 @@ export default function AccountPage() {
               <p>Manage stores that have been published.</p>
             </div>
 
-            {activeStores !== undefined && (
-              <span className={styles.countBadge}>{activeStores.length}</span>
-            )}
+            {activeStores !== undefined && <span className={styles.countBadge}>{activeStores.length}</span>}
           </div>
 
           {activeStores === undefined ? (
@@ -315,15 +273,9 @@ export default function AccountPage() {
           ) : (
             <div className={styles.storeList}>
               {activeStores.map((store) => {
-                const storeName = getStoreName(
-                  store.name,
-                  store.organizationName,
-                );
+                const storeName = getStoreName(store.name, store.organizationName);
 
-                const storePath = getStorePath(
-                  store.organizationSlug,
-                  store.slug,
-                );
+                const storePath = getStorePath(store.organizationSlug, store.slug);
 
                 const isArchiving = archivingStoreId === store._id;
 
@@ -354,21 +306,14 @@ export default function AccountPage() {
                       <button
                         type="button"
                         className={styles.primaryAction}
-                        onClick={() =>
-                          navigate(`/account/stores/${store._id}/edit`)
-                        }
+                        onClick={() => navigate(`/account/stores/${store._id}/edit`)}
                         disabled={isArchiving}
                       >
                         Edit Store
                       </button>
 
                       {storePath && (
-                        <button
-                          type="button"
-                          className={styles.secondaryAction}
-                          onClick={() => navigate(storePath)}
-                          disabled={isArchiving}
-                        >
+                        <button type="button" className={styles.secondaryAction} onClick={() => navigate(storePath)} disabled={isArchiving}>
                           View Store
                         </button>
                       )}

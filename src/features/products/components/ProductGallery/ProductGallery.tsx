@@ -2,14 +2,7 @@ import { useState } from "react";
 
 import styles from "./ProductGallery.module.scss";
 
-type ProductImageView =
-  | "leftQuarter"
-  | "front"
-  | "back"
-  | "left"
-  | "right"
-  | "detail"
-  | "other";
+type ProductImageView = "leftQuarter" | "front" | "back" | "left" | "right" | "detail" | "other";
 
 export interface ProductGalleryImage {
   id: string;
@@ -38,15 +31,10 @@ function formatViewLabel(view: ProductImageView) {
   return VIEW_LABELS[view];
 }
 
-export default function ProductGallery({
-  name,
-  color,
-  images,
-}: ProductGalleryProps) {
+export default function ProductGallery({ name, color, images }: ProductGalleryProps) {
   const [selectedImageId, setSelectedImageId] = useState<string>();
 
-  const selectedImage =
-    images.find((image) => image.id === selectedImageId) ?? images[0];
+  const selectedImage = images.find((image) => image.id === selectedImageId) ?? images[0];
 
   if (!selectedImage) {
     return (
@@ -58,17 +46,12 @@ export default function ProductGallery({
     );
   }
 
-  const selectedImageAlt =
-    selectedImage.altText?.trim() ||
-    `${name} in ${color} — ${formatViewLabel(selectedImage.view)} view`;
+  const selectedImageAlt = selectedImage.altText?.trim() || `${name} in ${color} — ${formatViewLabel(selectedImage.view)} view`;
 
   return (
     <div className={styles.gallery}>
       {images.length > 1 && (
-        <div
-          className={styles.thumbnails}
-          aria-label={`${name} in ${color} product views`}
-        >
+        <div className={styles.thumbnails} aria-label={`${name} in ${color} product views`}>
           {images.map((image) => {
             const isSelected = image.id === selectedImage.id;
             const viewLabel = formatViewLabel(image.view);
@@ -77,9 +60,7 @@ export default function ProductGallery({
               <button
                 key={image.id}
                 type="button"
-                className={`${styles.thumbnail} ${
-                  isSelected ? styles.activeThumb : ""
-                }`}
+                className={`${styles.thumbnail} ${isSelected ? styles.activeThumb : ""}`}
                 aria-label={`View ${viewLabel.toLowerCase()} image`}
                 aria-pressed={isSelected}
                 onClick={() => setSelectedImageId(image.id)}
@@ -94,11 +75,7 @@ export default function ProductGallery({
       )}
 
       <div className={styles.mainImage}>
-        <img
-          key={selectedImage.id}
-          src={selectedImage.url}
-          alt={selectedImageAlt}
-        />
+        <img key={selectedImage.id} src={selectedImage.url} alt={selectedImageAlt} />
       </div>
     </div>
   );

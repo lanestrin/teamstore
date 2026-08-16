@@ -2,122 +2,122 @@
 @use "../../../../styles/mixins" as *;
 
 .page {
-    display: flex;
-    width: 100%;
-    min-height: 100%;
-    max-width: 720px;
-    padding: $space-8;
-    flex-direction: column;
-    gap: $space-8;
-    box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  min-height: 100%;
+  max-width: 720px;
+  padding: $space-8;
+  flex-direction: column;
+  gap: $space-8;
+  box-sizing: border-box;
 }
 
 .wide {
-    max-width: none;
+  max-width: none;
 }
 
 .header {
-    display: flex;
-    flex-direction: column;
-    gap: $space-3;
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
 }
 
 .badge {
-    display: inline-flex;
-    width: fit-content;
-    height: 30px;
-    margin-bottom: $space-3;
-    padding: 0 $space-3;
-    align-items: center;
-    border-radius: $radius-pill;
-    background: rgba($brand-red, 0.08);
-    color: $brand-red;
-    font-size: 0.75rem;
-    font-weight: $font-bold;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+  display: inline-flex;
+  width: fit-content;
+  height: 30px;
+  margin-bottom: $space-3;
+  padding: 0 $space-3;
+  align-items: center;
+  border-radius: $radius-pill;
+  background: rgba($brand-red, 0.08);
+  color: $brand-red;
+  font-size: 0.75rem;
+  font-weight: $font-bold;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .header h1 {
-    margin: 0;
-    color: $text-primary;
-    font-size: 3rem;
-    font-weight: $font-bold;
-    line-height: 1;
-    text-transform: uppercase;
+  margin: 0;
+  color: $text-primary;
+  font-size: 3rem;
+  font-weight: $font-bold;
+  line-height: 1;
+  text-transform: uppercase;
 }
 
 .description {
-    max-width: 640px;
-    margin: 0;
-    color: $text-secondary;
-    font-size: 1.125rem;
-    line-height: $line-height-body;
+  max-width: 640px;
+  margin: 0;
+  color: $text-secondary;
+  font-size: 1.125rem;
+  line-height: $line-height-body;
 }
 
 .stepContent {
-    display: flex;
-    min-width: 0;
-    flex-direction: column;
-    gap: $space-6;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: $space-6;
 }
 
 .actions {
-    display: flex;
-    margin-top: auto;
-    padding-top: $space-2;
-    align-items: center;
-    justify-content: space-between;
+  display: flex;
+  margin-top: auto;
+  padding-top: $space-2;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .primaryButton {
-    @include button-red;
-    width: 100px;
-    height: 42px;
-    padding: 0 $space-4;
-    font-family: "Barlow Condensed", sans-serif;
-    font-size: 0.95rem;
-    font-weight: $font-bold;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+  @include button-red;
+  width: 100px;
+  height: 42px;
+  padding: 0 $space-4;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.95rem;
+  font-weight: $font-bold;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .secondaryButton {
-    @include button-ghost;
-    width: 100px;
-    height: 42px;
-    padding: 0 $space-4;
-    border: 2px solid rgba($black, 0.3);
-    background: transparent;
-    color: $text-primary;
-    font-family: "Barlow Condensed", sans-serif;
-    font-size: 0.95rem;
-    font-weight: $font-bold;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+  @include button-ghost;
+  width: 100px;
+  height: 42px;
+  padding: 0 $space-4;
+  border: 2px solid rgba($black, 0.3);
+  background: transparent;
+  color: $text-primary;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 0.95rem;
+  font-weight: $font-bold;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 
-    &:hover {
-        border: 2px solid $brand-red;
-        color: $brand-red;
-    }
+  &:hover {
+    border: 2px solid $brand-red;
+    color: $brand-red;
+  }
 }
 
 @media (max-width: 768px) {
-    .page {
-        padding: $space-6;
-    }
+  .page {
+    padding: $space-6;
+  }
 
-    .header h1 {
-        font-size: 2.5rem;
-    }
+  .header h1 {
+    font-size: 2.5rem;
+  }
 
-    .actions {
-        flex-direction: column-reverse;
-        gap: $space-3;
-    }
+  .actions {
+    flex-direction: column-reverse;
+    gap: $space-3;
+  }
 
-    .primaryButton,
-    .secondaryButton {
-        width: 100%;
-    }
+  .primaryButton,
+  .secondaryButton {
+    width: 100%;
+  }
 }

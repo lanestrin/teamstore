@@ -3,20 +3,19 @@ import Header from "../../components/header/Header";
 import Footer from "../../components/footer/Footer";
 
 export default function MainLayout() {
-	const location = useLocation();
+  const location = useLocation();
 
-	const hideFooter =
-		location.pathname.startsWith("/create-store");
+  const hideFooter = location.pathname.startsWith("/create-store");
 
-	return (
-		<div className="app-shell">
-			<Header />
+  return (
+    <div className="app-shell">
+      <Header />
 
-			<main className="app-main">
-				<Outlet />
-			</main>
+      <main className="app-main">
+        <Outlet />
+      </main>
 
-			{!hideFooter && <Footer />}
-		</div>
-	);
+      {!hideFooter && <Footer />}
+    </div>
+  );
 }

@@ -10,10 +10,7 @@ import ProductGallery from "./components/ProductGallery/ProductGallery";
 import ProductInfo from "./components/ProductInfo/ProductInfo";
 import styles from "./ProductDetailsPage.module.scss";
 
-function formatPrice(
-  minPriceInCents: number | null,
-  maxPriceInCents: number | null,
-) {
+function formatPrice(minPriceInCents: number | null, maxPriceInCents: number | null) {
   if (minPriceInCents === null) {
     return "Unavailable";
   }
@@ -34,19 +31,14 @@ export default function ProductDetailsPage() {
 
   const { addItem } = useCart();
 
-  const product = useQuery(
-    api.products.getActiveBySlug,
-    slug ? { slug } : "skip",
-  );
+  const product = useQuery(api.products.getActiveBySlug, slug ? { slug } : "skip");
 
   const [selectedColor, setSelectedColor] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [isAddedToCart, setIsAddedToCart] = useState(false);
 
-  const confirmationTimeoutRef = useRef<
-    ReturnType<typeof window.setTimeout> | undefined
-  >(undefined);
+  const confirmationTimeoutRef = useRef<ReturnType<typeof window.setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     return () => {
@@ -68,33 +60,20 @@ export default function ProductDetailsPage() {
     return <div className={styles.notFound}>Product not found</div>;
   }
 
-  const selectedColorOption =
-    product.colors.find((option) => option.color === selectedColor) ??
-    product.colors[0];
+  const selectedColorOption = product.colors.find((option) => option.color === selectedColor) ?? product.colors[0];
 
   if (!selectedColorOption) {
-    return (
-      <div className={styles.notFound}>Product options are unavailable</div>
-    );
+    return <div className={styles.notFound}>Product options are unavailable</div>;
   }
 
-  const selectedVariant = selectedColorOption.variants.find(
-    (variant) => variant.size === selectedSize,
-  );
+  const selectedVariant = selectedColorOption.variants.find((variant) => variant.size === selectedSize);
 
   const priceLabel = selectedVariant
-    ? formatPrice(
-        selectedVariant.directPriceInCents,
-        selectedVariant.directPriceInCents,
-      )
-    : formatPrice(
-        selectedColorOption.minPriceInCents,
-        selectedColorOption.maxPriceInCents,
-      );
+    ? formatPrice(selectedVariant.directPriceInCents, selectedVariant.directPriceInCents)
+    : formatPrice(selectedColorOption.minPriceInCents, selectedColorOption.maxPriceInCents);
 
   const colorOptions = product.colors.flatMap((option) => {
-    const thumbnail =
-      option.images.find((image) => image.view === "front") ?? option.images[0];
+    const thumbnail = option.images.find((image) => image.view === "front") ?? option.images[0];
 
     if (!thumbnail) {
       return [];
@@ -133,9 +112,7 @@ export default function ProductDetailsPage() {
       return;
     }
 
-    const productImage =
-      selectedColorOption.images.find((image) => image.view === "front") ??
-      selectedColorOption.images[0];
+    const productImage = selectedColorOption.images.find((image) => image.view === "front") ?? selectedColorOption.images[0];
 
     if (!productImage) {
       return;

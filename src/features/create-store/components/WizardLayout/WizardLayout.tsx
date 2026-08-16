@@ -29,9 +29,7 @@ export default function WizardLayout({
   hideBack = false,
   width = "standard",
 }: WizardLayoutProps) {
-  const pageClassName = [styles.page, width === "wide" ? styles.wide : ""]
-    .filter(Boolean)
-    .join(" ");
+  const pageClassName = [styles.page, width === "wide" ? styles.wide : ""].filter(Boolean).join(" ");
 
   return (
     <section className={pageClassName}>
@@ -49,21 +47,12 @@ export default function WizardLayout({
         {hideBack ? (
           <div aria-hidden="true" />
         ) : (
-          <button
-            type="button"
-            className={styles.secondaryButton}
-            onClick={onBack}
-          >
+          <button type="button" className={styles.secondaryButton} onClick={onBack}>
             {backLabel}
           </button>
         )}
 
-        <button
-          type="button"
-          className={styles.primaryButton}
-          onClick={onNext}
-          disabled={nextDisabled}
-        >
+        <button type="button" className={styles.primaryButton} onClick={onNext} disabled={nextDisabled}>
           {nextLabel}
         </button>
       </footer>

@@ -20,14 +20,7 @@ import process from "node:process";
  *   image-url-cache.json
  */
 
-type ProductImageView =
-  | "leftQuarter"
-  | "front"
-  | "back"
-  | "left"
-  | "right"
-  | "detail"
-  | "other";
+type ProductImageView = "leftQuarter" | "front" | "back" | "left" | "right" | "detail" | "other";
 
 type ProductAudience = "adult" | "youth" | "women" | "accessories";
 
@@ -302,58 +295,37 @@ function parseArgs(argv: string[]): CliOptions {
         break;
 
       case "--products":
-        options.selectedProductCount = parsePositiveInteger(
-          nextValue,
-          "--products",
-        );
+        options.selectedProductCount = parsePositiveInteger(nextValue, "--products");
         index += 1;
         break;
 
       case "--audit-colors":
-        options.colorsToAuditPerProduct = parsePositiveInteger(
-          nextValue,
-          "--audit-colors",
-        );
+        options.colorsToAuditPerProduct = parsePositiveInteger(nextValue, "--audit-colors");
         index += 1;
         break;
 
       case "--selected-colors":
-        options.selectedColorsPerProduct = parsePositiveInteger(
-          nextValue,
-          "--selected-colors",
-        );
+        options.selectedColorsPerProduct = parsePositiveInteger(nextValue, "--selected-colors");
         index += 1;
         break;
 
       case "--minimum-colors":
-        options.minimumQualifyingColors = parsePositiveInteger(
-          nextValue,
-          "--minimum-colors",
-        );
+        options.minimumQualifyingColors = parsePositiveInteger(nextValue, "--minimum-colors");
         index += 1;
         break;
 
       case "--candidates-per-bucket":
-        options.candidatesPerBucket = parsePositiveInteger(
-          nextValue,
-          "--candidates-per-bucket",
-        );
+        options.candidatesPerBucket = parsePositiveInteger(nextValue, "--candidates-per-bucket");
         index += 1;
         break;
 
       case "--concurrency":
-        options.requestConcurrency = parsePositiveInteger(
-          nextValue,
-          "--concurrency",
-        );
+        options.requestConcurrency = parsePositiveInteger(nextValue, "--concurrency");
         index += 1;
         break;
 
       case "--timeout-ms":
-        options.requestTimeoutMs = parsePositiveInteger(
-          nextValue,
-          "--timeout-ms",
-        );
+        options.requestTimeoutMs = parsePositiveInteger(nextValue, "--timeout-ms");
         index += 1;
         break;
 
@@ -405,12 +377,7 @@ function normalizeText(value: string | undefined) {
 }
 
 function isLicensedProduct(product: ProductAggregate) {
-  const searchableText = [
-    product.name,
-    product.description,
-    product.category,
-    ...product.colors.map((color) => color.color),
-  ]
+  const searchableText = [product.name, product.description, product.category, ...product.colors.map((color) => color.color)]
     .join(" ")
     .toUpperCase();
 
@@ -517,9 +484,7 @@ function mapCsvRows(text: string): CsvRow[] {
     throw new Error("CSV does not contain a header and data rows.");
   }
 
-  const headers = parsedRows[0].map((header, index) =>
-    index === 0 ? header.replace(/^\uFEFF/, "") : header,
-  );
+  const headers = parsedRows[0].map((header, index) => (index === 0 ? header.replace(/^\uFEFF/, "") : header));
 
   const requiredHeaders = [
     "Parent_SKU",
@@ -543,14 +508,10 @@ function mapCsvRows(text: string): CsvRow[] {
     "ProductVideoUrl",
   ];
 
-  const missingHeaders = requiredHeaders.filter(
-    (header) => !headers.includes(header),
-  );
+  const missingHeaders = requiredHeaders.filter((header) => !headers.includes(header));
 
   if (missingHeaders.length > 0) {
-    throw new Error(
-      `CSV is missing required columns: ${missingHeaders.join(", ")}`,
-    );
+    throw new Error(`CSV is missing required columns: ${missingHeaders.join(", ")}`);
   }
 
   return parsedRows.slice(1).flatMap((values) => {
@@ -614,11 +575,7 @@ function getCategoryBucket(name: string, category: string) {
   return "Other";
 }
 
-function getProductAudience(
-  name: string,
-  category: string,
-  categoryBucket: string,
-): ProductAudience {
+function getProductAudience(name: string, category: string, categoryBucket: string): ProductAudience {
   const searchable = `${name} ${category}`.toLowerCase();
 
   if (categoryBucket === "Hats" || categoryBucket === "Bags") {
@@ -661,10 +618,7 @@ function stripImageExtension(filename: string) {
 }
 
 function stripKnownViewSuffix(filenameStem: string) {
-  return filenameStem.replace(
-    /_(?:lquarter|rquarter|quarter|front|back|lside|rside|detail\d*|closeup)$/i,
-    "",
-  );
+  return filenameStem.replace(/_(?:lquarter|rquarter|quarter|front|back|lside|rside|detail\d*|closeup)$/i, "");
 }
 
 function getImageStems(row: CsvRow) {
@@ -690,15 +644,9 @@ function isLeftQuarterMainImage(url: string) {
 }
 
 function choosePreferredMainImage(rows: CsvRow[]) {
-  const imageCandidates = [
-    ...new Set(
-      rows.map((row) => normalizeText(row.Main_Image_URL)).filter(Boolean),
-    ),
-  ];
+  const imageCandidates = [...new Set(rows.map((row) => normalizeText(row.Main_Image_URL)).filter(Boolean))];
 
-  return (
-    imageCandidates.find(isLeftQuarterMainImage) ?? imageCandidates[0] ?? ""
-  );
+  return imageCandidates.find(isLeftQuarterMainImage) ?? imageCandidates[0] ?? "";
 }
 
 function chooseFirstNonEmpty(rows: CsvRow[], field: string) {
@@ -714,9 +662,7 @@ function chooseFirstNonEmpty(rows: CsvRow[], field: string) {
 }
 
 function aggregateProducts(rows: CsvRow[]): ProductAggregate[] {
-  const activeRows = rows.filter(
-    (row) => normalizeText(row.Status) === ACTIVE_STATUS,
-  );
+  const activeRows = rows.filter((row) => normalizeText(row.Status) === ACTIVE_STATUS);
 
   const rowsByProduct = new Map<string, CsvRow[]>();
 
@@ -740,10 +686,8 @@ function aggregateProducts(rows: CsvRow[]): ProductAggregate[] {
     const category = chooseFirstNonEmpty(productRows, "Category");
     const brand = chooseFirstNonEmpty(productRows, "Brand") || null;
     const division = chooseFirstNonEmpty(productRows, "Division") || null;
-    const sizeChartImageUrl =
-      chooseFirstNonEmpty(productRows, "Size_Chart_Image_URL") || null;
-    const productVideoUrl =
-      chooseFirstNonEmpty(productRows, "ProductVideoUrl") || null;
+    const sizeChartImageUrl = chooseFirstNonEmpty(productRows, "Size_Chart_Image_URL") || null;
+    const productVideoUrl = chooseFirstNonEmpty(productRows, "ProductVideoUrl") || null;
 
     const rowsByColor = new Map<string, CsvRow[]>();
 
@@ -765,14 +709,10 @@ function aggregateProducts(rows: CsvRow[]): ProductAggregate[] {
     for (const colorRows of rowsByColor.values()) {
       const color = normalizeText(colorRows[0]?.Color);
       const mainImageUrl = choosePreferredMainImage(colorRows);
-      const swatchImageUrl =
-        chooseFirstNonEmpty(colorRows, "Swatch_Image_URL") || null;
-      const colorHexValue =
-        chooseFirstNonEmpty(colorRows, "Color_Hex_Value") || null;
+      const swatchImageUrl = chooseFirstNonEmpty(colorRows, "Swatch_Image_URL") || null;
+      const colorHexValue = chooseFirstNonEmpty(colorRows, "Color_Hex_Value") || null;
 
-      const imageStems = [
-        ...new Set(colorRows.flatMap((row) => getImageStems(row))),
-      ];
+      const imageStems = [...new Set(colorRows.flatMap((row) => getImageStems(row)))];
 
       colors.push({
         color,
@@ -816,13 +756,7 @@ function aggregateProducts(rows: CsvRow[]): ProductAggregate[] {
       }
     });
 
-    const metadataComplete = Boolean(
-      providerProductId &&
-      name &&
-      description &&
-      category &&
-      variants.length === productRows.length,
-    );
+    const metadataComplete = Boolean(providerProductId && name && description && category && variants.length === productRows.length);
 
     const categoryBucket = getCategoryBucket(name, category);
 
@@ -849,28 +783,16 @@ function aggregateProducts(rows: CsvRow[]): ProductAggregate[] {
 }
 
 function getPreliminaryProductScore(product: ProductAggregate) {
-  const leftQuarterColorCount = product.colors.filter((color) =>
-    isLeftQuarterMainImage(color.mainImageUrl),
-  ).length;
+  const leftQuarterColorCount = product.colors.filter((color) => isLeftQuarterMainImage(color.mainImageUrl)).length;
 
-  return (
-    Math.min(leftQuarterColorCount, 12) * 100 +
-    Math.min(product.activeVariantCount, 200) +
-    (product.metadataComplete ? 50 : 0)
-  );
+  return Math.min(leftQuarterColorCount, 12) * 100 + Math.min(product.activeVariantCount, 200) + (product.metadataComplete ? 50 : 0);
 }
 
 function buildCandidatePool(products: ProductAggregate[], options: CliOptions) {
   const eligibleProducts = products.filter((product) => {
-    const leftQuarterColors = product.colors.filter((color) =>
-      isLeftQuarterMainImage(color.mainImageUrl),
-    );
+    const leftQuarterColors = product.colors.filter((color) => isLeftQuarterMainImage(color.mainImageUrl));
 
-    return (
-      product.metadataComplete &&
-      !isLicensedProduct(product) &&
-      leftQuarterColors.length >= options.minimumQualifyingColors
-    );
+    return product.metadataComplete && !isLicensedProduct(product) && leftQuarterColors.length >= options.minimumQualifyingColors;
   });
 
   const productsByBucket = new Map<string, ProductAggregate[]>();
@@ -887,15 +809,10 @@ function buildCandidatePool(products: ProductAggregate[], options: CliOptions) {
     const bucketProducts = productsByBucket.get(bucket) ?? [];
 
     bucketProducts.sort(
-      (first, second) =>
-        getPreliminaryProductScore(second) -
-          getPreliminaryProductScore(first) ||
-        first.name.localeCompare(second.name),
+      (first, second) => getPreliminaryProductScore(second) - getPreliminaryProductScore(first) || first.name.localeCompare(second.name),
     );
 
-    selectedCandidates.push(
-      ...bucketProducts.slice(0, options.candidatesPerBucket),
-    );
+    selectedCandidates.push(...bucketProducts.slice(0, options.candidatesPerBucket));
   }
 
   return selectedCandidates;
@@ -906,8 +823,7 @@ function selectColorsToAudit(product: ProductAggregate, options: CliOptions) {
     .filter((color) => isLeftQuarterMainImage(color.mainImageUrl))
     .sort(
       (first, second) =>
-        getTeamColorPriority(first.color) -
-          getTeamColorPriority(second.color) ||
+        getTeamColorPriority(first.color) - getTeamColorPriority(second.color) ||
         second.variantRows.length - first.variantRows.length ||
         first.color.localeCompare(second.color),
     )
@@ -956,11 +872,7 @@ class Semaphore {
   }
 }
 
-async function fetchWithTimeout(
-  url: string,
-  init: RequestInit,
-  timeoutMs: number,
-) {
+async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs: number) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -986,18 +898,11 @@ function responseLooksLikeImage(response: Response) {
   return response.ok && contentType.startsWith("image/");
 }
 
-async function verifyRemoteImage(
-  url: string,
-  timeoutMs: number,
-): Promise<UrlAuditResult> {
+async function verifyRemoteImage(url: string, timeoutMs: number): Promise<UrlAuditResult> {
   const checkedAt = new Date().toISOString();
 
   try {
-    const headResponse = await fetchWithTimeout(
-      url,
-      { method: "HEAD" },
-      timeoutMs,
-    );
+    const headResponse = await fetchWithTimeout(url, { method: "HEAD" }, timeoutMs);
 
     if (responseLooksLikeImage(headResponse)) {
       return {
@@ -1047,27 +952,16 @@ async function verifyRemoteImage(
 async function loadUrlCache(cachePath: string) {
   try {
     const contents = await readFile(cachePath, "utf8");
-    return new Map<string, UrlAuditResult>(
-      Object.entries(JSON.parse(contents) as Record<string, UrlAuditResult>),
-    );
+    return new Map<string, UrlAuditResult>(Object.entries(JSON.parse(contents) as Record<string, UrlAuditResult>));
   } catch {
     return new Map<string, UrlAuditResult>();
   }
 }
 
-async function saveUrlCache(
-  cachePath: string,
-  cache: Map<string, UrlAuditResult>,
-) {
-  const sortedEntries = [...cache.entries()].sort(([first], [second]) =>
-    first.localeCompare(second),
-  );
+async function saveUrlCache(cachePath: string, cache: Map<string, UrlAuditResult>) {
+  const sortedEntries = [...cache.entries()].sort(([first], [second]) => first.localeCompare(second));
 
-  await writeFile(
-    cachePath,
-    `${JSON.stringify(Object.fromEntries(sortedEntries), null, 2)}\n`,
-    "utf8",
-  );
+  await writeFile(cachePath, `${JSON.stringify(Object.fromEntries(sortedEntries), null, 2)}\n`, "utf8");
 }
 
 function buildSiblingUrl(mainImageUrl: string, stem: string, suffix: string) {
@@ -1087,33 +981,21 @@ function buildCandidateUrls(color: ColorAggregate, providerSuffix: string) {
   const urls = new Set<string>();
 
   for (const stem of color.imageStems) {
-    const siblingUrl = buildSiblingUrl(
-      color.mainImageUrl,
-      stem,
-      providerSuffix,
-    );
+    const siblingUrl = buildSiblingUrl(color.mainImageUrl, stem, providerSuffix);
 
     if (siblingUrl) {
       urls.add(siblingUrl);
     }
 
-    urls.add(
-      `https://static.momentecbrands.com/product_original_images/${stem}_${providerSuffix}.jpg`,
-    );
+    urls.add(`https://static.momentecbrands.com/product_original_images/${stem}_${providerSuffix}.jpg`);
 
-    urls.add(
-      `https://static.augustasportswear.com/product/${stem}_${providerSuffix}.jpg`,
-    );
+    urls.add(`https://static.augustasportswear.com/product/${stem}_${providerSuffix}.jpg`);
   }
 
   return [...urls];
 }
 
-function createUrlVerifier(
-  cache: Map<string, UrlAuditResult>,
-  semaphore: Semaphore,
-  timeoutMs: number,
-) {
+function createUrlVerifier(cache: Map<string, UrlAuditResult>, semaphore: Semaphore, timeoutMs: number) {
   return async function verifyUrl(url: string) {
     const cachedResult = cache.get(url);
 
@@ -1128,10 +1010,7 @@ function createUrlVerifier(
   };
 }
 
-async function findFirstVerifiedUrl(
-  urls: string[],
-  verifyUrl: (url: string) => Promise<UrlAuditResult>,
-) {
+async function findFirstVerifiedUrl(urls: string[], verifyUrl: (url: string) => Promise<UrlAuditResult>) {
   for (const url of urls) {
     const result = await verifyUrl(url);
 
@@ -1180,10 +1059,7 @@ async function auditColor(
   const auditedViews = await Promise.all(
     VIEW_CANDIDATES.map(async (spec) => {
       for (const providerSuffix of spec.providerSuffixes) {
-        const verifiedUrl = await findFirstVerifiedUrl(
-          buildCandidateUrls(color, providerSuffix),
-          verifyUrl,
-        );
+        const verifiedUrl = await findFirstVerifiedUrl(buildCandidateUrls(color, providerSuffix), verifyUrl);
 
         const displayColor = normalizeDisplayColor(color.color);
 
@@ -1196,9 +1072,7 @@ async function auditColor(
             providerView: providerSuffix,
             sortOrder: spec.sortOrder,
             externalImageUrl: verifiedUrl,
-            altText: `${product.name} in ${color.color} — ${formatViewLabel(
-              spec.view,
-            )} view`,
+            altText: `${product.name} in ${color.color} — ${formatViewLabel(spec.view)} view`,
             source: "verified-derived" as const,
           } satisfies VerifiedImage;
         }
@@ -1214,21 +1088,11 @@ async function auditColor(
     }
   }
 
-  images.sort(
-    (first, second) =>
-      first.sortOrder - second.sortOrder ||
-      first.providerView.localeCompare(second.providerView),
-  );
+  images.sort((first, second) => first.sortOrder - second.sortOrder || first.providerView.localeCompare(second.providerView));
 
   const views = new Set(images.map((image) => image.view));
 
-  const requiredViews: ProductImageView[] = [
-    "leftQuarter",
-    "front",
-    "back",
-    "left",
-    "right",
-  ];
+  const requiredViews: ProductImageView[] = ["leftQuarter", "front", "back", "left", "right"];
 
   const missingRequiredViews = requiredViews.filter((view) => !views.has(view));
 
@@ -1244,10 +1108,7 @@ async function auditColor(
     other: 3,
   };
 
-  const score = images.reduce(
-    (total, image) => total + viewWeights[image.view],
-    0,
-  );
+  const score = images.reduce((total, image) => total + viewWeights[image.view], 0);
 
   return {
     color: color.color,
@@ -1278,27 +1139,20 @@ async function auditProduct(
   verifyUrl: (url: string) => Promise<UrlAuditResult>,
 ): Promise<AuditedProduct> {
   const colorsToAudit = selectColorsToAudit(product, options);
-  const auditedColors = await Promise.all(
-    colorsToAudit.map((color) => auditColor(product, color, verifyUrl)),
-  );
+  const auditedColors = await Promise.all(colorsToAudit.map((color) => auditColor(product, color, verifyUrl)));
 
   const qualifyingColors = auditedColors
     .filter((color) => color.qualifies)
     .sort(
       (first, second) =>
         second.score - first.score ||
-        getTeamColorPriority(first.color) -
-          getTeamColorPriority(second.color) ||
+        getTeamColorPriority(first.color) - getTeamColorPriority(second.color) ||
         first.color.localeCompare(second.color),
     );
 
-  const selectedQualifyingColors = qualifyingColors.slice(
-    0,
-    options.selectedColorsPerProduct,
-  );
+  const selectedQualifyingColors = qualifyingColors.slice(0, options.selectedColorsPerProduct);
 
-  const qualifies =
-    selectedQualifyingColors.length >= options.minimumQualifyingColors;
+  const qualifies = selectedQualifyingColors.length >= options.minimumQualifyingColors;
 
   const score =
     selectedQualifyingColors.length * 1_000 +
@@ -1317,17 +1171,10 @@ async function auditProduct(
   };
 }
 
-function selectBalancedProducts(
-  auditedProducts: AuditedProduct[],
-  targetCount: number,
-) {
+function selectBalancedProducts(auditedProducts: AuditedProduct[], targetCount: number) {
   const qualified = auditedProducts
     .filter((product) => product.qualifies)
-    .sort(
-      (first, second) =>
-        second.score - first.score ||
-        first.product.name.localeCompare(second.product.name),
-    );
+    .sort((first, second) => second.score - first.score || first.product.name.localeCompare(second.product.name));
 
   const audienceTargets: Record<ProductAudience, number> = {
     adult: Math.round(targetCount * 0.45),
@@ -1336,10 +1183,7 @@ function selectBalancedProducts(
     accessories: Math.round(targetCount * 0.15),
   };
 
-  const totalAssigned = Object.values(audienceTargets).reduce(
-    (total, count) => total + count,
-    0,
-  );
+  const totalAssigned = Object.values(audienceTargets).reduce((total, count) => total + count, 0);
 
   audienceTargets.adult += targetCount - totalAssigned;
 
@@ -1357,18 +1201,12 @@ function selectBalancedProducts(
   };
 
   for (const audience of Object.keys(audienceTargets) as ProductAudience[]) {
-    const audienceProducts = qualified.filter(
-      (product) => product.product.audience === audience,
-    );
+    const audienceProducts = qualified.filter((product) => product.product.audience === audience);
 
     const selectedPerCategory = new Map<string, number>();
 
     for (const product of audienceProducts) {
-      if (
-        selected.filter(
-          (selectedProduct) => selectedProduct.product.audience === audience,
-        ).length >= audienceTargets[audience]
-      ) {
+      if (selected.filter((selectedProduct) => selectedProduct.product.audience === audience).length >= audienceTargets[audience]) {
         break;
       }
 
@@ -1385,11 +1223,7 @@ function selectBalancedProducts(
     }
 
     for (const product of audienceProducts) {
-      if (
-        selected.filter(
-          (selectedProduct) => selectedProduct.product.audience === audience,
-        ).length >= audienceTargets[audience]
-      ) {
+      if (selected.filter((selectedProduct) => selectedProduct.product.audience === audience).length >= audienceTargets[audience]) {
         break;
       }
 
@@ -1407,12 +1241,8 @@ function selectBalancedProducts(
 
   return selected.slice(0, targetCount);
 }
-function buildSelectedProductOutput(
-  auditedProduct: AuditedProduct,
-): SelectedProductOutput {
-  const selectedColorKeys = new Set(
-    auditedProduct.qualifyingColors.map((color) => color.colorKey),
-  );
+function buildSelectedProductOutput(auditedProduct: AuditedProduct): SelectedProductOutput {
+  const selectedColorKeys = new Set(auditedProduct.qualifyingColors.map((color) => color.colorKey));
 
   return {
     providerProductId: auditedProduct.product.providerProductId,
@@ -1431,13 +1261,9 @@ function buildSelectedProductOutput(
       providerColor: color.providerColor,
       colorKey: color.colorKey,
       colorHexValue: color.colorHexValue,
-      swatchImageUrl:
-        color.images.find((image) => image.view === "leftQuarter")
-          ?.externalImageUrl ?? color.swatchImageUrl,
+      swatchImageUrl: color.images.find((image) => image.view === "leftQuarter")?.externalImageUrl ?? color.swatchImageUrl,
     })),
-    variants: auditedProduct.product.variants.filter((variant) =>
-      selectedColorKeys.has(normalizeColorKey(variant.providerColor)),
-    ),
+    variants: auditedProduct.product.variants.filter((variant) => selectedColorKeys.has(normalizeColorKey(variant.providerColor))),
   };
 }
 
@@ -1452,10 +1278,7 @@ function escapeCsvValue(value: unknown) {
 }
 
 function toCsv(headers: string[], rows: unknown[][]) {
-  return [
-    headers.map(escapeCsvValue).join(","),
-    ...rows.map((row) => row.map(escapeCsvValue).join(",")),
-  ].join("\n");
+  return [headers.map(escapeCsvValue).join(","), ...rows.map((row) => row.map(escapeCsvValue).join(","))].join("\n");
 }
 
 async function writeOutputs(
@@ -1469,16 +1292,10 @@ async function writeOutputs(
   await mkdir(options.outputDir, { recursive: true });
 
   const selectedOutput = selectedProducts.map(buildSelectedProductOutput);
-  const selectedIds = new Set(
-    selectedProducts.map((product) => product.product.providerProductId),
-  );
+  const selectedIds = new Set(selectedProducts.map((product) => product.product.providerProductId));
 
   const draftCandidates = auditedProducts
-    .filter(
-      (product) =>
-        product.qualifies &&
-        !selectedIds.has(product.product.providerProductId),
-    )
+    .filter((product) => product.qualifies && !selectedIds.has(product.product.providerProductId))
     .map(buildSelectedProductOutput);
 
   const verifiedImageRows = selectedOutput.flatMap((product) =>
@@ -1503,9 +1320,7 @@ async function writeOutputs(
       product.product.providerProductId,
       product.product.name,
       product.product.categoryBucket,
-      product.qualifies
-        ? "Qualified but not selected"
-        : product.rejectionReason,
+      product.qualifies ? "Qualified but not selected" : product.rejectionReason,
       product.product.colors.length,
       product.auditedColors.length,
       product.qualifyingColors.length,
@@ -1522,21 +1337,11 @@ async function writeOutputs(
       auditedProducts: auditedProducts.length,
     },
     results: {
-      qualifiedProducts: auditedProducts.filter((product) => product.qualifies)
-        .length,
+      qualifiedProducts: auditedProducts.filter((product) => product.qualifies).length,
       selectedProducts: selectedProducts.length,
-      selectedColors: selectedOutput.reduce(
-        (total, product) => total + product.colors.length,
-        0,
-      ),
-      selectedVariants: selectedOutput.reduce(
-        (total, product) => total + product.variants.length,
-        0,
-      ),
-      verifiedImages: selectedOutput.reduce(
-        (total, product) => total + product.images.length,
-        0,
-      ),
+      selectedColors: selectedOutput.reduce((total, product) => total + product.colors.length, 0),
+      selectedVariants: selectedOutput.reduce((total, product) => total + product.variants.length, 0),
+      verifiedImages: selectedOutput.reduce((total, product) => total + product.images.length, 0),
       cachedUrlChecks: cache.size,
     },
     selectedProducts: selectedProducts.map((product) => ({
@@ -1564,11 +1369,7 @@ async function writeOutputs(
     ]);
 
   await Promise.all([
-    writeFile(
-      path.join(options.outputDir, "selected-products.json"),
-      `${JSON.stringify(selectedOutput, null, 2)}\n`,
-      "utf8",
-    ),
+    writeFile(path.join(options.outputDir, "selected-products.json"), `${JSON.stringify(selectedOutput, null, 2)}\n`, "utf8"),
     writeFile(
       path.join(options.outputDir, "verified-images.csv"),
       `${toCsv(
@@ -1592,51 +1393,22 @@ async function writeOutputs(
     writeFile(
       path.join(options.outputDir, "rejected-products.csv"),
       `${toCsv(
-        [
-          "providerProductId",
-          "productName",
-          "categoryBucket",
-          "reason",
-          "availableColors",
-          "auditedColors",
-          "qualifyingColors",
-          "score",
-        ],
+        ["providerProductId", "productName", "categoryBucket", "reason", "availableColors", "auditedColors", "qualifyingColors", "score"],
         rejectedRows,
       )}\n`,
       "utf8",
     ),
-    writeFile(
-      path.join(options.outputDir, "catalog-image-audit.json"),
-      `${JSON.stringify(summary, null, 2)}\n`,
-      "utf8",
-    ),
-    writeFile(
-      path.join(options.outputDir, "draft-candidates.json"),
-      `${JSON.stringify(draftCandidates, null, 2)}\n`,
-      "utf8",
-    ),
+    writeFile(path.join(options.outputDir, "catalog-image-audit.json"), `${JSON.stringify(summary, null, 2)}\n`, "utf8"),
+    writeFile(path.join(options.outputDir, "draft-candidates.json"), `${JSON.stringify(draftCandidates, null, 2)}\n`, "utf8"),
 
     writeFile(
       path.join(options.outputDir, "excluded-products.csv"),
-      `${toCsv(
-        [
-          "providerProductId",
-          "productName",
-          "categoryBucket",
-          "audience",
-          "reason",
-        ],
-        excludedRows,
-      )}\n`,
+      `${toCsv(["providerProductId", "productName", "categoryBucket", "audience", "reason"], excludedRows)}\n`,
       "utf8",
     ),
   ]);
 
-  await saveUrlCache(
-    path.join(options.outputDir, "image-url-cache.json"),
-    cache,
-  );
+  await saveUrlCache(path.join(options.outputDir, "image-url-cache.json"), cache);
 }
 
 async function main() {
@@ -1652,55 +1424,35 @@ async function main() {
   console.log(`Found ${products.length.toLocaleString()} active products.`);
 
   const candidates = buildCandidatePool(products, options);
-  console.log(
-    `Auditing ${candidates.length.toLocaleString()} candidate products across balanced category buckets.`,
-  );
+  console.log(`Auditing ${candidates.length.toLocaleString()} candidate products across balanced category buckets.`);
 
   await mkdir(options.outputDir, { recursive: true });
 
   const cachePath = path.join(options.outputDir, "image-url-cache.json");
   const cache = await loadUrlCache(cachePath);
   const semaphore = new Semaphore(options.requestConcurrency);
-  const verifyUrl = createUrlVerifier(
-    cache,
-    semaphore,
-    options.requestTimeoutMs,
-  );
+  const verifyUrl = createUrlVerifier(cache, semaphore, options.requestTimeoutMs);
 
   const auditedProducts: AuditedProduct[] = [];
 
   for (let index = 0; index < candidates.length; index += 1) {
     const product = candidates[index];
 
-    console.log(
-      `[${index + 1}/${candidates.length}] ${product.name} (${product.providerProductId})`,
-    );
+    console.log(`[${index + 1}/${candidates.length}] ${product.name} (${product.providerProductId})`);
 
     const auditedProduct = await auditProduct(product, options, verifyUrl);
     auditedProducts.push(auditedProduct);
 
-    console.log(
-      `  ${auditedProduct.qualifyingColors.length} qualifying colors; score ${auditedProduct.score}.`,
-    );
+    console.log(`  ${auditedProduct.qualifyingColors.length} qualifying colors; score ${auditedProduct.score}.`);
 
     if ((index + 1) % 10 === 0) {
       await saveUrlCache(cachePath, cache);
     }
   }
 
-  const selectedProducts = selectBalancedProducts(
-    auditedProducts,
-    options.selectedProductCount,
-  );
+  const selectedProducts = selectBalancedProducts(auditedProducts, options.selectedProductCount);
 
-  await writeOutputs(
-    options,
-    products,
-    candidates,
-    auditedProducts,
-    selectedProducts,
-    cache,
-  );
+  await writeOutputs(options, products, candidates, auditedProducts, selectedProducts, cache);
 
   console.log("");
   console.log(`Selected ${selectedProducts.length} products.`);
@@ -1714,8 +1466,6 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error(
-    error instanceof Error ? (error.stack ?? error.message) : error,
-  );
+  console.error(error instanceof Error ? (error.stack ?? error.message) : error);
   process.exitCode = 1;
 });

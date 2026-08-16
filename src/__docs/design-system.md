@@ -315,9 +315,7 @@ $button-accent-bg
 Buttons should use
 
 ```scss
-@include button-primary
-@include button-secondary
-@include button-accent
+@include button-primary @include button-secondary @include button-accent;
 ```
 
 instead of redefining styles.
