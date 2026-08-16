@@ -3,51 +3,35 @@ import { LuMessageCircle, LuRuler, LuLock } from "react-icons/lu";
 import styles from "./FooterPreview.module.scss";
 
 interface FooterPreviewProps {
-	brandColor: string;
+  brandColor: string;
 }
 
-export default function FooterPreview({
-	brandColor,
-}: FooterPreviewProps) {
-	return (
-		<footer className={styles.footer}>
-			<div>
-				<LuMessageCircle
-					style={{ color: brandColor }}
-				/>
+export default function FooterPreview({ brandColor }: FooterPreviewProps) {
+  return (
+    <footer className={styles.footer}>
+      <div>
+        <LuMessageCircle style={{ color: brandColor }} />
 
-				<strong>Need Help?</strong>
+        <strong>Need Help?</strong>
 
-				<span>
-					Contact us anytime
-				</span>
-			</div>
+        <span>Contact us anytime</span>
+      </div>
 
-			<div>
-				<LuRuler
-					style={{ color: brandColor }}
-				/>
+      <div>
+        <LuRuler style={{ color: brandColor }} />
 
-				<strong>Sizing Guide</strong>
+        <strong>Sizing Guide</strong>
 
-				<span>
-					Find your perfect fit
-				</span>
-			</div>
+        <span>Find your perfect fit</span>
+      </div>
 
-			<div>
-				<LuLock
-					style={{ color: brandColor }}
-				/>
+      <div>
+        <LuLock style={{ color: brandColor }} />
 
-				<strong>
-					Secure Checkout
-				</strong>
+        <strong>Secure Checkout</strong>
 
-				<span>
-					Safe and encrypted
-				</span>
-			</div>
-		</footer>
-	);
+        <span>Safe and encrypted</span>
+      </div>
+    </footer>
+  );
 }

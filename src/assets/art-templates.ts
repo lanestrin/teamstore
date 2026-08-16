@@ -2,16 +2,9 @@ import E20_31_SVG from "./art-templates/E20_31.svg?raw";
 import T12_CH8_SVG from "./art-templates/T12_CH8.svg?raw";
 import T15_DN35_SVG from "./art-templates/T15_DN35.svg?raw";
 
-export type ArtTemplateElementMovement =
-  | "horizontal"
-  | "vertical"
-  | "both"
-  | "none";
+export type ArtTemplateElementMovement = "horizontal" | "vertical" | "both" | "none";
 
-export type ArtTemplateTextField =
-  | "organizationName"
-  | "yearEstablished"
-  | "mascotName";
+export type ArtTemplateTextField = "organizationName" | "yearEstablished" | "mascotName";
 
 export type ArtTemplateTextTransform = "none" | "uppercase";
 

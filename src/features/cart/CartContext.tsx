@@ -1,12 +1,4 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-  type PropsWithChildren,
-} from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type PropsWithChildren } from "react";
 
 import type { AddCartItem, CartItem } from "./cart.types";
 
@@ -56,9 +48,7 @@ export function CartProvider({ children }: PropsWithChildren) {
     const quantityToAdd = Math.max(1, item.quantity);
 
     setItems((currentItems) => {
-      const existingItem = currentItems.find(
-        (currentItem) => currentItem.lineId === lineId,
-      );
+      const existingItem = currentItems.find((currentItem) => currentItem.lineId === lineId);
 
       if (!existingItem) {
         return [
@@ -96,29 +86,16 @@ export function CartProvider({ children }: PropsWithChildren) {
   }, []);
 
   const removeItem = useCallback((lineId: string) => {
-    setItems((currentItems) =>
-      currentItems.filter((item) => item.lineId !== lineId),
-    );
+    setItems((currentItems) => currentItems.filter((item) => item.lineId !== lineId));
   }, []);
 
   const clearCart = useCallback(() => {
     setItems([]);
   }, []);
 
-  const itemCount = useMemo(
-    () =>
-      items.reduce((totalQuantity, item) => totalQuantity + item.quantity, 0),
-    [items],
-  );
+  const itemCount = useMemo(() => items.reduce((totalQuantity, item) => totalQuantity + item.quantity, 0), [items]);
 
-  const subtotalInCents = useMemo(
-    () =>
-      items.reduce(
-        (subtotal, item) => subtotal + item.unitPriceInCents * item.quantity,
-        0,
-      ),
-    [items],
-  );
+  const subtotalInCents = useMemo(() => items.reduce((subtotal, item) => subtotal + item.unitPriceInCents * item.quantity, 0), [items]);
 
   const value = useMemo<CartContextValue>(
     () => ({
@@ -130,15 +107,7 @@ export function CartProvider({ children }: PropsWithChildren) {
       removeItem,
       clearCart,
     }),
-    [
-      items,
-      itemCount,
-      subtotalInCents,
-      addItem,
-      updateQuantity,
-      removeItem,
-      clearCart,
-    ],
+    [items, itemCount, subtotalInCents, addItem, updateQuantity, removeItem, clearCart],
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

@@ -1,9 +1,6 @@
 import { Outlet } from "react-router-dom";
 
-import {
-  CreateStoreProvider,
-  useCreateStore,
-} from "../context/CreateStoreContext";
+import { CreateStoreProvider, useCreateStore } from "../context/CreateStoreContext";
 
 import LivePreview from "../components/LivePreview/LivePreview";
 import ProgressSidebar from "../components/ProgressSidebar/ProgressSidebar";
@@ -15,8 +12,7 @@ import { useCreateStoreWorkflow } from "../hooks/useCreateStoreWorkflow";
 function CreateStoreContent() {
   const { currentStep } = useCreateStore();
 
-  const { isLoadingDraft, isSaving, isFinalizing, saveAndExit, createStore } =
-    useCreateStoreWorkflow();
+  const { isLoadingDraft, isSaving, isFinalizing, saveAndExit, createStore } = useCreateStoreWorkflow();
 
   const showLivePreview = currentStep === 1 || currentStep === 2;
 

@@ -1,245 +1,254 @@
 .preview {
-	display: flex;
-	flex-direction: column;
-	padding: $space-7;
-	background: $white;
-	border-left: 1px solid $border-light;
-	overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding: $space-7;
+  background: $white;
+  border-left: 1px solid $border-light;
+  overflow-y: auto;
 }
 
 .header {
-	margin-bottom: $space-5;
+  margin-bottom: $space-5;
 }
 
 .badge {
-	display: inline-flex;
-	align-items: center;
-	padding: 0 $space-3;
-	height: 30px;
-	margin-bottom: $space-3;
-	background: rgba($brand-red, .08);
-	border-radius: $radius-pill;
-	color: $brand-red;
-	font-size: .75rem;
-	font-weight: $font-bold;
-	text-transform: uppercase;
-	letter-spacing: .08em;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 $space-3;
+  height: 30px;
+  margin-bottom: $space-3;
+  background: rgba($brand-red, 0.08);
+  border-radius: $radius-pill;
+  color: $brand-red;
+  font-size: 0.75rem;
+  font-weight: $font-bold;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 .titleRow {
-	@include flex-between;
-	gap: $space-3;
-	margin-bottom: $space-2;
+  @include flex-between;
+  gap: $space-3;
+  margin-bottom: $space-2;
 }
 
 .titleRow h2 {
-	margin: 0;
-	font-family: $font-heading;
-	font-size: 2rem;
-	line-height: 1;
-	text-transform: uppercase;
+  margin: 0;
+  font-family: $font-heading;
+  font-size: 2rem;
+  line-height: 1;
+  text-transform: uppercase;
 }
 
 .header > p {
-	margin: 0;
-	color: $text-secondary;
-	font-size: .9rem;
+  margin: 0;
+  color: $text-secondary;
+  font-size: 0.9rem;
 }
 
 .colorPalette {
-	display: flex;
-	width: 42px;
-	height: 22px;
-	overflow: hidden;
-	border-radius: $radius-pill;
-	box-shadow: $shadow-sm;
+  display: flex;
+  width: 42px;
+  height: 22px;
+  overflow: hidden;
+  border-radius: $radius-pill;
+  box-shadow: $shadow-sm;
 }
 
 .primaryColor,
 .secondaryColor {
-	flex: 1;
+  flex: 1;
 }
 
 .storePreview {
-	flex: 1;
+  flex: 1;
 }
 
 .browser {
-	@include card;
-	overflow: hidden;
+  @include card;
+  overflow: hidden;
 }
 
 .browserBar {
-	display: flex;
-	align-items: center;
-	gap: $space-2;
-	height: 42px;
-	padding: 0 $space-4;
-	background: $gray-100;
-	border-bottom: 1px solid $border-light;
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  height: 42px;
+  padding: 0 $space-4;
+  background: $gray-100;
+  border-bottom: 1px solid $border-light;
 }
 
 .browserBar span {
-	width: 10px;
-	height: 10px;
-	border-radius: 50%;
-	background: $gray-300;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: $gray-300;
 }
 
 .store {
-	background: $gray-50;
+  background: $gray-50;
 }
 
 .promoBar {
-	@include flex-center;
-	gap: $space-2;
-	height: 36px;
-	color: $white;
-	font-size: .8rem;
-	font-weight: $font-semibold;
+  @include flex-center;
+  gap: $space-2;
+  height: 36px;
+  color: $white;
+  font-size: 0.8rem;
+  font-weight: $font-semibold;
 }
 
 .storeHeader {
+  @include flex-between;
+  padding: $space-2 $space-5;
+  background: $white;
+  border-bottom: 1px solid $border-light;
+  position: relative;
+  z-index: 10;
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.08),
+    0 6px 14px rgba(15, 23, 42, 0.1);
 
-	@include flex-between;
-	padding: $space-2 $space-5;
-	background: $white;
-	border-bottom: 1px solid $border-light;
-	position: relative;
-	z-index: 10;
-	box-shadow: 0 1px 2px rgba(15, 23, 42, .08), 0 6px 14px rgba(15, 23, 42, .10);
-
-
-
-	&::after {
-		content: "";
-		position: absolute;
-		left: 50%;
-		bottom: -1rem;
-		transform: translateX(-50%);
-		width: 100%;
-		height: 1rem;
-		pointer-events: none;
-		background: radial-gradient( farthest-corner at 50% -100%, color-mix(in srgb, var(--primary-color) 45%, black) 0%, color-mix(in srgb, var(--primary-color) 25%, black) 30%, transparent 75% );
-		filter: blur(1px);
-		opacity: .6;
-	}
+  &::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -1rem;
+    transform: translateX(-50%);
+    width: 100%;
+    height: 1rem;
+    pointer-events: none;
+    background: radial-gradient(
+      farthest-corner at 50% -100%,
+      color-mix(in srgb, var(--primary-color) 45%, black) 0%,
+      color-mix(in srgb, var(--primary-color) 25%, black) 30%,
+      transparent 75%
+    );
+    filter: blur(1px);
+    opacity: 0.6;
+  }
 }
 
-
 .brand {
-	display: flex;
-	align-items: center;
-	gap: $space-3;
+  display: flex;
+  align-items: center;
+  gap: $space-3;
 }
 
 .logoImage {
-	width: 48px;
-	height: 48px;
-	flex-shrink: 0;
-	display: block;
-	object-fit: contain;
-	object-position: center;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  display: block;
+  object-fit: contain;
+  object-position: center;
 }
 
 .brand strong {
-	display: block;
-	font-size: .95rem;
+  display: block;
+  font-size: 0.95rem;
 }
 
 .brand span {
-	display: block;
-	font-size: .75rem;
-	color: var(--header-muted-text-color, $text-secondary);
+  display: block;
+  font-size: 0.75rem;
+  color: var(--header-muted-text-color, $text-secondary);
 }
 
 .nav {
-	display: flex;
-	gap: $space-5;
-	font-size: .82rem;
-	font-weight: $font-medium;
-	color: var(--header-muted-text-color, $text-secondary);
+  display: flex;
+  gap: $space-5;
+  font-size: 0.82rem;
+  font-weight: $font-medium;
+  color: var(--header-muted-text-color, $text-secondary);
 }
 
 .actions {
-	display: flex;
-	align-items: center;
-	gap: $space-4;
+  display: flex;
+  align-items: center;
+  gap: $space-4;
 }
 
 .actions svg {
-	font-size: 1.1rem;
+  font-size: 1.1rem;
 }
 
 .cart {
-	position: relative;
+  position: relative;
 }
 
 .cart span {
-	position: absolute;
-	top: -8px;
-	right: -10px;
-	min-width: 18px;
-	height: 18px;
-	padding: 0 4px;
-	border-radius: $radius-pill;
-	color: $white;
-	font-size: .65rem;
-	display: flex;
-	align-items: center;
-	justify-content: center;
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: $radius-pill;
+  color: $white;
+  font-size: 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-
-
 .hero {
-	position: relative;
-	isolation: isolate;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: $space-8;
-	min-height: 320px;
-	padding: $space-7;
-	overflow: hidden;
-	color: $white;
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-8;
+  min-height: 320px;
+  padding: $space-7;
+  overflow: hidden;
+  color: $white;
 }
 
 .hero::before {
-	content: "";
-	position: absolute;
-	top: -32%;
-	right: -18%;
-	width: 82%;
-	height: 74%;
-	z-index: 4;
-	pointer-events: none;
-	background: radial-gradient( ellipse at 82% 18%, rgba(255, 255, 255, .36) 0%, rgba(255, 255, 255, .20) 20%, rgba(255, 255, 255, .08) 42%, transparent 68% ), linear-gradient( 155deg, transparent 0%, transparent 24%, rgba(255, 255, 255, .18) 42%, rgba(255, 255, 255, .08) 58%, transparent 78% );
-	filter: blur(14px);
-	opacity: .9;
-	mix-blend-mode: screen;
-	transform: rotate(-8deg);
+  content: "";
+  position: absolute;
+  top: -32%;
+  right: -18%;
+  width: 82%;
+  height: 74%;
+  z-index: 4;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse at 82% 18%,
+      rgba(255, 255, 255, 0.36) 0%,
+      rgba(255, 255, 255, 0.2) 20%,
+      rgba(255, 255, 255, 0.08) 42%,
+      transparent 68%
+    ),
+    linear-gradient(155deg, transparent 0%, transparent 24%, rgba(255, 255, 255, 0.18) 42%, rgba(255, 255, 255, 0.08) 58%, transparent 78%);
+  filter: blur(14px);
+  opacity: 0.9;
+  mix-blend-mode: screen;
+  transform: rotate(-8deg);
 }
 
 .hero::after {
-	content: "";
-	position: absolute;
-	inset: 0;
-	z-index: 2;
-	background: linear-gradient( 90deg, rgba(0, 0, 0, .06) 0%, rgba(0, 0, 0, .04) 34%, rgba(0, 0, 0, .10) 62%, rgba(0, 0, 0, .16) 100% );
-	pointer-events: none;
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.06) 0%, rgba(0, 0, 0, 0.04) 34%, rgba(0, 0, 0, 0.1) 62%, rgba(0, 0, 0, 0.16) 100%);
+  pointer-events: none;
 }
 
 .heroTexture {
-	position: absolute;
-	inset: 0;
-	z-index: 1;
-	background-size: 100% 100%;
-	background-position: center;
-	background-repeat: no-repeat;
-	mix-blend-mode: multiply;
-	opacity: .75;
-	pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  mix-blend-mode: multiply;
+  opacity: 0.75;
+  pointer-events: none;
 }
 
 /*.heroTexture::before {
@@ -251,94 +260,96 @@
 }*/
 
 .heroTexture::after {
-	content: "";
-	position: absolute;
-	inset: 0;
-	background: radial-gradient( circle at 28% 18%, rgba(255, 255, 255, .18), transparent 28% ), radial-gradient( circle at 78% 38%, rgba(255, 255, 255, .10), transparent 34% );
-	pointer-events: none;
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 28% 18%, rgba(255, 255, 255, 0.18), transparent 28%),
+    radial-gradient(circle at 78% 38%, rgba(255, 255, 255, 0.1), transparent 34%);
+  pointer-events: none;
 }
 
 .heroNoGradients::after,
 .heroNoGradients .heroTexture::before {
-	content: none;
-	display: none;
-	background: none;
+  content: none;
+  display: none;
+  background: none;
 }
 
 .heroContent {
-	position: relative;
-	z-index: 5;
-	max-width: 420px;
+  position: relative;
+  z-index: 5;
+  max-width: 420px;
 }
 
 .heroContent > span {
-	font-size: .85rem;
-	text-transform: uppercase;
-	letter-spacing: .08em;
-	opacity: .9;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.9;
 }
 
 .heroContent h3 {
-	margin: $space-2 0;
-	font-family: $font-heading;
-	font-size: 3rem;
-	line-height: 1;
-	text-transform: uppercase;
+  margin: $space-2 0;
+  font-family: $font-heading;
+  font-size: 3rem;
+  line-height: 1;
+  text-transform: uppercase;
 }
 
 .heroContent p {
-	margin: 0 0 $space-5;
-	line-height: 1.6;
-	max-width: 340px;
+  margin: 0 0 $space-5;
+  line-height: 1.6;
+  max-width: 340px;
 }
 
 .heroActions {
-	display: flex;
-	gap: $space-3;
+  display: flex;
+  gap: $space-3;
 }
 
 .heroActions button {
-	@include button-white;
-	padding: .8rem 1.4rem;
-	font-weight: $font-semibold;
+  @include button-white;
+  padding: 0.8rem 1.4rem;
+  font-weight: $font-semibold;
 }
 
 .heroActions button:first-child {
-	color: $white;
-	border: none;
+  color: $white;
+  border: none;
 }
 
 .heroArtwork {
-	position: absolute;
-	right: -110px;
-	bottom: -52px;
-	z-index: 3;
-	display: flex;
-	align-items: flex-end;
-	justify-content: flex-end;
-	width: 76%;
-	height: 112%;
-	pointer-events: none;
+  position: absolute;
+  right: -110px;
+  bottom: -52px;
+  z-index: 3;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  width: 76%;
+  height: 112%;
+  pointer-events: none;
 }
 
 .heroLogo {
-	width: 100%;
-	max-width: 620px;
-	max-height: 430px;
-	object-fit: contain;
-	object-position: right bottom;
-	filter: grayscale(1) brightness(.72) contrast(1.05);
-	mix-blend-mode: multiply;
-	-webkit-mask-image: linear-gradient( to top, transparent 0%, rgba(0, 0, 0, .22) 12%, rgba(0, 0, 0, .62) 38%, rgba(0, 0, 0, .92) 100% );
-	mask-image: linear-gradient( to top, transparent 0%, rgba(0, 0, 0, .22) 12%, rgba(0, 0, 0, .62) 38%, rgba(0, 0, 0, .92) 100% );
-	-webkit-mask-repeat: no-repeat;
-	mask-repeat: no-repeat;
-	-webkit-mask-size: 100% 100%;
-	mask-size: 100% 100%;
+  width: 100%;
+  max-width: 620px;
+  max-height: 430px;
+  object-fit: contain;
+  object-position: right bottom;
+  filter: grayscale(1) brightness(0.72) contrast(1.05);
+  mix-blend-mode: multiply;
+  -webkit-mask-image: linear-gradient(to top, transparent 0%, rgba(0, 0, 0, 0.22) 12%, rgba(0, 0, 0, 0.62) 38%, rgba(0, 0, 0, 0.92) 100%);
+  mask-image: linear-gradient(to top, transparent 0%, rgba(0, 0, 0, 0.22) 12%, rgba(0, 0, 0, 0.62) 38%, rgba(0, 0, 0, 0.92) 100%);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
 }
 
 @media (max-width: 1200px) {
-	.preview {
-		display: none;
-	}
+  .preview {
+    display: none;
+  }
 }

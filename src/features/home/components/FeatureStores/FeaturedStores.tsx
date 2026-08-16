@@ -40,24 +40,19 @@ const stores = [
   },
 ];
 export default function FeaturedStores() {
-    return (
-        <section className={styles.section}>
-            <div className={styles.header}>
-                <h2>Featured Stores</h2>
+  return (
+    <section className={styles.section}>
+      <div className={styles.header}>
+        <h2>Featured Stores</h2>
 
-                <a href="/stores">
-                    View all stores →
-                </a>
-            </div>
+        <a href="/stores">View all stores →</a>
+      </div>
 
-            <div className={styles.grid}>
-                {stores.map((store) => (
-                    <FeaturedStoreCard
-                        key={store.slug}
-                        {...store}
-                    />
-                ))}
-            </div>
-        </section>
-    );
+      <div className={styles.grid}>
+        {stores.map((store) => (
+          <FeaturedStoreCard key={store.slug} {...store} />
+        ))}
+      </div>
+    </section>
+  );
 }

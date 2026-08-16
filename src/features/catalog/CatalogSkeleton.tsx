@@ -9,11 +9,7 @@ const COLOR_THUMBNAIL_COUNT = 5;
 
 export default function CatalogSkeleton() {
   return (
-    <main
-      className={pageStyles.page}
-      aria-busy="true"
-      aria-label="Loading product catalog"
-    >
+    <main className={pageStyles.page} aria-busy="true" aria-label="Loading product catalog">
       <span className={pageStyles.visuallyHidden}>Loading product catalog</span>
 
       <div className={pageStyles.container}>
@@ -37,15 +33,9 @@ export default function CatalogSkeleton() {
           <aside className={`${pageStyles.filters} ${styles.filters}`}>
             <Skeleton className={styles.filterHeading} />
 
-            <FilterGroupSkeleton
-              optionCount={CATEGORY_FILTER_COUNT}
-              labelWidth="70%"
-            />
+            <FilterGroupSkeleton optionCount={CATEGORY_FILTER_COUNT} labelWidth="70%" />
 
-            <FilterGroupSkeleton
-              optionCount={SIZE_FILTER_COUNT}
-              labelWidth="35%"
-            />
+            <FilterGroupSkeleton optionCount={SIZE_FILTER_COUNT} labelWidth="35%" />
           </aside>
 
           <section className={pageStyles.results}>
@@ -70,10 +60,7 @@ interface FilterGroupSkeletonProps {
   labelWidth: string;
 }
 
-function FilterGroupSkeleton({
-  optionCount,
-  labelWidth,
-}: FilterGroupSkeletonProps) {
+function FilterGroupSkeleton({ optionCount, labelWidth }: FilterGroupSkeletonProps) {
   return (
     <div className={styles.filterGroup}>
       <Skeleton className={styles.filterLegend} />
@@ -83,10 +70,7 @@ function FilterGroupSkeleton({
           <div key={index} className={styles.filterOption}>
             <Skeleton className={styles.checkbox} />
 
-            <Skeleton
-              className={styles.filterLabel}
-              style={{ width: labelWidth }}
-            />
+            <Skeleton className={styles.filterLabel} style={{ width: labelWidth }} />
           </div>
         ))}
       </div>

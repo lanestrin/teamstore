@@ -2,10 +2,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 
-import {
-  classifyProductColor,
-  normalizeProductColorName,
-} from "../src/lib/classifyProductColor";
+import { classifyProductColor, normalizeProductColorName } from "../src/lib/classifyProductColor";
 
 /**
  * Runs the deterministic product-color classifier against the selected
@@ -89,10 +86,7 @@ interface ClassifiedColorSummary {
   }>;
 }
 
-const DEFAULT_INPUT_PATH = path.resolve(
-  process.cwd(),
-  "scripts/output/catalog-audit/selected-products.json",
-);
+const DEFAULT_INPUT_PATH = path.resolve(process.cwd(), "scripts/output/catalog-audit/selected-products.json");
 
 function parseArgs(argv: string[]): CliOptions {
   let inputPath = DEFAULT_INPUT_PATH;
@@ -122,7 +116,7 @@ function parseArgs(argv: string[]): CliOptions {
       case "--help":
       case "-h":
         printHelp();
-        process.exit(0);
+        return process.exit(0);
 
       default:
         throw new Error(`Unknown argument: ${argument}`);
@@ -183,43 +177,27 @@ function parseSelectedProducts(value: unknown): SelectedProduct[] {
       throw new Error(`Product at index ${productIndex} must be an object.`);
     }
 
-    const providerProductId = getRequiredString(
-      productValue.providerProductId,
-      `Product ${productIndex} providerProductId`,
-    );
+    const providerProductId = getRequiredString(productValue.providerProductId, `Product ${productIndex} providerProductId`);
 
-    const name = getRequiredString(
-      productValue.name,
-      `Product ${providerProductId} name`,
-    );
+    const name = getRequiredString(productValue.name, `Product ${providerProductId} name`);
 
     if (!Array.isArray(productValue.colors)) {
-      throw new Error(
-        `Product ${providerProductId} must contain a colors array.`,
-      );
+      throw new Error(`Product ${providerProductId} must contain a colors array.`);
     }
 
     const colors = productValue.colors.map((colorValue, colorIndex) => {
       if (!isRecord(colorValue)) {
-        throw new Error(
-          `Color ${colorIndex} on product ${providerProductId} must be an object.`,
-        );
+        throw new Error(`Color ${colorIndex} on product ${providerProductId} must be an object.`);
       }
 
-      const color = getRequiredString(
-        colorValue.color,
-        `Product ${providerProductId} color ${colorIndex} color`,
-      );
+      const color = getRequiredString(colorValue.color, `Product ${providerProductId} color ${colorIndex} color`);
 
-      const providerColor =
-        getOptionalString(colorValue.providerColor) ?? color;
+      const providerColor = getOptionalString(colorValue.providerColor) ?? color;
 
       return {
         color,
         providerColor,
-        colorKey:
-          getOptionalString(colorValue.colorKey) ??
-          normalizeColorKey(providerColor),
+        colorKey: getOptionalString(colorValue.colorKey) ?? normalizeColorKey(providerColor),
         colorHexValue: getOptionalString(colorValue.colorHexValue),
         swatchImageUrl: getOptionalString(colorValue.swatchImageUrl),
       };
@@ -233,9 +211,7 @@ function parseSelectedProducts(value: unknown): SelectedProduct[] {
   });
 }
 
-function classifyOccurrences(
-  products: SelectedProduct[],
-): ClassifiedOccurrence[] {
+function classifyOccurrences(products: SelectedProduct[]): ClassifiedOccurrence[] {
   return products.flatMap((product) =>
     product.colors.map((color) => ({
       providerProductId: product.providerProductId,
@@ -269,9 +245,7 @@ function classificationKey(classification: Classification): string {
   });
 }
 
-function buildClassificationVariations(
-  occurrences: ClassifiedOccurrence[],
-): ClassificationVariation[] {
+function buildClassificationVariations(occurrences: ClassifiedOccurrence[]): ClassificationVariation[] {
   const variations = new Map<string, ClassificationVariation>();
 
   for (const occurrence of occurrences) {
@@ -292,15 +266,11 @@ function buildClassificationVariations(
     (first, second) =>
       second.count - first.count ||
       second.classification.confidence - first.classification.confidence ||
-      first.classification.primary.category.localeCompare(
-        second.classification.primary.category,
-      ),
+      first.classification.primary.category.localeCompare(second.classification.primary.category),
   );
 }
 
-function summarizeClassifications(
-  occurrences: ClassifiedOccurrence[],
-): ClassifiedColorSummary[] {
+function summarizeClassifications(occurrences: ClassifiedOccurrence[]): ClassifiedColorSummary[] {
   const groups = new Map<string, ClassifiedOccurrence[]>();
 
   for (const occurrence of occurrences) {
@@ -312,28 +282,18 @@ function summarizeClassifications(
   const summaries: ClassifiedColorSummary[] = [];
 
   for (const [normalizedProviderColor, colorOccurrences] of groups) {
-    const providerColors = [
-      ...new Set(colorOccurrences.map((item) => item.providerColor)),
-    ].sort((a, b) => a.localeCompare(b));
+    const providerColors = [...new Set(colorOccurrences.map((item) => item.providerColor))].sort((a, b) => a.localeCompare(b));
 
     const variations = buildClassificationVariations(colorOccurrences);
     const representativeClassification = variations[0]?.classification;
 
     if (!representativeClassification) {
-      throw new Error(
-        `No classification was produced for ${normalizedProviderColor}.`,
-      );
+      throw new Error(`No classification was produced for ${normalizedProviderColor}.`);
     }
 
     const classificationIsConsistent = variations.length === 1;
 
-    const reviewReasons = [
-      ...new Set(
-        colorOccurrences.flatMap(
-          (item) => item.classification.reviewReasons,
-        ),
-      ),
-    ];
+    const reviewReasons = [...new Set(colorOccurrences.flatMap((item) => item.classification.reviewReasons))];
 
     if (!classificationIsConsistent) {
       reviewReasons.push("inconsistent-classification");
@@ -342,38 +302,23 @@ function summarizeClassifications(
     summaries.push({
       providerColor: providerColors[0],
       normalizedProviderColor,
-      displayColors: [
-        ...new Set(colorOccurrences.map((item) => item.color)),
-      ].sort((a, b) => a.localeCompare(b)),
-      colorKeys: [
-        ...new Set(colorOccurrences.map((item) => item.colorKey)),
-      ].sort((a, b) => a.localeCompare(b)),
-      productCount: new Set(
-        colorOccurrences.map((item) => item.providerProductId),
-      ).size,
+      displayColors: [...new Set(colorOccurrences.map((item) => item.color))].sort((a, b) => a.localeCompare(b)),
+      colorKeys: [...new Set(colorOccurrences.map((item) => item.colorKey))].sort((a, b) => a.localeCompare(b)),
+      productCount: new Set(colorOccurrences.map((item) => item.providerProductId)).size,
       occurrenceCount: colorOccurrences.length,
-      suppliedHexValues: [
-        ...new Set(
-          colorOccurrences.flatMap((item) =>
-            item.colorHexValue ? [item.colorHexValue] : [],
-          ),
-        ),
-      ].sort((a, b) => a.localeCompare(b)),
+      suppliedHexValues: [...new Set(colorOccurrences.flatMap((item) => (item.colorHexValue ? [item.colorHexValue] : [])))].sort((a, b) =>
+        a.localeCompare(b),
+      ),
       swatchCount: colorOccurrences.filter((item) => item.swatchImageUrl).length,
       representativeClassification,
       classificationVariations: variations,
       classificationIsConsistent,
-      needsReview:
-        !classificationIsConsistent ||
-        colorOccurrences.some((item) => item.classification.needsReview),
-      reviewReasons: [...new Set(reviewReasons)].sort((a, b) =>
-        a.localeCompare(b),
-      ),
+      needsReview: !classificationIsConsistent || colorOccurrences.some((item) => item.classification.needsReview),
+      reviewReasons: [...new Set(reviewReasons)].sort((a, b) => a.localeCompare(b)),
       exampleProducts: colorOccurrences
         .sort(
           (first, second) =>
-            first.productName.localeCompare(second.productName) ||
-            first.providerProductId.localeCompare(second.providerProductId),
+            first.productName.localeCompare(second.productName) || first.providerProductId.localeCompare(second.providerProductId),
         )
         .slice(0, 10)
         .map((item) => ({
@@ -388,9 +333,7 @@ function summarizeClassifications(
   }
 
   return summaries.sort(
-    (first, second) =>
-      second.productCount - first.productCount ||
-      first.providerColor.localeCompare(second.providerColor),
+    (first, second) => second.productCount - first.productCount || first.providerColor.localeCompare(second.providerColor),
   );
 }
 
@@ -403,8 +346,7 @@ function countValues(values: string[]): Record<string, number> {
 
   return Object.fromEntries(
     [...counts.entries()].sort(
-      ([firstValue, firstCount], [secondValue, secondCount]) =>
-        secondCount - firstCount || firstValue.localeCompare(secondValue),
+      ([firstValue, firstCount], [secondValue, secondCount]) => secondCount - firstCount || firstValue.localeCompare(secondValue),
     ),
   );
 }
@@ -420,10 +362,7 @@ function escapeCsvValue(value: unknown): string {
 }
 
 function toCsv(headers: string[], rows: unknown[][]): string {
-  return [
-    headers.map(escapeCsvValue).join(","),
-    ...rows.map((row) => row.map(escapeCsvValue).join(",")),
-  ].join("\n");
+  return [headers.map(escapeCsvValue).join(","), ...rows.map((row) => row.map(escapeCsvValue).join(","))].join("\n");
 }
 
 async function writeOutputs(
@@ -443,31 +382,15 @@ async function writeOutputs(
       uniqueNormalizedSupplierColors: summaries.length,
     },
     results: {
-      classifiedWithoutReview: summaries.filter((color) => !color.needsReview)
-        .length,
+      classifiedWithoutReview: summaries.filter((color) => !color.needsReview).length,
       needsReview: summaries.filter((color) => color.needsReview).length,
-      inconsistentClassifications: summaries.filter(
-        (color) => !color.classificationIsConsistent,
-      ).length,
-      unknownPrimaryCategories: summaries.filter(
-        (color) =>
-          color.representativeClassification.primary.category === "unknown",
-      ).length,
+      inconsistentClassifications: summaries.filter((color) => !color.classificationIsConsistent).length,
+      unknownPrimaryCategories: summaries.filter((color) => color.representativeClassification.primary.category === "unknown").length,
     },
-    primaryCategoryCounts: countValues(
-      summaries.map(
-        (color) => color.representativeClassification.primary.category,
-      ),
-    ),
-    sourceCounts: countValues(
-      summaries.map((color) => color.representativeClassification.source),
-    ),
-    patternCounts: countValues(
-      summaries.map((color) => color.representativeClassification.pattern),
-    ),
-    compositionCounts: countValues(
-      summaries.map((color) => color.representativeClassification.composition),
-    ),
+    primaryCategoryCounts: countValues(summaries.map((color) => color.representativeClassification.primary.category)),
+    sourceCounts: countValues(summaries.map((color) => color.representativeClassification.source)),
+    patternCounts: countValues(summaries.map((color) => color.representativeClassification.pattern)),
+    compositionCounts: countValues(summaries.map((color) => color.representativeClassification.composition)),
   };
 
   const csvRows = summaries.map((color) => {
@@ -487,9 +410,7 @@ async function writeOutputs(
       classification.primary.hexValue ?? "",
       classification.accents.map((accent) => accent.family).join(" | "),
       classification.accents.map((accent) => accent.category).join(" | "),
-      classification.accents
-        .map((accent) => accent.hexValue ?? "")
-        .join(" | "),
+      classification.accents.map((accent) => accent.hexValue ?? "").join(" | "),
       classification.tone,
       classification.pattern,
       classification.composition,
@@ -499,12 +420,7 @@ async function writeOutputs(
       color.classificationVariations.length,
       color.needsReview,
       color.reviewReasons.join(" | "),
-      color.exampleProducts
-        .map(
-          (product) =>
-            `${product.productName} (${product.providerProductId})`,
-        )
-        .join(" | "),
+      color.exampleProducts.map((product) => `${product.productName} (${product.providerProductId})`).join(" | "),
     ];
   });
 
@@ -566,22 +482,15 @@ async function main(): Promise<void> {
   await writeOutputs(options, products, occurrences, summaries);
 
   const needsReviewCount = summaries.filter((color) => color.needsReview).length;
-  const unknownCount = summaries.filter(
-    (color) =>
-      color.representativeClassification.primary.category === "unknown",
-  ).length;
+  const unknownCount = summaries.filter((color) => color.representativeClassification.primary.category === "unknown").length;
 
-  console.log(
-    `Classified ${summaries.length.toLocaleString()} unique supplier colors.`,
-  );
+  console.log(`Classified ${summaries.length.toLocaleString()} unique supplier colors.`);
   console.log(`${needsReviewCount.toLocaleString()} colors still need review.`);
-  console.log(
-    `${unknownCount.toLocaleString()} colors have an unknown primary category.`,
-  );
+  console.log(`${unknownCount.toLocaleString()} colors have an unknown primary category.`);
   console.log(`Output directory: ${options.outputDir}`);
 }
 
 main().catch((error) => {
-  console.error(error instanceof Error ? error.stack ?? error.message : error);
+  console.error(error instanceof Error ? (error.stack ?? error.message) : error);
   process.exitCode = 1;
 });

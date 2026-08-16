@@ -12,11 +12,7 @@ interface FavoriteStoresProps {
   onViewAll?: () => void;
 }
 
-export default function FavoriteStores({
-  stores,
-  onBrowseStores,
-  onViewAll,
-}: FavoriteStoresProps) {
+export default function FavoriteStores({ stores, onBrowseStores, onViewAll }: FavoriteStoresProps) {
   const hasStores = stores.length > 0;
 
   return (

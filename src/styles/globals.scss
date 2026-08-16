@@ -5,21 +5,21 @@
 *,
 *::before,
 *::after {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 html {
-    font-size: 16px;
-    scroll-behavior: smooth;
-    color-scheme: light;
-    -webkit-text-size-adjust: 100%;
+  font-size: 16px;
+  scroll-behavior: smooth;
+  color-scheme: light;
+  -webkit-text-size-adjust: 100%;
 }
 
 html,
 body,
 #root {
-    margin: 0;
-    min-height: 100%;
+  margin: 0;
+  min-height: 100%;
 }
 
 // ======================================================
@@ -27,25 +27,25 @@ body,
 // ======================================================
 
 body {
-    background: $page-background;
-    color: $text-primary;
-    font-family: $font-body;
-    font-size: 1rem;
-    font-weight: $font-regular;
-    line-height: $line-height-body;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+  background: $page-background;
+  color: $text-primary;
+  font-family: $font-body;
+  font-size: 1rem;
+  font-weight: $font-regular;
+  line-height: $line-height-body;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 ::selection {
-    background: rgba($brand-red, 0.2);
-    color: $text-primary;
+  background: rgba($brand-red, 0.2);
+  color: $text-primary;
 }
 
 :focus-visible {
-    outline: 2px solid $brand-red;
-    outline-offset: 2px;
+  outline: 2px solid $brand-red;
+  outline-offset: 2px;
 }
 
 // ======================================================
@@ -53,31 +53,31 @@ body {
 // ======================================================
 
 a {
-    color: inherit;
-    text-decoration: none;
+  color: inherit;
+  text-decoration: none;
 }
 
 button,
 input,
 textarea,
 select {
-    font: inherit;
+  font: inherit;
 }
 
 button {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 img {
-    display: block;
-    max-width: 100%;
+  display: block;
+  max-width: 100%;
 }
 
 ul,
 ol {
-    margin: 0;
-    padding: 0;
-    list-style: none;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 h1,
@@ -87,7 +87,7 @@ h4,
 h5,
 h6,
 p {
-    margin: 0;
+  margin: 0;
 }
 
 // ======================================================
@@ -95,13 +95,13 @@ p {
 // ======================================================
 
 .app-shell {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 .app-main {
-    flex: 1;
+  flex: 1;
 }
 
 // ======================================================
@@ -109,41 +109,41 @@ p {
 // ======================================================
 
 @font-face {
-    font-family: "HeadCapitalBoldGrunge";
-    src: url("/fonts/HeadCapitalBoldGrunge.otf") format("opentype");
-    font-weight: 700;
-    font-style: normal;
-    font-display: swap;
+  font-family: "HeadCapitalBoldGrunge";
+  src: url("/fonts/HeadCapitalBoldGrunge.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: "College";
-    src: url("/fonts/COLLEGE.TTF") format("truetype");
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
+  font-family: "College";
+  src: url("/fonts/COLLEGE.TTF") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: "BrushScriptBT-Regular";
-    src: url("/fonts/BrushScriptBT.ttf") format("truetype");
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
+  font-family: "BrushScriptBT-Regular";
+  src: url("/fonts/BrushScriptBT.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: "PhoenixScriptFLF";
-    src: url("/fonts/PhoenixScriptFLF.ttf") format("truetype");
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
+  font-family: "PhoenixScriptFLF";
+  src: url("/fonts/PhoenixScriptFLF.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: "StahlsVarsityPlus";
-    src: url("/fonts/StahlsVarsityPlus.ttf") format("truetype");
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
+  font-family: "StahlsVarsityPlus";
+  src: url("/fonts/StahlsVarsityPlus.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }

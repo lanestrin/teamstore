@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 
 import { useCreateStore } from "./context/CreateStoreContext";
 
-import ColorsStep from "./feature/1_ColorStep/ColorsStep";
-import ColorsStepSkeleton from "./feature/1_ColorStep/ColorsStepSkeleton";
-import OrganizationStep from "./feature/2_OraganizationStep/OrganizationStep";
-import SelectArtworkStep from "./feature/3_ArtworkStep/ArtworkStep";
-import SelectProductStep from "./feature/4_ProductsStep/ProductsStep";
+import ColorsStep from "./steps/1_ColorStep/ColorsStep";
+import ColorsStepSkeleton from "./steps/1_ColorStep/ColorsStepSkeleton";
+import OrganizationStep from "./steps/2_OraganizationStep/OrganizationStep";
+import SelectArtworkStep from "./steps/3_ArtworkStep/ArtworkStep";
+import SelectProductStep from "./steps/4_ProductsStep/ProductsStep";
 
 export default function CreateStorePage() {
   const [isLoading, setIsLoading] = useState(true);

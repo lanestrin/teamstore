@@ -2,85 +2,85 @@
 @use "../../../../styles/mixins" as *;
 
 .details {
-    width: 100%;
+  width: 100%;
 }
 
 .accordionGroup {
-    @include flex-column;
-    border-top: 1px solid $border-light;
+  @include flex-column;
+  border-top: 1px solid $border-light;
 }
 
 .accordion {
-    border-bottom: 1px solid $border-light;
+  border-bottom: 1px solid $border-light;
 }
 
 .accordionHeader {
-    @include flex-between;
-    width: 100%;
-    padding: $space-5 0;
-    background: transparent;
-    border: 0;
-    color: $text-primary;
-    font: inherit;
-    text-align: left;
-    cursor: pointer;
-    transition: color $transition-base;
+  @include flex-between;
+  width: 100%;
+  padding: $space-5 0;
+  background: transparent;
+  border: 0;
+  color: $text-primary;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: color $transition-base;
 
-    span {
-        font-size: 1rem;
-        font-weight: $font-bold;
-    }
+  span {
+    font-size: 1rem;
+    font-weight: $font-bold;
+  }
 
-    svg {
-        flex-shrink: 0;
-        font-size: 1.1rem;
-        transition: transform $transition-base;
-    }
+  svg {
+    flex-shrink: 0;
+    font-size: 1.1rem;
+    transition: transform $transition-base;
+  }
 
-    &:hover {
-        color: $brand-red;
-    }
+  &:hover {
+    color: $brand-red;
+  }
 }
 
 .rotate {
-    transform: rotate(180deg);
+  transform: rotate(180deg);
 }
 
 .accordionContent {
-    padding-bottom: $space-6;
+  padding-bottom: $space-6;
 
-    p {
-        margin: 0 0 $space-4;
-        color: $text-secondary;
-        line-height: 1.7;
-    }
+  p {
+    margin: 0 0 $space-4;
+    color: $text-secondary;
+    line-height: 1.7;
+  }
 
-    ul {
+  ul {
     display: grid;
     gap: $space-3;
     margin: 0;
     padding-left: $space-5;
-    }
+  }
 
-    li {
-        color: $text-secondary;
-        line-height: 1.7;
-    }
+  li {
+    color: $text-secondary;
+    line-height: 1.7;
+  }
 }
 
 @media (max-width: 768px) {
-    .accordionHeader {
-        padding: $space-4 0;
+  .accordionHeader {
+    padding: $space-4 0;
 
-        span {
-            font-size: 0.95rem;
-        }
+    span {
+      font-size: 0.95rem;
     }
+  }
 
-    .accordionContent {
-        p,
-        li {
-            font-size: 0.95rem;
-        }
+  .accordionContent {
+    p,
+    li {
+      font-size: 0.95rem;
     }
+  }
 }

@@ -1,12 +1,7 @@
 import { ConvexError, v } from "convex/values";
 
 import type { Doc, Id } from "./_generated/dataModel";
-import {
-  internalQuery,
-  mutation,
-  query,
-  type QueryCtx,
-} from "./_generated/server";
+import { internalQuery, mutation, query, type QueryCtx } from "./_generated/server";
 import { requirePlatformAdmin } from "./lib/authz";
 
 type CatalogReadCtx = {
@@ -49,21 +44,13 @@ function normalizeSlug(value: string) {
   return slug;
 }
 
-function normalizeProviderIdentity(
-  provider?: string,
-  providerProductId?: string,
-) {
+function normalizeProviderIdentity(provider?: string, providerProductId?: string) {
   const normalizedProvider = normalizeOptionalText(provider)?.toLowerCase();
 
   const normalizedProviderProductId = normalizeOptionalText(providerProductId);
 
-  if (
-    (normalizedProvider && !normalizedProviderProductId) ||
-    (!normalizedProvider && normalizedProviderProductId)
-  ) {
-    throw new ConvexError(
-      "Provider and provider product ID must be supplied together.",
-    );
+  if ((normalizedProvider && !normalizedProviderProductId) || (!normalizedProvider && normalizedProviderProductId)) {
+    throw new ConvexError("Provider and provider product ID must be supplied together.");
   }
 
   return {
@@ -73,17 +60,11 @@ function normalizeProviderIdentity(
 }
 
 function summarizeVariants(variants: Doc<"productVariants">[]) {
-  const activeVariants = variants.filter(
-    (variant) => variant.status === "active",
-  );
+  const activeVariants = variants.filter((variant) => variant.status === "active");
 
-  const purchasableVariants = activeVariants.filter(
-    (variant) => variant.availability === "available",
-  );
+  const purchasableVariants = activeVariants.filter((variant) => variant.availability === "available");
 
-  const prices = purchasableVariants.map(
-    (variant) => variant.directPriceInCents,
-  );
+  const prices = purchasableVariants.map((variant) => variant.directPriceInCents);
 
   return {
     minPriceInCents: prices.length > 0 ? Math.min(...prices) : null,
@@ -94,48 +75,29 @@ function summarizeVariants(variants: Doc<"productVariants">[]) {
 
     availableVariantCount: purchasableVariants.length,
 
-    availableColors: [
-      ...new Set(purchasableVariants.map((variant) => variant.color)),
-    ],
+    availableColors: [...new Set(purchasableVariants.map((variant) => variant.color))],
 
-    availableSizes: [
-      ...new Set(purchasableVariants.map((variant) => variant.size)),
-    ],
+    availableSizes: [...new Set(purchasableVariants.map((variant) => variant.size))],
   };
 }
 
-async function getVariantsForProduct(
-  ctx: CatalogReadCtx,
-  productId: Id<"products">,
-) {
+async function getVariantsForProduct(ctx: CatalogReadCtx, productId: Id<"products">) {
   return await ctx.db
     .query("productVariants")
     .withIndex("by_product", (q) => q.eq("productId", productId))
     .collect();
 }
 
-async function getProductColorsForProduct(
-  ctx: CatalogReadCtx,
-  productId: Id<"products">,
-) {
+async function getProductColorsForProduct(ctx: CatalogReadCtx, productId: Id<"products">) {
   return await ctx.db
     .query("productColors")
     .withIndex("by_product", (q) => q.eq("productId", productId))
     .collect();
 }
 
-function getAvailableColorFamilies(
-  variants: Doc<"productVariants">[],
-  productColors: Doc<"productColors">[],
-) {
+function getAvailableColorFamilies(variants: Doc<"productVariants">[], productColors: Doc<"productColors">[]) {
   const purchasableColorKeys = new Set(
-    variants
-      .filter(
-        (variant) =>
-          variant.status === "active" &&
-          variant.availability === "available",
-      )
-      .map((variant) => variant.colorKey),
+    variants.filter((variant) => variant.status === "active" && variant.availability === "available").map((variant) => variant.colorKey),
   );
 
   const families = new Set<Doc<"productColors">["primaryFamily"]>();
@@ -145,10 +107,7 @@ function getAvailableColorFamilies(
       continue;
     }
 
-    const classifiedFamilies = [
-      productColor.primaryFamily,
-      ...productColor.accents.map((accent) => accent.family),
-    ];
+    const classifiedFamilies = [productColor.primaryFamily, ...productColor.accents.map((accent) => accent.family)];
 
     for (const family of classifiedFamilies) {
       if (family !== "unknown") {
@@ -160,27 +119,16 @@ function getAvailableColorFamilies(
   return [...families];
 }
 
-async function getProductImagesForProduct(
-  ctx: CatalogReadCtx,
-  productId: Id<"products">,
-) {
+async function getProductImagesForProduct(ctx: CatalogReadCtx, productId: Id<"products">) {
   const images = await ctx.db
     .query("productImages")
     .withIndex("by_product", (q) => q.eq("productId", productId))
     .collect();
 
-  return images.sort(
-    (a, b) =>
-      a.sortOrder - b.sortOrder ||
-      a.color.localeCompare(b.color) ||
-      a._creationTime - b._creationTime,
-  );
+  return images.sort((a, b) => a.sortOrder - b.sortOrder || a.color.localeCompare(b.color) || a._creationTime - b._creationTime);
 }
 
-async function getProductImageUrl(
-  ctx: CatalogReadCtx,
-  image: Doc<"productImages">,
-) {
+async function getProductImageUrl(ctx: CatalogReadCtx, image: Doc<"productImages">) {
   if (image.imageStorageId) {
     const storageUrl = await ctx.storage.getUrl(image.imageStorageId);
 
@@ -192,10 +140,7 @@ async function getProductImageUrl(
   return image.externalImageUrl ?? null;
 }
 
-async function getResolvedProductImages(
-  ctx: CatalogReadCtx,
-  productId: Id<"products">,
-): Promise<ResolvedProductImage[]> {
+async function getResolvedProductImages(ctx: CatalogReadCtx, productId: Id<"products">): Promise<ResolvedProductImage[]> {
   const images = await getProductImagesForProduct(ctx, productId);
 
   const resolvedImages = await Promise.all(
@@ -216,14 +161,8 @@ async function getResolvedProductImages(
   return resolvedImages.flatMap((image) => (image ? [image] : []));
 }
 
-function buildProductColorOptions(
-  variants: Doc<"productVariants">[],
-  productImages: ResolvedProductImage[],
-) {
-  const purchasableVariants = variants.filter(
-    (variant) =>
-      variant.status === "active" && variant.availability === "available",
-  );
+function buildProductColorOptions(variants: Doc<"productVariants">[], productImages: ResolvedProductImage[]) {
+  const purchasableVariants = variants.filter((variant) => variant.status === "active" && variant.availability === "available");
 
   const colorNames = new Map<string, string>();
 
@@ -238,9 +177,7 @@ function buildProductColorOptions(
   }
 
   return [...colorNames.entries()].map(([colorKey, color]) => {
-    const colorVariants = purchasableVariants.filter(
-      (variant) => variant.colorKey === colorKey,
-    );
+    const colorVariants = purchasableVariants.filter((variant) => variant.colorKey === colorKey);
 
     const images = productImages
       .filter((image) => image.colorKey === colorKey)
@@ -283,11 +220,7 @@ function buildProductCardColorOptions(
   productColors: Doc<"productColors">[],
   preferredImageView: ProductCardPreferredImageView,
 ) {
-  const purchasableVariants = variants.filter(
-    (variant) =>
-      variant.status === "active" &&
-      variant.availability === "available",
-  );
+  const purchasableVariants = variants.filter((variant) => variant.status === "active" && variant.availability === "available");
 
   const colorNames = new Map<string, string>();
 
@@ -301,14 +234,11 @@ function buildProductCardColorOptions(
     colorNames.set(variant.colorKey, color);
   }
 
-  const fallbackImageView =
-    preferredImageView === "front" ? "leftQuarter" : "front";
+  const fallbackImageView = preferredImageView === "front" ? "leftQuarter" : "front";
 
   return [...colorNames.entries()]
     .flatMap(([colorKey, color]) => {
-      const colorImages = productImages.filter(
-        (image) => image.colorKey === colorKey,
-      );
+      const colorImages = productImages.filter((image) => image.colorKey === colorKey);
 
       const previewImage =
         colorImages.find((image) => image.view === preferredImageView) ??
@@ -319,17 +249,12 @@ function buildProductCardColorOptions(
         return [];
       }
 
-      const productColor = productColors.find(
-        (candidate) => candidate.colorKey === colorKey,
-      );
+      const productColor = productColors.find((candidate) => candidate.colorKey === colorKey);
 
       const colorFamilies = productColor
-        ? [
-            ...new Set([
-              productColor.primaryFamily,
-              ...productColor.accents.map((accent) => accent.family),
-            ]),
-          ].filter((family) => family !== "unknown")
+        ? [...new Set([productColor.primaryFamily, ...productColor.accents.map((accent) => accent.family)])].filter(
+            (family) => family !== "unknown",
+          )
         : [];
 
       return [
@@ -353,8 +278,7 @@ function buildProductCardColorOptions(
           composition: productColor?.composition ?? "unknown",
 
           classificationSource: productColor?.classificationSource,
-          classificationConfidence:
-            productColor?.classificationConfidence ?? 0,
+          classificationConfidence: productColor?.classificationConfidence ?? 0,
           needsReview: productColor?.needsReview ?? true,
           reviewReasons: productColor?.reviewReasons ?? [],
         },
@@ -379,17 +303,9 @@ async function decorateProductCard(
 
     imageUrls: [...new Set(images.map((image) => image.imageUrl))],
 
-    colorOptions: buildProductCardColorOptions(
-      variants,
-      images,
-      productColors,
-      preferredImageView,
-    ),
+    colorOptions: buildProductCardColorOptions(variants, images, productColors, preferredImageView),
 
-    availableColorFamilies: getAvailableColorFamilies(
-      variants,
-      productColors,
-    ),
+    availableColorFamilies: getAvailableColorFamilies(variants, productColors),
 
     ...summarizeVariants(variants),
   };
@@ -407,9 +323,7 @@ export const listActive = query({
     const products = category
       ? await ctx.db
           .query("products")
-          .withIndex("by_status_category", (q) =>
-            q.eq("status", "active").eq("category", category),
-          )
+          .withIndex("by_status_category", (q) => q.eq("status", "active").eq("category", category))
           .order("desc")
           .collect()
       : await ctx.db
@@ -418,14 +332,9 @@ export const listActive = query({
           .order("desc")
           .collect();
 
-    const decoratedProducts = await Promise.all(
-      products.map((product) => decorateProductCard(ctx, product)),
-    );
+    const decoratedProducts = await Promise.all(products.map((product) => decorateProductCard(ctx, product)));
 
-    return decoratedProducts.filter(
-      (product) =>
-        product.imageUrls.length > 0 && product.availableVariantCount > 0,
-    );
+    return decoratedProducts.filter((product) => product.imageUrls.length > 0 && product.availableVariantCount > 0);
   },
 });
 
@@ -440,25 +349,12 @@ export const listProductOptionsByProviderIds = query({
   },
 
   handler: async (ctx, args) => {
-    const provider = normalizeRequiredText(
-      args.provider,
-      "Provider",
-    ).toLowerCase();
+    const provider = normalizeRequiredText(args.provider, "Provider").toLowerCase();
 
-    const providerProductIds = [
-      ...new Set(
-        args.providerProductIds
-          .map((providerProductId) =>
-            providerProductId.trim(),
-          )
-          .filter(Boolean),
-      ),
-    ];
+    const providerProductIds = [...new Set(args.providerProductIds.map((providerProductId) => providerProductId.trim()).filter(Boolean))];
 
     if (providerProductIds.length > 50) {
-      throw new ConvexError(
-        "A maximum of 50 products can be requested at once.",
-      );
+      throw new ConvexError("A maximum of 50 products can be requested at once.");
     }
 
     const products = await Promise.all(
@@ -466,34 +362,16 @@ export const listProductOptionsByProviderIds = query({
         async (providerProductId) =>
           await ctx.db
             .query("products")
-            .withIndex("by_provider_product", (q) =>
-              q
-                .eq("provider", provider)
-                .eq(
-                  "providerProductId",
-                  providerProductId,
-                ),
-            )
+            .withIndex("by_provider_product", (q) => q.eq("provider", provider).eq("providerProductId", providerProductId))
             .unique(),
       ),
     );
 
-    const activeProducts = products.flatMap(
-      (product) =>
-        product?.status === "active" ? [product] : [],
-    );
+    const activeProducts = products.flatMap((product) => (product?.status === "active" ? [product] : []));
 
-    const decoratedProducts = await Promise.all(
-      activeProducts.map((product) =>
-        decorateProductCard(ctx, product, "front"),
-      ),
-    );
+    const decoratedProducts = await Promise.all(activeProducts.map((product) => decorateProductCard(ctx, product, "front")));
 
-    return decoratedProducts.filter(
-      (product) =>
-        product.imageUrls.length > 0 &&
-        product.availableVariantCount > 0,
-    );
+    return decoratedProducts.filter((product) => product.imageUrls.length > 0 && product.availableVariantCount > 0);
   },
 });
 
@@ -512,16 +390,9 @@ export const listTrending = query({
       .order("desc")
       .collect();
 
-    const decoratedProducts = await Promise.all(
-      products.map((product) => decorateProductCard(ctx, product)),
-    );
+    const decoratedProducts = await Promise.all(products.map((product) => decorateProductCard(ctx, product)));
 
-    return decoratedProducts
-      .filter(
-        (product) =>
-          product.imageUrls.length > 0 && product.availableVariantCount > 0,
-      )
-      .slice(0, limit);
+    return decoratedProducts.filter((product) => product.imageUrls.length > 0 && product.availableVariantCount > 0).slice(0, limit);
   },
 });
 
@@ -544,9 +415,7 @@ export const getActiveBySlug = query({
     const [variants, images] = await Promise.all([
       ctx.db
         .query("productVariants")
-        .withIndex("by_product_status", (q) =>
-          q.eq("productId", product._id).eq("status", "active"),
-        )
+        .withIndex("by_product_status", (q) => q.eq("productId", product._id).eq("status", "active"))
         .collect(),
 
       getResolvedProductImages(ctx, product._id),
@@ -558,16 +427,9 @@ export const getActiveBySlug = query({
 
     const imageUrls = [...new Set(images.map((image) => image.imageUrl))];
 
-    const hasColorWithoutImages = colors.some(
-      (color) => color.images.length === 0,
-    );
+    const hasColorWithoutImages = colors.some((color) => color.images.length === 0);
 
-    if (
-      imageUrls.length === 0 ||
-      summary.availableVariantCount === 0 ||
-      colors.length === 0 ||
-      hasColorWithoutImages
-    ) {
+    if (imageUrls.length === 0 || summary.availableVariantCount === 0 || colors.length === 0 || hasColorWithoutImages) {
       return null;
     }
 
@@ -589,9 +451,7 @@ export const listForManagement = query({
 
     const products = await ctx.db.query("products").order("desc").collect();
 
-    return await Promise.all(
-      products.map((product) => decorateProductCard(ctx, product)),
-    );
+    return await Promise.all(products.map((product) => decorateProductCard(ctx, product)));
   },
 });
 
@@ -610,11 +470,7 @@ export const getForManagement = query({
       return null;
     }
 
-    const [variants, images] = await Promise.all([
-      getVariantsForProduct(ctx, product._id),
-
-      getResolvedProductImages(ctx, product._id),
-    ]);
+    const [variants, images] = await Promise.all([getVariantsForProduct(ctx, product._id), getResolvedProductImages(ctx, product._id)]);
 
     return {
       ...product,
@@ -647,10 +503,7 @@ export const create = mutation({
 
     const slug = normalizeSlug(args.slug ?? name);
 
-    const providerIdentity = normalizeProviderIdentity(
-      args.provider,
-      args.providerProductId,
-    );
+    const providerIdentity = normalizeProviderIdentity(args.provider, args.providerProductId);
 
     const existingSlug = await ctx.db
       .query("products")
@@ -665,16 +518,12 @@ export const create = mutation({
       const existingProviderProduct = await ctx.db
         .query("products")
         .withIndex("by_provider_product", (q) =>
-          q
-            .eq("provider", providerIdentity.provider)
-            .eq("providerProductId", providerIdentity.providerProductId),
+          q.eq("provider", providerIdentity.provider).eq("providerProductId", providerIdentity.providerProductId),
         )
         .unique();
 
       if (existingProviderProduct) {
-        throw new ConvexError(
-          "This provider product has already been imported.",
-        );
+        throw new ConvexError("This provider product has already been imported.");
       }
     }
 
@@ -711,13 +560,9 @@ export const update = mutation({
       throw new ConvexError("Product not found.");
     }
 
-    const nextName =
-      args.name !== undefined
-        ? normalizeRequiredText(args.name, "Product name")
-        : undefined;
+    const nextName = args.name !== undefined ? normalizeRequiredText(args.name, "Product name") : undefined;
 
-    const nextSlug =
-      args.slug !== undefined ? normalizeSlug(args.slug) : undefined;
+    const nextSlug = args.slug !== undefined ? normalizeSlug(args.slug) : undefined;
 
     if (nextSlug && nextSlug !== product.slug) {
       const existingSlug = await ctx.db
@@ -737,10 +582,7 @@ export const update = mutation({
 
       ...(args.description !== undefined
         ? {
-            description:
-              args.description === null
-                ? undefined
-                : normalizeOptionalText(args.description),
+            description: args.description === null ? undefined : normalizeOptionalText(args.description),
           }
         : {}),
 
@@ -773,19 +615,13 @@ export const publish = mutation({
 
     const activeVariants = await ctx.db
       .query("productVariants")
-      .withIndex("by_product_status", (q) =>
-        q.eq("productId", product._id).eq("status", "active"),
-      )
+      .withIndex("by_product_status", (q) => q.eq("productId", product._id).eq("status", "active"))
       .collect();
 
-    const purchasableVariants = activeVariants.filter(
-      (variant) => variant.availability === "available",
-    );
+    const purchasableVariants = activeVariants.filter((variant) => variant.availability === "available");
 
     if (purchasableVariants.length === 0) {
-      throw new ConvexError(
-        "Add at least one active, available variant before publishing.",
-      );
+      throw new ConvexError("Add at least one active, available variant before publishing.");
     }
 
     const productImages = await getResolvedProductImages(ctx, product._id);
@@ -802,18 +638,12 @@ export const publish = mutation({
       purchasableColors.set(variant.colorKey, color);
     }
 
-    const colorsWithImages = new Set(
-      productImages.map((image) => image.colorKey),
-    );
+    const colorsWithImages = new Set(productImages.map((image) => image.colorKey));
 
-    const missingImageColor = [...purchasableColors.entries()].find(
-      ([colorKey]) => !colorsWithImages.has(colorKey),
-    );
+    const missingImageColor = [...purchasableColors.entries()].find(([colorKey]) => !colorsWithImages.has(colorKey));
 
     if (missingImageColor) {
-      throw new ConvexError(
-        `Add at least one product image for ${missingImageColor[1]} before publishing.`,
-      );
+      throw new ConvexError(`Add at least one product image for ${missingImageColor[1]} before publishing.`);
     }
 
     await ctx.db.patch(product._id, {

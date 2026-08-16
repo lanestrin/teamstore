@@ -1,67 +1,68 @@
-
 .userMenu {
-    position: relative;
+  position: relative;
 }
 
 .avatar {
-    @include flex-center;
-    width: 40px;
-    height: 40px;
-    background: $brand-red;
-    border: 0;
-    border-radius: $radius-round;
-    color: $text-inverse;
-    font-size: 0.875rem;
-    font-weight: $font-bold;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: background-color $transition-base, transform $transition-base;
+  @include flex-center;
+  width: 40px;
+  height: 40px;
+  background: $brand-red;
+  border: 0;
+  border-radius: $radius-round;
+  color: $text-inverse;
+  font-size: 0.875rem;
+  font-weight: $font-bold;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color $transition-base,
+    transform $transition-base;
 }
 
 .avatar:hover {
-    background: $brand-red-hover;
-    transform: translateY(-1px);
+  background: $brand-red-hover;
+  transform: translateY(-1px);
 }
 
 .dropdown {
-    position: absolute;
-    top: calc(100% + #{$space-3});
-    right: 0;
-    z-index: $z-dropdown;
-    width: 220px;
-    padding: $space-2;
-    background: $white;
-    border: 1px solid $border-light;
-    border-radius: $radius-lg;
-    box-shadow: $shadow-md;
+  position: absolute;
+  top: calc(100% + #{$space-3});
+  right: 0;
+  z-index: $z-dropdown;
+  width: 220px;
+  padding: $space-2;
+  background: $white;
+  border: 1px solid $border-light;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-md;
 }
 
 .dropdown a,
 .dropdown button {
-    display: flex;
-    align-items: center;
-    gap: $space-3;
-    width: 100%;
-    padding: $space-3 $space-4;
-    background: transparent;
-    border: 0;
-    border-radius: $radius-md;
-    color: $text-primary;
-    font-size: 0.9375rem;
-    font-weight: $font-medium;
-    text-align: left;
-    text-decoration: none;
-    cursor: pointer;
-    transition: background-color $transition-base;
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  width: 100%;
+  padding: $space-3 $space-4;
+  background: transparent;
+  border: 0;
+  border-radius: $radius-md;
+  color: $text-primary;
+  font-size: 0.9375rem;
+  font-weight: $font-medium;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color $transition-base;
 }
 
 .dropdown a:hover,
 .dropdown button:hover {
-    background: $gray-100;
+  background: $gray-100;
 }
 
 .dropdown svg {
-    flex-shrink: 0;
-    color: $text-secondary;
-    font-size: 1.125rem;
+  flex-shrink: 0;
+  color: $text-secondary;
+  font-size: 1.125rem;
 }

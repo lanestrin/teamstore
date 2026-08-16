@@ -1,73 +1,75 @@
 .emptyState {
-	@include flex-center;
-	flex: 1;
-	flex-direction: column;
-	padding: $space-8;
-	text-align: center;
+  @include flex-center;
+  flex: 1;
+  flex-direction: column;
+  padding: $space-8;
+  text-align: center;
 }
 
 .icon {
-	@include flex-center;
-	width: 72px;
-	height: 72px;
-	margin-bottom: $space-6;
-	border-radius: $radius-round;
-	background: $gray-100;
-	color: $brand-red;
-	transition: transform $transition-base, background $transition-base;
+  @include flex-center;
+  width: 72px;
+  height: 72px;
+  margin-bottom: $space-6;
+  border-radius: $radius-round;
+  background: $gray-100;
+  color: $brand-red;
+  transition:
+    transform $transition-base,
+    background $transition-base;
 
-	svg {
-		font-size: 2rem;
-	}
+  svg {
+    font-size: 2rem;
+  }
 }
 
 .content {
-	max-width: 360px;
+  max-width: 360px;
 }
 
 .content h3 {
-	margin-bottom: $space-3;
-	font-family: $font-heading;
-	font-size: 2rem;
-	font-weight: $font-semibold;
-	line-height: $line-height-heading;
-	letter-spacing: $letter-spacing-heading;
-	color: $text-primary;
+  margin-bottom: $space-3;
+  font-family: $font-heading;
+  font-size: 2rem;
+  font-weight: $font-semibold;
+  line-height: $line-height-heading;
+  letter-spacing: $letter-spacing-heading;
+  color: $text-primary;
 }
 
 .content p {
-	color: $text-secondary;
-	font-size: 1rem;
-	line-height: $line-height-body;
+  color: $text-secondary;
+  font-size: 1rem;
+  line-height: $line-height-body;
 }
 
 .action {
-	@include button-white;
-	margin-top: $space-6;
-	padding: 0.85rem 1.5rem;
-	font-weight: $font-semibold;
+  @include button-white;
+  margin-top: $space-6;
+  padding: 0.85rem 1.5rem;
+  font-weight: $font-semibold;
 }
 
 @media (max-width: 768px) {
-	.emptyState {
-		padding: $space-6;
-	}
+  .emptyState {
+    padding: $space-6;
+  }
 
-	.icon {
-		width: 64px;
-		height: 64px;
-		margin-bottom: $space-5;
+  .icon {
+    width: 64px;
+    height: 64px;
+    margin-bottom: $space-5;
 
-		svg {
-			font-size: 1.75rem;
-		}
-	}
+    svg {
+      font-size: 1.75rem;
+    }
+  }
 
-	.content {
-		max-width: 100%;
-	}
+  .content {
+    max-width: 100%;
+  }
 
-	.content h3 {
-		font-size: 1.6rem;
-	}
+  .content h3 {
+    font-size: 1.6rem;
+  }
 }

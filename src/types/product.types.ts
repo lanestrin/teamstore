@@ -1,8 +1,4 @@
-export type ProductCategory =
-  | "Required"
-  | "Fanwear"
-  | "Headwear"
-  | "Bags";
+export type ProductCategory = "Required" | "Fanwear" | "Headwear" | "Bags";
 
 export interface IProduct {
   id: number;

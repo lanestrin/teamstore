@@ -1,0 +1,328 @@
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: $space-6;
+
+  background: rgba(17, 24, 39, 0.62);
+}
+
+.productEditorModal {
+  display: flex;
+  flex-direction: column;
+
+  width: min(920px, 100%);
+  max-height: calc(100vh - 48px);
+
+  overflow: hidden;
+
+  background: $white;
+  border-radius: $radius-lg;
+
+  box-shadow: $shadow-md;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $space-4;
+
+  padding: $space-5 $space-6;
+
+  border-bottom: 1px solid $border-light;
+}
+
+.modalHeader h2 {
+  margin: 0;
+
+  font-size: 1.25rem;
+  font-weight: $font-semibold;
+  color: $text-primary;
+}
+
+.modalHeader p {
+  margin: $space-1 0 0;
+
+  font-size: 0.875rem;
+  color: $text-secondary;
+}
+
+.modalCloseButton {
+  @include button-base;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex: 0 0 auto;
+
+  width: 38px;
+  height: 38px;
+  padding: 0;
+
+  background: $white;
+  border: 1px solid $border-light;
+  border-radius: $radius-pill;
+
+  color: $text-primary;
+
+  cursor: pointer;
+
+  transition:
+    background-color $transition-base,
+    border-color $transition-base;
+}
+
+.modalCloseButton:hover {
+  background: $gray-100;
+  border-color: $gray-300;
+}
+
+.modalCloseButton svg {
+  width: 18px;
+  height: 18px;
+}
+
+.modalBody {
+  display: grid;
+  grid-template-columns:
+    minmax(260px, 0.8fr)
+    minmax(0, 1.2fr);
+  gap: $space-6;
+
+  padding: $space-6;
+
+  overflow-y: auto;
+}
+
+.modalProductPreview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 420px;
+  padding: $space-6;
+
+  background: $gray-50;
+  border: 1px solid $border-light;
+  border-radius: $radius-lg;
+}
+
+.modalProductPreview img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+  max-height: 380px;
+
+  object-fit: contain;
+}
+
+.colorEditor {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+}
+
+.colorEditorHeading h3 {
+  margin: 0;
+
+  font-size: 1rem;
+  font-weight: $font-semibold;
+  color: $text-primary;
+}
+
+.colorEditorHeading p {
+  margin: $space-1 0 0;
+
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: $text-secondary;
+}
+
+.colorGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: $space-3;
+}
+
+.colorOption {
+  @include button-base;
+
+  position: relative;
+
+  display: grid;
+  grid-template-columns:
+    58px
+    minmax(0, 1fr)
+    20px;
+  align-items: center;
+  gap: $space-3;
+
+  min-width: 0;
+  padding: $space-2;
+
+  background: $white;
+  border: 1px solid $border-light;
+  border-radius: $radius-md;
+
+  text-align: left;
+  color: $text-primary;
+
+  cursor: pointer;
+
+  transition:
+    background-color $transition-base,
+    border-color $transition-base,
+    box-shadow $transition-base;
+}
+
+.colorOption:hover {
+  background: $gray-50;
+  border-color: $gray-300;
+}
+
+.colorOptionSelected {
+  border-color: $text-primary;
+  box-shadow: 0 0 0 1px $text-primary;
+}
+
+.colorOption img {
+  display: block;
+
+  width: 58px;
+  height: 58px;
+
+  object-fit: contain;
+
+  background: $gray-50;
+  border-radius: $radius-sm;
+}
+
+.colorOption span {
+  min-width: 0;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  font-size: 0.8125rem;
+  font-weight: $font-medium;
+  white-space: nowrap;
+}
+
+.colorOption svg {
+  width: 17px;
+  height: 17px;
+
+  color: $text-primary;
+}
+
+.modalActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: $space-3;
+
+  padding: $space-4 $space-6;
+
+  border-top: 1px solid $border-light;
+}
+
+.modalCancelButton,
+.modalSaveButton {
+  @include button-base;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 40px;
+  padding: $space-2 $space-4;
+
+  border-radius: $radius-md;
+
+  font-size: 0.875rem;
+  font-weight: $font-semibold;
+
+  cursor: pointer;
+
+  transition:
+    background-color $transition-base,
+    border-color $transition-base,
+    opacity $transition-base;
+}
+
+.modalCancelButton {
+  background: $white;
+  border: 1px solid $border-light;
+  color: $text-primary;
+}
+
+.modalCancelButton:hover {
+  background: $gray-100;
+  border-color: $gray-300;
+}
+
+.modalSaveButton {
+  background: $text-primary;
+  border: 1px solid $text-primary;
+  color: $white;
+}
+
+.modalSaveButton:hover {
+  opacity: 0.9;
+}
+
+@media (max-width: 1100px) {
+  .modalBody {
+    grid-template-columns:
+      minmax(220px, 0.7fr)
+      minmax(0, 1.3fr);
+  }
+}
+
+@media (max-width: 760px) {
+  .modalBackdrop {
+    padding: $space-3;
+  }
+
+  .productEditorModal {
+    max-height: calc(100vh - 24px);
+  }
+
+  .modalBody {
+    grid-template-columns: 1fr;
+  }
+
+  .modalProductPreview {
+    min-height: 280px;
+  }
+
+  .colorGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .modalHeader,
+  .modalBody,
+  .modalActions {
+    padding-left: $space-4;
+    padding-right: $space-4;
+  }
+
+  .modalActions {
+    flex-direction: column-reverse;
+  }
+
+  .modalCancelButton,
+  .modalSaveButton {
+    width: 100%;
+  }
+}

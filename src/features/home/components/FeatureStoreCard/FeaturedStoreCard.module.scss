@@ -2,127 +2,132 @@
 @use "../../../../styles/mixins" as *;
 
 .card {
-    @include card;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 260px;
-    padding: $space-4;
-    overflow: hidden;
-    text-decoration: none;
-    background: linear-gradient( 180deg, $background-dark 0%, $background-dark-alt 100% );
-    transition: transform $transition-base, box-shadow $transition-base, border-color $transition-base;
+  @include card;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 260px;
+  padding: $space-4;
+  overflow: hidden;
+  text-decoration: none;
+  background: linear-gradient(180deg, $background-dark 0%, $background-dark-alt 100%);
+  transition:
+    transform $transition-base,
+    box-shadow $transition-base,
+    border-color $transition-base;
 }
 
 .card::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    right: 0;
-    left: 0;
-    height: 1px;
-    background: rgba(255, 255, 255, 0.1);
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .card:hover {
-    transform: translateY(-6px);
-    border-color: $border-medium;
-    box-shadow: $shadow-md;
+  transform: translateY(-6px);
+  border-color: $border-medium;
+  box-shadow: $shadow-md;
 }
 
 .logo {
-    @include flex-center;
-    width: 100%;
-    height: 150px;
-    margin-bottom: $space-5;
+  @include flex-center;
+  width: 100%;
+  height: 150px;
+  margin-bottom: $space-5;
 }
 
 .logoImage {
-    width: 90%;
-    height: 90%;
-    object-fit: contain;
-    filter: grayscale(100%) brightness(1.15) contrast(1.1);
-    transition: filter $transition-base, transform $transition-base;
+  width: 90%;
+  height: 90%;
+  object-fit: contain;
+  filter: grayscale(100%) brightness(1.15) contrast(1.1);
+  transition:
+    filter $transition-base,
+    transform $transition-base;
 }
 
 .card:hover .logoImage {
-    filter: none;
-    transform: scale(1.08);
+  filter: none;
+  transform: scale(1.08);
 }
 
 .card h3 {
-    margin: 0 0 $space-2;
-    color: $text-inverse;
-    font-family: "Barlow Condensed", sans-serif;
-    font-size: 1.6rem;
-    font-weight: $font-semibold;
-    text-align: center;
+  margin: 0 0 $space-2;
+  color: $text-inverse;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 1.6rem;
+  font-weight: $font-semibold;
+  text-align: center;
 }
 
 .card p {
-    margin: 0;
-    color: $text-muted;
-    font-size: 0.95rem;
-    text-align: center;
+  margin: 0;
+  color: $text-muted;
+  font-size: 0.95rem;
+  text-align: center;
 }
 
 @media (max-width: 768px) {
-    .card {
-        min-height: 180px;
-        padding: $space-4;
-    }
+  .card {
+    min-height: 180px;
+    padding: $space-4;
+  }
 
-    .card:hover,
-    .card:focus-visible,
-    .card:active {
-        transform: translateY(-4px);
-    }
+  .card:hover,
+  .card:focus-visible,
+  .card:active {
+    transform: translateY(-4px);
+  }
 
-    .card::after {
-        right: $space-4;
-        bottom: $space-4;
-    }
+  .card::after {
+    right: $space-4;
+    bottom: $space-4;
+  }
 
-    .logo {
-        width: 100%;
-        height: 96px;
-        margin-bottom: $space-3;
-    }
+  .logo {
+    width: 100%;
+    height: 96px;
+    margin-bottom: $space-3;
+  }
 
-    .logoImage {
-        width: 82%;
-        height: 82%;
-    }
+  .logoImage {
+    width: 82%;
+    height: 82%;
+  }
 
-    .card h3 {
-        font-size: 1.45rem;
-        text-align: center;
-    }
+  .card h3 {
+    font-size: 1.45rem;
+    text-align: center;
+  }
 
-    .card p {
-        font-size: 0.9rem;
-        text-align: center;
-    }
+  .card p {
+    font-size: 0.9rem;
+    text-align: center;
+  }
 }
 
 @media (max-width: 480px) {
-    .card {
-        min-height: 155px;
-        padding: $space-4;
-    }
+  .card {
+    min-height: 155px;
+    padding: $space-4;
+  }
 
-    .logo {
-        height: 82px;
-        margin-bottom: $space-1;
-    }
+  .logo {
+    height: 82px;
+    margin-bottom: $space-1;
+  }
 
-    .logoImage {
-        width: 80%;
-        height: 80%;
-    }
+  .logoImage {
+    width: 80%;
+    height: 80%;
+  }
 
-    .card h3 {
-        font-size: 1.35rem;
-    }
+  .card h3 {
+    font-size: 1.35rem;
+  }
 }

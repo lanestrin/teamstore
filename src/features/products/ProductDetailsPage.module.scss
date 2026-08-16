@@ -1,73 +1,73 @@
 .page {
-    min-height: 100vh;
-    background: $page-background;
+  min-height: 100vh;
+  background: $page-background;
 }
 
 .container {
-    @include page-container;
-    padding-top: $space-8;
-    padding-bottom: $space-9;
+  @include page-container;
+  padding-top: $space-8;
+  padding-bottom: $space-9;
 }
 
 .backLink {
-    display: inline-flex;
-    align-items: center;
-    gap: $space-2;
-    margin-bottom: $space-6;
-    color: $text-muted;
-    font-weight: $font-medium;
-    text-decoration: none;
-    transition: color $transition-base;
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  margin-bottom: $space-6;
+  color: $text-muted;
+  font-weight: $font-medium;
+  text-decoration: none;
+  transition: color $transition-base;
 }
 
 .backLink:hover {
-    color: $brand-red;
+  color: $brand-red;
 }
 
 .productSection {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    align-items: start;
-    gap: $space-7;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  gap: $space-7;
 }
 
 .galleryColumn {
-    position: sticky;
-    top: 110px;
-    align-self: start;
+  position: sticky;
+  top: 110px;
+  align-self: start;
 }
 
 .contentColumn {
-    display: flex;
-    flex-direction: column;
-    gap: $space-6;
-    min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+  min-width: 0;
 }
 
 .notFound {
-    padding: $space-9 $space-5;
-    color: $text-primary;
-    font-size: 2rem;
-    text-align: center;
+  padding: $space-9 $space-5;
+  color: $text-primary;
+  font-size: 2rem;
+  text-align: center;
 }
 
 @media (max-width: 1200px) {
-    .productSection {
-        gap: $space-6;
-    }
+  .productSection {
+    gap: $space-6;
+  }
 }
 
 @media (max-width: 992px) {
-    .productSection {
-        grid-template-columns: 1fr;
-        gap: $space-5;
-    }
+  .productSection {
+    grid-template-columns: 1fr;
+    gap: $space-5;
+  }
 
-    .galleryColumn {
-        position: static;
-    }
+  .galleryColumn {
+    position: static;
+  }
 
-    .contentColumn {
-        gap: $space-5;
-    }
+  .contentColumn {
+    gap: $space-5;
+  }
 }

@@ -14,10 +14,7 @@ function formatCurrency(amountInCents: number) {
   }).format(amountInCents / 100);
 }
 
-export default function CartSummary({
-  itemCount,
-  subtotalInCents,
-}: CartSummaryProps) {
+export default function CartSummary({ itemCount, subtotalInCents }: CartSummaryProps) {
   return (
     <aside className={styles.summary}>
       <h2>Order Summary</h2>
@@ -48,9 +45,7 @@ export default function CartSummary({
         <span>Checkout Coming Soon</span>
       </button>
 
-      <p className={styles.checkoutNote}>
-        Checkout will be connected after the cart flow is complete.
-      </p>
+      <p className={styles.checkoutNote}>Checkout will be connected after the cart flow is complete.</p>
     </aside>
   );
 }

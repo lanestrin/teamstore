@@ -25,8 +25,7 @@ export const requiredProducts: IProduct[] = [
 
     isRequired: true,
 
-    description:
-      "Official Jaguars Soccer team hoodie required for all rostered players.",
+    description: "Official Jaguars Soccer team hoodie required for all rostered players.",
 
     deliveryEstimate: "September 1 - September 5, 2026",
 
@@ -50,8 +49,7 @@ export const requiredProducts: IProduct[] = [
 
     isRequired: true,
 
-    description:
-      "Lightweight practice hoodie approved for all Jaguars Soccer training sessions.",
+    description: "Lightweight practice hoodie approved for all Jaguars Soccer training sessions.",
 
     deliveryEstimate: "September 1 - September 5, 2026",
 
@@ -72,8 +70,7 @@ export const requiredProducts: IProduct[] = [
 
     isRequired: true,
 
-    description:
-      "Official Jaguars Soccer performance tee required for all players.",
+    description: "Official Jaguars Soccer performance tee required for all players.",
 
     deliveryEstimate: "September 1 - September 5, 2026",
 
@@ -95,8 +92,7 @@ export const fanwearProducts: IProduct[] = [
     image: hoodie,
     price: 45.0,
 
-    description:
-      "Comfortable fleece hoodie for Jaguars Soccer families and supporters.",
+    description: "Comfortable fleece hoodie for Jaguars Soccer families and supporters.",
 
     deliveryEstimate: "Ships within 10 business days",
 
@@ -113,8 +109,7 @@ export const fanwearProducts: IProduct[] = [
     image: cap,
     price: 28.0,
 
-    description:
-      "Official Jaguars Soccer sideline cap worn by players, coaches, and supporters.",
+    description: "Official Jaguars Soccer sideline cap worn by players, coaches, and supporters.",
 
     deliveryEstimate: "Ships within 10 business days",
 
@@ -131,8 +126,7 @@ export const fanwearProducts: IProduct[] = [
     image: backpack,
     price: 55.0,
 
-    description:
-      "Durable backpack designed for practices, tournaments, and travel.",
+    description: "Durable backpack designed for practices, tournaments, and travel.",
 
     deliveryEstimate: "Ships within 10 business days",
 
@@ -147,8 +141,7 @@ export const fanwearProducts: IProduct[] = [
     image: tee,
     price: 22.0,
 
-    description:
-      "Lightweight spirit tee perfect for game day and everyday wear.",
+    description: "Lightweight spirit tee perfect for game day and everyday wear.",
 
     deliveryEstimate: "Ships within 10 business days",
 
@@ -165,8 +158,7 @@ export const fanwearProducts: IProduct[] = [
     image: hoodie2,
     price: 48.0,
 
-    description:
-      "Premium alumni hoodie celebrating Jaguars Soccer tradition.",
+    description: "Premium alumni hoodie celebrating Jaguars Soccer tradition.",
 
     deliveryEstimate: "Ships within 10 business days",
 
@@ -183,8 +175,7 @@ export const fanwearProducts: IProduct[] = [
     image: backpack,
     price: 60.0,
 
-    description:
-      "Large-capacity travel backpack for tournaments and overnight trips.",
+    description: "Large-capacity travel backpack for tournaments and overnight trips.",
 
     deliveryEstimate: "Ships within 10 business days",
 
@@ -199,8 +190,7 @@ export const fanwearProducts: IProduct[] = [
     image: cap,
     price: 26.0,
 
-    description:
-      "Classic Jaguars Soccer cap for parents and supporters.",
+    description: "Classic Jaguars Soccer cap for parents and supporters.",
 
     deliveryEstimate: "Ships within 10 business days",
 
@@ -217,8 +207,7 @@ export const fanwearProducts: IProduct[] = [
     image: tee,
     price: 25.0,
 
-    description:
-      "Moisture-wicking performance tee featuring Jaguars Soccer branding.",
+    description: "Moisture-wicking performance tee featuring Jaguars Soccer branding.",
 
     deliveryEstimate: "Ships within 10 business days",
 
@@ -235,8 +224,7 @@ export const fanwearProducts: IProduct[] = [
     image: hoodie,
     price: 44.0,
 
-    description:
-      "Everyday spirit hoodie built for comfort and school pride.",
+    description: "Everyday spirit hoodie built for comfort and school pride.",
 
     deliveryEstimate: "Ships within 10 business days",
 
@@ -253,8 +241,7 @@ export const fanwearProducts: IProduct[] = [
     image: tee,
     price: 20.0,
 
-    description:
-      "Official Booster Club tee supporting Jaguars Soccer programs.",
+    description: "Official Booster Club tee supporting Jaguars Soccer programs.",
 
     deliveryEstimate: "Ships within 10 business days",
 
@@ -271,8 +258,7 @@ export const fanwearProducts: IProduct[] = [
     image: cap,
     price: 30.0,
 
-    description:
-      "Premium coaches cap featuring embroidered Jaguars Soccer branding.",
+    description: "Premium coaches cap featuring embroidered Jaguars Soccer branding.",
 
     deliveryEstimate: "Ships within 10 business days",
 
@@ -289,8 +275,7 @@ export const fanwearProducts: IProduct[] = [
     image: backpack,
     price: 65.0,
 
-    description:
-      "Premium travel backpack with expanded storage and team branding.",
+    description: "Premium travel backpack with expanded storage and team branding.",
 
     deliveryEstimate: "Ships within 10 business days",
 
@@ -305,8 +290,7 @@ export const fanwearProducts: IProduct[] = [
     image: hoodie2,
     price: 52.0,
 
-    description:
-      "Performance fleece hoodie built for athletes and everyday wear.",
+    description: "Performance fleece hoodie built for athletes and everyday wear.",
 
     deliveryEstimate: "Ships within 10 business days",
 

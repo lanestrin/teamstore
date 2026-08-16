@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { LuCheck } from "react-icons/lu";
 import { Link } from "react-router-dom";
 
@@ -38,90 +38,62 @@ export default function ProductCard({
   showDeadline = false,
   showRequiredStatus = false,
 }: ProductCardProps) {
-  const colorOptions = useMemo(
-    () => product.colorOptions ?? [],
-    [product.colorOptions],
-  );
+  const colorOptions = useMemo(() => product.colorOptions ?? [], [product.colorOptions]);
 
   const preferredColorOption = useMemo(() => {
     if (!preferredColorFamily) {
       return undefined;
     }
 
-    return colorOptions.find((colorOption) =>
-      colorOption.colorFamilies?.includes(preferredColorFamily),
-    );
+    return colorOptions.find((colorOption) => colorOption.colorFamilies?.includes(preferredColorFamily));
   }, [colorOptions, preferredColorFamily]);
 
   const firstColorKey = colorOptions[0]?.colorKey ?? null;
   const preferredColorKey = preferredColorOption?.colorKey ?? null;
 
-  const [selectedColorKey, setSelectedColorKey] = useState<string | null>(
-    preferredColorKey ?? firstColorKey,
-  );
+  const [manualColorSelection, setManualColorSelection] = useState<{
+    productId: string;
+    preferredColorKey: string | null;
+    colorKey: string;
+  } | null>(null);
 
-  useEffect(() => {
-    setSelectedColorKey(preferredColorKey ?? firstColorKey);
-  }, [product.id, preferredColorKey, firstColorKey]);
+  const selectedColorKey =
+    manualColorSelection?.productId === product.id && manualColorSelection.preferredColorKey === preferredColorKey
+      ? manualColorSelection.colorKey
+      : (preferredColorKey ?? firstColorKey);
 
   const selectedColorOption =
-    colorOptions.find(
-      (colorOption) => colorOption.colorKey === selectedColorKey,
-    ) ??
-    preferredColorOption ??
-    colorOptions[0];
+    colorOptions.find((colorOption) => colorOption.colorKey === selectedColorKey) ?? preferredColorOption ?? colorOptions[0];
 
   const previewImageUrl = selectedColorOption?.imageUrl ?? product.imageUrl;
 
   const visibleColorOptions = useMemo(() => {
     const firstOptions = colorOptions.slice(0, MAX_VISIBLE_COLOR_OPTIONS);
 
-    if (
-      !selectedColorOption ||
-      firstOptions.some(
-        (colorOption) => colorOption.colorKey === selectedColorOption.colorKey,
-      )
-    ) {
+    if (!selectedColorOption || firstOptions.some((colorOption) => colorOption.colorKey === selectedColorOption.colorKey)) {
       return firstOptions;
     }
 
-    return [
-      ...firstOptions.slice(0, MAX_VISIBLE_COLOR_OPTIONS - 1),
-      selectedColorOption,
-    ];
+    return [...firstOptions.slice(0, MAX_VISIBLE_COLOR_OPTIONS - 1), selectedColorOption];
   }, [colorOptions, selectedColorOption]);
 
-  const additionalColorCount = Math.max(
-    colorOptions.length - visibleColorOptions.length,
-    0,
-  );
+  const additionalColorCount = Math.max(colorOptions.length - visibleColorOptions.length, 0);
 
-  const hasVariantSummary =
-    colorOptions.length > 0 || product.availableSizeCount !== undefined;
+  const hasVariantSummary = colorOptions.length > 0 || product.availableSizeCount !== undefined;
 
-  const previewImageAlt = selectedColorOption
-    ? `${product.name} in ${selectedColorOption.color}`
-    : product.name;
+  const previewImageAlt = selectedColorOption ? `${product.name} in ${selectedColorOption.color}` : product.name;
 
   return (
     <article className={styles.card}>
       {showRequiredStatus && (
-        <div
-          className={`${styles.statusBadge} ${
-            product.inCart ? styles.statusComplete : styles.statusIncomplete
-          }`}
-        >
+        <div className={`${styles.statusBadge} ${product.inCart ? styles.statusComplete : styles.statusIncomplete}`}>
           <LuCheck aria-hidden="true" />
 
           <span>{product.inCart ? "Added to Cart" : "Required"}</span>
         </div>
       )}
 
-      <Link
-        to={product.productUrl}
-        className={styles.cardLink}
-        aria-label={`View ${product.name}`}
-      >
+      <Link to={product.productUrl} className={styles.cardLink} aria-label={`View ${product.name}`}>
         <div className={styles.imageWrapper}>
           <img src={previewImageUrl} alt={previewImageAlt} loading="lazy" />
         </div>
@@ -149,56 +121,47 @@ export default function ProductCard({
       {hasVariantSummary && (
         <div className={styles.variantSummary}>
           {colorOptions.length > 0 && (
-            <div
-              className={styles.colorOptions}
-              aria-label="Available product colors"
-            >
+            <div className={styles.colorOptions} aria-label="Available product colors">
               {visibleColorOptions.map((colorOption) => {
-                const isSelected =
-                  colorOption.colorKey === selectedColorOption?.colorKey;
+                const isSelected = colorOption.colorKey === selectedColorOption?.colorKey;
 
                 return (
                   <button
                     key={colorOption.colorKey}
                     type="button"
-                    className={`${styles.colorOption} ${
-                      isSelected ? styles.colorOptionSelected : ""
-                    }`}
+                    className={`${styles.colorOption} ${isSelected ? styles.colorOptionSelected : ""}`}
                     aria-label={`Preview ${product.name} in ${colorOption.color}`}
                     aria-pressed={isSelected}
                     title={colorOption.color}
-                    onClick={() => setSelectedColorKey(colorOption.colorKey)}
+                    onClick={() =>
+                      setManualColorSelection({
+                        productId: product.id,
+                        preferredColorKey,
+                        colorKey: colorOption.colorKey,
+                      })
+                    }
                   >
                     <img src={colorOption.imageUrl} alt="" loading="lazy" />
                   </button>
                 );
               })}
 
-              {additionalColorCount > 0 && (
-                <span className={styles.additionalColors}>
-                  +{additionalColorCount}
-                </span>
-              )}
+              {additionalColorCount > 0 && <span className={styles.additionalColors}>+{additionalColorCount}</span>}
             </div>
           )}
 
           <p className={styles.variantMeta}>
             {colorOptions.length > 0 && (
               <span>
-                {colorOptions.length}{" "}
-                {colorOptions.length === 1 ? "color" : "colors"}
+                {colorOptions.length} {colorOptions.length === 1 ? "color" : "colors"}
               </span>
             )}
 
-            {colorOptions.length > 0 &&
-              product.availableSizeCount !== undefined && (
-                <span aria-hidden="true"> · </span>
-              )}
+            {colorOptions.length > 0 && product.availableSizeCount !== undefined && <span aria-hidden="true"> · </span>}
 
             {product.availableSizeCount !== undefined && (
               <span>
-                {product.availableSizeCount}{" "}
-                {product.availableSizeCount === 1 ? "size" : "sizes"}
+                {product.availableSizeCount} {product.availableSizeCount === 1 ? "size" : "sizes"}
               </span>
             )}
           </p>

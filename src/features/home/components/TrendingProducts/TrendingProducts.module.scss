@@ -2,77 +2,77 @@
 @use "../../../../styles/mixins" as *;
 
 .section {
-    @include page-container;
-    padding-top: $space-8;
-    padding-bottom: $space-8;
+  @include page-container;
+  padding-top: $space-8;
+  padding-bottom: $space-8;
 }
 
 .header {
-    @include flex-between;
-    gap: $space-4;
-    margin-bottom: $space-6;
+  @include flex-between;
+  gap: $space-4;
+  margin-bottom: $space-6;
 }
 
 .header h2 {
-    margin: 0;
-    color: $text-primary;
-    font-family: "Barlow Condensed", sans-serif;
-    font-size: 3rem;
-    text-transform: uppercase;
+  margin: 0;
+  color: $text-primary;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 3rem;
+  text-transform: uppercase;
 }
 
 .header a {
-    color: $brand-red;
-    font-family: "Barlow Condensed", sans-serif;
-    font-size: 1.1rem;
-    font-weight: $font-semibold;
-    text-decoration: none;
-    transition: color $transition-base;
+  color: $brand-red;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 1.1rem;
+  font-weight: $font-semibold;
+  text-decoration: none;
+  transition: color $transition-base;
 }
 
 .header a:hover {
-    color: $brand-red-hover;
+  color: $brand-red-hover;
 }
 
 .grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: $space-5;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: $space-5;
 }
 
 @media (max-width: 1200px) {
-    .grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 @media (max-width: 768px) {
-    .header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 
-    .grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 576px) {
-    .section {
-        padding-top: $space-7;
-        padding-bottom: $space-7;
-    }
+  .section {
+    padding-top: $space-7;
+    padding-bottom: $space-7;
+  }
 
-    .header {
-        margin-bottom: $space-5;
-    }
+  .header {
+    margin-bottom: $space-5;
+  }
 
-    .header h2 {
-        font-size: 2.35rem;
-    }
+  .header h2 {
+    font-size: 2.35rem;
+  }
 
-    .grid {
-        grid-template-columns: 1fr;
-        gap: $space-4;
-    }
+  .grid {
+    grid-template-columns: 1fr;
+    gap: $space-4;
+  }
 }

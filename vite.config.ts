@@ -24,12 +24,7 @@ export default defineConfig({
 
   server: {
     watch: {
-      ignored: [
-        "**/.vs/**",
-        "**/node_modules/**",
-        "**/bin/**",
-        "**/obj/**",
-      ],
+      ignored: ["**/.vs/**", "**/node_modules/**", "**/bin/**", "**/obj/**"],
     },
   },
 });

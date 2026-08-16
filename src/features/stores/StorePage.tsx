@@ -100,21 +100,13 @@ export default function StorePage() {
 
   const storeName = store.name ?? store.organizationName ?? "Team Store";
 
-  const storeDescription =
-    store.description ??
-    `Official apparel and merchandise for ${
-      store.organizationName ?? "this organization"
-    }.`;
+  const storeDescription = store.description ?? `Official apparel and merchandise for ${store.organizationName ?? "this organization"}.`;
 
   return (
     <div className={styles.page}>
       <section className={styles.hero}>
         <div className={styles.heroContent}>
-          <img
-            src={jaguarsLogo}
-            alt={store.organizationName ?? storeName}
-            className={styles.logo}
-          />
+          <img src={jaguarsLogo} alt={store.organizationName ?? storeName} className={styles.logo} />
 
           <div>
             <span className={styles.storeLabel}>OFFICIAL TEAM STORE</span>
@@ -151,20 +143,13 @@ export default function StorePage() {
 
             <span>August 15, 2026 • 12 Days Remaining</span>
 
-            <small>
-              All required team items must be ordered before the deadline.
-            </small>
+            <small>All required team items must be ordered before the deadline.</small>
           </div>
         </div>
 
         <div className={styles.requiredGrid}>
           {requiredProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={createProductCardData(product)}
-              showDeadline
-              showRequiredStatus
-            />
+            <ProductCard key={product.id} product={createProductCardData(product)} showDeadline showRequiredStatus />
           ))}
         </div>
       </section>
@@ -174,19 +159,13 @@ export default function StorePage() {
           <div>
             <h2>Featured Fanwear</h2>
 
-            <p>
-              Optional apparel and accessories for family, friends, alumni, and
-              supporters.
-            </p>
+            <p>Optional apparel and accessories for family, friends, alumni, and supporters.</p>
           </div>
         </div>
 
         <div className={styles.fanwearGrid}>
           {fanwearProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={createProductCardData(product)}
-            />
+            <ProductCard key={product.id} product={createProductCardData(product)} />
           ))}
         </div>
       </section>

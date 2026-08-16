@@ -9,23 +9,11 @@ interface Props {
   slug: string;
 }
 
-export default function FeaturedStoreCard({
-  logo,
-  name,
-  products,
-  slug
-}: Props) {
+export default function FeaturedStoreCard({ logo, name, products, slug }: Props) {
   return (
-    <Link
-      to={`/store/${slug}`}
-      className={styles.card}
-    >
+    <Link to={`/store/${slug}`} className={styles.card}>
       <div className={styles.logo}>
-        <img
-          src={logo}
-          alt={name}
-          className={styles.logoImage}
-        />
+        <img src={logo} alt={name} className={styles.logoImage} />
       </div>
 
       <h3>{name}</h3>

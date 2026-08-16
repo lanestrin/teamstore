@@ -2,11 +2,7 @@ import { authTables } from "@convex-dev/auth/server";
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
-const storeStatus = v.union(
-  v.literal("draft"),
-  v.literal("active"),
-  v.literal("archived"),
-);
+const storeStatus = v.union(v.literal("draft"), v.literal("active"), v.literal("archived"));
 
 const storeActivity = v.union(
   v.literal("basketball"),
@@ -20,11 +16,9 @@ const storeActivity = v.union(
   v.literal("other"),
 );
 
-const productStatus = v.union(
-  v.literal("draft"),
-  v.literal("active"),
-  v.literal("archived"),
-);
+const productCollectionSection = v.union(v.literal("uniforms"), v.literal("fanwear"));
+
+const productStatus = v.union(v.literal("draft"), v.literal("active"), v.literal("archived"));
 
 const productColorFamily = v.union(
   v.literal("black"),
@@ -36,6 +30,7 @@ const productColorFamily = v.union(
   v.literal("yellow"),
   v.literal("green"),
   v.literal("blue"),
+  v.literal("navy"),
   v.literal("purple"),
   v.literal("pink"),
   v.literal("brown"),
@@ -79,12 +74,7 @@ const productColorCategory = v.union(
   v.literal("unknown"),
 );
 
-const productColorTone = v.union(
-  v.literal("light"),
-  v.literal("medium"),
-  v.literal("dark"),
-  v.literal("unknown"),
-);
+const productColorTone = v.union(v.literal("light"), v.literal("medium"), v.literal("dark"), v.literal("unknown"));
 
 const productColorPattern = v.union(
   v.literal("solid"),
@@ -103,12 +93,7 @@ const productColorComposition = v.union(
   v.literal("unknown"),
 );
 
-const productColorClassificationSource = v.union(
-  v.literal("supplier-hex"),
-  v.literal("name-rule"),
-  v.literal("ai"),
-  v.literal("manual"),
-);
+const productColorClassificationSource = v.union(v.literal("supplier-hex"), v.literal("name-rule"), v.literal("ai"), v.literal("manual"));
 
 const productColorReviewReason = v.union(
   v.literal("missing-hex"),
@@ -140,11 +125,7 @@ const productImageView = v.union(
 
 const variantStatus = v.union(v.literal("active"), v.literal("inactive"));
 
-const variantAvailability = v.union(
-  v.literal("available"),
-  v.literal("unavailable"),
-  v.literal("discontinued"),
-);
+const variantAvailability = v.union(v.literal("available"), v.literal("unavailable"), v.literal("discontinued"));
 
 export default defineSchema({
   ...authTables,
@@ -193,12 +174,9 @@ export default defineSchema({
     status: storeStatus,
     createdAt: v.number(),
     updatedAt: v.number(),
-    })
+  })
     .index("by_slug", ["slug"])
-    .index("by_organization_slug_and_slug", [
-      "organizationSlug",
-      "slug",
-    ])
+    .index("by_organization_slug_and_slug", ["organizationSlug", "slug"])
     .index("by_creator", ["createdBy"])
     .index("by_creator_status", ["createdBy", "status"])
     .index("by_organization", ["organizationId"]),
@@ -235,6 +213,28 @@ export default defineSchema({
     .index("by_status_category", ["status", "category"])
     .index("by_provider_product", ["provider", "providerProductId"]),
 
+  productCollectionItems: defineTable({
+    productId: v.id("products"),
+
+    section: productCollectionSection,
+
+    // Uniforms are activity-specific.
+    // Fanwear is global, so activity is omitted.
+    activity: v.optional(storeActivity),
+
+    decorationProfileId: v.string(),
+
+    suggestedRequired: v.boolean(),
+    sortOrder: v.number(),
+
+    isActive: v.boolean(),
+
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_product", ["productId"])
+    .index("by_section_activity_active_order", ["section", "activity", "isActive", "sortOrder"]),
+
   // Products explicitly selected for a store.
   // Catalog product details remain in the shared products table.
   storeProducts: defineTable({
@@ -249,10 +249,7 @@ export default defineSchema({
   })
     .index("by_store", ["storeId"])
     .index("by_product", ["productId"])
-    .index("by_store_product", [
-      "storeId",
-      "productId",
-    ]),
+    .index("by_store_product", ["storeId", "productId"]),
 
   // Canonical color options for blank products.
   // One row represents one productId + colorKey pair and stores the
@@ -306,13 +303,7 @@ export default defineSchema({
     providerView: v.optional(v.string()),
     sortOrder: v.number(),
 
-    source: v.optional(
-      v.union(
-        v.literal("csv-main"),
-        v.literal("verified-derived"),
-        v.literal("manual-upload"),
-      ),
-    ),
+    source: v.optional(v.union(v.literal("csv-main"), v.literal("verified-derived"), v.literal("manual-upload"))),
 
     imageStorageId: v.optional(v.id("_storage")),
     externalImageUrl: v.optional(v.string()),
@@ -323,11 +314,7 @@ export default defineSchema({
   })
     .index("by_product", ["productId"])
     .index("by_product_color_key", ["productId", "colorKey"])
-    .index("by_product_color_key_order", [
-      "productId",
-      "colorKey",
-      "sortOrder",
-    ]),
+    .index("by_product_color_key_order", ["productId", "colorKey", "sortOrder"]),
 
   // Exact purchasable blank-product configurations.
   // Store-specific retail pricing will live on
@@ -363,11 +350,7 @@ export default defineSchema({
     .index("by_product", ["productId"])
     .index("by_product_status", ["productId", "status"])
     .index("by_product_color_key", ["productId", "colorKey"])
-    .index("by_product_color_key_status", [
-      "productId",
-      "colorKey",
-      "status",
-    ])
+    .index("by_product_color_key_status", ["productId", "colorKey", "status"])
     .index("by_sku", ["sku"])
     .index("by_provider_variant", ["provider", "providerVariantId"]),
 });

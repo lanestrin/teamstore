@@ -1,212 +1,212 @@
 .card {
-    @include card;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    transition:
-        transform $transition-base,
-        box-shadow $transition-base,
-        border-color $transition-base;
+  @include card;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition:
+    transform $transition-base,
+    box-shadow $transition-base,
+    border-color $transition-base;
 }
 
 .card:hover,
 .card:focus-within {
-    box-shadow: $shadow-md;
-    transform: translateY(-2px);
+  box-shadow: $shadow-md;
+  transform: translateY(-2px);
 }
 
 .cardLink {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    color: inherit;
-    text-decoration: none;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  color: inherit;
+  text-decoration: none;
 }
 
 .cardLink:focus-visible {
-    outline: 2px solid $brand-red;
-    outline-offset: -2px;
+  outline: 2px solid $brand-red;
+  outline-offset: -2px;
 }
 
 .imageWrapper {
-    @include flex-center;
-    height: 240px;
-    padding: $space-4;
-    overflow: hidden;
-    background: $page-background-alt;
+  @include flex-center;
+  height: 240px;
+  padding: $space-4;
+  overflow: hidden;
+  background: $page-background-alt;
 }
 
 .imageWrapper img {
-    width: auto;
-    height: 100%;
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    transition: transform $transition-base;
-    mix-blend-mode: darken;
+  width: auto;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: transform $transition-base;
+  mix-blend-mode: darken;
 }
 
 .cardLink:hover .imageWrapper img {
-    transform: scale(1.025);
+  transform: scale(1.025);
 }
 
 .content {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    padding: $space-4;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: $space-4;
 }
 
 .content h3 {
-    margin: 0 0 $space-3;
-    color: $text-primary;
-    font-size: 1rem;
-    font-weight: $font-bold;
-    line-height: 1.4;
+  margin: 0 0 $space-3;
+  color: $text-primary;
+  font-size: 1rem;
+  font-weight: $font-bold;
+  line-height: 1.4;
 }
 
 .deadline {
-    margin-bottom: $space-4;
-    color: $error;
-    font-size: 0.85rem;
-    font-weight: $font-bold;
+  margin-bottom: $space-4;
+  color: $error;
+  font-size: 0.85rem;
+  font-weight: $font-bold;
 }
 
 .footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: $space-3;
-    margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-3;
+  margin-top: auto;
 }
 
 .price {
-    color: $text-primary;
-    font-size: 1.25rem;
-    font-weight: $font-bold;
+  color: $text-primary;
+  font-size: 1.25rem;
+  font-weight: $font-bold;
 }
 
 .variantSummary {
-    padding: 0 $space-4 $space-4;
+  padding: 0 $space-4 $space-4;
 }
 
 .colorOptions {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: $space-2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $space-2;
 }
 
 .colorOption {
-    @include flex-center;
-    width: 38px;
-    height: 38px;
-    padding: 2px;
-    overflow: hidden;
-    border: 1px solid $border-light;
-    border-radius: 50%;
-    background: $page-background-alt;
-    cursor: pointer;
-    transition:
-        border-color $transition-base,
-        box-shadow $transition-base,
-        transform $transition-base;
+  @include flex-center;
+  width: 38px;
+  height: 38px;
+  padding: 2px;
+  overflow: hidden;
+  border: 1px solid $border-light;
+  border-radius: 50%;
+  background: $page-background-alt;
+  cursor: pointer;
+  transition:
+    border-color $transition-base,
+    box-shadow $transition-base,
+    transform $transition-base;
 }
 
 .colorOption:hover {
-    border-color: $text-muted;
-    transform: translateY(-1px);
+  border-color: $text-muted;
+  transform: translateY(-1px);
 }
 
 .colorOption:focus-visible {
-    outline: 2px solid $border-medium;
-    outline-offset: 2px;
+  outline: 2px solid $border-medium;
+  outline-offset: 2px;
 }
 
 .colorOption img {
-    width: 100%;
-    height: 100%;
-    border-radius: inherit;
-    object-fit: contain;
-    mix-blend-mode: darken;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: contain;
+  mix-blend-mode: darken;
 }
 
 .colorOptionSelected {
-    border-color: $brand-red;
-    box-shadow: 0 0 0 1px $brand-red;
+  border-color: $brand-red;
+  box-shadow: 0 0 0 1px $brand-red;
 }
 
 .additionalColors {
-    display: inline-flex;
-    align-items: center;
-    min-height: 38px;
-    color: $text-secondary;
-    font-size: 0.85rem;
-    font-weight: $font-bold;
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  color: $text-secondary;
+  font-size: 0.85rem;
+  font-weight: $font-bold;
 }
 
 .variantMeta {
-    margin: $space-3 0 0;
-    color: $text-secondary;
-    font-size: 0.85rem;
-    line-height: 1.4;
+  margin: $space-3 0 0;
+  color: $text-secondary;
+  font-size: 0.85rem;
+  line-height: 1.4;
 }
 
 .statusBadge {
-    position: absolute;
-    top: $space-3;
-    right: $space-3;
-    z-index: 2;
-    display: inline-flex;
-    align-items: center;
-    gap: $space-2;
-    padding: $space-1 $space-3;
-    border-radius: $radius-pill;
-    pointer-events: none;
-    font-size: 0.75rem;
-    font-weight: $font-bold;
+  position: absolute;
+  top: $space-3;
+  right: $space-3;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-1 $space-3;
+  border-radius: $radius-pill;
+  pointer-events: none;
+  font-size: 0.75rem;
+  font-weight: $font-bold;
 }
 
 .statusComplete {
-    background: #dcfce7;
-    color: #15803d;
+  background: #dcfce7;
+  color: #15803d;
 }
 
 .statusIncomplete {
-    background: $gray-100;
-    color: $text-muted;
+  background: $gray-100;
+  color: $text-muted;
 }
 
 @media (max-width: 768px) {
-    .imageWrapper {
-        height: 230px;
-        padding: $space-3;
-    }
+  .imageWrapper {
+    height: 230px;
+    padding: $space-3;
+  }
 
-    .content {
-        padding: $space-4;
-    }
+  .content {
+    padding: $space-4;
+  }
 }
 
 @media (max-width: 576px) {
-    .imageWrapper {
-        height: 220px;
-        padding: $space-3;
-    }
+  .imageWrapper {
+    height: 220px;
+    padding: $space-3;
+  }
 
-    .colorOption {
-        width: 36px;
-        height: 36px;
-    }
+  .colorOption {
+    width: 36px;
+    height: 36px;
+  }
 
-    .additionalColors {
-        min-height: 36px;
-    }
+  .additionalColors {
+    min-height: 36px;
+  }
 }
 
 @media (max-width: 420px) {
-    .imageWrapper {
-        height: 210px;
-    }
+  .imageWrapper {
+    height: 210px;
+  }
 }

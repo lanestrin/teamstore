@@ -42,11 +42,7 @@ export default function ProductInfo({
   const hasAvailableColors = colors.length > 0;
   const hasAvailableSizes = sizes.length > 0;
 
-  const canAddToCart =
-    hasAvailableColors &&
-    Boolean(selectedColor) &&
-    hasAvailableSizes &&
-    Boolean(selectedSize);
+  const canAddToCart = hasAvailableColors && Boolean(selectedColor) && hasAvailableSizes && Boolean(selectedSize);
 
   return (
     <div className={styles.info}>
@@ -59,9 +55,7 @@ export default function ProductInfo({
       <div className={styles.optionSection}>
         <div className={styles.sectionLabel}>
           COLOR
-          {selectedColor && (
-            <span className={styles.selectedOption}>{selectedColor}</span>
-          )}
+          {selectedColor && <span className={styles.selectedOption}>{selectedColor}</span>}
         </div>
 
         {hasAvailableColors ? (
@@ -73,37 +67,26 @@ export default function ProductInfo({
                 <button
                   key={color.name}
                   type="button"
-                  className={`${styles.colorOption} ${
-                    isSelected ? styles.activeColor : ""
-                  }`}
+                  className={`${styles.colorOption} ${isSelected ? styles.activeColor : ""}`}
                   aria-label={`Select ${color.name}`}
                   aria-pressed={isSelected}
                   title={color.name}
                   onClick={() => onColorChange(color.name)}
                 >
-                  <img
-                    src={color.imageUrl}
-                    alt=""
-                    className={styles.colorThumbnail}
-                    loading="lazy"
-                  />
+                  <img src={color.imageUrl} alt="" className={styles.colorThumbnail} loading="lazy" />
                 </button>
               );
             })}
           </div>
         ) : (
-          <div className={styles.groupLabel}>
-            No colors are currently available.
-          </div>
+          <div className={styles.groupLabel}>No colors are currently available.</div>
         )}
       </div>
 
       <div className={styles.optionSection}>
         <div className={styles.sectionLabel}>
           SIZE
-          {selectedSize && (
-            <span className={styles.selectedOption}>{selectedSize}</span>
-          )}
+          {selectedSize && <span className={styles.selectedOption}>{selectedSize}</span>}
         </div>
 
         {hasAvailableSizes ? (
@@ -127,9 +110,7 @@ export default function ProductInfo({
             })}
           </div>
         ) : (
-          <div className={styles.groupLabel}>
-            No sizes are currently available for this color.
-          </div>
+          <div className={styles.groupLabel}>No sizes are currently available for this color.</div>
         )}
       </div>
 
@@ -148,11 +129,7 @@ export default function ProductInfo({
 
           <span>{quantity}</span>
 
-          <button
-            type="button"
-            aria-label="Increase quantity"
-            onClick={() => onQuantityChange(quantity + 1)}
-          >
+          <button type="button" aria-label="Increase quantity" onClick={() => onQuantityChange(quantity + 1)}>
             <LuPlus />
           </button>
         </div>
@@ -160,9 +137,7 @@ export default function ProductInfo({
 
       <button
         type="button"
-        className={`${styles.addToCart} ${
-          isAddedToCart ? styles.addedToCart : ""
-        }`}
+        className={`${styles.addToCart} ${isAddedToCart ? styles.addedToCart : ""}`}
         disabled={!canAddToCart}
         onClick={onAddToCart}
       >

@@ -52,9 +52,7 @@ npx convex dev
 Call the mutation from an authenticated platform-admin page:
 
 ```tsx
-const replaceCatalog = useMutation(
-  api.csvDemoCatalog.replaceCatalog
-);
+const replaceCatalog = useMutation(api.csvDemoCatalog.replaceCatalog);
 
 const result = await replaceCatalog({
   confirmation: "REPLACE_CATALOG",

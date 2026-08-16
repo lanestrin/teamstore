@@ -1,0 +1,107 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: $space-5;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $space-4;
+}
+
+.sectionHeader h2 {
+  margin: 0;
+
+  font-size: 1.25rem;
+  font-weight: $font-semibold;
+  color: $text-primary;
+}
+
+.sectionHeader p {
+  max-width: 680px;
+  margin: $space-1 0 0;
+
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: $text-secondary;
+}
+
+.sectionCount {
+  flex: 0 0 auto;
+
+  padding: $space-1 $space-3;
+
+  background: $gray-100;
+  border-radius: $radius-pill;
+
+  font-size: 0.75rem;
+  font-weight: $font-semibold;
+  color: $text-secondary;
+}
+
+.productGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: $space-5;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-3;
+
+  min-height: 180px;
+  padding: $space-8;
+
+  background: $gray-50;
+  border: 1px solid $border-light;
+  border-radius: $radius-lg;
+
+  font-size: 0.875rem;
+  color: $text-secondary;
+}
+
+.loadingIcon {
+  width: 22px;
+  height: 22px;
+
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (min-width: 1500px) {
+  .productGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1100px) {
+  .productGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .sectionHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .sectionCount {
+    align-self: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .productGrid {
+    grid-template-columns: 1fr;
+  }
+}

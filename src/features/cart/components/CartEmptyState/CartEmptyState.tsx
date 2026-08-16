@@ -12,10 +12,7 @@ export default function CartEmptyState() {
 
       <h2>Your cart is empty</h2>
 
-      <p>
-        Browse the blank-product catalog and select a color, size, and quantity
-        to add an item.
-      </p>
+      <p>Browse the blank-product catalog and select a color, size, and quantity to add an item.</p>
 
       <Link to="/products" className={styles.continueButton}>
         Continue Shopping

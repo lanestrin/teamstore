@@ -1,29 +1,32 @@
 .card {
-    @include card;
-    display: flex;
-    flex-direction: column;
-    gap: $space-4;
-    padding: $space-5;
-    transition: transform $transition-base, border-color $transition-base, box-shadow $transition-base;
+  @include card;
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+  padding: $space-5;
+  transition:
+    transform $transition-base,
+    border-color $transition-base,
+    box-shadow $transition-base;
 }
 
 .card:hover {
-    transform: translateY(-4px);
-    box-shadow: $shadow-sm;
+  transform: translateY(-4px);
+  box-shadow: $shadow-sm;
 }
 
 .title {
-    margin: 0;
-    color: $text-primary;
+  margin: 0;
+  color: $text-primary;
 }
 
 .description {
-    margin: 0;
-    color: $text-secondary;
+  margin: 0;
+  color: $text-secondary;
 }
 
 .button {
-    @include button-red;
-    align-self: flex-start;
-    margin-top: auto;
+  @include button-red;
+  align-self: flex-start;
+  margin-top: auto;
 }

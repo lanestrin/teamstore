@@ -1,5 +1,5 @@
 .page {
-	background: $page-background;
+  background: $page-background;
 }
 
 /* =========================
@@ -7,68 +7,68 @@
    ========================= */
 
 .hero {
-	padding: $space-8 $space-5;
-	background: linear-gradient( 135deg, $background-dark 0%, $background-dark-alt 100% );
-	color: $text-inverse;
+  padding: $space-8 $space-5;
+  background: linear-gradient(135deg, $background-dark 0%, $background-dark-alt 100%);
+  color: $text-inverse;
 }
 
 .heroContent {
-	@include page-container;
-	display: flex;
-	align-items: center;
-	gap: $space-6;
+  @include page-container;
+  display: flex;
+  align-items: center;
+  gap: $space-6;
 }
 
 .logo {
-	width: 140px;
-	height: 140px;
-	padding: $space-4;
-	object-fit: contain;
-	background: $white;
-	border-radius: $radius-lg;
+  width: 140px;
+  height: 140px;
+  padding: $space-4;
+  object-fit: contain;
+  background: $white;
+  border-radius: $radius-lg;
 }
 
 .storeLabel {
-	display: inline-block;
-	margin-bottom: $space-3;
-	color: rgba($white, 0.7);
-	font-size: 0.85rem;
-	font-weight: $font-bold;
-	letter-spacing: 0.08em;
+  display: inline-block;
+  margin-bottom: $space-3;
+  color: rgba($white, 0.7);
+  font-size: 0.85rem;
+  font-weight: $font-bold;
+  letter-spacing: 0.08em;
 }
 
 .hero h1 {
-	margin: 0 0 $space-3;
-	font-family: "Barlow Condensed", sans-serif;
-	font-size: clamp(3rem, 6vw, 5rem);
-	line-height: 0.95;
-	text-transform: uppercase;
+  margin: 0 0 $space-3;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: clamp(3rem, 6vw, 5rem);
+  line-height: 0.95;
+  text-transform: uppercase;
 }
 
 .hero p {
-	max-width: 700px;
-	margin: 0;
-	color: rgba($white, 0.8);
-	line-height: 1.7;
+  max-width: 700px;
+  margin: 0;
+  color: rgba($white, 0.8);
+  line-height: 1.7;
 }
 
 .storeMeta {
-	display: flex;
-	flex-wrap: wrap;
-	gap: $space-3;
-	margin-top: $space-5;
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-3;
+  margin-top: $space-5;
 }
 
 .storeMeta span {
-	display: inline-flex;
-	align-items: center;
-	height: 34px;
-	padding: 0 $space-3;
-	background: rgba($white, 0.1);
-	border: 1px solid rgba($white, 0.15);
-	border-radius: $radius-pill;
-	font-size: 0.85rem;
-	font-weight: $font-semibold;
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 $space-3;
+  background: rgba($white, 0.1);
+  border: 1px solid rgba($white, 0.15);
+  border-radius: $radius-pill;
+  font-size: 0.85rem;
+  font-weight: $font-semibold;
 }
 
 /* =========================
@@ -77,39 +77,39 @@
 
 .requiredSection,
 .fanwearSection {
-	@include page-container;
-	padding-top: $space-7;
-	padding-bottom: $space-7;
+  @include page-container;
+  padding-top: $space-7;
+  padding-bottom: $space-7;
 }
 
 .requiredSection {
-	margin-top: $space-6;
-	background: $page-background-alt;
-	border-radius: $radius-xl;
+  margin-top: $space-6;
+  background: $page-background-alt;
+  border-radius: $radius-xl;
 }
 
 .fanwearSection {
-	margin-top: $space-7;
-	border-top: 2px solid $border-light;
+  margin-top: $space-7;
+  border-top: 2px solid $border-light;
 }
 
 .sectionHeader {
-	@include flex-between;
-	align-items: flex-start;
-	gap: $space-6;
-	margin-bottom: $space-6;
+  @include flex-between;
+  align-items: flex-start;
+  gap: $space-6;
+  margin-bottom: $space-6;
 }
 
 .sectionHeader h2 {
-	margin: 0 0 $space-2;
-	font-family: "Barlow Condensed", sans-serif;
-	font-size: 2.5rem;
-	text-transform: uppercase;
+  margin: 0 0 $space-2;
+  font-family: "Barlow Condensed", sans-serif;
+  font-size: 2.5rem;
+  text-transform: uppercase;
 }
 
 .sectionHeader p {
-	margin: 0;
-	color: $text-muted;
+  margin: 0;
+  color: $text-muted;
 }
 
 /* =========================
@@ -117,45 +117,45 @@
    ========================= */
 
 .deadlineBanner {
-	display: flex;
-	align-items: center;
-	gap: $space-5;
-	margin-bottom: $space-6;
-	padding: $space-5;
-	background: #fff7ed;
-	border: 1px solid #fed7aa;
-	border-radius: $radius-md;
+  display: flex;
+  align-items: center;
+  gap: $space-5;
+  margin-bottom: $space-6;
+  padding: $space-5;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: $radius-md;
 }
 
 .deadlineIcon {
-	@include flex-center;
-	width: 56px;
-	height: 56px;
-	flex-shrink: 0;
-	background: #fb923c;
-	border-radius: $radius-round;
-	color: $text-inverse;
-	font-size: 1.5rem;
+  @include flex-center;
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  background: #fb923c;
+  border-radius: $radius-round;
+  color: $text-inverse;
+  font-size: 1.5rem;
 }
 
 .deadlineBanner strong {
-	display: block;
-	margin-bottom: $space-1;
-	color: #c2410c;
-	font-size: 0.95rem;
-	letter-spacing: 0.04em;
+  display: block;
+  margin-bottom: $space-1;
+  color: #c2410c;
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
 }
 
 .deadlineBanner span {
-	display: block;
-	margin-bottom: $space-1;
-	color: $text-primary;
-	font-size: 1.1rem;
-	font-weight: $font-bold;
+  display: block;
+  margin-bottom: $space-1;
+  color: $text-primary;
+  font-size: 1.1rem;
+  font-weight: $font-bold;
 }
 
 .deadlineBanner small {
-	color: $text-muted;
+  color: $text-muted;
 }
 
 /* =========================
@@ -163,15 +163,15 @@
    ========================= */
 
 .requiredGrid {
-	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	gap: $space-5;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $space-5;
 }
 
 .fanwearGrid {
-	display: grid;
-	grid-template-columns: repeat(4, 1fr);
-	gap: $space-5;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $space-5;
 }
 
 /* =========================
@@ -179,33 +179,33 @@
    ========================= */
 
 .requiredChecklist {
-	display: flex;
-	flex-direction: column;
-	gap: $space-2;
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
 }
 
 .checklistComplete,
 .checklistPending {
-	display: flex;
-	align-items: center;
-	gap: $space-2;
-	font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  font-size: 0.95rem;
 }
 
 .checklistComplete {
-	color: $success;
-	font-weight: $font-semibold;
+  color: $success;
+  font-weight: $font-semibold;
 }
 
 .checklistPending {
-	color: $text-muted;
+  color: $text-muted;
 }
 
 .checklistComplete span,
 .checklistPending span {
-	width: 18px;
-	text-align: center;
-	font-weight: $font-bold;
+  width: 18px;
+  text-align: center;
+  font-weight: $font-bold;
 }
 
 /* =========================
@@ -213,34 +213,34 @@
    ========================= */
 
 @media (max-width: 992px) {
-	.requiredGrid,
-	.fanwearGrid {
-		grid-template-columns: repeat(2, 1fr);
-	}
+  .requiredGrid,
+  .fanwearGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 660px) {
-	.hero {
-		padding: $space-7 $space-5;
-	}
+  .hero {
+    padding: $space-7 $space-5;
+  }
 
-	.heroContent {
-		flex-direction: column;
-		align-items: flex-start;
-		gap: $space-5;
-	}
+  .heroContent {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $space-5;
+  }
 
-	.logo {
-		width: 110px;
-		height: 110px;
-	}
+  .logo {
+    width: 110px;
+    height: 110px;
+  }
 
-	.hero h1 {
-		font-size: 3rem;
-	}
+  .hero h1 {
+    font-size: 3rem;
+  }
 
-	.requiredGrid,
-	.fanwearGrid {
-		grid-template-columns: 1fr;
-	}
+  .requiredGrid,
+  .fanwearGrid {
+    grid-template-columns: 1fr;
+  }
 }

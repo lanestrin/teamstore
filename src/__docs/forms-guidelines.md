@@ -56,23 +56,30 @@ Example:
 ### Good
 
 ```scss
-.upload {}
+.upload {
+}
 
-.slug {}
+.slug {
+}
 
-.productGrid {}
+.productGrid {
+}
 
-.productCard {}
+.productCard {
+}
 ```
 
 ### Bad
 
 ```scss
-.field {}
+.field {
+}
 
-.field input {}
+.field input {
+}
 
-.field textarea {}
+.field textarea {
+}
 ```
 
 Those belong in `_forms.scss`.

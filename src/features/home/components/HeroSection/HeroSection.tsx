@@ -8,11 +8,7 @@ import styles from "./HeroSection.module.scss";
 export default function HeroSection() {
   return (
     <section className={styles.hero}>
-      <img
-        src={heroBanner}
-        alt="TeamStore Hero"
-        className={styles.background}
-      />
+      <img src={heroBanner} alt="TeamStore Hero" className={styles.background} />
 
       <div className={styles.overlay}>
         <div className={styles.content}>
@@ -24,10 +20,7 @@ export default function HeroSection() {
             <span>MAKE IT HAPPEN.</span>
           </h1>
 
-          <p className={styles.description}>
-            Custom apparel and fan gear for teams,
-            schools, clubs, and organizations.
-          </p>
+          <p className={styles.description}>Custom apparel and fan gear for teams, schools, clubs, and organizations.</p>
 
           <div className={styles.actions}>
             <Link to="/stores" className={styles.primaryButton}>
