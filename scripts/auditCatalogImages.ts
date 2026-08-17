@@ -3,7 +3,7 @@ import path from "node:path";
 import process from "node:process";
 
 /**
- * Audits supplier image families and selects a balanced 60-product demo catalog.
+ * Audits supplier image families and selects a balanced 100-product demo catalog.
  *
  * Run from the project root:
  *
@@ -231,6 +231,25 @@ const TEAM_COLOR_PRIORITY = [
   "pink",
 ];
 
+const PRODUCT_ACTIVITY_ORDER = ["basketball", "baseball", "football", "soccer", "softball", "volleyball", "wrestling"] as const;
+
+type ProductActivity = (typeof PRODUCT_ACTIVITY_ORDER)[number];
+
+const ACTIVITY_SELECTION_TARGET = 6;
+const ACTIVITY_CANDIDATES_PER_SPORT = 15;
+
+function getProductActivity(category: string): ProductActivity | null {
+  const normalizedCategory = category.toUpperCase();
+
+  for (const activity of PRODUCT_ACTIVITY_ORDER) {
+    if (normalizedCategory.includes(`| ${activity.toUpperCase()} |`)) {
+      return activity;
+    }
+  }
+
+  return null;
+}
+
 const LICENSED_PRODUCT_TERMS = [
   "NBA",
   "NFL",
@@ -251,11 +270,11 @@ const LICENSED_PRODUCT_TERMS = [
 const DEFAULT_OPTIONS: CliOptions = {
   csvPath: path.resolve(process.cwd(), "product-data-std-all.csv"),
   outputDir: path.resolve(process.cwd(), "scripts/output/catalog-audit"),
-  selectedProductCount: 60,
+  selectedProductCount: 100,
   colorsToAuditPerProduct: 8,
   selectedColorsPerProduct: 6,
   minimumQualifyingColors: 4,
-  candidatesPerBucket: 15,
+  candidatesPerBucket: 25,
   requestConcurrency: 8,
   requestTimeoutMs: 10_000,
 };
@@ -361,11 +380,11 @@ Usage:
 Options:
   --csv <path>                    Supplier CSV path
   --output <directory>            Output directory
-  --products <count>              Number of products to select (default: 60)
+  --products <count>              Number of products to select (default: 100)
   --audit-colors <count>          Colors audited per candidate product (default: 8)
   --selected-colors <count>       Maximum selected colors per product (default: 6)
   --minimum-colors <count>        Minimum qualifying colors per product (default: 4)
-  --candidates-per-bucket <count> Candidate products audited per category bucket (default: 15)
+  --candidates-per-bucket <count> Candidate products audited per category bucket (default: 25)
   --concurrency <count>           Maximum simultaneous HTTP requests (default: 8)
   --timeout-ms <milliseconds>     Per-request timeout (default: 10000)
   --help                          Show this help message
@@ -795,6 +814,33 @@ function buildCandidatePool(products: ProductAggregate[], options: CliOptions) {
     return product.metadataComplete && !isLicensedProduct(product) && leftQuarterColors.length >= options.minimumQualifyingColors;
   });
 
+  const selectedCandidates: ProductAggregate[] = [];
+  const selectedCandidateIds = new Set<string>();
+
+  const addCandidates = (candidates: ProductAggregate[]) => {
+    for (const product of candidates) {
+      if (selectedCandidateIds.has(product.providerProductId)) {
+        continue;
+      }
+
+      selectedCandidates.push(product);
+      selectedCandidateIds.add(product.providerProductId);
+    }
+  };
+
+  // Make sure each supported sport gets a meaningful image-audit pool before
+  // the general category balancing runs. This prevents strong fanwear buckets
+  // from crowding out uniform candidates.
+  for (const activity of PRODUCT_ACTIVITY_ORDER) {
+    const activityProducts = eligibleProducts
+      .filter((product) => getProductActivity(product.category) === activity)
+      .sort(
+        (first, second) => getPreliminaryProductScore(second) - getPreliminaryProductScore(first) || first.name.localeCompare(second.name),
+      );
+
+    addCandidates(activityProducts.slice(0, ACTIVITY_CANDIDATES_PER_SPORT));
+  }
+
   const productsByBucket = new Map<string, ProductAggregate[]>();
 
   for (const product of eligibleProducts) {
@@ -803,8 +849,6 @@ function buildCandidatePool(products: ProductAggregate[], options: CliOptions) {
     productsByBucket.set(product.categoryBucket, bucketProducts);
   }
 
-  const selectedCandidates: ProductAggregate[] = [];
-
   for (const bucket of CATEGORY_BUCKET_ORDER) {
     const bucketProducts = productsByBucket.get(bucket) ?? [];
 
@@ -812,7 +856,7 @@ function buildCandidatePool(products: ProductAggregate[], options: CliOptions) {
       (first, second) => getPreliminaryProductScore(second) - getPreliminaryProductScore(first) || first.name.localeCompare(second.name),
     );
 
-    selectedCandidates.push(...bucketProducts.slice(0, options.candidatesPerBucket));
+    addCandidates(bucketProducts.slice(0, options.candidatesPerBucket));
   }
 
   return selectedCandidates;
@@ -1191,7 +1235,7 @@ function selectBalancedProducts(auditedProducts: AuditedProduct[], targetCount: 
   const selectedIds = new Set<string>();
 
   const addProduct = (product: AuditedProduct) => {
-    if (selectedIds.has(product.product.providerProductId)) {
+    if (selectedIds.has(product.product.providerProductId) || selected.length >= targetCount) {
       return false;
     }
 
@@ -1199,6 +1243,25 @@ function selectBalancedProducts(auditedProducts: AuditedProduct[], targetCount: 
     selectedIds.add(product.product.providerProductId);
     return true;
   };
+
+  // Reserve room for activity-specific uniform products first. If a sport
+  // does not have six qualified products, take everything available and let
+  // the normal balancing logic fill the remaining slots.
+  for (const activity of PRODUCT_ACTIVITY_ORDER) {
+    const activityProducts = qualified.filter((product) => getProductActivity(product.product.category) === activity);
+
+    let selectedForActivity = 0;
+
+    for (const product of activityProducts) {
+      if (selectedForActivity >= ACTIVITY_SELECTION_TARGET || selected.length >= targetCount) {
+        break;
+      }
+
+      if (addProduct(product)) {
+        selectedForActivity += 1;
+      }
+    }
+  }
 
   for (const audience of Object.keys(audienceTargets) as ProductAudience[]) {
     const audienceProducts = qualified.filter((product) => product.product.audience === audience);
@@ -1241,6 +1304,7 @@ function selectBalancedProducts(auditedProducts: AuditedProduct[], targetCount: 
 
   return selected.slice(0, targetCount);
 }
+
 function buildSelectedProductOutput(auditedProduct: AuditedProduct): SelectedProductOutput {
   const selectedColorKeys = new Set(auditedProduct.qualifyingColors.map((color) => color.colorKey));
 

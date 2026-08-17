@@ -32,7 +32,7 @@ export type ArtworkTemplatesDraft = Record<string, ArtworkTemplateDraft>;
 export type ArtworkSvgMap = Readonly<Record<string, string>>;
 
 export interface ProductSelectionInput {
-  providerProductId: string;
+  productId: Id<"products">;
   colorKey: string;
   artworkTemplateId: string;
   isRequired?: boolean;
@@ -40,7 +40,7 @@ export interface ProductSelectionInput {
 
 export interface ProductSelectionDraft {
   combinationKey: string;
-  providerProductId: string;
+  productId: Id<"products">;
   colorKey: string;
   artworkTemplateId: string;
   isRequired: boolean;
@@ -118,8 +118,8 @@ interface CreateStoreContextValue {
   resetStoreDraft: () => void;
 }
 
-export function createProductCombinationKey(providerProductId: string, colorKey: string, artworkTemplateId: string): string {
-  return [providerProductId.trim(), colorKey.trim(), artworkTemplateId.trim()].map((value) => encodeURIComponent(value)).join("__");
+export function createProductCombinationKey(productId: string, colorKey: string, artworkTemplateId: string): string {
+  return [productId.trim(), colorKey.trim(), artworkTemplateId.trim()].map((value) => encodeURIComponent(value)).join("__");
 }
 
 function classifyHexColorFamily(hexColor: string): ProductColorFamily {
@@ -195,12 +195,12 @@ function classifyHexColorFamily(hexColor: string): ProductColorFamily {
     return "green";
   }
 
-  if (hue < 260) {
-    return "blue";
-  }
-
   if (hue >= 195 && hue < 255 && lightness < 0.28) {
     return "navy";
+  }
+
+  if (hue < 260) {
+    return "blue";
   }
 
   if (hue < 320) {
@@ -383,17 +383,15 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
   }
 
   function selectProduct(selection: ProductSelectionInput) {
-    const providerProductId = selection.providerProductId.trim();
-
+    const productId = selection.productId.trim() as Id<"products">;
     const colorKey = selection.colorKey.trim();
-
     const artworkTemplateId = selection.artworkTemplateId.trim();
 
-    if (!providerProductId || !colorKey || !artworkTemplateId) {
+    if (!productId || !colorKey || !artworkTemplateId) {
       return;
     }
 
-    const combinationKey = createProductCombinationKey(providerProductId, colorKey, artworkTemplateId);
+    const combinationKey = createProductCombinationKey(productId, colorKey, artworkTemplateId);
 
     setStoreDraft((currentDraft) => {
       const existingSelection = currentDraft.productSelections[combinationKey];
@@ -406,10 +404,9 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
 
           [combinationKey]: {
             combinationKey,
-            providerProductId,
+            productId,
             colorKey,
             artworkTemplateId,
-
             isRequired: existingSelection?.isRequired ?? selection.isRequired ?? false,
           },
         },
@@ -494,10 +491,8 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
       }
 
       const nextColorKey = updates.colorKey?.trim() || currentSelection.colorKey;
-
       const nextArtworkTemplateId = updates.artworkTemplateId?.trim() || currentSelection.artworkTemplateId;
-
-      const nextCombinationKey = createProductCombinationKey(currentSelection.providerProductId, nextColorKey, nextArtworkTemplateId);
+      const nextCombinationKey = createProductCombinationKey(currentSelection.productId, nextColorKey, nextArtworkTemplateId);
 
       if (nextCombinationKey === normalizedCombinationKey) {
         return currentDraft;
@@ -521,13 +516,9 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
 
           [nextCombinationKey]: {
             combinationKey: nextCombinationKey,
-
-            providerProductId: currentSelection.providerProductId,
-
+            productId: currentSelection.productId,
             colorKey: nextColorKey,
-
             artworkTemplateId: nextArtworkTemplateId,
-
             isRequired: currentSelection.isRequired || existingNextSelection?.isRequired === true,
           },
         },
@@ -550,45 +541,27 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
 
     setStoreId(draft._id);
     setCurrentStep(draft.currentStep);
-
     setPrimaryColor(draft.primaryColor ?? DEFAULT_PRIMARY_COLOR);
-
     setSecondaryColor(draft.secondaryColor ?? DEFAULT_SECONDARY_COLOR);
-
     setStoreDraft({
       organizationName: draft.organizationName ?? "",
-
       organizationSlug: draft.organizationSlug ?? "",
-
       activity: draft.activity ?? "",
-
       storeName: draft.name ?? "",
-
       storeSlug: draft.slug ?? "",
-
       storeDescription: draft.description ?? "",
-
       logoFile: null,
-
       logoStorageId: draft.logoStorageId ?? null,
-
       artworkTemplates: {},
 
       artworkText: {
         organizationName: draft.organizationName ?? "",
-
         yearEstablished: "2020",
         mascotName: "MUSTANGS",
       },
 
-      /*
-       * Reinitialize from the stored primary
-       * color when Step 4 is reached.
-       */
       productColorFamily: "",
-
       productGenerationSeed: DEFAULT_PRODUCT_GENERATION_SEED,
-
       productSelections: {},
     });
   }
@@ -598,9 +571,7 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
     setCurrentStep(1);
 
     setPrimaryColor(DEFAULT_PRIMARY_COLOR);
-
     setSecondaryColor(DEFAULT_SECONDARY_COLOR);
-
     setStoreDraft(createDefaultStoreDraft());
   }
 
@@ -609,16 +580,12 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
       value={{
         storeId,
         setStoreId,
-
         currentStep,
         setCurrentStep,
-
         primaryColor,
         secondaryColor,
-
         setPrimaryColor,
         setSecondaryColor,
-
         storeDraft,
 
         resolvedArtworkText,
@@ -627,7 +594,6 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
         artworkSvgsByTemplateId,
 
         updateStoreDraft,
-
         updateArtworkTemplateDraft,
 
         selectProduct,

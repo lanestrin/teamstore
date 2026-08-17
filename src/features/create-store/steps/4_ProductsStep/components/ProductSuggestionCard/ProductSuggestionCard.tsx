@@ -34,7 +34,7 @@ export default function ProductSuggestionCard({
   onRequiredClick,
   onEdit,
 }: ProductSuggestionCardProps) {
-  const productName = suggestion.product.name ?? suggestion.providerProductId;
+  const productName = suggestion.product.name ?? suggestion.productId;
 
   return (
     <article className={styles.productCard} data-selected={isSelected}>

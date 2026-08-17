@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 
 import { api } from "../../../../../convex/_generated/api";
 
@@ -17,6 +17,7 @@ function getErrorMessage(error: unknown): string {
 }
 
 export default function ReplaceCatalogButton() {
+  const catalogSummary = useQuery(api.csvDemoCatalog.getCatalogSummary);
   const clearCatalogBatch = useMutation(api.csvDemoCatalog.clearCatalogBatch);
   const importCatalogBatch = useMutation(api.csvDemoCatalog.importCatalogBatch);
 
@@ -181,17 +182,17 @@ export default function ReplaceCatalogButton() {
           <dl className={styles.summary}>
             <div>
               <dt>Products</dt>
-              <dd>60</dd>
+              <dd>{catalogSummary ? catalogSummary.products.toLocaleString() : "—"}</dd>
             </div>
 
             <div>
               <dt>Colors</dt>
-              <dd>360</dd>
+              <dd>{catalogSummary ? catalogSummary.colors.toLocaleString() : "—"}</dd>
             </div>
 
             <div>
               <dt>Variants</dt>
-              <dd>2,143</dd>
+              <dd>{catalogSummary ? catalogSummary.variants.toLocaleString() : "—"}</dd>
             </div>
 
             <div>
@@ -252,8 +253,8 @@ export default function ReplaceCatalogButton() {
             </div>
 
             <p id="replace-catalog-description" className={styles.modalDescription}>
-              This permanently deletes the current catalog before inserting the audited 60-product catalog. Existing manual catalog edits
-              cannot be recovered.
+              This permanently deletes the current catalog before inserting the audited catalog bundled with the app. Existing manual
+              catalog edits cannot be recovered.
             </p>
 
             {progressText && (

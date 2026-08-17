@@ -17,7 +17,6 @@ export default function useFileDataUrl(file: File | null) {
     }
 
     const reader = new FileReader();
-
     let isCancelled = false;
 
     reader.onload = () => {
@@ -53,11 +52,6 @@ export default function useFileDataUrl(file: File | null) {
     };
   }, [file]);
 
-  /*
-   * If the incoming file changes, don't briefly
-   * expose the previous file's data URL while
-   * the new FileReader is still loading.
-   */
   if (result.file !== file) {
     return null;
   }
