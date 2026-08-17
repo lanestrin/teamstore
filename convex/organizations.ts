@@ -8,7 +8,6 @@ import type { Id } from "./_generated/dataModel";
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const HEX_COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/;
 
-const CATALOG_PROVIDER = "augusta-csv";
 const MAX_STORE_PRODUCTS = 50;
 
 const storeActivity = v.union(
@@ -24,12 +23,12 @@ const storeActivity = v.union(
 );
 
 const storeProductSelection = v.object({
-  providerProductId: v.string(),
+  productId: v.id("products"),
   isRequired: v.boolean(),
 });
 
 interface StoreProductSelectionInput {
-  providerProductId: string;
+  productId: Id<"products">;
   isRequired: boolean;
 }
 
@@ -72,25 +71,16 @@ function normalizeStoreProductSelections(selections: StoreProductSelectionInput[
     throw new ConvexError(`A store can contain a maximum of ${MAX_STORE_PRODUCTS} products during setup.`);
   }
 
-  const seenProviderProductIds = new Set<string>();
+  const seenProductIds = new Set<Id<"products">>();
 
   return selections.map((selection) => {
-    const providerProductId = selection.providerProductId.trim();
-
-    if (!providerProductId) {
-      throw new ConvexError("Every selected product must have a provider product ID.");
+    if (seenProductIds.has(selection.productId)) {
+      throw new ConvexError(`Product ${selection.productId} was selected more than once.`);
     }
 
-    if (seenProviderProductIds.has(providerProductId)) {
-      throw new ConvexError(`Product ${providerProductId} was selected more than once.`);
-    }
+    seenProductIds.add(selection.productId);
 
-    seenProviderProductIds.add(providerProductId);
-
-    return {
-      providerProductId,
-      isRequired: selection.isRequired,
-    };
+    return selection;
   });
 }
 
@@ -102,13 +92,10 @@ async function resolveStoreProductSelections(
 
   return await Promise.all(
     normalizedSelections.map(async (selection, sortOrder) => {
-      const product = await ctx.db
-        .query("products")
-        .withIndex("by_provider_product", (q) => q.eq("provider", CATALOG_PROVIDER).eq("providerProductId", selection.providerProductId))
-        .unique();
+      const product = await ctx.db.get(selection.productId);
 
       if (!product || product.status !== "active") {
-        throw new ConvexError(`Selected product ${selection.providerProductId} is not available.`);
+        throw new ConvexError(`Selected product ${selection.productId} is not available.`);
       }
 
       const activeVariants = await ctx.db

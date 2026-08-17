@@ -1,6 +1,6 @@
 import { ConvexError, v } from "convex/values";
 
-import { mutation } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 import { classifyProductColor, extractProductColorHexValues, normalizeProductColorName } from "../src/lib/classifyProductColor";
 import { selectedCatalogSummary, selectedProducts } from "./docs/selectedProductsData";
 import { requirePlatformAdmin } from "./lib/authz";
@@ -9,6 +9,43 @@ const PROVIDER = "augusta-csv";
 const CONFIRMATION = "REPLACE_CATALOG";
 const DEFAULT_DELETE_LIMIT = 200;
 
+type ProductActivity =
+  "basketball" | "baseball" | "football" | "soccer" | "softball" | "volleyball" | "wrestling" | "spirit-wear" | "other";
+
+function getProductActivity(providerCategory: string): ProductActivity | undefined {
+  const category = providerCategory.toUpperCase();
+
+  if (category.includes("| BASKETBALL |")) {
+    return "basketball";
+  }
+
+  if (category.includes("| BASEBALL |")) {
+    return "baseball";
+  }
+
+  if (category.includes("| FOOTBALL |")) {
+    return "football";
+  }
+
+  if (category.includes("| SOCCER |")) {
+    return "soccer";
+  }
+
+  if (category.includes("| SOFTBALL |")) {
+    return "softball";
+  }
+
+  if (category.includes("| VOLLEYBALL |")) {
+    return "volleyball";
+  }
+
+  if (category.includes("| WRESTLING |")) {
+    return "wrestling";
+  }
+
+  return undefined;
+}
+
 function normalizeOptionalText(value?: string | null) {
   return value?.trim() || undefined;
 }
@@ -16,6 +53,16 @@ function normalizeOptionalText(value?: string | null) {
 function normalizeColorKey(providerColor: string) {
   return providerColor.trim().toLowerCase();
 }
+
+export const getCatalogSummary = query({
+  args: {},
+
+  handler: async (ctx) => {
+    await requirePlatformAdmin(ctx);
+
+    return selectedCatalogSummary;
+  },
+});
 
 /**
  * Deletes the existing catalog in bounded batches.
@@ -158,6 +205,73 @@ export const reclassifyProductColorsBatch = mutation({
   },
 });
 
+export const reclassifyProductActivitiesBatch = mutation({
+  args: {
+    cursor: v.optional(v.string()),
+    limit: v.optional(v.number()),
+  },
+
+  handler: async (ctx, args) => {
+    await requirePlatformAdmin(ctx);
+
+    const limit = Math.min(Math.max(Math.floor(args.limit ?? 100), 1), 200);
+
+    const result = await ctx.db.query("products").paginate({
+      cursor: args.cursor ?? null,
+      numItems: limit,
+    });
+
+    let classified = 0;
+    let unclassified = 0;
+    let skipped = 0;
+
+    const activityCounts = {
+      basketball: 0,
+      baseball: 0,
+      football: 0,
+      soccer: 0,
+      softball: 0,
+      volleyball: 0,
+      wrestling: 0,
+    };
+
+    for (const product of result.page) {
+      /*
+       * This classifier understands Augusta's category format.
+       * Future vendors should normalize activity inside their own importer.
+       */
+      if (product.provider !== PROVIDER) {
+        skipped += 1;
+        continue;
+      }
+
+      const activity = product.providerCategory ? getProductActivity(product.providerCategory) : undefined;
+
+      await ctx.db.patch(product._id, {
+        activity,
+        updatedAt: Date.now(),
+      });
+
+      if (activity && activity in activityCounts) {
+        activityCounts[activity as keyof typeof activityCounts] += 1;
+        classified += 1;
+      } else {
+        unclassified += 1;
+      }
+    }
+
+    return {
+      processed: result.page.length,
+      classified,
+      unclassified,
+      skipped,
+      activityCounts,
+      done: result.isDone,
+      nextCursor: result.isDone ? null : result.continueCursor,
+    };
+  },
+});
+
 /**
  * Imports one audited product per call.
  *
@@ -209,6 +323,7 @@ export const importCatalogBatch = mutation({
       description: normalizeOptionalText(product.description),
       category: product.categoryBucket,
       providerCategory: product.category,
+      activity: getProductActivity(product.category),
       brand: normalizeOptionalText(product.brand),
       division: normalizeOptionalText(product.division),
       sizeChartImageUrl: normalizeOptionalText(product.sizeChartImageUrl),

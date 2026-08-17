@@ -16,8 +16,6 @@ const storeActivity = v.union(
   v.literal("other"),
 );
 
-const productCollectionSection = v.union(v.literal("uniforms"), v.literal("fanwear"));
-
 const productStatus = v.union(v.literal("draft"), v.literal("active"), v.literal("archived"));
 
 const productColorFamily = v.union(
@@ -204,6 +202,8 @@ export default defineSchema({
     provider: v.optional(v.string()),
     providerProductId: v.optional(v.string()),
 
+    activity: v.optional(storeActivity),
+
     status: productStatus,
     createdAt: v.number(),
     updatedAt: v.number(),
@@ -211,29 +211,8 @@ export default defineSchema({
     .index("by_slug", ["slug"])
     .index("by_status", ["status"])
     .index("by_status_category", ["status", "category"])
+    .index("by_status_activity", ["status", "activity"])
     .index("by_provider_product", ["provider", "providerProductId"]),
-
-  productCollectionItems: defineTable({
-    productId: v.id("products"),
-
-    section: productCollectionSection,
-
-    // Uniforms are activity-specific.
-    // Fanwear is global, so activity is omitted.
-    activity: v.optional(storeActivity),
-
-    decorationProfileId: v.string(),
-
-    suggestedRequired: v.boolean(),
-    sortOrder: v.number(),
-
-    isActive: v.boolean(),
-
-    createdAt: v.number(),
-    updatedAt: v.number(),
-  })
-    .index("by_product", ["productId"])
-    .index("by_section_activity_active_order", ["section", "activity", "isActive", "sortOrder"]),
 
   // Products explicitly selected for a store.
   // Catalog product details remain in the shared products table.

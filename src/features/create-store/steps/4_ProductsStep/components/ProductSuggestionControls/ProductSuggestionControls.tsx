@@ -1,10 +1,22 @@
 import { LuRefreshCw } from "react-icons/lu";
 
-import { PRODUCT_COLLECTIONS, type ProductCollectionActivity } from "../../lib/productCollections";
-
+import type { ProductColorFamily } from "../../../../../../types/productColor.types";
 import { PRODUCT_COLOR_OPTIONS } from "../../lib/productColorOptions";
 import styles from "./ProductSuggestionControls.module.scss";
-import type { ProductColorFamily } from "../../../../../../types/productColor.types";
+
+const STORE_ACTIVITIES = [
+  "basketball",
+  "baseball",
+  "football",
+  "soccer",
+  "softball",
+  "volleyball",
+  "wrestling",
+  "spirit-wear",
+  "other",
+] as const;
+
+type StoreActivity = (typeof STORE_ACTIVITIES)[number];
 
 interface ProductSuggestionControlsProps {
   activity: string;
@@ -14,7 +26,7 @@ interface ProductSuggestionControlsProps {
   availableProductColorFamilies: ReadonlySet<string>;
   isLoading: boolean;
   canRegenerate: boolean;
-  onActivityChange: (activity: ProductCollectionActivity) => void;
+  onActivityChange: (activity: StoreActivity) => void;
   onProductColorChange: (colorFamily: ProductColorFamily) => void;
   onRegenerate: () => void;
 }
@@ -24,6 +36,10 @@ function getActivityLabel(activity: string): string {
     .split("-")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
+}
+
+function isStoreActivity(value: string): value is StoreActivity {
+  return STORE_ACTIVITIES.some((activity) => activity === value);
 }
 
 export default function ProductSuggestionControls({
@@ -54,12 +70,14 @@ export default function ProductSuggestionControls({
             value={activity}
             className={styles.summarySelect}
             onChange={(event) => {
-              const nextActivity = event.currentTarget.value as ProductCollectionActivity;
+              const nextActivity = event.currentTarget.value;
 
-              onActivityChange(nextActivity);
+              if (isStoreActivity(nextActivity)) {
+                onActivityChange(nextActivity);
+              }
             }}
           >
-            {(Object.keys(PRODUCT_COLLECTIONS) as ProductCollectionActivity[]).map((activityOption) => (
+            {STORE_ACTIVITIES.map((activityOption) => (
               <option key={activityOption} value={activityOption}>
                 {getActivityLabel(activityOption)}
               </option>

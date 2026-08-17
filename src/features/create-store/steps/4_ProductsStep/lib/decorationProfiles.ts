@@ -125,6 +125,20 @@ export function getDecorationProfile(profileId: DecorationProfileId): Decoration
   return DECORATION_PROFILES[profileId];
 }
 
+export function getDecorationProfileIdForProductCategory(category: string): DecorationProfileId {
+  const normalizedCategory = category.trim().toLowerCase();
+
+  if (normalizedCategory === "hats") {
+    return "cap-front";
+  }
+
+  if (normalizedCategory === "shorts" || normalizedCategory === "pants & joggers") {
+    return "left-leg";
+  }
+
+  return "upper-front";
+}
+
 export function createDefaultProductArtworkPlacement(profileId: DecorationProfileId): ProductArtworkPlacement {
   const placement = DECORATION_PROFILES[profileId].defaultPlacement;
 

@@ -8,20 +8,30 @@ import type { ProductColorFamily } from "../../../../types/productColor.types";
 import WizardLayout from "../../components/WizardLayout/WizardLayout";
 import { createProductCombinationKey, useCreateStore } from "../../context/CreateStoreContext";
 
+import ProductEditorModal from "./components/ProductEditorModal/ProductEditorModal";
 import ProductSuggestionControls from "./components/ProductSuggestionControls/ProductSuggestionControls";
+import ProductSuggestionSection from "./components/ProductSuggestionSection/ProductSuggestionSection";
 import { PRODUCT_COLOR_OPTIONS } from "./lib/productColorOptions";
-
-import { getAvailableProductColorFamilies, generateProductSuggestions } from "./lib/productGeneration";
-
-import { PRODUCT_COLLECTION_PROVIDER, PRODUCT_COLLECTIONS, type ProductCollectionActivity } from "./lib/productCollections";
-
+import { generateProductSuggestions } from "./lib/productGeneration";
 import type { EditingProductState, GeneratedSuggestion, ProductColorOption, ProductOption } from "./lib/productStep.types";
 import styles from "./ProductsStep.module.scss";
-import ProductEditorModal from "./components/ProductEditorModal/ProductEditorModal";
-import ProductSuggestionSection from "./components/ProductSuggestionSection/ProductSuggestionSection";
 
-function isProductCollectionActivity(value: string): value is ProductCollectionActivity {
-  return Object.prototype.hasOwnProperty.call(PRODUCT_COLLECTIONS, value);
+const STORE_ACTIVITIES = [
+  "basketball",
+  "baseball",
+  "football",
+  "soccer",
+  "softball",
+  "volleyball",
+  "wrestling",
+  "spirit-wear",
+  "other",
+] as const;
+
+type StoreActivity = (typeof STORE_ACTIVITIES)[number];
+
+function isStoreActivity(value: string): value is StoreActivity {
+  return STORE_ACTIVITIES.some((activity) => activity === value);
 }
 
 function getActivityLabel(activity: string): string {
@@ -65,39 +75,58 @@ export default function SelectProductsStep() {
   const [colorOverrides, setColorOverrides] = useState<Record<string, string>>({});
 
   /*
-   * Resolve the curated collection for
-   * the currently selected activity.
+   * "unknown" is valid catalog classification data,
+   * but it should never act as a selectable product filter.
    */
-  const collection = useMemo(
-    () => (isProductCollectionActivity(storeDraft.activity) ? PRODUCT_COLLECTIONS[storeDraft.activity] : []),
-    [storeDraft.activity],
-  );
-
-  const providerProductIds = useMemo(() => collection.map((item) => item.providerProductId), [collection]);
+  const filterableProductColorFamily = storeDraft.productColorFamily === "unknown" ? "" : storeDraft.productColorFamily;
 
   /*
-   * Load the real supplier products,
-   * available colors, and front images.
+   * Selected product IDs are sent to Convex so selected
+   * products remain available even when the color filter changes.
    */
-  const productOptions = useQuery(
-    api.products.listProductOptionsByProviderIds,
-    providerProductIds.length > 0
+  const selectedProductIds = useMemo(
+    () => [...new Set(Object.values(storeDraft.productSelections).map((selection) => selection.productId))],
+    [storeDraft.productSelections],
+  );
+
+  /*
+   * Store Creation is now vendor-independent.
+   *
+   * Convex returns:
+   * - uniforms for the selected activity
+   * - global fanwear
+   * - available product color families
+   *
+   * Supplier IDs are no longer used to build the assortment.
+   */
+  const storeCreationProducts = useQuery(
+    api.products.getStoreCreationProducts,
+    isStoreActivity(storeDraft.activity)
       ? {
-          provider: PRODUCT_COLLECTION_PROVIDER,
-          providerProductIds,
+          activity: storeDraft.activity,
+          colorFamily: filterableProductColorFamily || undefined,
+          selectedProductIds,
         }
       : "skip",
   );
 
   /*
-   * Fast lookup for generation and
-   * rebuilding selected combinations.
+   * Generation works from one normalized product pool.
+   * product.activity determines whether a product belongs
+   * in Uniforms or Fanwear.
    */
-  const productsByProviderId = useMemo(() => {
-    return new Map<string, ProductOption>(
-      (productOptions ?? []).flatMap((product) => (product.providerProductId ? [[product.providerProductId, product] as const] : [])),
-    );
-  }, [productOptions]);
+  const productOptions = useMemo<ProductOption[]>(() => {
+    if (!storeCreationProducts) {
+      return [];
+    }
+
+    return [...storeCreationProducts.uniforms, ...storeCreationProducts.fanwear];
+  }, [storeCreationProducts]);
+
+  const availableProductColorFamilies = useMemo(
+    () => new Set(storeCreationProducts?.availableProductColorFamilies ?? []),
+    [storeCreationProducts],
+  );
 
   /*
    * Used to display the artwork template
@@ -119,56 +148,29 @@ export default function SelectProductsStep() {
 
   const selectedProductCount = Object.keys(storeDraft.productSelections).length;
 
-  const isLoading = providerProductIds.length > 0 && productOptions === undefined;
+  const isLoading = isStoreActivity(storeDraft.activity) && storeCreationProducts === undefined;
 
-  /*
-   * Curated products that could not currently
-   * be resolved into an available catalog item.
-   */
-  const unavailableProductCount =
-    productOptions === undefined ? 0 : collection.filter((item) => !productsByProviderId.has(item.providerProductId)).length;
-
-  /*
-   * Determine which broad product colors
-   * exist in this activity's collection.
-   */
-  const availableProductColorFamilies = useMemo(() => getAvailableProductColorFamilies(productOptions ?? []), [productOptions]);
-
-  /*
-   * "unknown" is valid catalog classification data,
-   * but it should never act as a selectable product filter.
-   */
-  const filterableProductColorFamily = storeDraft.productColorFamily === "unknown" ? "" : storeDraft.productColorFamily;
-
-  /*
-   * Product generation now lives entirely
-   * inside productGeneration.ts.
-   */
   const suggestions = useMemo<GeneratedSuggestion[]>(() => {
-    if (!productOptions) {
+    if (!storeCreationProducts) {
       return [];
     }
 
     return generateProductSuggestions({
-      collection,
-      productsByProviderId,
+      products: productOptions,
       selectedArtworkTemplateIds,
       productColorFamily: filterableProductColorFamily,
       productGenerationSeed: storeDraft.productGenerationSeed,
       productSelections: storeDraft.productSelections,
       activity: storeDraft.activity,
-      providerProductIds,
     });
   }, [
-    collection,
+    storeCreationProducts,
     productOptions,
-    productsByProviderId,
-    providerProductIds,
     selectedArtworkTemplateIds,
-    storeDraft.activity,
     filterableProductColorFamily,
     storeDraft.productGenerationSeed,
     storeDraft.productSelections,
+    storeDraft.activity,
   ]);
 
   /*
@@ -193,7 +195,7 @@ export default function SelectProductsStep() {
   function getEffectiveCombinationKey(suggestion: GeneratedSuggestion): string {
     const color = getEffectiveColor(suggestion);
 
-    return createProductCombinationKey(suggestion.providerProductId, color.colorKey, suggestion.artworkTemplateId);
+    return createProductCombinationKey(suggestion.productId, color.colorKey, suggestion.artworkTemplateId);
   }
 
   function getArtworkName(artworkTemplateId: string): string {
@@ -208,12 +210,7 @@ export default function SelectProductsStep() {
     return storeDraft.productSelections[getEffectiveCombinationKey(suggestion)]?.isRequired ?? false;
   }
 
-  /*
-   * Activity changes affect the actual curated
-   * product collection, so existing selections
-   * are cleared after confirmation.
-   */
-  function handleActivityChange(nextActivity: ProductCollectionActivity) {
+  function handleActivityChange(nextActivity: StoreActivity) {
     if (nextActivity === storeDraft.activity) {
       return;
     }
@@ -238,12 +235,6 @@ export default function SelectProductsStep() {
     });
   }
 
-  /*
-   * Changing Product Color does not clear
-   * anything the user already selected.
-   *
-   * It simply generates a new unselected pool.
-   */
   function handleProductColorChange(nextColor: ProductColorFamily) {
     if (nextColor === storeDraft.productColorFamily) {
       return;
@@ -269,7 +260,7 @@ export default function SelectProductsStep() {
     }
 
     selectProduct({
-      providerProductId: suggestion.providerProductId,
+      productId: suggestion.productId,
       colorKey: color.colorKey,
       artworkTemplateId: suggestion.artworkTemplateId,
       isRequired: false,
@@ -283,13 +274,9 @@ export default function SelectProductsStep() {
 
     const selection = storeDraft.productSelections[combinationKey];
 
-    /*
-     * Clicking the star on an unselected
-     * suggestion selects it and makes it required.
-     */
     if (!selection) {
       selectProduct({
-        providerProductId: suggestion.providerProductId,
+        productId: suggestion.productId,
         colorKey: color.colorKey,
         artworkTemplateId: suggestion.artworkTemplateId,
         isRequired: true,
@@ -310,10 +297,6 @@ export default function SelectProductsStep() {
     });
   }
 
-  /*
-   * Resolve the full suggestion associated with
-   * the small piece of modal state.
-   */
   const editingSuggestion = useMemo(
     () => (editingProduct ? (suggestions.find((suggestion) => suggestion.combinationKey === editingProduct.suggestionKey) ?? null) : null),
     [editingProduct, suggestions],
@@ -340,17 +323,13 @@ export default function SelectProductsStep() {
     const previousColor = getEffectiveColor(editingSuggestion);
 
     const previousCombinationKey = createProductCombinationKey(
-      editingSuggestion.providerProductId,
+      editingSuggestion.productId,
       previousColor.colorKey,
       editingSuggestion.artworkTemplateId,
     );
 
     const currentSelection = storeDraft.productSelections[previousCombinationKey];
 
-    /*
-     * Selected products need their stored
-     * combination updated.
-     */
     if (currentSelection) {
       updateProductSelection(previousCombinationKey, {
         colorKey: editingProduct.colorKey,
@@ -364,10 +343,6 @@ export default function SelectProductsStep() {
         return remainingOverrides;
       });
     } else {
-      /*
-       * Unselected cards only need a temporary
-       * display override until selected.
-       */
       setColorOverrides((currentOverrides) => ({
         ...currentOverrides,
         [editingSuggestion.combinationKey]: editingProduct.colorKey,
@@ -416,18 +391,16 @@ export default function SelectProductsStep() {
 
               <div>
                 <h2>Select artwork first</h2>
-
                 <p>Return to the artwork step and select at least one template.</p>
               </div>
             </div>
-          ) : collection.length === 0 ? (
+          ) : !isLoading && availableProductColorFamilies.size === 0 ? (
             <div className={styles.emptyState}>
               <LuTriangleAlert aria-hidden="true" />
 
               <div>
-                <h2>No product collection is available</h2>
-
-                <p>A curated collection has not been created for {activityLabel} yet.</p>
+                <h2>No products are available</h2>
+                <p>No available products were found for this catalog.</p>
               </div>
             </div>
           ) : !isLoading && !hasMatchingSuggestions ? (
@@ -442,17 +415,6 @@ export default function SelectProductsStep() {
             </div>
           ) : (
             <>
-              {unavailableProductCount > 0 && (
-                <div className={styles.warning} role="status">
-                  <LuTriangleAlert aria-hidden="true" />
-
-                  <span>
-                    {unavailableProductCount} recommended {unavailableProductCount === 1 ? "product is" : "products are"} currently
-                    unavailable.
-                  </span>
-                </div>
-              )}
-
               <ProductSuggestionSection
                 title="Uniforms"
                 description={`${productColorLabel} uniform options with randomly assigned artwork.`}
