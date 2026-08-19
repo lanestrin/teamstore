@@ -1,9 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 
 import { createContext, useContext, useEffect, useMemo, useState, type Dispatch, type ReactNode, type SetStateAction } from "react";
-
 import type { Doc, Id } from "../../../../convex/_generated/dataModel";
-
 import { ART_TEMPLATE_LIST } from "../../../assets/art-templates";
 
 import useFileDataUrl from "../hooks/useFileDataUrl";
@@ -28,7 +26,6 @@ export interface ArtworkTemplateDraft {
 }
 
 export type ArtworkTemplatesDraft = Record<string, ArtworkTemplateDraft>;
-
 export type ArtworkSvgMap = Readonly<Record<string, string>>;
 
 export interface ProductSelectionInput {
@@ -47,43 +44,34 @@ export interface ProductSelectionDraft {
 }
 
 export type ProductSelectionsDraft = Record<string, ProductSelectionDraft>;
-
 export interface CreateStoreDraft {
   organizationName: string;
   organizationSlug: string;
-
   activity: string;
-
   storeName: string;
   storeSlug: string;
   storeDescription: string;
-
   logoFile: File | null;
   logoStorageId: Id<"_storage"> | null;
-
   artworkTemplates: ArtworkTemplatesDraft;
   artworkText: ArtworkTextDraft;
-
   productColorFamily: ProductColorFamily | "";
-
+  productSecondaryColorFamily: ProductColorFamily | "";
   productGenerationSeed: number;
   productSelections: ProductSelectionsDraft;
 }
 
 interface CreateStoreContextValue {
   storeId: Id<"stores"> | null;
-
   setStoreId: Dispatch<SetStateAction<Id<"stores"> | null>>;
 
   currentStep: number;
-
   setCurrentStep: Dispatch<SetStateAction<number>>;
 
   primaryColor: string;
   secondaryColor: string;
 
   setPrimaryColor: Dispatch<SetStateAction<string>>;
-
   setSecondaryColor: Dispatch<SetStateAction<string>>;
 
   storeDraft: CreateStoreDraft;
@@ -94,13 +82,9 @@ interface CreateStoreContextValue {
   artworkSvgsByTemplateId: ArtworkSvgMap;
 
   updateStoreDraft: (updates: Partial<CreateStoreDraft>) => void;
-
   updateArtworkTemplateDraft: (templateId: string, updates: Partial<Omit<ArtworkTemplateDraft, "selectedArtTemplateId">>) => void;
-
   selectProduct: (selection: ProductSelectionInput) => void;
-
   removeProduct: (combinationKey: string) => void;
-
   toggleProductRequired: (combinationKey: string) => void;
 
   updateProductSelection: (
@@ -112,9 +96,7 @@ interface CreateStoreContextValue {
   ) => void;
 
   regenerateProductSuggestions: () => void;
-
   loadStoreDraft: (draft: Doc<"stores">) => void;
-
   resetStoreDraft: () => void;
 }
 
@@ -122,7 +104,7 @@ export function createProductCombinationKey(productId: string, colorKey: string,
   return [productId.trim(), colorKey.trim(), artworkTemplateId.trim()].map((value) => encodeURIComponent(value)).join("__");
 }
 
-function classifyHexColorFamily(hexColor: string): ProductColorFamily {
+export function classifyHexColorFamily(hexColor: string): ProductColorFamily {
   const normalized = hexColor.trim().replace("#", "");
 
   if (!/^[0-9a-fA-F]{6}$/.test(normalized)) {
@@ -130,17 +112,11 @@ function classifyHexColorFamily(hexColor: string): ProductColorFamily {
   }
 
   const red = Number.parseInt(normalized.slice(0, 2), 16) / 255;
-
   const green = Number.parseInt(normalized.slice(2, 4), 16) / 255;
-
   const blue = Number.parseInt(normalized.slice(4, 6), 16) / 255;
-
   const maximum = Math.max(red, green, blue);
-
   const minimum = Math.min(red, green, blue);
-
   const lightness = (maximum + minimum) / 2;
-
   const difference = maximum - minimum;
 
   if (lightness <= 0.12) {
@@ -214,33 +190,21 @@ function createDefaultStoreDraft(): CreateStoreDraft {
   return {
     organizationName: "",
     organizationSlug: "",
-
     activity: "",
-
     storeName: "",
     storeSlug: "",
     storeDescription: "",
-
     logoFile: null,
     logoStorageId: null,
-
     artworkTemplates: {},
-
     artworkText: {
       organizationName: "Smallville",
       yearEstablished: "2026",
       mascotName: "Crows",
     },
-
-    /*
-     * Empty until Step 4 is reached.
-     * At that point it is initialized from
-     * the user's primary team color.
-     */
     productColorFamily: "",
-
+    productSecondaryColorFamily: "",
     productGenerationSeed: DEFAULT_PRODUCT_GENERATION_SEED,
-
     productSelections: {},
   };
 }
@@ -253,19 +217,12 @@ interface CreateStoreProviderProps {
 
 export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
   const [storeId, setStoreId] = useState<Id<"stores"> | null>(null);
-
   const [currentStep, setCurrentStep] = useState(1);
-
   const [primaryColor, setPrimaryColor] = useState(DEFAULT_PRIMARY_COLOR);
-
   const [secondaryColor, setSecondaryColor] = useState(DEFAULT_SECONDARY_COLOR);
-
   const [storeDraft, setStoreDraft] = useState<CreateStoreDraft>(createDefaultStoreDraft);
-
   const mascotDataUrl = useFileDataUrl(storeDraft.logoFile);
-
   const [fontLoadVersion, setFontLoadVersion] = useState(0);
-
   const resolvedArtworkText = useMemo<ArtworkTextDraft>(
     () => ({
       ...storeDraft.artworkText,
@@ -311,11 +268,9 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
 
     for (const template of ART_TEMPLATE_LIST) {
       const templateDraft = storeDraft.artworkTemplates[template.id];
-
       const baseSvg = createCustomizedSvg(template, resolvedArtworkText, mascotDataUrl);
 
       baseSvgs[template.id] = baseSvg;
-
       finalSvgs[template.id] = applySavedArtworkAdjustments(baseSvg, template.editableElements, templateDraft?.artworkAdjustments ?? {});
     }
 
@@ -325,11 +280,6 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
     };
   }, [fontLoadVersion, mascotDataUrl, resolvedArtworkText, storeDraft.artworkTemplates]);
 
-  /*
-   * Step 4 starts with the primary team
-   * color, but after initialization the
-   * product color filter is independent.
-   */
   useEffect(() => {
     if (currentStep !== 4 || storeDraft.productColorFamily) {
       return;
@@ -344,9 +294,10 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
         ...currentDraft,
 
         productColorFamily: classifyHexColorFamily(primaryColor),
+        productSecondaryColorFamily: classifyHexColorFamily(secondaryColor),
       };
     });
-  }, [currentStep, primaryColor, storeDraft.productColorFamily]);
+  }, [currentStep, primaryColor, secondaryColor, storeDraft.productColorFamily]);
 
   function updateStoreDraft(updates: Partial<CreateStoreDraft>) {
     setStoreDraft((currentDraft) => ({
@@ -359,22 +310,17 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
     setStoreDraft((currentDraft) => {
       const currentTemplateDraft = currentDraft.artworkTemplates[templateId] ?? {
         selectedArtTemplateId: templateId,
-
         isSelected: false,
-
         artworkAdjustments: {},
       };
 
       return {
         ...currentDraft,
-
         artworkTemplates: {
           ...currentDraft.artworkTemplates,
-
           [templateId]: {
             ...currentTemplateDraft,
             ...updates,
-
             selectedArtTemplateId: templateId,
           },
         },
@@ -561,6 +507,7 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
       },
 
       productColorFamily: "",
+      productSecondaryColorFamily: "",
       productGenerationSeed: DEFAULT_PRODUCT_GENERATION_SEED,
       productSelections: {},
     });

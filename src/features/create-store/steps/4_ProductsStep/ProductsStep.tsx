@@ -46,6 +46,10 @@ function getActivityLabel(activity: string): string {
 }
 
 function getProductColorLabel(family: ProductColorFamily | ""): string {
+  if (!family) {
+    return "All";
+  }
+
   return PRODUCT_COLOR_OPTIONS.find((option) => option.value === family)?.label ?? "Product color";
 }
 
@@ -63,6 +67,9 @@ export default function SelectProductsStep() {
     regenerateProductSuggestions,
   } = useCreateStore();
 
+  const primaryColorFamily = storeDraft.productColorFamily;
+  const secondaryColorFamily = storeDraft.productSecondaryColorFamily;
+
   const [editingProduct, setEditingProduct] = useState<EditingProductState | null>(null);
 
   /*
@@ -73,12 +80,6 @@ export default function SelectProductsStep() {
    * inside productSelections instead.
    */
   const [colorOverrides, setColorOverrides] = useState<Record<string, string>>({});
-
-  /*
-   * "unknown" is valid catalog classification data,
-   * but it should never act as a selectable product filter.
-   */
-  const filterableProductColorFamily = storeDraft.productColorFamily === "unknown" ? "" : storeDraft.productColorFamily;
 
   /*
    * Selected product IDs are sent to Convex so selected
@@ -104,7 +105,7 @@ export default function SelectProductsStep() {
     isStoreActivity(storeDraft.activity)
       ? {
           activity: storeDraft.activity,
-          colorFamily: filterableProductColorFamily || undefined,
+          colorFamily: primaryColorFamily && primaryColorFamily !== "unknown" ? primaryColorFamily : undefined,
           selectedProductIds,
         }
       : "skip",
@@ -128,16 +129,8 @@ export default function SelectProductsStep() {
     [storeCreationProducts],
   );
 
-  /*
-   * Used to display the artwork template
-   * name on each suggestion card.
-   */
   const artworkTemplatesById = useMemo(() => new Map(ART_TEMPLATE_LIST.map((template) => [template.id, template])), []);
 
-  /*
-   * Only artwork templates explicitly selected
-   * during Step 3 participate in generation.
-   */
   const selectedArtworkTemplateIds = useMemo(
     () =>
       Object.values(storeDraft.artworkTemplates)
@@ -151,14 +144,15 @@ export default function SelectProductsStep() {
   const isLoading = isStoreActivity(storeDraft.activity) && storeCreationProducts === undefined;
 
   const suggestions = useMemo<GeneratedSuggestion[]>(() => {
-    if (!storeCreationProducts) {
+    if (!storeCreationProducts || !primaryColorFamily) {
       return [];
     }
 
     return generateProductSuggestions({
       products: productOptions,
       selectedArtworkTemplateIds,
-      productColorFamily: filterableProductColorFamily,
+      primaryColorFamily,
+      secondaryColorFamily,
       productGenerationSeed: storeDraft.productGenerationSeed,
       productSelections: storeDraft.productSelections,
       activity: storeDraft.activity,
@@ -167,7 +161,8 @@ export default function SelectProductsStep() {
     storeCreationProducts,
     productOptions,
     selectedArtworkTemplateIds,
-    filterableProductColorFamily,
+    primaryColorFamily,
+    secondaryColorFamily,
     storeDraft.productGenerationSeed,
     storeDraft.productSelections,
     storeDraft.activity,
@@ -235,7 +230,7 @@ export default function SelectProductsStep() {
     });
   }
 
-  function handleProductColorChange(nextColor: ProductColorFamily) {
+  function handlePrimaryColorChange(nextColor: ProductColorFamily) {
     if (nextColor === storeDraft.productColorFamily) {
       return;
     }
@@ -249,9 +244,22 @@ export default function SelectProductsStep() {
     });
   }
 
+  function handleSecondaryColorChange(nextColor: ProductColorFamily | "") {
+    if (nextColor === storeDraft.productSecondaryColorFamily) {
+      return;
+    }
+
+    setColorOverrides({});
+    setEditingProduct(null);
+
+    updateStoreDraft({
+      productSecondaryColorFamily: nextColor,
+      productGenerationSeed: storeDraft.productGenerationSeed + 1,
+    });
+  }
+
   function handleSelectionChange(suggestion: GeneratedSuggestion, checked: boolean) {
     const color = getEffectiveColor(suggestion);
-
     const combinationKey = getEffectiveCombinationKey(suggestion);
 
     if (!checked) {
@@ -269,9 +277,7 @@ export default function SelectProductsStep() {
 
   function handleRequiredClick(suggestion: GeneratedSuggestion) {
     const color = getEffectiveColor(suggestion);
-
     const combinationKey = getEffectiveCombinationKey(suggestion);
-
     const selection = storeDraft.productSelections[combinationKey];
 
     if (!selection) {
@@ -321,13 +327,11 @@ export default function SelectProductsStep() {
     }
 
     const previousColor = getEffectiveColor(editingSuggestion);
-
     const previousCombinationKey = createProductCombinationKey(
       editingSuggestion.productId,
       previousColor.colorKey,
       editingSuggestion.artworkTemplateId,
     );
-
     const currentSelection = storeDraft.productSelections[previousCombinationKey];
 
     if (currentSelection) {
@@ -353,19 +357,21 @@ export default function SelectProductsStep() {
   }
 
   const activityLabel = getActivityLabel(storeDraft.activity);
-
-  const productColorLabel = getProductColorLabel(storeDraft.productColorFamily);
-
+  const primaryColorLabel = getProductColorLabel(primaryColorFamily);
+  const secondaryColorLabel = getProductColorLabel(secondaryColorFamily);
   const hasMatchingSuggestions = suggestions.length > 0;
-
-  const canRegenerate = Boolean(storeDraft.productColorFamily) && selectedArtworkTemplateIds.length > 0;
+  const canRegenerate = Boolean(primaryColorFamily) && selectedArtworkTemplateIds.length > 0;
 
   return (
     <>
       <WizardLayout
         step={currentStep}
         title={`Choose products for ${activityLabel}`}
-        description={`Choose from ${productColorLabel.toLowerCase()} garments with randomly assigned artwork from the templates you selected.`}
+        description={
+          secondaryColorFamily
+            ? `Choose products that match your ${primaryColorLabel} and ${secondaryColorLabel} product colors.`
+            : `Choose ${primaryColorLabel} products with any secondary color.`
+        }
         onBack={() => setCurrentStep(3)}
         onNext={() => setCurrentStep(5)}
         nextDisabled={isLoading || selectedProductCount === 0}
@@ -374,14 +380,16 @@ export default function SelectProductsStep() {
         <div className={styles.productsStep}>
           <ProductSuggestionControls
             activity={storeDraft.activity}
-            productColorFamily={storeDraft.productColorFamily}
+            primaryColorFamily={primaryColorFamily}
+            secondaryColorFamily={secondaryColorFamily}
             selectedCount={selectedProductCount}
             suggestionCount={suggestions.length}
             availableProductColorFamilies={availableProductColorFamilies}
             isLoading={isLoading}
             canRegenerate={canRegenerate}
             onActivityChange={handleActivityChange}
-            onProductColorChange={handleProductColorChange}
+            onPrimaryColorChange={handlePrimaryColorChange}
+            onSecondaryColorChange={handleSecondaryColorChange}
             onRegenerate={regenerateProductSuggestions}
           />
 
@@ -408,16 +416,20 @@ export default function SelectProductsStep() {
               <LuTriangleAlert aria-hidden="true" />
 
               <div>
-                <h2>No {productColorLabel.toLowerCase()} products found</h2>
+                <h2>No matching products found</h2>
 
-                <p>Choose another Product Color to see available garments.</p>
+                <p>
+                  {secondaryColorFamily
+                    ? `No quick setup products were found for your ${primaryColorLabel} and ${secondaryColorLabel} product colors.`
+                    : `No quick setup products were found for ${primaryColorLabel} with any secondary color.`}
+                </p>
               </div>
             </div>
           ) : (
             <>
               <ProductSuggestionSection
                 title="Uniforms"
-                description={`${productColorLabel} uniform options with randomly assigned artwork.`}
+                description={`${primaryColorLabel} and ${secondaryColorLabel} uniform options with randomly assigned artwork.`}
                 section="uniforms"
                 suggestions={suggestions}
                 isLoading={isLoading}
@@ -433,7 +445,7 @@ export default function SelectProductsStep() {
 
               <ProductSuggestionSection
                 title="Fanwear"
-                description={`${productColorLabel} fanwear options with randomly assigned artwork.`}
+                description={`${primaryColorLabel} and ${secondaryColorLabel} fanwear options with randomly assigned artwork.`}
                 section="fanwear"
                 suggestions={suggestions}
                 isLoading={isLoading}
