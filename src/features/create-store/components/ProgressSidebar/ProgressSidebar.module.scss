@@ -73,7 +73,32 @@
   position: relative;
   display: flex;
   gap: 1rem;
-  padding-bottom: 2rem;
+  width: 100%;
+  padding: 0 0 2rem;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.step:not(:disabled):hover .content h3 {
+  color: white;
+}
+
+.step:not(:disabled):hover .circle {
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+.step:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.85);
+  outline-offset: 4px;
+  border-radius: $radius-sm;
+}
+
+.step:disabled {
+  cursor: default;
 }
 
 .line {
@@ -100,6 +125,10 @@
   font-size: 0.85rem;
   font-weight: 700;
   flex-shrink: 0;
+  transition:
+      border-color $transition-base,
+      background-color $transition-base,
+      box-shadow $transition-base;
 }
 
 .active {
@@ -119,6 +148,7 @@
   margin: 2px 0 4px;
   font-size: 0.96rem;
   font-weight: 600;
+  transition: color $transition-base;
 }
 
 .content p {

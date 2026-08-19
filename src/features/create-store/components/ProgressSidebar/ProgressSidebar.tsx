@@ -7,10 +7,12 @@ import styles from "./ProgressSidebar.module.scss";
 
 interface ProgressSidebarProps {
   currentStep: number;
+  furthestStepReached: number;
 
   isSaving: boolean;
   isFinalizing: boolean;
 
+  onStepChange: (step: number) => void;
   onSaveAndExit: () => Promise<void>;
   onCreateStore: () => Promise<void>;
 }
@@ -38,7 +40,15 @@ const steps = [
   },
 ];
 
-export default function ProgressSidebar({ currentStep, isSaving, isFinalizing, onSaveAndExit, onCreateStore }: ProgressSidebarProps) {
+export default function ProgressSidebar({
+  currentStep,
+  furthestStepReached,
+  isSaving,
+  isFinalizing,
+  onStepChange,
+  onSaveAndExit,
+  onCreateStore,
+}: ProgressSidebarProps) {
   const isWorking = isSaving || isFinalizing;
 
   return (
@@ -60,15 +70,27 @@ export default function ProgressSidebar({ currentStep, isSaving, isFinalizing, o
           const stepNumber = index + 1;
 
           const isActive = stepNumber === currentStep;
+          const isComplete = stepNumber < furthestStepReached;
 
-          const isComplete = stepNumber < currentStep;
+          /*
+           * Review is not implemented yet, so only
+           * Steps 1–4 can be used for sidebar navigation.
+           */
+          const canNavigate = stepNumber <= furthestStepReached && stepNumber <= 4 && !isWorking;
 
           return (
-            <div key={step.title} className={styles.step} aria-current={isActive ? "step" : undefined}>
-              {index < steps.length - 1 && <div className={`${styles.line} ${isComplete ? styles.lineComplete : ""}`} />}
+            <button
+              key={step.title}
+              type="button"
+              className={styles.step}
+              aria-current={isActive ? "step" : undefined}
+              disabled={!canNavigate}
+              onClick={() => onStepChange(stepNumber)}
+            >
+              {index < steps.length - 1 && <div className={`${styles.line} ${isComplete ? styles.lineComplete : ""}`} aria-hidden="true" />}
 
               <div className={`${styles.circle} ${isActive ? styles.active : ""} ${isComplete ? styles.complete : ""}`}>
-                {isComplete ? <LuCheck aria-hidden="true" /> : stepNumber}
+                {isComplete && !isActive ? <LuCheck aria-hidden="true" /> : stepNumber}
               </div>
 
               <div className={styles.content}>
@@ -76,7 +98,7 @@ export default function ProgressSidebar({ currentStep, isSaving, isFinalizing, o
 
                 <p>{step.description}</p>
               </div>
-            </div>
+            </button>
           );
         })}
       </nav>
