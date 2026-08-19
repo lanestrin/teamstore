@@ -66,7 +66,8 @@ interface CreateStoreContextValue {
   setStoreId: Dispatch<SetStateAction<Id<"stores"> | null>>;
 
   currentStep: number;
-  setCurrentStep: Dispatch<SetStateAction<number>>;
+  furthestStepReached: number;
+  setCurrentStep: (step: number) => void;
 
   primaryColor: string;
   secondaryColor: string;
@@ -217,7 +218,8 @@ interface CreateStoreProviderProps {
 
 export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
   const [storeId, setStoreId] = useState<Id<"stores"> | null>(null);
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStepState] = useState(1);
+  const [furthestStepReached, setFurthestStepReached] = useState(1);
   const [primaryColor, setPrimaryColor] = useState(DEFAULT_PRIMARY_COLOR);
   const [secondaryColor, setSecondaryColor] = useState(DEFAULT_SECONDARY_COLOR);
   const [storeDraft, setStoreDraft] = useState<CreateStoreDraft>(createDefaultStoreDraft);
@@ -486,7 +488,8 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
     }
 
     setStoreId(draft._id);
-    setCurrentStep(draft.currentStep);
+    setCurrentStepState(draft.currentStep);
+    setFurthestStepReached(draft.currentStep);
     setPrimaryColor(draft.primaryColor ?? DEFAULT_PRIMARY_COLOR);
     setSecondaryColor(draft.secondaryColor ?? DEFAULT_SECONDARY_COLOR);
     setStoreDraft({
@@ -513,9 +516,16 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
     });
   }
 
+  function setCurrentStep(step: number) {
+    setCurrentStepState(step);
+
+    setFurthestStepReached((currentFurthestStep) => Math.max(currentFurthestStep, step));
+  }
+
   function resetStoreDraft() {
     setStoreId(null);
-    setCurrentStep(1);
+    setCurrentStepState(1);
+    setFurthestStepReached(1);
 
     setPrimaryColor(DEFAULT_PRIMARY_COLOR);
     setSecondaryColor(DEFAULT_SECONDARY_COLOR);
@@ -527,8 +537,11 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
       value={{
         storeId,
         setStoreId,
+
         currentStep,
+        furthestStepReached,
         setCurrentStep,
+
         primaryColor,
         secondaryColor,
         setPrimaryColor,

@@ -10,10 +10,8 @@ import styles from "./CreateStoreLayout.module.scss";
 import { useCreateStoreWorkflow } from "../hooks/useCreateStoreWorkflow";
 
 function CreateStoreContent() {
-  const { currentStep } = useCreateStore();
-
+  const { currentStep, furthestStepReached, setCurrentStep } = useCreateStore();
   const { isLoadingDraft, isSaving, isFinalizing, saveAndExit, createStore } = useCreateStoreWorkflow();
-
   const showLivePreview = currentStep === 1 || currentStep === 2;
 
   if (isLoadingDraft) {
@@ -37,8 +35,10 @@ function CreateStoreContent() {
       <aside className={styles.sidebar}>
         <ProgressSidebar
           currentStep={currentStep}
+          furthestStepReached={furthestStepReached}
           isSaving={isSaving}
           isFinalizing={isFinalizing}
+          onStepChange={setCurrentStep}
           onSaveAndExit={saveAndExit}
           onCreateStore={createStore}
         />
