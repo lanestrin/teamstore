@@ -3,14 +3,15 @@ import { createProductCombinationKey, type ProductSelectionsDraft } from "../../
 import { getDecorationProfileIdForProductCategory } from "./decorationProfiles";
 import type { GeneratedSuggestion, ProductOption, ProductSuggestionSection } from "./productStep.types";
 
-export const MAX_GENERATED_SUGGESTIONS = 30;
-
-type FilterableProductColorFamily = Exclude<ProductColorFamily, "unknown">;
+export const MAX_UNIFORM_SUGGESTIONS = 8;
+export const MAX_FANWEAR_SUGGESTIONS = 12;
+const MAX_ARTWORK_VARIATIONS_PER_PRODUCT_COLOR = 2;
 
 interface GenerateProductSuggestionsArgs {
   products: readonly ProductOption[];
   selectedArtworkTemplateIds: readonly string[];
-  productColorFamily: FilterableProductColorFamily | "";
+  primaryColorFamily: ProductColorFamily;
+  secondaryColorFamily: ProductColorFamily | "";
   productGenerationSeed: number;
   productSelections: ProductSelectionsDraft;
   activity: string;
@@ -21,6 +22,7 @@ interface ProductColorCandidate {
   section: ProductSuggestionSection;
   product: ProductOption;
   color: ProductOption["colorOptions"][number];
+  priority: number;
 }
 
 function hashString(value: string): number {
@@ -74,12 +76,8 @@ function getProductSection(product: ProductOption): ProductSuggestionSection {
 function rebuildSelectedSuggestions(
   productsById: ReadonlyMap<string, ProductOption>,
   productSelections: ProductSelectionsDraft,
-): {
-  suggestions: GeneratedSuggestion[];
-  selectedProductColorPairs: Set<string>;
-} {
+): GeneratedSuggestion[] {
   const suggestions: GeneratedSuggestion[] = [];
-  const selectedProductColorPairs = new Set<string>();
 
   for (const selection of Object.values(productSelections)) {
     const product = productsById.get(selection.productId);
@@ -94,8 +92,6 @@ function rebuildSelectedSuggestions(
       continue;
     }
 
-    selectedProductColorPairs.add(getProductColorPairKey(selection.productId, selection.colorKey));
-
     suggestions.push({
       combinationKey: selection.combinationKey,
       productId: selection.productId,
@@ -107,30 +103,59 @@ function rebuildSelectedSuggestions(
     });
   }
 
-  return {
-    suggestions,
-    selectedProductColorPairs,
-  };
+  return suggestions;
+}
+
+function getQuickSetupColorPriority(
+  colorFamilies: readonly ProductColorFamily[],
+  primaryColorFamily: ProductColorFamily,
+  secondaryColorFamily: ProductColorFamily | "",
+): number {
+  if (primaryColorFamily === "unknown") {
+    return 0;
+  }
+
+  const colors = [...new Set(colorFamilies.filter((color) => color !== "unknown"))];
+
+  if (colors.length === 1 && colors[0] === primaryColorFamily) {
+    return 1;
+  }
+
+  if (!secondaryColorFamily) {
+    if (colors.length === 2 && colors.includes(primaryColorFamily)) {
+      return 2;
+    }
+    return 0;
+  }
+
+  if (secondaryColorFamily === "unknown") {
+    return 0;
+  }
+
+  if (
+    colors.length === 2 &&
+    primaryColorFamily !== secondaryColorFamily &&
+    colors.includes(primaryColorFamily) &&
+    colors.includes(secondaryColorFamily)
+  ) {
+    return 2;
+  }
+
+  return 0;
 }
 
 function buildColorCandidates(
   products: readonly ProductOption[],
-  productColorFamily: FilterableProductColorFamily,
-  selectedProductColorPairs: ReadonlySet<string>,
+  primaryColorFamily: ProductColorFamily,
+  secondaryColorFamily: ProductColorFamily | "",
 ): ProductColorCandidate[] {
   const candidates: ProductColorCandidate[] = [];
 
   for (const product of products) {
-    const matchingColors = product.colorOptions.filter((color) => color.colorFamilies.includes(productColorFamily));
+    for (const color of product.colorOptions) {
+      const priority = getQuickSetupColorPriority(color.colorFamilies, primaryColorFamily, secondaryColorFamily);
 
-    for (const color of matchingColors) {
-      const pairKey = getProductColorPairKey(product._id, color.colorKey);
-
-      /*
-       * Don't generate another artwork variation
-       * beside a garment/color already selected.
-       */
-      if (selectedProductColorPairs.has(pairKey)) {
+      if (priority === 0) {
         continue;
       }
 
@@ -139,6 +164,7 @@ function buildColorCandidates(
         section: getProductSection(product),
         product,
         color,
+        priority,
       });
     }
   }
@@ -150,65 +176,137 @@ function chooseArtworkTemplate(
   candidate: ProductColorCandidate,
   selectedArtworkTemplateIds: readonly string[],
   generationSeed: number,
-): string {
-  const artworkSeed = hashString([generationSeed, candidate.productId, candidate.color.colorKey].join("|"));
+  usedArtworkTemplateIds: ReadonlySet<string>,
+): string | null {
+  const availableArtworkTemplateIds = selectedArtworkTemplateIds.filter(
+    (artworkTemplateId) => !usedArtworkTemplateIds.has(artworkTemplateId),
+  );
 
-  return selectedArtworkTemplateIds[artworkSeed % selectedArtworkTemplateIds.length];
+  if (availableArtworkTemplateIds.length === 0) {
+    return null;
+  }
+
+  const artworkSeed = hashString([generationSeed, candidate.productId, candidate.color.colorKey, usedArtworkTemplateIds.size].join("|"));
+
+  return availableArtworkTemplateIds[artworkSeed % availableArtworkTemplateIds.length];
 }
 
 export function generateProductSuggestions({
   products,
   selectedArtworkTemplateIds,
-  productColorFamily,
+  primaryColorFamily,
+  secondaryColorFamily,
   productGenerationSeed,
   productSelections,
   activity,
 }: GenerateProductSuggestionsArgs): GeneratedSuggestion[] {
   const productsById = new Map<string, ProductOption>(products.map((product) => [product._id, product]));
-
-  const { suggestions: selectedSuggestions, selectedProductColorPairs } = rebuildSelectedSuggestions(productsById, productSelections);
+  const selectedSuggestions = rebuildSelectedSuggestions(productsById, productSelections);
 
   /*
    * Selected products remain visible even when
    * the Product Color filter changes.
    */
-  if (!productColorFamily || selectedArtworkTemplateIds.length === 0) {
+
+  if (selectedArtworkTemplateIds.length === 0) {
     return selectedSuggestions;
   }
 
-  const colorCandidates = buildColorCandidates(products, productColorFamily, selectedProductColorPairs);
+  const colorCandidates = buildColorCandidates(products, primaryColorFamily, secondaryColorFamily);
   const productIds = products.map((product) => product._id).sort();
   const generationSeed = hashString(
-    [productGenerationSeed, activity, productColorFamily, ...selectedArtworkTemplateIds, ...productIds].join("|"),
+    [productGenerationSeed, activity, primaryColorFamily, secondaryColorFamily, ...selectedArtworkTemplateIds, ...productIds].join("|"),
   );
 
-  const randomizedCandidates = shuffleWithSeed(colorCandidates, generationSeed);
+  const twoColorCandidates = colorCandidates.filter((candidate) => candidate.priority === 2);
+  const solidColorCandidates = colorCandidates.filter((candidate) => candidate.priority === 1);
+
+  const randomizedCandidates = [
+    ...shuffleWithSeed(twoColorCandidates, generationSeed),
+    ...shuffleWithSeed(solidColorCandidates, generationSeed + 1),
+  ];
+
   const generated = new Map<string, GeneratedSuggestion>();
+  const artworkIdsByProductColor = new Map<string, Set<string>>();
+
+  let uniformCount = selectedSuggestions.filter((suggestion) => suggestion.section === "uniforms").length;
+
+  let fanwearCount = selectedSuggestions.filter((suggestion) => suggestion.section === "fanwear").length;
 
   /*
    * Explicit selections are preserved first.
    */
   for (const suggestion of selectedSuggestions) {
     generated.set(suggestion.combinationKey, suggestion);
+
+    const pairKey = getProductColorPairKey(suggestion.productId, suggestion.color.colorKey);
+    const artworkIds = artworkIdsByProductColor.get(pairKey) ?? new Set<string>();
+
+    artworkIds.add(suggestion.artworkTemplateId);
+    artworkIdsByProductColor.set(pairKey, artworkIds);
   }
 
-  for (const candidate of randomizedCandidates) {
-    if (generated.size >= MAX_GENERATED_SUGGESTIONS) {
-      break;
+  for (let variation = 0; variation < MAX_ARTWORK_VARIATIONS_PER_PRODUCT_COLOR; variation += 1) {
+    for (const candidate of randomizedCandidates) {
+      if (candidate.section === "uniforms" && uniformCount >= MAX_UNIFORM_SUGGESTIONS) {
+        continue;
+      }
+
+      if (candidate.section === "fanwear" && fanwearCount >= MAX_FANWEAR_SUGGESTIONS) {
+        continue;
+      }
+
+      const pairKey = getProductColorPairKey(candidate.productId, candidate.color.colorKey);
+
+      const usedArtworkTemplateIds = artworkIdsByProductColor.get(pairKey) ?? new Set<string>();
+
+      if (usedArtworkTemplateIds.size >= MAX_ARTWORK_VARIATIONS_PER_PRODUCT_COLOR) {
+        continue;
+      }
+
+      /*
+       * First pass favors product variety.
+       * Second pass allows another artwork variation.
+       */
+      if (variation === 0 && usedArtworkTemplateIds.size > 0) {
+        continue;
+      }
+
+      const artworkTemplateId = chooseArtworkTemplate(candidate, selectedArtworkTemplateIds, generationSeed, usedArtworkTemplateIds);
+
+      if (!artworkTemplateId) {
+        continue;
+      }
+
+      const combinationKey = createProductCombinationKey(candidate.productId, candidate.color.colorKey, artworkTemplateId);
+
+      generated.set(combinationKey, {
+        combinationKey,
+        productId: candidate.productId,
+        section: candidate.section,
+        decorationProfileId: getDecorationProfileIdForProductCategory(candidate.product.category),
+        product: candidate.product,
+        color: candidate.color,
+        artworkTemplateId,
+      });
+
+      usedArtworkTemplateIds.add(artworkTemplateId);
+      artworkIdsByProductColor.set(pairKey, usedArtworkTemplateIds);
+
+      if (candidate.section === "uniforms") {
+        uniformCount += 1;
+      } else {
+        fanwearCount += 1;
+      }
+
+      if (uniformCount >= MAX_UNIFORM_SUGGESTIONS && fanwearCount >= MAX_FANWEAR_SUGGESTIONS) {
+        break;
+      }
     }
 
-    const artworkTemplateId = chooseArtworkTemplate(candidate, selectedArtworkTemplateIds, generationSeed);
-    const combinationKey = createProductCombinationKey(candidate.productId, candidate.color.colorKey, artworkTemplateId);
-
-    generated.set(combinationKey, {
-      combinationKey,
-      productId: candidate.productId,
-      section: candidate.section,
-      decorationProfileId: getDecorationProfileIdForProductCategory(candidate.product.category),
-      product: candidate.product,
-      color: candidate.color,
-      artworkTemplateId,
-    });
+    if (uniformCount >= MAX_UNIFORM_SUGGESTIONS && fanwearCount >= MAX_FANWEAR_SUGGESTIONS) {
+      break;
+    }
   }
 
   return [...generated.values()];
