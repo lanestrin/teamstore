@@ -27,6 +27,13 @@ const storeProductSelection = v.object({
   isRequired: v.boolean(),
 });
 
+const storeUploadedArtwork = v.object({
+  id: v.string(),
+  fileName: v.string(),
+  storageId: v.id("_storage"),
+  isSelected: v.boolean(),
+});
+
 interface StoreProductSelectionInput {
   productId: Id<"products">;
   isRequired: boolean;
@@ -145,6 +152,20 @@ async function replaceStoreProductSelections(
   }
 }
 
+export const generateArtworkUploadUrl = mutation({
+  args: {},
+
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+
+    if (userId === null) {
+      throw new ConvexError("You must be signed in to upload artwork.");
+    }
+
+    return await ctx.storage.generateUploadUrl();
+  },
+});
+
 /**
  * Creates a new draft store or updates an existing draft.
  *
@@ -166,6 +187,7 @@ export const saveDraft = mutation({
 
     logoStorageId: v.optional(v.id("_storage")),
     bannerStorageId: v.optional(v.id("_storage")),
+    uploadedArtworks: v.optional(v.array(storeUploadedArtwork)),
 
     primaryColor: v.optional(v.string()),
     secondaryColor: v.optional(v.string()),
@@ -240,6 +262,11 @@ export const saveDraft = mutation({
               bannerStorageId: args.bannerStorageId,
             }
           : {}),
+        ...(args.uploadedArtworks !== undefined
+          ? {
+              uploadedArtworks: args.uploadedArtworks,
+            }
+          : {}),
 
         primaryColor: args.primaryColor,
         secondaryColor: args.secondaryColor,
@@ -268,6 +295,7 @@ export const saveDraft = mutation({
 
       logoStorageId: args.logoStorageId,
       bannerStorageId: args.bannerStorageId,
+      uploadedArtworks: args.uploadedArtworks,
 
       primaryColor: args.primaryColor,
       secondaryColor: args.secondaryColor,
@@ -307,7 +335,17 @@ export const getDraft = query({
       return null;
     }
 
-    return store;
+    const uploadedArtworks = await Promise.all(
+      (store.uploadedArtworks ?? []).map(async (artwork) => ({
+        ...artwork,
+        storageUrl: await ctx.storage.getUrl(artwork.storageId),
+      })),
+    );
+
+    return {
+      ...store,
+      uploadedArtworks,
+    };
   },
 });
 
@@ -457,6 +495,7 @@ export const createOrganizationWithStore = mutation({
     logoStorageId: v.optional(v.id("_storage")),
 
     bannerStorageId: v.optional(v.id("_storage")),
+    uploadedArtworks: v.optional(v.array(storeUploadedArtwork)),
 
     primaryColor: v.string(),
     secondaryColor: v.string(),
@@ -590,6 +629,12 @@ export const createOrganizationWithStore = mutation({
             }
           : {}),
 
+        ...(args.uploadedArtworks !== undefined
+          ? {
+              uploadedArtworks: args.uploadedArtworks,
+            }
+          : {}),
+
         primaryColor: args.primaryColor,
 
         secondaryColor: args.secondaryColor,
@@ -623,11 +668,10 @@ export const createOrganizationWithStore = mutation({
       description: storeDescription,
 
       logoStorageId: args.logoStorageId,
-
       bannerStorageId: args.bannerStorageId,
+      uploadedArtworks: args.uploadedArtworks,
 
       primaryColor: args.primaryColor,
-
       secondaryColor: args.secondaryColor,
 
       currentStep: args.currentStep,

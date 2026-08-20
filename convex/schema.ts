@@ -16,6 +16,13 @@ const storeActivity = v.union(
   v.literal("other"),
 );
 
+const storeUploadedArtwork = v.object({
+  id: v.string(),
+  fileName: v.string(),
+  storageId: v.id("_storage"),
+  isSelected: v.boolean(),
+});
+
 const productStatus = v.union(v.literal("draft"), v.literal("active"), v.literal("archived"));
 
 const productColorFamily = v.union(
@@ -166,6 +173,7 @@ export default defineSchema({
     description: v.optional(v.string()),
     logoStorageId: v.optional(v.id("_storage")),
     bannerStorageId: v.optional(v.id("_storage")),
+    uploadedArtworks: v.optional(v.array(storeUploadedArtwork)),
     primaryColor: v.optional(v.string()),
     secondaryColor: v.optional(v.string()),
     currentStep: v.number(),

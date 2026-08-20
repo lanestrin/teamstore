@@ -12,7 +12,7 @@ import ProductEditorModal from "./components/ProductEditorModal/ProductEditorMod
 import ProductSuggestionControls from "./components/ProductSuggestionControls/ProductSuggestionControls";
 import ProductSuggestionSection from "./components/ProductSuggestionSection/ProductSuggestionSection";
 import { PRODUCT_COLOR_OPTIONS } from "./lib/productColorOptions";
-import { generateProductSuggestions } from "./lib/productGeneration";
+import { createUploadedArtworkId, generateProductSuggestions, getUploadedArtworkId } from "./lib/productGeneration";
 import type { EditingProductState, GeneratedSuggestion, ProductColorOption, ProductOption } from "./lib/productStep.types";
 import styles from "./ProductsStep.module.scss";
 
@@ -51,6 +51,31 @@ function getProductColorLabel(family: ProductColorFamily | ""): string {
   }
 
   return PRODUCT_COLOR_OPTIONS.find((option) => option.value === family)?.label ?? "Product color";
+}
+
+function readFileAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        resolve(reader.result);
+        return;
+      }
+
+      reject(new Error(`Could not read ${file.name}.`));
+    };
+
+    reader.onerror = () => reject(reader.error ?? new Error(`Could not read ${file.name}.`));
+
+    reader.readAsDataURL(file);
+  });
+}
+
+function createUploadedArtworkPreviewSvg(imageUrl: string): string {
+  const escapedImageUrl = imageUrl.replaceAll("&", "&amp;").replaceAll('"', "&quot;");
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"><image href="${escapedImageUrl}" x="0" y="0" width="100" height="100" preserveAspectRatio="xMidYMid meet" /></svg>`;
 }
 
 export default function SelectProductsStep() {
@@ -131,12 +156,72 @@ export default function SelectProductsStep() {
 
   const artworkTemplatesById = useMemo(() => new Map(ART_TEMPLATE_LIST.map((template) => [template.id, template])), []);
 
-  const selectedArtworkTemplateIds = useMemo(
-    () =>
-      Object.values(storeDraft.artworkTemplates)
+  const selectedArtworkIds = useMemo(
+    () => [
+      ...Object.values(storeDraft.artworkTemplates)
         .filter((template) => template.isSelected)
         .map((template) => template.selectedArtTemplateId),
-    [storeDraft.artworkTemplates],
+
+      ...storeDraft.uploadedArtworks.filter((artwork) => artwork.isSelected).map((artwork) => createUploadedArtworkId(artwork.id)),
+    ],
+    [storeDraft.artworkTemplates, storeDraft.uploadedArtworks],
+  );
+
+  const uploadedArtworksById = useMemo(
+    () => new Map(storeDraft.uploadedArtworks.map((artwork) => [artwork.id, artwork])),
+    [storeDraft.uploadedArtworks],
+  );
+
+  const [uploadedArtworkPreviewSvgsById, setUploadedArtworkPreviewSvgsById] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    void Promise.all(
+      storeDraft.uploadedArtworks.map(async (artwork) => {
+        let imageUrl: string | null = null;
+
+        if (artwork.file) {
+          imageUrl = await readFileAsDataUrl(artwork.file);
+        } else if (artwork.storageUrl) {
+          imageUrl = artwork.storageUrl;
+        }
+
+        if (!imageUrl) {
+          return null;
+        }
+
+        return [createUploadedArtworkId(artwork.id), createUploadedArtworkPreviewSvg(imageUrl)] as const;
+      }),
+    )
+      .then((entries) => {
+        if (isCancelled) {
+          return;
+        }
+
+        setUploadedArtworkPreviewSvgsById(
+          Object.fromEntries(entries.filter((entry): entry is readonly [string, string] => entry !== null)),
+        );
+      })
+      .catch((error) => {
+        console.error("Could not build uploaded artwork previews.", error);
+
+        if (!isCancelled) {
+          setUploadedArtworkPreviewSvgsById({});
+        }
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [storeDraft.uploadedArtworks]);
+
+  const artworkPreviewSvgsById = useMemo(
+    () => ({
+      ...artworkSvgsByTemplateId,
+      ...uploadedArtworkPreviewSvgsById,
+    }),
+    [artworkSvgsByTemplateId, uploadedArtworkPreviewSvgsById],
   );
 
   const selectedProductCount = Object.keys(storeDraft.productSelections).length;
@@ -150,7 +235,7 @@ export default function SelectProductsStep() {
 
     return generateProductSuggestions({
       products: productOptions,
-      selectedArtworkTemplateIds,
+      selectedArtworkIds,
       primaryColorFamily,
       secondaryColorFamily,
       productGenerationSeed: storeDraft.productGenerationSeed,
@@ -160,7 +245,7 @@ export default function SelectProductsStep() {
   }, [
     storeCreationProducts,
     productOptions,
-    selectedArtworkTemplateIds,
+    selectedArtworkIds,
     primaryColorFamily,
     secondaryColorFamily,
     storeDraft.productGenerationSeed,
@@ -193,8 +278,14 @@ export default function SelectProductsStep() {
     return createProductCombinationKey(suggestion.productId, color.colorKey, suggestion.artworkTemplateId);
   }
 
-  function getArtworkName(artworkTemplateId: string): string {
-    return artworkTemplatesById.get(artworkTemplateId)?.name ?? "Artwork";
+  function getArtworkName(artworkId: string): string {
+    const uploadedArtworkId = getUploadedArtworkId(artworkId);
+
+    if (uploadedArtworkId) {
+      return uploadedArtworksById.get(uploadedArtworkId)?.fileName ?? "Uploaded artwork";
+    }
+
+    return artworkTemplatesById.get(artworkId)?.name ?? "Artwork";
   }
 
   function isSuggestionSelected(suggestion: GeneratedSuggestion): boolean {
@@ -360,7 +451,9 @@ export default function SelectProductsStep() {
   const primaryColorLabel = getProductColorLabel(primaryColorFamily);
   const secondaryColorLabel = getProductColorLabel(secondaryColorFamily);
   const hasMatchingSuggestions = suggestions.length > 0;
-  const canRegenerate = Boolean(primaryColorFamily) && selectedArtworkTemplateIds.length > 0;
+  const canRegenerate = Boolean(primaryColorFamily);
+
+  const artworkDescription = selectedArtworkIds.length > 0 ? "with randomly assigned artwork" : "without artwork";
 
   return (
     <>
@@ -393,16 +486,7 @@ export default function SelectProductsStep() {
             onRegenerate={regenerateProductSuggestions}
           />
 
-          {selectedArtworkTemplateIds.length === 0 ? (
-            <div className={styles.emptyState}>
-              <LuTriangleAlert aria-hidden="true" />
-
-              <div>
-                <h2>Select artwork first</h2>
-                <p>Return to the artwork step and select at least one template.</p>
-              </div>
-            </div>
-          ) : !isLoading && availableProductColorFamilies.size === 0 ? (
+          {!isLoading && availableProductColorFamilies.size === 0 ? (
             <div className={styles.emptyState}>
               <LuTriangleAlert aria-hidden="true" />
 
@@ -429,11 +513,11 @@ export default function SelectProductsStep() {
             <>
               <ProductSuggestionSection
                 title="Uniforms"
-                description={`${primaryColorLabel} and ${secondaryColorLabel} uniform options with randomly assigned artwork.`}
+                description={`${primaryColorLabel} and ${secondaryColorLabel} uniform options ${artworkDescription}.`}
                 section="uniforms"
                 suggestions={suggestions}
                 isLoading={isLoading}
-                artworkSvgsByTemplateId={artworkSvgsByTemplateId}
+                artworkSvgsByTemplateId={artworkPreviewSvgsById}
                 getArtworkName={getArtworkName}
                 getEffectiveColor={getEffectiveColor}
                 isSelected={isSuggestionSelected}
@@ -445,11 +529,11 @@ export default function SelectProductsStep() {
 
               <ProductSuggestionSection
                 title="Fanwear"
-                description={`${primaryColorLabel} and ${secondaryColorLabel} fanwear options with randomly assigned artwork.`}
+                description={`${primaryColorLabel} and ${secondaryColorLabel} fanwear options ${artworkDescription}.`}
                 section="fanwear"
                 suggestions={suggestions}
                 isLoading={isLoading}
-                artworkSvgsByTemplateId={artworkSvgsByTemplateId}
+                artworkSvgsByTemplateId={artworkPreviewSvgsById}
                 getArtworkName={getArtworkName}
                 getEffectiveColor={getEffectiveColor}
                 isSelected={isSuggestionSelected}

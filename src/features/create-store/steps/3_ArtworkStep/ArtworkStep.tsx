@@ -1,14 +1,14 @@
-import { useMemo, useState, type ChangeEvent } from "react";
+import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { LuImage, LuPencil, LuUpload } from "react-icons/lu";
 
 import { ART_TEMPLATE_LIST, type ArtTemplate } from "../../../../assets/art-templates";
-
 import WizardLayout from "../../components/WizardLayout/WizardLayout";
-
 import { useCreateStore, type ArtworkTextDraft } from "../../context/CreateStoreContext";
 
 import ArtworkEditorModal from "./components/ArtworkEditorModal/ArtworkEditorModal";
 import ArtTemplatePreview from "./components/ArtTemplatePreview/ArtTemplatePreview";
+import UploadedArtCard from "./components/UploadedArtCard/UploadedArtCard";
+import UploadedArtworkCard from "./components/UploadedArtworkCard/UploadedArtworkCard";
 
 import styles from "./ArtworkStep.module.scss";
 import type { ArtworkAdjustments } from "./lib/artworkEditor";
@@ -41,51 +41,54 @@ function formatFileSize(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function readFileAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        resolve(reader.result);
+        return;
+      }
+
+      reject(new Error(`Could not read ${file.name}.`));
+    };
+
+    reader.onerror = () => reject(reader.error ?? new Error(`Could not read ${file.name}.`));
+
+    reader.readAsDataURL(file);
+  });
+}
+
 export default function SelectArtworksStep() {
   const {
     currentStep,
     setCurrentStep,
-
     storeDraft,
     updateStoreDraft,
     updateArtworkTemplateDraft,
-
     resolvedArtworkText,
     mascotDataUrl,
-
     artworkBaseSvgsByTemplateId,
     artworkSvgsByTemplateId,
   } = useCreateStore();
 
   const [editingTemplateId, setEditingTemplateId] = useState<string | null>(null);
-
   const [mascotError, setMascotError] = useState<string | null>(null);
 
-  /*
-   * Context owns all SVG generation.
-   *
-   * This step only combines those derived SVGs
-   * with template-selection UI state.
-   */
   const templateGalleryItems = useMemo<ArtworkTemplateGalleryItem[]>(
     () =>
       ART_TEMPLATE_LIST.map((template) => {
         const templateDraft = storeDraft.artworkTemplates[template.id];
-
         const artworkAdjustments = templateDraft?.artworkAdjustments ?? {};
-
         const baseSvg = artworkBaseSvgsByTemplateId[template.id] ?? template.svg;
-
         const customizedSvg = artworkSvgsByTemplateId[template.id] ?? baseSvg;
 
         return {
           template,
-
           baseSvg,
           customizedSvg,
-
           isSelected: templateDraft?.isSelected ?? false,
-
           artworkAdjustments,
         };
       }),
@@ -99,13 +102,84 @@ export default function SelectArtworksStep() {
 
   const selectedTemplateCount = useMemo(() => templateGalleryItems.filter(({ isSelected }) => isSelected).length, [templateGalleryItems]);
 
+  const [uploadedArtworkPreviews, setUploadedArtworkPreviews] = useState<Map<string, string>>(new Map());
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    void Promise.all(
+      storeDraft.uploadedArtworks.map(async (artwork) => {
+        if (artwork.file) {
+          const previewUrl = await readFileAsDataUrl(artwork.file);
+
+          return [artwork.id, previewUrl] as const;
+        }
+
+        if (artwork.storageUrl) {
+          return [artwork.id, artwork.storageUrl] as const;
+        }
+
+        return null;
+      }),
+    )
+      .then((entries) => {
+        if (isCancelled) {
+          return;
+        }
+
+        const validEntries = entries.filter((entry): entry is readonly [string, string] => entry !== null);
+
+        setUploadedArtworkPreviews(new Map(validEntries));
+      })
+      .catch((error) => {
+        console.error("Could not build uploaded artwork previews.", error);
+      });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [storeDraft.uploadedArtworks]);
+
   function updateArtworkText(field: keyof ArtworkTextDraft, value: string) {
     updateStoreDraft({
       artworkText: {
         ...storeDraft.artworkText,
-
         [field]: value,
       },
+    });
+  }
+
+  function handleArtworkFilesAdded(files: File[]) {
+    const newArtworks = files.map((file) => ({
+      id: crypto.randomUUID(),
+      fileName: file.name,
+      file,
+      storageId: null,
+      storageUrl: null,
+      isSelected: false,
+    }));
+
+    updateStoreDraft({
+      uploadedArtworks: [...storeDraft.uploadedArtworks, ...newArtworks],
+    });
+  }
+
+  function handleArtworkRemove(artworkId: string) {
+    updateStoreDraft({
+      uploadedArtworks: storeDraft.uploadedArtworks.filter((artwork) => artwork.id !== artworkId),
+    });
+  }
+
+  function handleUploadedArtworkSelectionChange(artworkId: string, isSelected: boolean) {
+    updateStoreDraft({
+      uploadedArtworks: storeDraft.uploadedArtworks.map((artwork) =>
+        artwork.id === artworkId
+          ? {
+              ...artwork,
+              isSelected,
+            }
+          : artwork,
+      ),
     });
   }
 
@@ -118,17 +192,13 @@ export default function SelectArtworksStep() {
 
     if (!isSupportedMascotFile(file)) {
       setMascotError("Choose a PNG, JPG, JPEG, or SVG file.");
-
       event.currentTarget.value = "";
-
       return;
     }
 
     if (file.size > MAX_MASCOT_FILE_SIZE) {
       setMascotError("The mascot file must be 5 MB or smaller.");
-
       event.currentTarget.value = "";
-
       return;
     }
 
@@ -145,10 +215,9 @@ export default function SelectArtworksStep() {
       <WizardLayout
         step={currentStep}
         title="Choose Your Artwork"
-        description="Customize the previews, then select every artwork template you want to use."
+        description="Customize a template, upload your own art, or continue without artwork."
         onBack={() => setCurrentStep(2)}
         onNext={() => setCurrentStep(4)}
-        nextDisabled={selectedTemplateCount === 0}
         width="wide"
       >
         <div className={styles.editor}>
@@ -156,23 +225,31 @@ export default function SelectArtworksStep() {
             <div className={styles.controlSection}>
               <div className={styles.controlsHeading}>
                 <h2>Artwork Text</h2>
-
-                <p>Changes appear in every template preview immediately.</p>
+                <p>Customize the text used across your artwork templates.</p>
               </div>
 
               <label className={styles.field}>
-                <span>Organization name</span>
-
+                <span>Line 1</span>
                 <input
                   type="text"
+                  placeholder="Line 1"
                   value={resolvedArtworkText.organizationName}
                   onChange={(event) => updateArtworkText("organizationName", event.currentTarget.value)}
                 />
               </label>
 
               <label className={styles.field}>
-                <span>Established year</span>
+                <span>Line 2</span>
+                <input
+                  type="text"
+                  placeholder="Line 2"
+                  value={resolvedArtworkText.mascotName}
+                  onChange={(event) => updateArtworkText("mascotName", event.currentTarget.value)}
+                />
+              </label>
 
+              <label className={styles.field}>
+                <span>Established year</span>
                 <input
                   type="text"
                   inputMode="numeric"
@@ -182,16 +259,6 @@ export default function SelectArtworksStep() {
                   onChange={(event) => updateArtworkText("yearEstablished", event.currentTarget.value.replace(/\D/g, "").slice(0, 4))}
                 />
               </label>
-
-              <label className={styles.field}>
-                <span>Mascot name</span>
-
-                <input
-                  type="text"
-                  value={resolvedArtworkText.mascotName}
-                  onChange={(event) => updateArtworkText("mascotName", event.currentTarget.value)}
-                />
-              </label>
             </div>
 
             <div className={styles.divider} />
@@ -199,7 +266,6 @@ export default function SelectArtworksStep() {
             <div className={styles.controlSection}>
               <div className={styles.controlsHeading}>
                 <h2>Mascot</h2>
-
                 <p>The mascot uploaded earlier is loaded automatically. Upload another file to replace it in every preview.</p>
               </div>
 
@@ -210,14 +276,11 @@ export default function SelectArtworksStep() {
 
                 <div className={styles.mascotDetails}>
                   <strong>{storeDraft.logoFile?.name ?? (storeDraft.logoStorageId ? "Saved mascot" : "No mascot uploaded")}</strong>
-
                   <span>{storeDraft.logoFile ? formatFileSize(storeDraft.logoFile.size) : "PNG, JPG, or SVG · Maximum 5 MB"}</span>
 
                   <label className={styles.replaceButton}>
                     <LuUpload aria-hidden="true" />
-
                     {storeDraft.logoFile || storeDraft.logoStorageId ? "Replace mascot" : "Upload mascot"}
-
                     <input
                       type="file"
                       accept=".png,.jpg,.jpeg,.svg,image/png,image/jpeg,image/svg+xml"
@@ -244,11 +307,29 @@ export default function SelectArtworksStep() {
           </section>
 
           <section className={styles.templateGallery} aria-labelledby="artwork-template-gallery-title">
+            <UploadedArtCard onFilesAdded={handleArtworkFilesAdded} />
+
+            {storeDraft.uploadedArtworks.length > 0 && (
+              <div className={styles.uploadedArtworkGrid}>
+                {storeDraft.uploadedArtworks.map((artwork) => {
+                  return (
+                    <UploadedArtworkCard
+                      key={artwork.id}
+                      fileName={artwork.fileName}
+                      previewUrl={uploadedArtworkPreviews.get(artwork.id)}
+                      isSelected={artwork.isSelected}
+                      onSelectionChange={(checked) => handleUploadedArtworkSelectionChange(artwork.id, checked)}
+                      onRemove={() => handleArtworkRemove(artwork.id)}
+                    />
+                  );
+                })}
+              </div>
+            )}
+
             <div className={styles.templateGalleryHeader}>
               <div>
                 <h2 id="artwork-template-gallery-title">Artwork Templates</h2>
-
-                <p>Select any number of templates. Each template keeps its own artwork adjustments.</p>
+                <p>Select any templates you want to use, or continue without artwork.</p>
               </div>
 
               <p className={styles.selectionCount} aria-live="polite">
@@ -278,7 +359,6 @@ export default function SelectArtworksStep() {
                           })
                         }
                       />
-
                       <span>Use this template</span>
                     </label>
 
@@ -289,7 +369,6 @@ export default function SelectArtworksStep() {
                       onClick={() => setEditingTemplateId(template.id)}
                     >
                       <LuPencil aria-hidden="true" />
-
                       <span>Edit art</span>
                     </button>
                   </div>
@@ -311,7 +390,6 @@ export default function SelectArtworksStep() {
             updateArtworkTemplateDraft(editingTemplate.template.id, {
               artworkAdjustments: nextAdjustments,
             });
-
             setEditingTemplateId(null);
           }}
         />

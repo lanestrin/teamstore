@@ -2,6 +2,7 @@ import { LuLoaderCircle } from "react-icons/lu";
 import styles from "./ProductSuggestionSection.module.scss";
 import type { GeneratedSuggestion, ProductColorOption } from "../../lib/productStep.types";
 import ProductSuggestionCard from "../ProductSuggestionCard/ProductSuggestionCard";
+import { NO_ARTWORK_TEMPLATE_ID } from "../../lib/productGeneration";
 
 interface ProductSuggestionSectionProps {
   title: string;
@@ -66,7 +67,9 @@ export default function ProductSuggestionSection({
                 key={suggestion.combinationKey}
                 suggestion={suggestion}
                 color={color}
-                artworkName={getArtworkName(suggestion.artworkTemplateId)}
+                artworkName={
+                  suggestion.artworkTemplateId === NO_ARTWORK_TEMPLATE_ID ? "None" : getArtworkName(suggestion.artworkTemplateId)
+                }
                 artworkSvg={artworkSvgsByTemplateId[suggestion.artworkTemplateId] ?? null}
                 isSelected={isSelected(suggestion)}
                 isRequired={isRequired(suggestion)}
