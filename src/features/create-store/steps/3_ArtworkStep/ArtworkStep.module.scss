@@ -244,7 +244,8 @@
   white-space: nowrap;
 }
 
-.templateGrid {
+.templateGrid,
+.uploadedArtworkGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
   gap: 1rem;
@@ -272,12 +273,12 @@
     transform: translateY(-1px);
   }
 
-  &[data-selected="true"] {
-    border-color: #d92d20;
-    box-shadow:
-      0 0 0 2px rgb(217 45 32 / 14%),
-      0 8px 22px rgb(16 24 40 / 8%);
-  }
+    &[data-selected="true"] {
+      border-color: #16a34a;
+      box-shadow:
+        0 0 0 2px rgb(22 163 74 / 16%),
+        0 8px 22px rgb(16 24 40 / 8%);
+    }
 }
 
 .templateCardHeader {
@@ -359,7 +360,7 @@
     height: 18px;
     flex: 0 0 auto;
     margin: 0;
-    accent-color: #d92d20;
+    accent-color: #16a34a;
     cursor: pointer;
   }
 
@@ -369,11 +370,11 @@
     white-space: nowrap;
   }
 
-  &:focus-within {
-    outline: 3px solid rgb(217 45 32 / 18%);
-    outline-offset: 3px;
-    border-radius: 4px;
-  }
+    &:focus-within {
+      outline: 3px solid rgb(34 197 94 / 18%);
+      outline-offset: 3px;
+      border-radius: 4px;
+    }
 }
 
 .editArtworkButton {

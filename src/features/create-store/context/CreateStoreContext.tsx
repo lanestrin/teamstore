@@ -25,6 +25,25 @@ export interface ArtworkTemplateDraft {
   artworkAdjustments: ArtworkAdjustments;
 }
 
+export interface UploadedArtworkDraft {
+  id: string;
+  fileName: string;
+  file: File | null;
+  storageId: Id<"_storage"> | null;
+  storageUrl: string | null;
+  isSelected: boolean;
+}
+
+interface LoadedStoreDraft extends Omit<Doc<"stores">, "uploadedArtworks"> {
+  uploadedArtworks?: Array<{
+    id: string;
+    fileName: string;
+    storageId: Id<"_storage">;
+    storageUrl: string | null;
+    isSelected: boolean;
+  }>;
+}
+
 export type ArtworkTemplatesDraft = Record<string, ArtworkTemplateDraft>;
 export type ArtworkSvgMap = Readonly<Record<string, string>>;
 
@@ -54,6 +73,7 @@ export interface CreateStoreDraft {
   logoFile: File | null;
   logoStorageId: Id<"_storage"> | null;
   artworkTemplates: ArtworkTemplatesDraft;
+  uploadedArtworks: UploadedArtworkDraft[];
   artworkText: ArtworkTextDraft;
   productColorFamily: ProductColorFamily | "";
   productSecondaryColorFamily: ProductColorFamily | "";
@@ -97,7 +117,7 @@ interface CreateStoreContextValue {
   ) => void;
 
   regenerateProductSuggestions: () => void;
-  loadStoreDraft: (draft: Doc<"stores">) => void;
+  loadStoreDraft: (draft: LoadedStoreDraft) => void;
   resetStoreDraft: () => void;
 }
 
@@ -198,10 +218,11 @@ function createDefaultStoreDraft(): CreateStoreDraft {
     logoFile: null,
     logoStorageId: null,
     artworkTemplates: {},
+    uploadedArtworks: [],
     artworkText: {
-      organizationName: "Smallville",
-      yearEstablished: "2026",
-      mascotName: "Crows",
+      organizationName: "YOUR TEAM",
+      mascotName: "Mascot",
+      yearEstablished: new Date().getFullYear().toString(),
     },
     productColorFamily: "",
     productSecondaryColorFamily: "",
@@ -225,14 +246,7 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
   const [storeDraft, setStoreDraft] = useState<CreateStoreDraft>(createDefaultStoreDraft);
   const mascotDataUrl = useFileDataUrl(storeDraft.logoFile);
   const [fontLoadVersion, setFontLoadVersion] = useState(0);
-  const resolvedArtworkText = useMemo<ArtworkTextDraft>(
-    () => ({
-      ...storeDraft.artworkText,
-
-      organizationName: storeDraft.artworkText.organizationName || storeDraft.organizationName,
-    }),
-    [storeDraft.artworkText, storeDraft.organizationName],
-  );
+  const resolvedArtworkText = storeDraft.artworkText;
 
   /*
    * Text fitting depends on the final loaded font metrics.
@@ -482,7 +496,7 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
     }));
   }
 
-  function loadStoreDraft(draft: Doc<"stores">) {
+  function loadStoreDraft(draft: LoadedStoreDraft) {
     if (draft.status !== "draft") {
       throw new Error("Only draft stores can be loaded into the store wizard.");
     }
@@ -492,6 +506,7 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
     setFurthestStepReached(draft.currentStep);
     setPrimaryColor(draft.primaryColor ?? DEFAULT_PRIMARY_COLOR);
     setSecondaryColor(draft.secondaryColor ?? DEFAULT_SECONDARY_COLOR);
+
     setStoreDraft({
       organizationName: draft.organizationName ?? "",
       organizationSlug: draft.organizationSlug ?? "",
@@ -503,10 +518,19 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
       logoStorageId: draft.logoStorageId ?? null,
       artworkTemplates: {},
 
+      uploadedArtworks: (draft.uploadedArtworks ?? []).map((artwork) => ({
+        id: artwork.id,
+        fileName: artwork.fileName,
+        file: null,
+        storageId: artwork.storageId,
+        storageUrl: artwork.storageUrl,
+        isSelected: artwork.isSelected,
+      })),
+
       artworkText: {
-        organizationName: draft.organizationName ?? "",
-        yearEstablished: "2020",
-        mascotName: "MUSTANGS",
+        organizationName: "YOUR TEAM",
+        mascotName: "Mascot",
+        yearEstablished: new Date().getFullYear().toString(),
       },
 
       productColorFamily: "",

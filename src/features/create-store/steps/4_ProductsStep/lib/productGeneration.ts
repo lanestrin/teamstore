@@ -5,11 +5,26 @@ import type { GeneratedSuggestion, ProductOption, ProductSuggestionSection } fro
 
 export const MAX_UNIFORM_SUGGESTIONS = 8;
 export const MAX_FANWEAR_SUGGESTIONS = 12;
+export const NO_ARTWORK_TEMPLATE_ID = "none";
+export const UPLOADED_ARTWORK_PREFIX = "upload:";
+
+export function createUploadedArtworkId(uploadedArtworkId: string): string {
+  return `${UPLOADED_ARTWORK_PREFIX}${uploadedArtworkId.trim()}`;
+}
+
+export function getUploadedArtworkId(artworkId: string): string | null {
+  if (!artworkId.startsWith(UPLOADED_ARTWORK_PREFIX)) {
+    return null;
+  }
+
+  return artworkId.slice(UPLOADED_ARTWORK_PREFIX.length) || null;
+}
+
 const MAX_ARTWORK_VARIATIONS_PER_PRODUCT_COLOR = 2;
 
 interface GenerateProductSuggestionsArgs {
   products: readonly ProductOption[];
-  selectedArtworkTemplateIds: readonly string[];
+  selectedArtworkIds: readonly string[];
   primaryColorFamily: ProductColorFamily;
   secondaryColorFamily: ProductColorFamily | "";
   productGenerationSeed: number;
@@ -172,28 +187,26 @@ function buildColorCandidates(
   return candidates;
 }
 
-function chooseArtworkTemplate(
+function chooseArtwork(
   candidate: ProductColorCandidate,
-  selectedArtworkTemplateIds: readonly string[],
+  selectedArtworkIds: readonly string[],
   generationSeed: number,
-  usedArtworkTemplateIds: ReadonlySet<string>,
+  usedArtworkIds: ReadonlySet<string>,
 ): string | null {
-  const availableArtworkTemplateIds = selectedArtworkTemplateIds.filter(
-    (artworkTemplateId) => !usedArtworkTemplateIds.has(artworkTemplateId),
-  );
+  const availableArtworkIds = selectedArtworkIds.filter((artworkId) => !usedArtworkIds.has(artworkId));
 
-  if (availableArtworkTemplateIds.length === 0) {
+  if (availableArtworkIds.length === 0) {
     return null;
   }
 
-  const artworkSeed = hashString([generationSeed, candidate.productId, candidate.color.colorKey, usedArtworkTemplateIds.size].join("|"));
+  const artworkSeed = hashString([generationSeed, candidate.productId, candidate.color.colorKey, usedArtworkIds.size].join("|"));
 
-  return availableArtworkTemplateIds[artworkSeed % availableArtworkTemplateIds.length];
+  return availableArtworkIds[artworkSeed % availableArtworkIds.length];
 }
 
 export function generateProductSuggestions({
   products,
-  selectedArtworkTemplateIds,
+  selectedArtworkIds,
   primaryColorFamily,
   secondaryColorFamily,
   productGenerationSeed,
@@ -204,18 +217,16 @@ export function generateProductSuggestions({
   const selectedSuggestions = rebuildSelectedSuggestions(productsById, productSelections);
 
   /*
-   * Selected products remain visible even when
-   * the Product Color filter changes.
+   * Templates and uploaded artwork share the same string ID path.
+   * Uploaded artwork uses the `upload:` prefix.
+   * No artwork is represented by one internal `none` ID.
    */
-
-  if (selectedArtworkTemplateIds.length === 0) {
-    return selectedSuggestions;
-  }
+  const availableArtworkIds = selectedArtworkIds.length > 0 ? selectedArtworkIds : [NO_ARTWORK_TEMPLATE_ID];
 
   const colorCandidates = buildColorCandidates(products, primaryColorFamily, secondaryColorFamily);
   const productIds = products.map((product) => product._id).sort();
   const generationSeed = hashString(
-    [productGenerationSeed, activity, primaryColorFamily, secondaryColorFamily, ...selectedArtworkTemplateIds, ...productIds].join("|"),
+    [productGenerationSeed, activity, primaryColorFamily, secondaryColorFamily, ...availableArtworkIds, ...productIds].join("|"),
   );
 
   const twoColorCandidates = colorCandidates.filter((candidate) => candidate.priority === 2);
@@ -258,9 +269,9 @@ export function generateProductSuggestions({
 
       const pairKey = getProductColorPairKey(candidate.productId, candidate.color.colorKey);
 
-      const usedArtworkTemplateIds = artworkIdsByProductColor.get(pairKey) ?? new Set<string>();
+      const usedArtworkIds = artworkIdsByProductColor.get(pairKey) ?? new Set<string>();
 
-      if (usedArtworkTemplateIds.size >= MAX_ARTWORK_VARIATIONS_PER_PRODUCT_COLOR) {
+      if (usedArtworkIds.size >= MAX_ARTWORK_VARIATIONS_PER_PRODUCT_COLOR) {
         continue;
       }
 
@@ -268,11 +279,11 @@ export function generateProductSuggestions({
        * First pass favors product variety.
        * Second pass allows another artwork variation.
        */
-      if (variation === 0 && usedArtworkTemplateIds.size > 0) {
+      if (variation === 0 && usedArtworkIds.size > 0) {
         continue;
       }
 
-      const artworkTemplateId = chooseArtworkTemplate(candidate, selectedArtworkTemplateIds, generationSeed, usedArtworkTemplateIds);
+      const artworkTemplateId = chooseArtwork(candidate, availableArtworkIds, generationSeed, usedArtworkIds);
 
       if (!artworkTemplateId) {
         continue;
@@ -290,8 +301,8 @@ export function generateProductSuggestions({
         artworkTemplateId,
       });
 
-      usedArtworkTemplateIds.add(artworkTemplateId);
-      artworkIdsByProductColor.set(pairKey, usedArtworkTemplateIds);
+      usedArtworkIds.add(artworkTemplateId);
+      artworkIdsByProductColor.set(pairKey, usedArtworkIds);
 
       if (candidate.section === "uniforms") {
         uniformCount += 1;

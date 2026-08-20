@@ -67,7 +67,8 @@ interface CreateStoreWorkflow {
 export function useCreateStoreWorkflow(): CreateStoreWorkflow {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { storeId, setStoreId, currentStep, primaryColor, secondaryColor, storeDraft, loadStoreDraft, resetStoreDraft } = useCreateStore();
+  const { storeId, setStoreId, currentStep, primaryColor, secondaryColor, storeDraft, updateStoreDraft, loadStoreDraft, resetStoreDraft } =
+    useCreateStore();
   const draftIdParam = searchParams.get("draftId");
   const draftId = draftIdParam ? (draftIdParam as Id<"stores">) : null;
   const savedDraft = useQuery(
@@ -79,6 +80,7 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
       : "skip",
   );
 
+  const generateArtworkUploadUrl = useMutation(api.organizations.generateArtworkUploadUrl);
   const saveDraftMutation = useMutation(api.organizations.saveDraft);
   const createOrganizationWithStore = useMutation(api.organizations.createOrganizationWithStore);
   const loadedDraftIdRef = useRef<Id<"stores"> | null>(null);
@@ -121,6 +123,56 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
     loadedDraftIdRef.current = savedDraft._id;
   }, [draftId, savedDraft, loadStoreDraft, navigate]);
 
+  async function prepareUploadedArtworks() {
+    const uploadedArtworks = await Promise.all(
+      storeDraft.uploadedArtworks.map(async (artwork) => {
+        let storageId = artwork.storageId;
+
+        if (!storageId) {
+          if (!artwork.file) {
+            throw new Error(`${artwork.fileName} needs to be uploaded again.`);
+          }
+
+          const uploadUrl = await generateArtworkUploadUrl();
+
+          const response = await fetch(uploadUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": artwork.file.type || "application/octet-stream",
+            },
+            body: artwork.file,
+          });
+
+          if (!response.ok) {
+            throw new Error(`Could not upload ${artwork.fileName}.`);
+          }
+
+          const result = (await response.json()) as {
+            storageId: Id<"_storage">;
+          };
+
+          storageId = result.storageId;
+        }
+
+        return {
+          id: artwork.id,
+          fileName: artwork.fileName,
+          storageId,
+          isSelected: artwork.isSelected,
+        };
+      }),
+    );
+
+    updateStoreDraft({
+      uploadedArtworks: storeDraft.uploadedArtworks.map((artwork) => ({
+        ...artwork,
+        storageId: uploadedArtworks.find((savedArtwork) => savedArtwork.id === artwork.id)?.storageId ?? artwork.storageId,
+      })),
+    });
+
+    return uploadedArtworks;
+  }
+
   async function saveAndExit(): Promise<void> {
     if (isSaving) {
       return;
@@ -130,6 +182,7 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
 
     try {
       const organizationSlug = storeDraft.organizationSlug || slugify(storeDraft.organizationName);
+      const uploadedArtworks = await prepareUploadedArtworks();
 
       const result = await saveDraftMutation({
         storeId: storeId ?? undefined,
@@ -140,6 +193,7 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
         storeSlug: normalizeOptionalText(storeDraft.storeSlug),
         storeDescription: normalizeOptionalText(storeDraft.storeDescription),
         logoStorageId: storeDraft.logoStorageId ?? undefined,
+        uploadedArtworks,
         primaryColor,
         secondaryColor,
         currentStep,
@@ -201,6 +255,8 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
     setIsFinalizing(true);
 
     try {
+      const uploadedArtworks = await prepareUploadedArtworks();
+
       const result = await createOrganizationWithStore({
         storeId: storeId ?? undefined,
         organizationName,
@@ -210,6 +266,7 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
         storeSlug,
         storeDescription: normalizeOptionalText(storeDraft.storeDescription),
         logoStorageId: storeDraft.logoStorageId ?? undefined,
+        uploadedArtworks,
         primaryColor,
         secondaryColor,
         currentStep,
