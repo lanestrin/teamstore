@@ -52,6 +52,8 @@ function buildProductSelections(selections: ProductSelectionsDraft) {
     .sort((first, second) => first.productId.localeCompare(second.productId))
     .map((selection) => ({
       productId: selection.productId,
+      colorKey: selection.colorKey,
+      artworkTemplateId: selection.artworkTemplateId,
       isRequired: selection.isRequired,
     }));
 }
