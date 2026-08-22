@@ -1,13 +1,10 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
-
 import { mutation, query, type MutationCtx } from "./_generated/server";
-
 import type { Id } from "./_generated/dataModel";
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const HEX_COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/;
-
 const MAX_STORE_PRODUCTS = 50;
 
 const storeActivity = v.union(
@@ -24,6 +21,8 @@ const storeActivity = v.union(
 
 const storeProductSelection = v.object({
   productId: v.id("products"),
+  colorKey: v.string(),
+  artworkTemplateId: v.string(),
   isRequired: v.boolean(),
 });
 
@@ -36,11 +35,15 @@ const storeUploadedArtwork = v.object({
 
 interface StoreProductSelectionInput {
   productId: Id<"products">;
+  colorKey: string;
+  artworkTemplateId: string;
   isRequired: boolean;
 }
 
 interface ResolvedStoreProductSelection {
   productId: Id<"products">;
+  colorKey: string;
+  artworkTemplateId: string;
   isRequired: boolean;
   sortOrder: number;
 }
@@ -118,6 +121,8 @@ async function resolveStoreProductSelections(
 
       return {
         productId: product._id,
+        colorKey: selection.colorKey,
+        artworkTemplateId: selection.artworkTemplateId,
         isRequired: selection.isRequired,
         sortOrder,
       };
@@ -144,6 +149,8 @@ async function replaceStoreProductSelections(
     await ctx.db.insert("storeProducts", {
       storeId,
       productId: selection.productId,
+      colorKey: selection.colorKey,
+      artworkTemplateId: selection.artworkTemplateId,
       isRequired: selection.isRequired,
       sortOrder: selection.sortOrder,
       createdAt: now,
@@ -207,13 +214,9 @@ export const saveDraft = mutation({
     }
 
     const organizationName = normalizeOptionalText(args.organizationName);
-
     const organizationSlug = normalizeOptionalSlug(args.organizationSlug);
-
     const storeName = normalizeOptionalText(args.storeName);
-
     const storeSlug = normalizeOptionalSlug(args.storeSlug);
-
     const storeDescription = normalizeOptionalText(args.storeDescription);
 
     if (organizationSlug) {

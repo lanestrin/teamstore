@@ -228,6 +228,9 @@ export default defineSchema({
     storeId: v.id("stores"),
     productId: v.id("products"),
 
+    colorKey: v.string(),
+    artworkTemplateId: v.string(),
+
     isRequired: v.boolean(),
     sortOrder: v.number(),
 
