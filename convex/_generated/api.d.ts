@@ -16,6 +16,7 @@ import type * as lib_authz from "../lib/authz.js";
 import type * as organizations from "../organizations.js";
 import type * as productVariants from "../productVariants.js";
 import type * as products from "../products.js";
+import type * as resendOTPasswordReset from "../resendOTPasswordReset.js";
 import type * as users from "../users.js";
 
 import type {
@@ -33,6 +34,7 @@ declare const fullApi: ApiFromModules<{
   organizations: typeof organizations;
   productVariants: typeof productVariants;
   products: typeof products;
+  resendOTPasswordReset: typeof resendOTPasswordReset;
   users: typeof users;
 }>;
 
