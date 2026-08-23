@@ -145,7 +145,6 @@
 }
 
 .content h3 {
-  margin: 2px 0 4px;
   font-size: 0.96rem;
   font-weight: 600;
   transition: color $transition-base;
@@ -194,4 +193,15 @@
 
 .exitButton:hover {
   color: white;
+}
+
+.stepTitle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stepTitle h3 {
+  margin: 2px 0 4px;
 }

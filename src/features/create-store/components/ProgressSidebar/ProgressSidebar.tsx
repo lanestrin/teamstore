@@ -4,6 +4,7 @@ import { LuCheck, LuLogOut } from "react-icons/lu";
 import { images } from "../../../../assets/images";
 
 import styles from "./ProgressSidebar.module.scss";
+import ComingSoonBadge from "../../../../components/coming-soon-badge/ComingSoonBadge";
 
 interface ProgressSidebarProps {
   currentStep: number;
@@ -37,6 +38,7 @@ const steps = [
   {
     title: "Review",
     description: "Review and publish",
+    comingSoon: true,
   },
 ];
 
@@ -94,7 +96,11 @@ export default function ProgressSidebar({
               </div>
 
               <div className={styles.content}>
-                <h3>{step.title}</h3>
+                <div className={styles.stepTitle}>
+                  <h3>{step.title}</h3>
+
+                  {step.comingSoon && <ComingSoonBadge />}
+                </div>
 
                 <p>{step.description}</p>
               </div>
