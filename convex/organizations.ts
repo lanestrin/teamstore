@@ -256,19 +256,19 @@ export const saveDraft = mutation({
 
         ...(args.logoStorageId !== undefined
           ? {
-              logoStorageId: args.logoStorageId,
-            }
+            logoStorageId: args.logoStorageId,
+          }
           : {}),
 
         ...(args.bannerStorageId !== undefined
           ? {
-              bannerStorageId: args.bannerStorageId,
-            }
+            bannerStorageId: args.bannerStorageId,
+          }
           : {}),
         ...(args.uploadedArtworks !== undefined
           ? {
-              uploadedArtworks: args.uploadedArtworks,
-            }
+            uploadedArtworks: args.uploadedArtworks,
+          }
           : {}),
 
         primaryColor: args.primaryColor,
@@ -622,20 +622,20 @@ export const createOrganizationWithStore = mutation({
 
         ...(args.logoStorageId !== undefined
           ? {
-              logoStorageId: args.logoStorageId,
-            }
+            logoStorageId: args.logoStorageId,
+          }
           : {}),
 
         ...(args.bannerStorageId !== undefined
           ? {
-              bannerStorageId: args.bannerStorageId,
-            }
+            bannerStorageId: args.bannerStorageId,
+          }
           : {}),
 
         ...(args.uploadedArtworks !== undefined
           ? {
-              uploadedArtworks: args.uploadedArtworks,
-            }
+            uploadedArtworks: args.uploadedArtworks,
+          }
           : {}),
 
         primaryColor: args.primaryColor,
@@ -730,6 +730,41 @@ export const checkStoreSlugAvailability = query({
     return {
       available: conflictingStore === undefined,
     };
+  },
+});
+
+/**
+ * Lists active stores for the public store directory.
+ */
+export const listActiveStores = query({
+  args: {},
+
+  handler: async (ctx) => {
+    const stores = await ctx.db.query("stores").collect();
+    const activeStores = stores.filter(
+      (store) => store.status === "active" && store.organizationSlug && store.slug,
+    );
+
+    return await Promise.all(
+      activeStores.map(async (store) => {
+        const storeProducts = await ctx.db
+          .query("storeProducts")
+          .withIndex("by_store", (q) => q.eq("storeId", store._id))
+          .collect();
+
+        return {
+          id: store._id,
+          organizationSlug: store.organizationSlug!,
+          slug: store.slug!,
+          name: store.name ?? store.organizationName ?? "Team Store",
+          activity: store.activity,
+          productCount: storeProducts.length,
+          logoUrl: store.logoStorageId
+            ? await ctx.storage.getUrl(store.logoStorageId)
+            : null,
+        };
+      }),
+    );
   },
 });
 

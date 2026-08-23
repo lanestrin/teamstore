@@ -174,7 +174,7 @@ export default function StoresPage() {
         {view === "list" ? (
           <div className={styles.storeList}>
             {stores.map((store) => (
-              <Link key={store.slug} to={`/store/${store.slug}`} className={styles.storeRow}>
+              <Link key={store.slug} to={`/store/demo/${store.slug}`} className={styles.storeRow}>
                 <img src={store.logo} alt={store.name} />
 
                 <strong>{store.name}</strong>
@@ -194,7 +194,7 @@ export default function StoresPage() {
         ) : (
           <div className={styles.gridView}>
             {stores.map((store) => (
-              <Link key={store.slug} to={`/store/${store.slug}`} className={styles.gridCard}>
+              <Link key={store.slug} to={`/store/demo/${store.slug}`} className={styles.gridCard}>
                 <div className={styles.gridCardImage}>
                   <img src={store.logo} alt={store.name} />
                 </div>
