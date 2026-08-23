@@ -5,9 +5,59 @@ import { api } from "../../../convex/_generated/api";
 
 import ProductCard from "../../components/product-card/ProductCard";
 import jaguarsLogo from "../../assets/images/jaguars_logo.png";
+import knightsLogo from "../../assets/images/knights_logo.png";
+import lionsLogo from "../../assets/images/lions_logo.png";
+import tigersLogo from "../../assets/images/tigers_logo.png";
+import trojanLogo from "../../assets/images/trojan_logo.png";
 import { fanwearProducts, requiredProducts } from "../../mocks/products";
 
 import styles from "./StorePage.module.scss";
+
+const demoStores = {
+  "jaguars-soccer": {
+    name: "Jaguars Soccer",
+    organizationName: "Jaguars Athletics",
+    description: "Official apparel and merchandise for Jaguars Soccer.",
+    activity: "soccer",
+    logo: jaguarsLogo,
+  },
+  "knights-baseball": {
+    name: "Knights Baseball",
+    organizationName: "Knights Athletics",
+    description: "Official apparel and merchandise for Knights Baseball.",
+    activity: "baseball",
+    logo: knightsLogo,
+  },
+  "lions-track": {
+    name: "Lions Track",
+    organizationName: "Lions Athletics",
+    description: "Official apparel and merchandise for Lions Track.",
+    activity: "other",
+    logo: lionsLogo,
+  },
+  "tigers-athletics": {
+    name: "Tigers Athletics",
+    organizationName: "Tigers Athletics",
+    description: "Official apparel and merchandise for Tigers Athletics.",
+    activity: "other",
+    logo: tigersLogo,
+  },
+  "trojans-lacrosse": {
+    name: "Trojans Lacrosse",
+    organizationName: "Trojans Athletics",
+    description: "Official apparel and merchandise for Trojans Lacrosse.",
+    activity: "other",
+    logo: trojanLogo,
+  },
+} as const;
+
+function getDemoStore(storeSlug: string | undefined) {
+  if (!storeSlug || !(storeSlug in demoStores)) {
+    return null;
+  }
+
+  return demoStores[storeSlug as keyof typeof demoStores];
+}
 
 function createProductCardData(product: (typeof requiredProducts)[number]) {
   return {
@@ -38,15 +88,18 @@ export default function StorePage() {
     storeSlug: string;
   }>();
 
-  const store = useQuery(
+  const isDemoRoute = organizationSlug === "demo";
+  const liveStore = useQuery(
     api.organizations.getActiveStoreBySlugs,
-    organizationSlug && storeSlug
+    organizationSlug && storeSlug && !isDemoRoute
       ? {
-          organizationSlug,
-          storeSlug,
-        }
+        organizationSlug,
+        storeSlug,
+      }
       : "skip",
   );
+  const demoStore = isDemoRoute ? getDemoStore(storeSlug) : null;
+  const store = demoStore ?? liveStore;
 
   if (!organizationSlug || !storeSlug) {
     return (
@@ -64,7 +117,7 @@ export default function StorePage() {
     );
   }
 
-  if (store === undefined) {
+  if (!isDemoRoute && store === undefined) {
     return (
       <div className={styles.page}>
         <section className={styles.hero}>
@@ -79,7 +132,7 @@ export default function StorePage() {
     );
   }
 
-  if (store === null) {
+  if (store == null) {
     return (
       <div className={styles.page}>
         <section className={styles.hero}>
@@ -101,12 +154,13 @@ export default function StorePage() {
   const storeName = store.name ?? store.organizationName ?? "Team Store";
 
   const storeDescription = store.description ?? `Official apparel and merchandise for ${store.organizationName ?? "this organization"}.`;
+  const storeLogo = "logo" in store ? store.logo : jaguarsLogo;
 
   return (
     <div className={styles.page}>
       <section className={styles.hero}>
         <div className={styles.heroContent}>
-          <img src={jaguarsLogo} alt={store.organizationName ?? storeName} className={styles.logo} />
+          <img src={storeLogo} alt={store.organizationName ?? storeName} className={styles.logo} />
 
           <div>
             <span className={styles.storeLabel}>OFFICIAL TEAM STORE</span>

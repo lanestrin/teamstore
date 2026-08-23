@@ -1,8 +1,6 @@
 import { Link } from "react-router-dom";
-
 import heroBanner from "../../../../assets/images/hero-banner.webp";
 import FeaturesBar from "../FeaturesBar/FeaturesBar";
-
 import styles from "./HeroSection.module.scss";
 
 export default function HeroSection() {
@@ -26,8 +24,7 @@ export default function HeroSection() {
             <Link to="/stores" className={styles.primaryButton}>
               SHOP STORES
             </Link>
-
-            <Link to="/categories" className={styles.secondaryButton}>
+            <Link to="/products" className={styles.secondaryButton}>
               BROWSE CATEGORIES
             </Link>
           </div>
