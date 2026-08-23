@@ -13,10 +13,10 @@
   grid-template-columns:
     minmax(260px, 320px) minmax(0, 1fr) minmax(320px, 420px);
   align-items: start;
-  gap: $space-8;
+  gap: $space-9;
   width: 100%;
-  padding-top: $space-8;
-  padding-bottom: $space-8;
+  padding-top: $space-6;
+  padding-bottom: $space-5;
 }
 
 .brand,
@@ -80,6 +80,7 @@
   color: rgba(255, 255, 255, 0.7);
   text-decoration: none;
   transition: color $transition-base;
+  font-size: 0.85rem;
 }
 
 .navigation a:hover {
@@ -91,7 +92,7 @@
   width: 100%;
   max-width: 420px;
   justify-self: end;
-  padding: $space-5;
+  padding: $space-4;
   background: rgba(255, 255, 255, 0.025);
   border: 1px solid rgba(232, 106, 29, 0.25);
   border-radius: $radius-xl;
@@ -190,10 +191,12 @@
   width: 100%;
   max-width: $container-width;
   margin: 0 auto;
-  padding: $space-5;
+  padding: $space-3;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   color: rgba(255, 255, 255, 0.55);
   text-align: center;
+  font-size: 0.85rem;
+  line-height: 1.5;
 }
 
 /* iPad Pro / smaller desktop */
@@ -233,11 +236,6 @@
   .navigation,
   .supportCard {
     grid-column: auto;
-  }
-
-  .logo {
-    height: 42px;
-    margin-bottom: $space-4;
   }
 
   .brand p {
