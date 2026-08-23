@@ -37,7 +37,7 @@ export function HowItWorksPage() {
         <p>TeamStore gives your organization one place to browse products, manage selections, and collect individual orders.</p>
 
         <div className={styles.heroActions}>
-          <Link className={styles.primaryButton} to="/catalog">
+          <Link className={styles.primaryButton} to="/products">
             Browse the catalog
           </Link>
 
@@ -93,7 +93,7 @@ export function HowItWorksPage() {
           <p>Explore the catalog and begin choosing products for your team.</p>
         </div>
 
-        <Link className={styles.primaryButton} to="/catalog">
+        <Link className={styles.primaryButton} to="/products">
           Explore products
         </Link>
       </section>

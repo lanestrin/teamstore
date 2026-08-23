@@ -4,6 +4,7 @@ import { FaInstagram, FaFacebookF, FaXTwitter, FaYoutube, FaTiktok } from "react
 
 import styles from "./Footer.module.scss";
 import { images } from "../../assets/images";
+import ComingSoonBadge from "../coming-soon-badge/ComingSoonBadge";
 
 export default function Footer() {
   return (
@@ -41,7 +42,7 @@ export default function Footer() {
           <div>
             <h4>Shop</h4>
             <Link to="/stores">Stores</Link>
-            <Link to="/categories">Categories</Link>
+            <Link to="/products">Catalog</Link>
             <Link to="/new">New Arrivals</Link>
           </div>
 
@@ -66,13 +67,16 @@ export default function Footer() {
         <div className={styles.supportCard}>
           <span className={styles.supportLabel}>REAL PEOPLE. REAL SUPPORT.</span>
 
-          <a href="#" className={styles.supportItem}>
+          <a href="#" className={`${styles.supportItem} ${styles.supportLink}`}>
             <div className={styles.iconCircle}>
               <LuMessageCircleMore />
             </div>
 
             <div>
-              <strong>Live Chat</strong>
+              <div className={styles.supportTitleRow}>
+                <strong>Live Chat</strong>
+                <ComingSoonBadge />
+              </div>
 
               <span className={styles.online}>
                 <span className={styles.onlineDot} />
@@ -81,19 +85,21 @@ export default function Footer() {
             </div>
           </a>
 
-          <a href="tel:8775978086" className={styles.supportItem}>
+          <div className={styles.supportItem}>
             <div className={styles.iconCircle}>
               <LuPhone />
             </div>
 
             <div>
-              <strong>Call Us</strong>
+              <div className={styles.supportTitleRow}>
+                <strong>Call Us</strong>
+                <ComingSoonBadge />
+              </div>
 
               <span>877.597.8086</span>
-
               <span>Monday – Friday 7am – 6pm CT</span>
             </div>
-          </a>
+          </div>
         </div>
       </div>
 
