@@ -1,0 +1,47 @@
+.errorSummary {
+  padding: $space-4;
+  background: $error-background;
+  border: 1px solid $error-border;
+  border-radius: $radius-md;
+  font-size: 0.8rem !important;
+}
+
+.errorSummary h2 {
+  margin: 0 0 $space-2;
+  font-size: 1rem;
+  font-weight: $font-semibold;
+  color: $error;
+}
+
+.errorSummary ul {
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+  margin: 0;
+  padding-left: $space-5;
+}
+
+.errorSummary button {
+  padding: 0;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  color: $error;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.errorSummary button:hover {
+  text-decoration-thickness: 2px;
+}
+
+.errorSummary button:focus-visible {
+  outline: 2px solid $error;
+  outline-offset: 3px;
+  border-radius: $radius-sm;
+}
+
+.errorSummary button span {
+  font-weight: $font-semibold;
+}

@@ -180,3 +180,54 @@
     width: 100%;
   }
 }
+
+.required {
+  margin-left: $space-1;
+  color: $error;
+}
+
+.optional {
+  margin-left: $space-2;
+  font-size: 0.875rem;
+  color: $text-secondary;
+}
+
+.helper,
+.errorMessage {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.helper {
+  color: $text-secondary;
+}
+
+.errorMessage {
+  color: $error;
+}
+
+.invalidControl {
+  border-color: $error-border;
+  scroll-margin-top: $space-8;
+}
+
+.invalidControl:focus {
+  border-color: $error;
+}
+
+.invalidUpload {
+  border-color: $error-border;
+  background: $error-background;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
