@@ -4,7 +4,7 @@ import { LuTrash2, LuUpload } from "react-icons/lu";
 import WizardLayout from "../../components/WizardLayout/WizardLayout";
 import { useCreateStore } from "../../context/CreateStoreContext";
 
-import formStyles from "../../../../styles/forms.module.scss";
+import formStyles from "../../styles/form.module.scss";
 import styles from "./OrganizationStep.module.scss";
 import useFileDataUrl from "../../hooks/useFileDataUrl";
 import FormErrorSummary from "../../components/FormErrorSummary/FormErrorSummary";
