@@ -1,11 +1,13 @@
+import { useRef, useState } from "react";
 import { LuTrash2, LuUpload } from "react-icons/lu";
 
 import WizardLayout from "../../components/WizardLayout/WizardLayout";
 import { useCreateStore } from "../../context/CreateStoreContext";
 
-import formStyles from "../../../../styles/Forms.module.scss";
+import formStyles from "../../styles/form.module.scss";
 import styles from "./OrganizationStep.module.scss";
 import useFileDataUrl from "../../hooks/useFileDataUrl";
+import FormErrorSummary from "../../components/FormErrorSummary/FormErrorSummary";
 
 const STORE_ACTIVITIES = [
   { value: "basketball", label: "Basketball" },
@@ -19,6 +21,16 @@ const STORE_ACTIVITIES = [
   { value: "other", label: "Other" },
 ] as const;
 
+const ALLOWED_LOGO_EXTENSIONS = ["png", "jpg", "jpeg", "svg"];
+const MAX_LOGO_SIZE = 5 * 1024 * 1024;
+
+type ValidationErrors = {
+  organizationName?: string;
+  activity?: string;
+  storeName?: string;
+  logo?: string;
+};
+
 function slugify(value: string): string {
   return value
     .toLowerCase()
@@ -27,16 +39,81 @@ function slugify(value: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
+function validateOrganizationName(value: string): string | undefined {
+  return value.trim() ? undefined : "Enter your organization name.";
+}
+
+function validateActivity(value: string): string | undefined {
+  if (!value) {
+    return "Select a store activity.";
+  }
+
+  const isValidActivity = STORE_ACTIVITIES.some((activity) => activity.value === value);
+
+  return isValidActivity ? undefined : "Select a valid store activity.";
+}
+
+function validateStoreName(value: string): string | undefined {
+  return value.trim() ? undefined : "Enter your store name.";
+}
+
+function validateLogo(file: File | null): string | undefined {
+  if (!file) {
+    return undefined;
+  }
+
+  const extension = file.name.split(".").pop()?.toLowerCase();
+
+  if (!extension || !ALLOWED_LOGO_EXTENSIONS.includes(extension)) {
+    return "Upload a PNG, JPG, JPEG, or SVG file.";
+  }
+
+  if (file.size > MAX_LOGO_SIZE) {
+    return "Logo must be 5 MB or smaller.";
+  }
+
+  return undefined;
+}
+
 export default function OrganizationStep() {
   const { currentStep, setCurrentStep, storeDraft, updateStoreDraft } = useCreateStore();
 
+  const [errors, setErrors] = useState<ValidationErrors>({});
+  const [showErrorSummary, setShowErrorSummary] = useState(false);
+
+  const organizationNameRef = useRef<HTMLInputElement>(null);
+  const activityRef = useRef<HTMLSelectElement>(null);
+  const storeNameRef = useRef<HTMLInputElement>(null);
+  const logoRef = useRef<HTMLInputElement>(null);
+
   const logoPreviewUrl = useFileDataUrl(storeDraft.logoFile);
+
+  function setFieldError(field: keyof ValidationErrors, error?: string) {
+    setErrors((current) => ({
+      ...current,
+      [field]: error,
+    }));
+  }
 
   function handleOrganizationNameChange(value: string) {
     updateStoreDraft({
       organizationName: value,
       organizationSlug: slugify(value),
     });
+
+    if (errors.organizationName) {
+      setFieldError("organizationName", validateOrganizationName(value));
+    }
+  }
+
+  function handleActivityChange(value: string) {
+    updateStoreDraft({
+      activity: value,
+    });
+
+    if (errors.activity) {
+      setFieldError("activity", validateActivity(value));
+    }
   }
 
   function handleStoreNameChange(value: string) {
@@ -44,19 +121,106 @@ export default function OrganizationStep() {
       storeName: value,
       storeSlug: slugify(value),
     });
+
+    if (errors.storeName) {
+      setFieldError("storeName", validateStoreName(value));
+    }
   }
 
   function handleLogoChange(file: File | null) {
+    const logoError = validateLogo(file);
+
+    setFieldError("logo", logoError);
+
+    if (logoError) {
+      return;
+    }
+
     updateStoreDraft({
       logoFile: file,
     });
   }
 
+  function focusAndScrollToField(field: keyof ValidationErrors) {
+    const fieldRefs = {
+      organizationName: organizationNameRef,
+      activity: activityRef,
+      storeName: storeNameRef,
+      logo: logoRef,
+    };
+
+    const element = fieldRefs[field].current;
+
+    if (!element) {
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      element.focus({ preventScroll: true });
+      element.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    });
+  }
+
+  function scrollToFirstError(nextErrors: ValidationErrors) {
+    const fieldOrder: Array<keyof ValidationErrors> = ["organizationName", "activity", "storeName", "logo"];
+
+    const firstErrorField = fieldOrder.find((field) => nextErrors[field]);
+
+    if (firstErrorField) {
+      focusAndScrollToField(firstErrorField);
+    }
+  }
+
+  function handleNext() {
+    const nextErrors: ValidationErrors = {
+      organizationName: validateOrganizationName(storeDraft.organizationName),
+      activity: validateActivity(storeDraft.activity),
+      storeName: validateStoreName(storeDraft.storeName),
+      logo: validateLogo(storeDraft.logoFile),
+    };
+
+    setErrors(nextErrors);
+
+    const hasErrors = Object.values(nextErrors).some(Boolean);
+
+    if (hasErrors) {
+      setShowErrorSummary(true);
+      scrollToFirstError(nextErrors);
+      return;
+    }
+
+    setShowErrorSummary(false);
+    setCurrentStep(3);
+  }
+
+  const errorSummaryItems = [
+    {
+      field: "organizationName" as const,
+      label: "Organization Name",
+      message: errors.organizationName,
+    },
+    {
+      field: "activity" as const,
+      label: "Store Activity",
+      message: errors.activity,
+    },
+    {
+      field: "storeName" as const,
+      label: "Store Name",
+      message: errors.storeName,
+    },
+    {
+      field: "logo" as const,
+      label: "Organization Logo",
+      message: errors.logo,
+    },
+  ];
+
   const logoExtension = storeDraft.logoFile ? storeDraft.logoFile.name.split(".").pop()?.toUpperCase() : null;
-
   const logoSize = storeDraft.logoFile ? `${Math.round(storeDraft.logoFile.size / 1024)} KB` : null;
-
-  const isNextDisabled = !storeDraft.organizationName.trim() || !storeDraft.activity || !storeDraft.storeName.trim();
 
   return (
     <WizardLayout
@@ -64,10 +228,11 @@ export default function OrganizationStep() {
       title="Tell us about your organization"
       description="This information will help us create your store and customize your experience."
       onBack={() => setCurrentStep(1)}
-      onNext={() => setCurrentStep(3)}
-      nextDisabled={isNextDisabled}
+      onNext={handleNext}
     >
       <div className={styles.form}>
+        {showErrorSummary && <FormErrorSummary errors={errorSummaryItems} onErrorClick={focusAndScrollToField} />}
+
         <div className={formStyles.field}>
           <label htmlFor="organizationName">
             Organization Name
@@ -75,14 +240,27 @@ export default function OrganizationStep() {
           </label>
 
           <input
+            ref={organizationNameRef}
             id="organizationName"
             type="text"
             placeholder="e.g. Smallville High School"
             value={storeDraft.organizationName}
+            className={errors.organizationName ? styles.invalidControl : undefined}
+            aria-invalid={Boolean(errors.organizationName)}
+            aria-describedby={errors.organizationName ? "organizationName-helper organizationName-error" : "organizationName-helper"}
             onChange={(event) => handleOrganizationNameChange(event.target.value)}
+            onBlur={() => setFieldError("organizationName", validateOrganizationName(storeDraft.organizationName))}
           />
 
-          <p className={styles.helper}>This is the name of your organization or club.</p>
+          {errors.organizationName && (
+            <p id="organizationName-error" className={styles.errorMessage} role="alert">
+              {errors.organizationName}
+            </p>
+          )}
+
+          <p id="organizationName-helper" className={styles.helper}>
+            This is the name of your organization or club.
+          </p>
         </div>
 
         <div className={formStyles.field}>
@@ -92,14 +270,14 @@ export default function OrganizationStep() {
           </label>
 
           <select
+            ref={activityRef}
             id="activity"
             value={storeDraft.activity}
-            onChange={(event) =>
-              updateStoreDraft({
-                activity: event.target.value,
-              })
-            }
-            required
+            className={errors.activity ? styles.invalidControl : undefined}
+            aria-invalid={Boolean(errors.activity)}
+            aria-describedby={errors.activity ? "activity-helper activity-error" : "activity-helper"}
+            onChange={(event) => handleActivityChange(event.target.value)}
+            onBlur={() => setFieldError("activity", validateActivity(storeDraft.activity))}
           >
             <option value="" disabled>
               Select an activity
@@ -112,7 +290,15 @@ export default function OrganizationStep() {
             ))}
           </select>
 
-          <p className={styles.helper}>We’ll use this to show relevant uniforms and fanwear.</p>
+          {errors.activity && (
+            <p id="activity-error" className={styles.errorMessage} role="alert">
+              {errors.activity}
+            </p>
+          )}
+
+          <p id="activity-helper" className={styles.helper}>
+            We’ll use this to show relevant uniforms and fanwear.
+          </p>
         </div>
 
         <div className={formStyles.field}>
@@ -122,14 +308,27 @@ export default function OrganizationStep() {
           </label>
 
           <input
+            ref={storeNameRef}
             id="storeName"
             type="text"
             placeholder="e.g. 2026 Spring Store"
             value={storeDraft.storeName}
+            className={errors.storeName ? styles.invalidControl : undefined}
+            aria-invalid={Boolean(errors.storeName)}
+            aria-describedby={errors.storeName ? "storeName-helper storeName-error" : "storeName-helper"}
             onChange={(event) => handleStoreNameChange(event.target.value)}
+            onBlur={() => setFieldError("storeName", validateStoreName(storeDraft.storeName))}
           />
 
-          <p className={styles.helper}>This is the name displayed on your storefront.</p>
+          {errors.storeName && (
+            <p id="storeName-error" className={styles.errorMessage} role="alert">
+              {errors.storeName}
+            </p>
+          )}
+
+          <p id="storeName-helper" className={styles.helper}>
+            This is the name displayed on your storefront.
+          </p>
         </div>
 
         <div className={formStyles.field}>
@@ -149,11 +348,22 @@ export default function OrganizationStep() {
           <label htmlFor="logo">Organization Logo</label>
 
           <input
+            ref={logoRef}
             id="logo"
             type="file"
             accept=".png,.jpg,.jpeg,.svg"
             className={styles.fileInput}
-            onChange={(event) => handleLogoChange(event.target.files?.[0] ?? null)}
+            aria-describedby={errors.logo ? "logo-helper logo-error" : "logo-helper"}
+            onChange={(event) => {
+              const file = event.target.files?.[0] ?? null;
+              const logoError = validateLogo(file);
+
+              handleLogoChange(file);
+
+              if (logoError) {
+                event.target.value = "";
+              }
+            }}
           />
 
           {storeDraft.logoFile ? (
@@ -184,7 +394,7 @@ export default function OrganizationStep() {
               </div>
             </div>
           ) : (
-            <label htmlFor="logo" className={styles.upload}>
+            <label htmlFor="logo" className={`${styles.upload} ${errors.logo ? styles.invalidUpload : ""}`}>
               <div className={styles.uploadIcon}>
                 <LuUpload />
               </div>
@@ -193,6 +403,16 @@ export default function OrganizationStep() {
               <p>PNG, JPG or SVG (max 5 MB)</p>
             </label>
           )}
+
+          {errors.logo && (
+            <p id="logo-error" className={styles.errorMessage} role="alert">
+              {errors.logo}
+            </p>
+          )}
+
+          <span id="logo-helper" className={styles.visuallyHidden}>
+            Accepted logo formats are PNG, JPG, JPEG, and SVG. Maximum file size is 5 MB.
+          </span>
         </div>
 
         <div className={formStyles.field}>

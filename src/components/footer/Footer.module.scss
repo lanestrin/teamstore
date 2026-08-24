@@ -27,7 +27,7 @@
 
 .logo {
   width: auto;
-  height: 48px;
+  height: 38px;
   margin-bottom: $space-5;
 }
 
@@ -36,6 +36,7 @@
   margin: 0;
   color: rgba(255, 255, 255, 0.7);
   line-height: 1.7;
+  font-size: 0.9rem;
 }
 
 .brandSocials {
@@ -93,6 +94,7 @@
   max-width: 420px;
   justify-self: end;
   padding: $space-4;
+  padding-bottom: 0px;
   background: rgba(255, 255, 255, 0.025);
   border: 1px solid rgba(232, 106, 29, 0.25);
   border-radius: $radius-xl;
@@ -140,8 +142,8 @@
   @include flex-center;
 
   flex-shrink: 0;
-  width: 52px;
-  height: 52px;
+  width: 48px;
+  height: 48px;
   background: $brand-red;
   border-radius: $radius-round;
   font-size: 1.2rem;
