@@ -354,6 +354,7 @@ export default function SelectProductsStep() {
 
     updateStoreDraft({
       productColorFamily: nextColor,
+      productSecondaryColorFamily: "",
       productGenerationSeed: storeDraft.productGenerationSeed + 1,
     });
   }
