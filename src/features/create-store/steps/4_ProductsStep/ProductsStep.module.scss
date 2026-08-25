@@ -49,7 +49,7 @@
   text-align: left;
 }
 
-.emptyState > svg {
+.emptyState>svg {
   flex: 0 0 auto;
 
   width: 28px;
@@ -74,8 +74,97 @@
   color: $text-secondary;
 }
 
+/*
+ * Exact team-color combinations are preferred.
+ * When that combination is unavailable, this notice explains
+ * why primary-color alternatives are being shown instead.
+ */
+
+.colorFallbackNotice {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+
+  padding: $space-6;
+
+  background: $gray-50;
+  border: 1px solid $border-light;
+  border-radius: $radius-lg;
+}
+
+.colorFallbackEyebrow {
+  font-size: 0.75rem;
+  font-weight: $font-semibold;
+  line-height: 1.25;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $text-secondary;
+}
+
+.colorFallbackContent {
+  max-width: 760px;
+}
+
+.colorFallbackContent h2 {
+  margin: 0;
+
+  font-size: 1.375rem;
+  font-weight: $font-semibold;
+  line-height: 1.25;
+  color: $text-primary;
+}
+
+.colorFallbackContent p {
+  margin: $space-2 0 0;
+
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: $text-secondary;
+}
+
+.colorFallbackSuggestion {
+  display: flex;
+  align-items: baseline;
+  gap: $space-2;
+
+  width: fit-content;
+  padding-top: $space-3;
+
+  border-top: 1px solid $border-light;
+}
+
+.colorFallbackSuggestion span {
+  font-size: 0.75rem;
+  font-weight: $font-semibold;
+  line-height: 1.25;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: $text-secondary;
+}
+
+.colorFallbackSuggestion strong {
+  font-size: 1rem;
+  font-weight: $font-semibold;
+  line-height: 1.4;
+  color: $text-primary;
+}
+
 @media (max-width: 640px) {
   .productsStep {
     gap: $space-6;
+  }
+
+  .colorFallbackNotice {
+    padding: $space-4;
+  }
+
+  .colorFallbackContent h2 {
+    font-size: 1.125rem;
+  }
+
+  .colorFallbackSuggestion {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: $space-1;
   }
 }

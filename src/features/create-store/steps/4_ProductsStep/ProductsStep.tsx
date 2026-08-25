@@ -149,13 +149,39 @@ export default function SelectProductsStep() {
     return [...storeCreationProducts.uniforms, ...storeCreationProducts.fanwear];
   }, [storeCreationProducts]);
 
+  const isLoading = isStoreActivity(storeDraft.activity) && storeCreationProducts === undefined;
+
+  /*
+   * A selected secondary color should only be treated as an exact match
+   * when the catalog actually contains a two-color option with both
+   * the selected primary and secondary families.
+   *
+   * If that exact pair does not exist, suggestions fall back to
+   * primary + All without changing the user's saved team colors.
+   */
+  const hasExactSecondaryColorCombination = useMemo(() => {
+    if (!primaryColorFamily || !secondaryColorFamily || primaryColorFamily === "unknown" || secondaryColorFamily === "unknown") {
+      return true;
+    }
+
+    return productOptions.some((product) =>
+      product.colorOptions.some((color) => {
+        const colorFamilies = [...new Set(color.colorFamilies)];
+
+        return colorFamilies.length === 2 && colorFamilies.includes(primaryColorFamily) && colorFamilies.includes(secondaryColorFamily);
+      }),
+    );
+  }, [productOptions, primaryColorFamily, secondaryColorFamily]);
+
+  const isUsingColorFallback = Boolean(secondaryColorFamily) && !isLoading && !hasExactSecondaryColorCombination;
+  const suggestionSecondaryColorFamily = isUsingColorFallback ? "" : secondaryColorFamily;
+
   const availableProductColorFamilies = useMemo(
     () => new Set(storeCreationProducts?.availableProductColorFamilies ?? []),
     [storeCreationProducts],
   );
 
   const artworkTemplatesById = useMemo(() => new Map(ART_TEMPLATE_LIST.map((template) => [template.id, template])), []);
-
   const selectedArtworkIds = useMemo(
     () => [
       ...Object.values(storeDraft.artworkTemplates)
@@ -225,9 +251,6 @@ export default function SelectProductsStep() {
   );
 
   const selectedProductCount = Object.keys(storeDraft.productSelections).length;
-
-  const isLoading = isStoreActivity(storeDraft.activity) && storeCreationProducts === undefined;
-
   const suggestions = useMemo<GeneratedSuggestion[]>(() => {
     if (!storeCreationProducts || !primaryColorFamily) {
       return [];
@@ -237,7 +260,7 @@ export default function SelectProductsStep() {
       products: productOptions,
       selectedArtworkIds,
       primaryColorFamily,
-      secondaryColorFamily,
+      secondaryColorFamily: suggestionSecondaryColorFamily,
       productGenerationSeed: storeDraft.productGenerationSeed,
       productSelections: storeDraft.productSelections,
       activity: storeDraft.activity,
@@ -247,7 +270,7 @@ export default function SelectProductsStep() {
     productOptions,
     selectedArtworkIds,
     primaryColorFamily,
-    secondaryColorFamily,
+    suggestionSecondaryColorFamily,
     storeDraft.productGenerationSeed,
     storeDraft.productSelections,
     storeDraft.activity,
@@ -367,18 +390,10 @@ export default function SelectProductsStep() {
   }
 
   function handleRequiredClick(suggestion: GeneratedSuggestion) {
-    const color = getEffectiveColor(suggestion);
     const combinationKey = getEffectiveCombinationKey(suggestion);
     const selection = storeDraft.productSelections[combinationKey];
 
     if (!selection) {
-      selectProduct({
-        productId: suggestion.productId,
-        colorKey: color.colorKey,
-        artworkTemplateId: suggestion.artworkTemplateId,
-        isRequired: true,
-      });
-
       return;
     }
 
@@ -452,7 +467,6 @@ export default function SelectProductsStep() {
   const secondaryColorLabel = getProductColorLabel(secondaryColorFamily);
   const hasMatchingSuggestions = suggestions.length > 0;
   const canRegenerate = Boolean(primaryColorFamily);
-
   const artworkDescription = selectedArtworkIds.length > 0 ? "with randomly assigned artwork" : "without artwork";
 
   return (
@@ -511,9 +525,35 @@ export default function SelectProductsStep() {
             </div>
           ) : (
             <>
+              {isUsingColorFallback && (
+                <aside className={styles.colorFallbackNotice}>
+                  <span className={styles.colorFallbackEyebrow}>No exact color match</span>
+
+                  <div className={styles.colorFallbackContent}>
+                    <h2>
+                      {primaryColorLabel} + {secondaryColorLabel} products aren&apos;t currently available
+                    </h2>
+
+                    <p>
+                      We couldn&apos;t find products in your exact {primaryColorLabel} and {secondaryColorLabel} combination. May we suggest
+                      these {primaryColorLabel} products with other available secondary colors instead?
+                    </p>
+                  </div>
+
+                  <div className={styles.colorFallbackSuggestion}>
+                    <span>Suggested colors</span>
+                    <strong>{primaryColorLabel} + All</strong>
+                  </div>
+                </aside>
+              )}
+
               <ProductSuggestionSection
                 title="Uniforms"
-                description={`${primaryColorLabel} and ${secondaryColorLabel} uniform options ${artworkDescription}.`}
+                description={
+                  isUsingColorFallback
+                    ? `${primaryColorLabel} uniform alternatives with available secondary colors ${artworkDescription}.`
+                    : `${primaryColorLabel} and ${secondaryColorLabel} uniform options ${artworkDescription}.`
+                }
                 section="uniforms"
                 suggestions={suggestions}
                 isLoading={isLoading}
@@ -529,7 +569,11 @@ export default function SelectProductsStep() {
 
               <ProductSuggestionSection
                 title="Fanwear"
-                description={`${primaryColorLabel} and ${secondaryColorLabel} fanwear options ${artworkDescription}.`}
+                description={
+                  isUsingColorFallback
+                    ? `${primaryColorLabel} fanwear alternatives with available secondary colors ${artworkDescription}.`
+                    : `${primaryColorLabel} and ${secondaryColorLabel} fanwear options ${artworkDescription}.`
+                }
                 section="fanwear"
                 suggestions={suggestions}
                 isLoading={isLoading}
