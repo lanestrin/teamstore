@@ -320,7 +320,44 @@ export function generateProductSuggestions({
     }
   }
 
-  return [...generated.values()];
+  /*
+   * Selection state must not change the visual order of the suggestion grid.
+   *
+   * Selected suggestions are intentionally rebuilt first so they survive
+   * filter changes, but Map insertion order would otherwise move them to the
+   * front of the UI. Sort the final list using a seed that only changes when
+   * the assortment itself is regenerated or its generation inputs change.
+   */
+  const suggestionOrderSeed = hashString(
+    [productGenerationSeed, activity, primaryColorFamily, secondaryColorFamily, ...availableArtworkIds].join("|"),
+  );
+
+  return [...generated.values()].sort((leftSuggestion, rightSuggestion) => {
+    const leftOrder = hashString(
+      [
+        suggestionOrderSeed,
+        leftSuggestion.section,
+        leftSuggestion.productId,
+        leftSuggestion.color.colorKey,
+        leftSuggestion.artworkTemplateId,
+      ].join("|"),
+    );
+    const rightOrder = hashString(
+      [
+        suggestionOrderSeed,
+        rightSuggestion.section,
+        rightSuggestion.productId,
+        rightSuggestion.color.colorKey,
+        rightSuggestion.artworkTemplateId,
+      ].join("|"),
+    );
+
+    if (leftOrder !== rightOrder) {
+      return leftOrder - rightOrder;
+    }
+
+    return leftSuggestion.combinationKey.localeCompare(rightSuggestion.combinationKey);
+  });
 }
 
 export function getAvailableProductColorFamilies(products: readonly ProductOption[]): Set<string> {

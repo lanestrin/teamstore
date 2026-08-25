@@ -1,4 +1,5 @@
 .productCard {
+  position: relative;
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -6,239 +7,219 @@
 
   background: $white;
   border: 1px solid $border-light;
-  border-radius: $radius-lg;
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgb(16 24 40 / 4%);
 
   transition:
-    border-color $transition-base,
-    box-shadow $transition-base,
-    transform $transition-base;
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    transform 150ms ease;
 }
 
 .productCard:hover {
   border-color: $gray-300;
-  box-shadow: $shadow-sm;
+  box-shadow: 0 8px 24px rgb(16 24 40 / 8%);
   transform: translateY(-2px);
 }
 
-.productCardSelected {
-  border-color: $text-primary;
-  box-shadow: 0 0 0 1px $text-primary;
+.productCard[data-selected="true"] {
+  border-color: #16a34a;
+  box-shadow:
+    0 0 0 2px rgb(22 163 74 / 14%),
+    0 8px 24px rgb(16 24 40 / 8%);
 }
 
 .productImageArea {
   position: relative;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
+  display: grid;
   aspect-ratio: 4 / 3;
-  padding: $space-4;
+  min-height: 240px;
+  padding: 1rem;
+  place-items: center;
   overflow: hidden;
 
   background: $gray-50;
   border-bottom: 1px solid $border-light;
 }
 
-.productImage {
+.productImage,
+.productImageArea [data-garment-artwork-preview] {
   display: block;
-
   width: 100%;
   height: 100%;
-
+  min-height: 0;
   object-fit: contain;
-
-  transition: transform $transition-base;
 }
 
-.productCard:hover [data-garment-artwork-preview] {
-  transform: scale(1.025);
+.productImagePlaceholder {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  min-height: 220px;
+  place-items: center;
+
+  color: $text-secondary;
+  font-size: 0.875rem;
 }
 
 .requiredButton {
   @include button-base;
 
   position: absolute;
-  top: $space-3;
-  right: $space-3;
+  top: 0.75rem;
+  right: 0.75rem;
   z-index: 2;
 
   display: inline-flex;
+  min-height: 36px;
+  padding: 0 0.75rem;
   align-items: center;
   justify-content: center;
+  gap: 0.4rem;
 
-  width: 38px;
-  height: 38px;
-  padding: 0;
-
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid $border-light;
-  border-radius: $radius-pill;
-
-  color: $text-secondary;
-
+  background: rgb(255 255 255 / 96%);
+  border: 1px solid $gray-300;
+  border-radius: 999px;
   box-shadow: $shadow-sm;
 
+  color: $text-secondary;
   cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: $font-semibold;
+  line-height: 1;
+  white-space: nowrap;
 
   transition:
-    background-color $transition-base,
-    border-color $transition-base,
-    color $transition-base,
-    transform $transition-base;
+    background-color 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    color 150ms ease;
 }
 
-.requiredButton:hover {
-  background: $white;
-  border-color: $gray-300;
+.requiredButton:hover:not(:disabled) {
+  background: $gray-50;
+  border-color: $text-secondary;
   color: $text-primary;
+}
 
-  transform: scale(1.05);
+.requiredButton:focus-visible {
+  border-color: $text-primary;
+  outline: none;
+  box-shadow:
+    0 0 0 3px rgb(23 25 28 / 12%),
+    $shadow-sm;
+}
+
+.requiredButton:disabled {
+  background: rgb(255 255 255 / 88%);
+  border-color: $border-light;
+
+  color: $text-secondary;
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.requiredButton[data-required="true"] {
+  background: $text-primary;
+  border-color: $text-primary;
+
+  color: $white;
+}
+
+.requiredButton[data-required="true"]:hover:not(:disabled) {
+  background: $text-primary;
+  border-color: $text-primary;
+
+  color: $white;
 }
 
 .requiredButton svg {
-  width: 19px;
-  height: 19px;
+  flex: 0 0 auto;
+
+  width: 15px;
+  height: 15px;
 }
 
-.requiredButtonActive {
-  background: $text-primary;
-  border-color: $text-primary;
-  color: $white;
+.requiredButton[data-required="true"] svg {
+  fill: currentColor;
 }
 
-.requiredButtonActive:hover {
-  background: $text-primary;
-  border-color: $text-primary;
-  color: $white;
-}
-
-.selectedBadge {
-  position: absolute;
-  top: $space-3;
-  left: $space-3;
-
-  display: inline-flex;
-  align-items: center;
-  gap: $space-1;
-
-  padding: $space-1 $space-2;
-
-  background: $text-primary;
-  border-radius: $radius-pill;
-
-  font-size: 0.75rem;
-  font-weight: $font-semibold;
-  color: $white;
-}
-
-.selectedBadge svg {
-  width: 14px;
-  height: 14px;
-}
-
-.productContent {
+.productCardBody {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: $space-4;
-
-  padding: $space-4;
-}
-
-.productHeading {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: $space-3;
-}
-
-.productHeading > div {
   min-width: 0;
 }
 
-.productHeading h3 {
-  margin: 0;
-
-  font-size: 1rem;
-  font-weight: $font-semibold;
-  line-height: 1.35;
-
-  color: $text-primary;
+.productInfo {
+  padding: 1rem;
 }
 
-.productCategory {
-  display: -webkit-box;
+.productTitleRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: start;
+}
 
-  margin: $space-1 0 0;
-  overflow: hidden;
+.productTitleRow h3 {
+  margin: 0;
 
-  font-size: 0.75rem;
-  line-height: 1.4;
-  color: $text-secondary;
-
-  -webkit-box-orient: vertical;
+  color: $text-primary;
+  font-size: 0.95rem;
+  font-weight: $font-semibold;
+  line-height: 1.35;
 }
 
 .productPrice {
-  flex: 0 0 auto;
-
+  color: $text-primary;
   font-size: 0.875rem;
   font-weight: $font-semibold;
+  line-height: 1.35;
   white-space: nowrap;
-
-  color: $text-primary;
 }
 
-.productMeta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: $space-2;
-}
+.productColorName {
+  margin: 0.25rem 0 0;
 
-.productMeta span {
-  padding: $space-1 $space-2;
-
-  background: $gray-100;
-  border-radius: $radius-sm;
-
-  font-size: 0.75rem;
   color: $text-secondary;
+  font-size: 0.78rem;
+  line-height: 1.4;
 }
 
-.productActions {
-  display: flex;
+.productCardActions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.75rem;
   align-items: center;
-  justify-content: space-between;
-  gap: $space-3;
 
   margin-top: auto;
-  padding-top: $space-2;
+  padding: 0.8rem 1rem;
+
+  background: $white;
+  border-top: 1px solid $border-light;
 }
 
 .productCheckbox {
   display: inline-flex;
-  align-items: center;
-  gap: $space-2;
-
   min-width: 0;
+  align-items: center;
+  gap: 0.55rem;
 
-  font-size: 0.8125rem;
-  font-weight: $font-semibold;
   color: $text-primary;
-
   cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: $font-semibold;
+  line-height: 1.25;
 }
 
 .productCheckbox input {
   flex: 0 0 auto;
-
   width: 18px;
   height: 18px;
   margin: 0;
 
-  accent-color: $text-primary;
-
+  accent-color: #16a34a;
   cursor: pointer;
 }
 
@@ -248,56 +229,66 @@
   white-space: nowrap;
 }
 
+.productCheckbox:focus-within {
+  border-radius: 4px;
+  outline: 3px solid rgb(34 197 94 / 18%);
+  outline-offset: 3px;
+}
+
 .editProductButton {
   @include button-base;
 
   display: inline-flex;
+  min-height: 36px;
+  padding: 0 0.75rem;
   align-items: center;
   justify-content: center;
-  gap: $space-2;
-
-  flex: 0 0 auto;
-
-  min-height: 36px;
-  padding: $space-2 $space-3;
+  gap: 0.4rem;
 
   background: $white;
-  border: 1px solid $border-light;
-  border-radius: $radius-md;
+  border: 1px solid $gray-300;
+  border-radius: 8px;
 
-  font-size: 0.8125rem;
-  font-weight: $font-semibold;
   color: $text-primary;
-
   cursor: pointer;
-
-  transition:
-    background-color $transition-base,
-    border-color $transition-base;
+  font-size: 0.8rem;
+  font-weight: $font-semibold;
+  white-space: nowrap;
 }
 
 .editProductButton:hover {
-  background: $gray-100;
-  border-color: $gray-300;
+  background: $gray-50;
+  border-color: $text-secondary;
+}
+
+.editProductButton:focus-visible {
+  border-color: $text-primary;
+  outline: none;
+  box-shadow: 0 0 0 3px rgb(23 25 28 / 12%);
 }
 
 .editProductButton svg {
+  flex: 0 0 auto;
   width: 15px;
   height: 15px;
 }
 
 @media (max-width: 640px) {
-  .productHeading {
-    flex-direction: column;
+  .productImageArea {
+    min-height: 220px;
+  }
+
+  .productTitleRow {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
   }
 
   .productPrice {
     white-space: normal;
   }
 
-  .productActions {
-    align-items: stretch;
-    flex-direction: column;
+  .productCardActions {
+    grid-template-columns: 1fr;
   }
 
   .editProductButton {
