@@ -87,7 +87,7 @@ export default function ProductSuggestionControls({
 
               return (
                 <option key={option.value} value={option.value} disabled={!isLoading && !isAvailable}>
-                  {isAvailable ? option.label : `${option.label} — Unavailable`}
+                  {isLoading || isAvailable ? option.label : `${option.label} — Unavailable`}
                 </option>
               );
             })}
