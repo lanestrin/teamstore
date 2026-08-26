@@ -39,13 +39,37 @@ const colorOptions = [
 ];
 
 export default function ColorsStep() {
-  const { currentStep, setCurrentStep, primaryColor, secondaryColor, setPrimaryColor, setSecondaryColor } = useCreateStore();
+  const { currentStep, setCurrentStep, primaryColor, secondaryColor, setPrimaryColor, setSecondaryColor, resetProductStep } =
+    useCreateStore();
 
   const selectedColorId = colorOptions.find((option) => option.primary === primaryColor && option.secondary === secondaryColor)?.id;
 
   function handlePresetSelect(primary: string, secondary: string) {
+    if (primary === primaryColor && secondary === secondaryColor) {
+      return;
+    }
+
+    resetProductStep();
     setPrimaryColor(primary);
     setSecondaryColor(secondary);
+  }
+
+  function handlePrimaryColorChange(nextPrimaryColor: string) {
+    if (nextPrimaryColor === primaryColor) {
+      return;
+    }
+
+    resetProductStep();
+    setPrimaryColor(nextPrimaryColor);
+  }
+
+  function handleSecondaryColorChange(nextSecondaryColor: string) {
+    if (nextSecondaryColor === secondaryColor) {
+      return;
+    }
+
+    resetProductStep();
+    setSecondaryColor(nextSecondaryColor);
   }
 
   return (
@@ -73,9 +97,9 @@ export default function ColorsStep() {
       </div>
 
       <div className={styles.customColors}>
-        <ColorPicker label="Primary Color" value={primaryColor} onChange={setPrimaryColor} />
+        <ColorPicker label="Primary Color" value={primaryColor} onChange={handlePrimaryColorChange} />
 
-        <ColorPicker label="Secondary Color" value={secondaryColor} onChange={setSecondaryColor} />
+        <ColorPicker label="Secondary Color" value={secondaryColor} onChange={handleSecondaryColorChange} />
       </div>
 
       <div className={styles.info}>
