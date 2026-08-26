@@ -1,17 +1,13 @@
 import type { FunctionReturnType } from "convex/server";
-
 import { api } from "../../../../../../convex/_generated/api";
 import type { ProductColorFamily } from "../../../../../types/productColor.types";
-
-import type { DecorationProfileId } from "./decorationProfiles";
+import type { DecorationProfileId, ProductArtworkPlacement } from "./decorationProfiles";
 import type { Id } from "../../../../../../convex/_generated/dataModel";
 
 type StoreCreationProducts = NonNullable<FunctionReturnType<typeof api.products.getStoreCreationProducts>>;
 
 export type ProductOption = StoreCreationProducts["uniforms"][number];
-
 export type ProductColorOption = ProductOption["colorOptions"][number];
-
 export type ProductSuggestionSection = "uniforms" | "fanwear";
 
 export interface GeneratedSuggestion {
@@ -26,7 +22,7 @@ export interface GeneratedSuggestion {
 
 export interface EditingProductState {
   suggestionKey: string;
-  colorKey: string;
+  placement: ProductArtworkPlacement;
 }
 
 export interface ProductColorOptionDefinition {

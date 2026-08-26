@@ -6,11 +6,12 @@ import { api } from "../../../../../convex/_generated/api";
 import { ART_TEMPLATE_LIST } from "../../../../assets/art-templates";
 import type { ProductColorFamily } from "../../../../types/productColor.types";
 import WizardLayout from "../../components/WizardLayout/WizardLayout";
-import { createProductCombinationKey, useCreateStore } from "../../context/CreateStoreContext";
+import { useCreateStore } from "../../context/CreateStoreContext";
 
 import ProductEditorModal from "./components/ProductEditorModal/ProductEditorModal";
 import ProductSuggestionControls from "./components/ProductSuggestionControls/ProductSuggestionControls";
 import ProductSuggestionSection from "./components/ProductSuggestionSection/ProductSuggestionSection";
+import { createDefaultProductArtworkPlacement, type ProductArtworkPlacement } from "./lib/decorationProfiles";
 import { PRODUCT_COLOR_OPTIONS } from "./lib/productColorOptions";
 import { createUploadedArtworkId, generateProductSuggestions, getUploadedArtworkId } from "./lib/productGeneration";
 import type { EditingProductState, GeneratedSuggestion, ProductColorOption, ProductOption } from "./lib/productStep.types";
@@ -98,22 +99,23 @@ export default function SelectProductsStep() {
   const [editingProduct, setEditingProduct] = useState<EditingProductState | null>(null);
 
   /*
-   * Used only when the user edits the color
-   * of an unselected suggestion.
+   * Product artwork placement can be edited before a suggestion is selected.
    *
-   * Selected products store their color directly
-   * inside productSelections instead.
+   * Selected products persist placement in productSelections.
+   * Unselected suggestions keep temporary placement overrides here.
    */
-  const [colorOverrides, setColorOverrides] = useState<Record<string, string>>({});
+  const [placementOverrides, setPlacementOverrides] = useState<Record<string, ProductArtworkPlacement>>({});
 
   /*
-   * Selected product IDs are sent to Convex so selected
-   * products remain available even when the color filter changes.
+   * Keep the Convex catalog query stable while the user selects products.
+   *
+   * We only snapshot selected product IDs when an upstream catalog filter
+   * changes. This lets selected products survive a primary-color change
+   * without refetching the catalog on every checkbox click.
    */
-  const selectedProductIds = useMemo(
-    () => [...new Set(Object.values(storeDraft.productSelections).map((selection) => selection.productId))],
-    [storeDraft.productSelections],
-  );
+  const [preservedProductIds, setPreservedProductIds] = useState(() => [
+    ...new Set(Object.values(storeDraft.productSelections).map((selection) => selection.productId)),
+  ]);
 
   /*
    * Store Creation is now vendor-independent.
@@ -131,7 +133,7 @@ export default function SelectProductsStep() {
       ? {
           activity: storeDraft.activity,
           colorFamily: primaryColorFamily && primaryColorFamily !== "unknown" ? primaryColorFamily : undefined,
-          selectedProductIds,
+          selectedProductIds: preservedProductIds,
         }
       : "skip",
   );
@@ -277,28 +279,32 @@ export default function SelectProductsStep() {
   ]);
 
   /*
-   * Temporary card edits should not survive
+   * Temporary product-placement edits should not survive
    * a regenerated assortment.
    */
   useEffect(() => {
-    setColorOverrides({});
+    setPlacementOverrides({});
     setEditingProduct(null);
   }, [storeDraft.productGenerationSeed]);
 
   function getEffectiveColor(suggestion: GeneratedSuggestion): ProductColorOption {
-    const overrideColorKey = colorOverrides[suggestion.combinationKey];
-
-    if (!overrideColorKey) {
-      return suggestion.color;
-    }
-
-    return suggestion.product.colorOptions.find((color) => color.colorKey === overrideColorKey) ?? suggestion.color;
+    return suggestion.color;
   }
 
-  function getEffectiveCombinationKey(suggestion: GeneratedSuggestion): string {
-    const color = getEffectiveColor(suggestion);
+  function getArtworkPlacement(suggestion: GeneratedSuggestion): ProductArtworkPlacement {
+    const selection = storeDraft.productSelections[suggestion.combinationKey];
 
-    return createProductCombinationKey(suggestion.productId, color.colorKey, suggestion.artworkTemplateId);
+    if (selection?.artworkPlacement) {
+      return selection.artworkPlacement;
+    }
+
+    const placementOverride = placementOverrides[suggestion.combinationKey];
+
+    if (placementOverride) {
+      return placementOverride;
+    }
+
+    return createDefaultProductArtworkPlacement(suggestion.decorationProfileId);
   }
 
   function getArtworkName(artworkId: string): string {
@@ -312,11 +318,11 @@ export default function SelectProductsStep() {
   }
 
   function isSuggestionSelected(suggestion: GeneratedSuggestion): boolean {
-    return storeDraft.productSelections[getEffectiveCombinationKey(suggestion)] !== undefined;
+    return storeDraft.productSelections[suggestion.combinationKey] !== undefined;
   }
 
   function isSuggestionRequired(suggestion: GeneratedSuggestion): boolean {
-    return storeDraft.productSelections[getEffectiveCombinationKey(suggestion)]?.isRequired ?? false;
+    return storeDraft.productSelections[suggestion.combinationKey]?.isRequired ?? false;
   }
 
   function handleActivityChange(nextActivity: StoreActivity) {
@@ -334,8 +340,9 @@ export default function SelectProductsStep() {
       }
     }
 
-    setColorOverrides({});
+    setPlacementOverrides({});
     setEditingProduct(null);
+    setPreservedProductIds([]);
 
     updateStoreDraft({
       activity: nextActivity,
@@ -349,8 +356,9 @@ export default function SelectProductsStep() {
       return;
     }
 
-    setColorOverrides({});
+    setPlacementOverrides({});
     setEditingProduct(null);
+    setPreservedProductIds([...new Set(Object.values(storeDraft.productSelections).map((selection) => selection.productId))]);
 
     updateStoreDraft({
       productColorFamily: nextColor,
@@ -364,7 +372,7 @@ export default function SelectProductsStep() {
       return;
     }
 
-    setColorOverrides({});
+    setPlacementOverrides({});
     setEditingProduct(null);
 
     updateStoreDraft({
@@ -374,39 +382,47 @@ export default function SelectProductsStep() {
   }
 
   function handleSelectionChange(suggestion: GeneratedSuggestion, checked: boolean) {
-    const color = getEffectiveColor(suggestion);
-    const combinationKey = getEffectiveCombinationKey(suggestion);
-
     if (!checked) {
-      removeProduct(combinationKey);
+      const currentSelection = storeDraft.productSelections[suggestion.combinationKey];
+
+      const artworkPlacement = currentSelection?.artworkPlacement;
+
+      if (artworkPlacement) {
+        setPlacementOverrides((currentOverrides) => ({
+          ...currentOverrides,
+          [suggestion.combinationKey]: { ...artworkPlacement },
+        }));
+      }
+
+      removeProduct(suggestion.combinationKey);
       return;
     }
+
+    const color = getEffectiveColor(suggestion);
 
     selectProduct({
       productId: suggestion.productId,
       colorKey: color.colorKey,
       artworkTemplateId: suggestion.artworkTemplateId,
       isRequired: false,
+      artworkPlacement: getArtworkPlacement(suggestion),
     });
   }
 
   function handleRequiredClick(suggestion: GeneratedSuggestion) {
-    const combinationKey = getEffectiveCombinationKey(suggestion);
-    const selection = storeDraft.productSelections[combinationKey];
+    const selection = storeDraft.productSelections[suggestion.combinationKey];
 
     if (!selection) {
       return;
     }
 
-    toggleProductRequired(combinationKey);
+    toggleProductRequired(suggestion.combinationKey);
   }
 
   function openProductEditor(suggestion: GeneratedSuggestion) {
-    const color = getEffectiveColor(suggestion);
-
     setEditingProduct({
       suggestionKey: suggestion.combinationKey,
-      colorKey: color.colorKey,
+      placement: { ...getArtworkPlacement(suggestion) },
     });
   }
 
@@ -415,7 +431,7 @@ export default function SelectProductsStep() {
     [editingProduct, suggestions],
   );
 
-  function handleEditorColorChange(colorKey: string) {
+  function handleEditorPlacementChange(placement: ProductArtworkPlacement) {
     setEditingProduct((currentEditingProduct) => {
       if (!currentEditingProduct) {
         return null;
@@ -423,30 +439,24 @@ export default function SelectProductsStep() {
 
       return {
         ...currentEditingProduct,
-        colorKey,
+        placement: { ...placement },
       };
     });
   }
 
-  function saveProductColor() {
+  function saveProductPlacement() {
     if (!editingSuggestion || !editingProduct) {
       return;
     }
 
-    const previousColor = getEffectiveColor(editingSuggestion);
-    const previousCombinationKey = createProductCombinationKey(
-      editingSuggestion.productId,
-      previousColor.colorKey,
-      editingSuggestion.artworkTemplateId,
-    );
-    const currentSelection = storeDraft.productSelections[previousCombinationKey];
+    const currentSelection = storeDraft.productSelections[editingSuggestion.combinationKey];
 
     if (currentSelection) {
-      updateProductSelection(previousCombinationKey, {
-        colorKey: editingProduct.colorKey,
+      updateProductSelection(editingSuggestion.combinationKey, {
+        artworkPlacement: editingProduct.placement,
       });
 
-      setColorOverrides((currentOverrides) => {
+      setPlacementOverrides((currentOverrides) => {
         const { [editingSuggestion.combinationKey]: removedOverride, ...remainingOverrides } = currentOverrides;
 
         void removedOverride;
@@ -454,9 +464,9 @@ export default function SelectProductsStep() {
         return remainingOverrides;
       });
     } else {
-      setColorOverrides((currentOverrides) => ({
+      setPlacementOverrides((currentOverrides) => ({
         ...currentOverrides,
-        [editingSuggestion.combinationKey]: editingProduct.colorKey,
+        [editingSuggestion.combinationKey]: { ...editingProduct.placement },
       }));
     }
 
@@ -561,6 +571,7 @@ export default function SelectProductsStep() {
                 artworkSvgsByTemplateId={artworkPreviewSvgsById}
                 getArtworkName={getArtworkName}
                 getEffectiveColor={getEffectiveColor}
+                getArtworkPlacement={getArtworkPlacement}
                 isSelected={isSuggestionSelected}
                 isRequired={isSuggestionRequired}
                 onSelectionChange={handleSelectionChange}
@@ -581,6 +592,7 @@ export default function SelectProductsStep() {
                 artworkSvgsByTemplateId={artworkPreviewSvgsById}
                 getArtworkName={getArtworkName}
                 getEffectiveColor={getEffectiveColor}
+                getArtworkPlacement={getArtworkPlacement}
                 isSelected={isSuggestionSelected}
                 isRequired={isSuggestionRequired}
                 onSelectionChange={handleSelectionChange}
@@ -595,9 +607,11 @@ export default function SelectProductsStep() {
       {editingSuggestion && editingProduct && (
         <ProductEditorModal
           suggestion={editingSuggestion}
-          colorKey={editingProduct.colorKey}
-          onColorChange={handleEditorColorChange}
-          onSave={saveProductColor}
+          color={getEffectiveColor(editingSuggestion)}
+          artworkSvg={artworkPreviewSvgsById[editingSuggestion.artworkTemplateId] ?? null}
+          placement={editingProduct.placement}
+          onPlacementChange={handleEditorPlacementChange}
+          onSave={saveProductPlacement}
           onClose={() => setEditingProduct(null)}
         />
       )}

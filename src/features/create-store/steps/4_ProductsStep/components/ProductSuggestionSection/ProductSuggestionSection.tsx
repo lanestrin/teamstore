@@ -1,5 +1,6 @@
 import { LuLoaderCircle } from "react-icons/lu";
 import styles from "./ProductSuggestionSection.module.scss";
+import type { ProductArtworkPlacement } from "../../lib/decorationProfiles";
 import type { GeneratedSuggestion, ProductColorOption } from "../../lib/productStep.types";
 import ProductSuggestionCard from "../ProductSuggestionCard/ProductSuggestionCard";
 import { NO_ARTWORK_TEMPLATE_ID } from "../../lib/productGeneration";
@@ -13,6 +14,7 @@ interface ProductSuggestionSectionProps {
   artworkSvgsByTemplateId: Readonly<Record<string, string>>;
   getArtworkName: (artworkTemplateId: string) => string;
   getEffectiveColor: (suggestion: GeneratedSuggestion) => ProductColorOption;
+  getArtworkPlacement: (suggestion: GeneratedSuggestion) => ProductArtworkPlacement;
   isSelected: (suggestion: GeneratedSuggestion) => boolean;
   isRequired: (suggestion: GeneratedSuggestion) => boolean;
   onSelectionChange: (suggestion: GeneratedSuggestion, checked: boolean) => void;
@@ -29,6 +31,7 @@ export default function ProductSuggestionSection({
   artworkSvgsByTemplateId,
   getArtworkName,
   getEffectiveColor,
+  getArtworkPlacement,
   isSelected,
   isRequired,
   onSelectionChange,
@@ -61,12 +64,14 @@ export default function ProductSuggestionSection({
         <div className={styles.productGrid}>
           {sectionSuggestions.map((suggestion) => {
             const color = getEffectiveColor(suggestion);
+            const placement = getArtworkPlacement(suggestion);
 
             return (
               <ProductSuggestionCard
                 key={suggestion.combinationKey}
                 suggestion={suggestion}
                 color={color}
+                placement={placement}
                 artworkName={
                   suggestion.artworkTemplateId === NO_ARTWORK_TEMPLATE_ID ? "None" : getArtworkName(suggestion.artworkTemplateId)
                 }

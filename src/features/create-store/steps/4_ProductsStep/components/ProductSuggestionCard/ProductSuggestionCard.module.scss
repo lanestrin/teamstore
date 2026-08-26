@@ -42,6 +42,10 @@
   border-bottom: 1px solid $border-light;
 }
 
+.productImage{
+  mix-blend-mode: darken;
+}
+
 .productImage,
 .productImageArea [data-garment-artwork-preview] {
   display: block;

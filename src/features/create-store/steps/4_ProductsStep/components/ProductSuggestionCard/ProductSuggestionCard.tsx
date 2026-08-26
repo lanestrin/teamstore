@@ -1,11 +1,13 @@
 import { LuPencil, LuStar } from "react-icons/lu";
 import styles from "./ProductSuggestionCard.module.scss";
+import type { ProductArtworkPlacement } from "../../lib/decorationProfiles";
 import type { GeneratedSuggestion, ProductColorOption } from "../../lib/productStep.types";
 import GarmentArtworkPreview from "../GarmentArtworkPreview/GarmentArtworkPreview";
 
 interface ProductSuggestionCardProps {
   suggestion: GeneratedSuggestion;
   color: ProductColorOption;
+  placement: ProductArtworkPlacement;
   artworkName: string;
   artworkSvg: string | null;
   isSelected: boolean;
@@ -18,6 +20,7 @@ interface ProductSuggestionCardProps {
 export default function ProductSuggestionCard({
   suggestion,
   color,
+  placement,
   artworkSvg,
   isSelected,
   isRequired,
@@ -37,6 +40,7 @@ export default function ProductSuggestionCard({
               garmentName={productName}
               artworkSvg={artworkSvg}
               decorationProfileId={suggestion.decorationProfileId}
+              placement={placement}
             />
           ) : (
             <img src={color.imageUrl} alt={productName} className={styles.productImage} />
