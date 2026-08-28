@@ -16,6 +16,8 @@ const storeActivity = v.union(
   v.literal("other"),
 );
 
+const storeType = v.union(v.literal("fanwear"), v.literal("uniform"), v.literal("hybrid"));
+
 const storeUploadedArtwork = v.object({
   id: v.string(),
   fileName: v.string(),
@@ -175,6 +177,7 @@ export default defineSchema({
     organizationName: v.optional(v.string()),
     organizationSlug: v.optional(v.string()),
     activity: v.optional(storeActivity),
+    storeType: v.optional(storeType),
     name: v.optional(v.string()),
     slug: v.optional(v.string()),
     description: v.optional(v.string()),
@@ -291,22 +294,17 @@ export default defineSchema({
   // left, right, and detail.
   productImages: defineTable({
     productId: v.id("products"),
-
     color: v.string(),
     colorKey: v.string(),
     providerColor: v.optional(v.string()),
-
     view: productImageView,
     providerView: v.optional(v.string()),
     sortOrder: v.number(),
-
     source: v.optional(v.union(v.literal("csv-main"), v.literal("verified-derived"), v.literal("manual-upload"))),
-
     imageStorageId: v.optional(v.id("_storage")),
     externalImageUrl: v.optional(v.string()),
     altText: v.optional(v.string()),
     decorationPreviewBounds: v.optional(decorationPreviewBounds),
-
     createdAt: v.number(),
     updatedAt: v.number(),
   })
@@ -319,29 +317,22 @@ export default defineSchema({
   // storeProductVariants later.
   productVariants: defineTable({
     productId: v.id("products"),
-
     sku: v.string(),
     upc: v.optional(v.string()),
-
     color: v.string(),
     colorKey: v.string(),
     providerColor: v.optional(v.string()),
     size: v.string(),
-
     provider: v.optional(v.string()),
     providerVariantId: v.optional(v.string()),
-
     baseCostInCents: v.number(),
     directPriceInCents: v.number(),
     compareAtPriceInCents: v.optional(v.number()),
     currency: v.string(),
-
     weight: v.optional(v.number()),
     weightUnit: v.optional(v.string()),
-
     availability: variantAvailability,
     status: variantStatus,
-
     createdAt: v.number(),
     updatedAt: v.number(),
   })

@@ -191,6 +191,7 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
         organizationName: normalizeOptionalText(storeDraft.organizationName),
         organizationSlug: normalizeOptionalText(organizationSlug),
         activity: isStoreActivity(storeDraft.activity) ? storeDraft.activity : undefined,
+        storeType: storeDraft.storeType || undefined,
         storeName: normalizeOptionalText(storeDraft.storeName),
         storeSlug: normalizeOptionalText(storeDraft.storeSlug),
         storeDescription: normalizeOptionalText(storeDraft.storeDescription),
@@ -219,6 +220,7 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
     const organizationName = storeDraft.organizationName.trim();
     const organizationSlug = storeDraft.organizationSlug.trim() || slugify(organizationName);
     const activity = storeDraft.activity.trim();
+    const storeType = storeDraft.storeType;
     const storeName = storeDraft.storeName.trim();
     const storeSlug = storeDraft.storeSlug.trim();
 
@@ -236,6 +238,12 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
 
     if (!storeSlug) {
       window.alert("Store address is required.");
+
+      return;
+    }
+
+    if (!storeType) {
+      window.alert("Store type is required.");
 
       return;
     }
@@ -264,6 +272,7 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
         organizationName,
         organizationSlug,
         activity,
+        storeType,
         storeName,
         storeSlug,
         storeDescription: normalizeOptionalText(storeDraft.storeDescription),

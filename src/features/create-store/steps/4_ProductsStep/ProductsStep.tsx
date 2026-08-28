@@ -96,6 +96,9 @@ export default function SelectProductsStep() {
   const primaryColorFamily = storeDraft.productColorFamily;
   const secondaryColorFamily = storeDraft.productSecondaryColorFamily;
 
+  const showUniforms = storeDraft.storeType === "uniform" || storeDraft.storeType === "hybrid";
+  const showFanwear = storeDraft.storeType === "fanwear" || storeDraft.storeType === "hybrid";
+
   const [editingProduct, setEditingProduct] = useState<EditingProductState | null>(null);
 
   /*
@@ -148,8 +151,20 @@ export default function SelectProductsStep() {
       return [];
     }
 
-    return [...storeCreationProducts.uniforms, ...storeCreationProducts.fanwear];
-  }, [storeCreationProducts]);
+    if (storeDraft.storeType === "uniform") {
+      return storeCreationProducts.uniforms;
+    }
+
+    if (storeDraft.storeType === "fanwear") {
+      return storeCreationProducts.fanwear;
+    }
+
+    if (storeDraft.storeType === "hybrid") {
+      return [...storeCreationProducts.uniforms, ...storeCreationProducts.fanwear];
+    }
+
+    return [];
+  }, [storeCreationProducts, storeDraft.storeType]);
 
   const isLoading = isStoreActivity(storeDraft.activity) && storeCreationProducts === undefined;
 
@@ -179,8 +194,8 @@ export default function SelectProductsStep() {
   const suggestionSecondaryColorFamily = isUsingColorFallback ? "" : secondaryColorFamily;
 
   const availableProductColorFamilies = useMemo(
-    () => new Set(storeCreationProducts?.availableProductColorFamilies ?? []),
-    [storeCreationProducts],
+    () => new Set(productOptions.flatMap((product) => product.colorOptions.flatMap((color) => color.colorFamilies))),
+    [productOptions],
   );
 
   const artworkTemplatesById = useMemo(() => new Map(ART_TEMPLATE_LIST.map((template) => [template.id, template])), []);
@@ -557,47 +572,51 @@ export default function SelectProductsStep() {
                 </aside>
               )}
 
-              <ProductSuggestionSection
-                title="Uniforms"
-                description={
-                  isUsingColorFallback
-                    ? `${primaryColorLabel} uniform alternatives with available secondary colors ${artworkDescription}.`
-                    : `${primaryColorLabel} and ${secondaryColorLabel} uniform options ${artworkDescription}.`
-                }
-                section="uniforms"
-                suggestions={suggestions}
-                isLoading={isLoading}
-                artworkSvgsByTemplateId={artworkPreviewSvgsById}
-                getArtworkName={getArtworkName}
-                getEffectiveColor={getEffectiveColor}
-                getArtworkPlacement={getArtworkPlacement}
-                isSelected={isSuggestionSelected}
-                isRequired={isSuggestionRequired}
-                onSelectionChange={handleSelectionChange}
-                onRequiredClick={handleRequiredClick}
-                onEdit={openProductEditor}
-              />
+              {showUniforms && (
+                <ProductSuggestionSection
+                  title="Uniforms"
+                  description={
+                    isUsingColorFallback
+                      ? `${primaryColorLabel} uniform alternatives with available secondary colors ${artworkDescription}.`
+                      : `${primaryColorLabel} and ${secondaryColorLabel} uniform options ${artworkDescription}.`
+                  }
+                  section="uniforms"
+                  suggestions={suggestions}
+                  isLoading={isLoading}
+                  artworkSvgsByTemplateId={artworkPreviewSvgsById}
+                  getArtworkName={getArtworkName}
+                  getEffectiveColor={getEffectiveColor}
+                  getArtworkPlacement={getArtworkPlacement}
+                  isSelected={isSuggestionSelected}
+                  isRequired={isSuggestionRequired}
+                  onSelectionChange={handleSelectionChange}
+                  onRequiredClick={handleRequiredClick}
+                  onEdit={openProductEditor}
+                />
+              )}
 
-              <ProductSuggestionSection
-                title="Fanwear"
-                description={
-                  isUsingColorFallback
-                    ? `${primaryColorLabel} fanwear alternatives with available secondary colors ${artworkDescription}.`
-                    : `${primaryColorLabel} and ${secondaryColorLabel} fanwear options ${artworkDescription}.`
-                }
-                section="fanwear"
-                suggestions={suggestions}
-                isLoading={isLoading}
-                artworkSvgsByTemplateId={artworkPreviewSvgsById}
-                getArtworkName={getArtworkName}
-                getEffectiveColor={getEffectiveColor}
-                getArtworkPlacement={getArtworkPlacement}
-                isSelected={isSuggestionSelected}
-                isRequired={isSuggestionRequired}
-                onSelectionChange={handleSelectionChange}
-                onRequiredClick={handleRequiredClick}
-                onEdit={openProductEditor}
-              />
+              {showFanwear && (
+                <ProductSuggestionSection
+                  title="Fanwear"
+                  description={
+                    isUsingColorFallback
+                      ? `${primaryColorLabel} fanwear alternatives with available secondary colors ${artworkDescription}.`
+                      : `${primaryColorLabel} and ${secondaryColorLabel} fanwear options ${artworkDescription}.`
+                  }
+                  section="fanwear"
+                  suggestions={suggestions}
+                  isLoading={isLoading}
+                  artworkSvgsByTemplateId={artworkPreviewSvgsById}
+                  getArtworkName={getArtworkName}
+                  getEffectiveColor={getEffectiveColor}
+                  getArtworkPlacement={getArtworkPlacement}
+                  isSelected={isSuggestionSelected}
+                  isRequired={isSuggestionRequired}
+                  onSelectionChange={handleSelectionChange}
+                  onRequiredClick={handleRequiredClick}
+                  onEdit={openProductEditor}
+                />
+              )}
             </>
           )}
         </div>
