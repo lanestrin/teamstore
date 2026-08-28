@@ -12,6 +12,12 @@ export interface SelectedCatalogImage {
   externalImageUrl: string;
   altText?: string;
   source?: CatalogImageSource;
+  decorationPreviewBounds?: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
 }
 
 export interface SelectedCatalogColor {

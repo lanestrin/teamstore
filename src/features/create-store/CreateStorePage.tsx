@@ -7,11 +7,11 @@ import ColorsStepSkeleton from "./steps/1_ColorStep/ColorsStepSkeleton";
 import OrganizationStep from "./steps/2_OraganizationStep/OrganizationStep";
 import SelectArtworkStep from "./steps/3_ArtworkStep/ArtworkStep";
 import SelectProductStep from "./steps/4_ProductsStep/ProductsStep";
+import WizardLayout from "./components/WizardLayout/WizardLayout";
 
 export default function CreateStorePage() {
   const [isLoading, setIsLoading] = useState(true);
-
-  const { currentStep } = useCreateStore();
+  const { currentStep, setCurrentStep } = useCreateStore();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -27,10 +27,10 @@ export default function CreateStorePage() {
 
   switch (currentStep) {
     case 1:
-      return <ColorsStep />;
+      return <OrganizationStep />;
 
     case 2:
-      return <OrganizationStep />;
+      return <ColorsStep />;
 
     case 3:
       return <SelectArtworkStep />;
@@ -38,7 +38,22 @@ export default function CreateStorePage() {
     case 4:
       return <SelectProductStep />;
 
+    case 5:
+      return (
+        <WizardLayout
+          step={5}
+          title="Review Your Store"
+          description="The full review experience is coming soon."
+          onBack={() => setCurrentStep(4)}
+          nextLabel="Coming Soon"
+          nextDisabled
+          width="wide"
+        >
+          <p>Your store setup is complete. Review and publishing controls will be added here next.</p>
+        </WizardLayout>
+      );
+
     default:
-      return <ColorsStep />;
+      return <OrganizationStep />;
   }
 }

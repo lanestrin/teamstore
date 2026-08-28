@@ -61,6 +61,7 @@ export default function ProductEditorModal({
   const [isDragging, setIsDragging] = useState(false);
   const productName = suggestion.product.name ?? suggestion.productId;
   const decorationProfile = getDecorationProfile(suggestion.decorationProfileId);
+  const previewBounds = color.decorationPreviewBounds ?? decorationProfile.previewBounds;
   const defaultPlacement = createDefaultProductArtworkPlacement(suggestion.decorationProfileId);
   const canEditArtwork = Boolean(artworkSvg);
 
@@ -150,8 +151,8 @@ export default function ProductEditorModal({
     }
 
     const previewRect = previewElement.getBoundingClientRect();
-    const decorationZoneWidth = previewRect.width * decorationProfile.previewBounds.width;
-    const decorationZoneHeight = previewRect.height * decorationProfile.previewBounds.height;
+    const decorationZoneWidth = previewRect.width * previewBounds.width;
+    const decorationZoneHeight = previewRect.height * previewBounds.height;
 
     if (decorationZoneWidth <= 0 || decorationZoneHeight <= 0) {
       return;
@@ -219,7 +220,10 @@ export default function ProductEditorModal({
               garmentImageUrl={color.imageUrl}
               garmentName={productName}
               artworkSvg={artworkSvg ?? undefined}
+              surfaceHex={color.primaryHexValue}
+              surfaceTone={color.tone}
               decorationProfileId={suggestion.decorationProfileId}
+              decorationPreviewBounds={color.decorationPreviewBounds}
               placement={placement}
               showDecorationZone={canEditArtwork}
             />

@@ -77,8 +77,8 @@ export default function ColorsStep() {
       step={currentStep}
       title="Choose Your Team Colors"
       description="Choose one of our popular color combinations or customize your own. Your selected colors will be applied when your storefront preview is created."
-      hideBack
-      onNext={() => setCurrentStep(2)}
+      onBack={() => setCurrentStep(1)}
+      onNext={() => setCurrentStep(3)}
     >
       <div>
         <h2 className={styles.sectionTitle}>Popular Color Combinations</h2>

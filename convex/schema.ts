@@ -128,6 +128,13 @@ const productImageView = v.union(
   v.literal("other"),
 );
 
+const decorationPreviewBounds = v.object({
+  x: v.number(),
+  y: v.number(),
+  width: v.number(),
+  height: v.number(),
+});
+
 const variantStatus = v.union(v.literal("active"), v.literal("inactive"));
 
 const variantAvailability = v.union(v.literal("available"), v.literal("unavailable"), v.literal("discontinued"));
@@ -298,6 +305,7 @@ export default defineSchema({
     imageStorageId: v.optional(v.id("_storage")),
     externalImageUrl: v.optional(v.string()),
     altText: v.optional(v.string()),
+    decorationPreviewBounds: v.optional(decorationPreviewBounds),
 
     createdAt: v.number(),
     updatedAt: v.number(),

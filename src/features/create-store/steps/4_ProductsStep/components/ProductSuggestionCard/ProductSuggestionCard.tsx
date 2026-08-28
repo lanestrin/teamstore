@@ -39,7 +39,10 @@ export default function ProductSuggestionCard({
               garmentImageUrl={color.imageUrl}
               garmentName={productName}
               artworkSvg={artworkSvg}
+              surfaceHex={color.primaryHexValue}
+              surfaceTone={color.tone}
               decorationProfileId={suggestion.decorationProfileId}
+              decorationPreviewBounds={color.decorationPreviewBounds}
               placement={placement}
             />
           ) : (
