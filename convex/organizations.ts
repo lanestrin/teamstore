@@ -19,6 +19,8 @@ const storeActivity = v.union(
   v.literal("other"),
 );
 
+const storeType = v.union(v.literal("fanwear"), v.literal("uniform"), v.literal("hybrid"));
+
 const storeProductSelection = v.object({
   productId: v.id("products"),
   colorKey: v.string(),
@@ -182,23 +184,18 @@ export const generateArtworkUploadUrl = mutation({
 export const saveDraft = mutation({
   args: {
     storeId: v.optional(v.id("stores")),
-
     organizationName: v.optional(v.string()),
     organizationSlug: v.optional(v.string()),
-
     activity: v.optional(storeActivity),
-
+    storeType: v.optional(storeType),
     storeName: v.optional(v.string()),
     storeSlug: v.optional(v.string()),
     storeDescription: v.optional(v.string()),
-
     logoStorageId: v.optional(v.id("_storage")),
     bannerStorageId: v.optional(v.id("_storage")),
     uploadedArtworks: v.optional(v.array(storeUploadedArtwork)),
-
     primaryColor: v.optional(v.string()),
     secondaryColor: v.optional(v.string()),
-
     currentStep: v.number(),
   },
 
@@ -256,19 +253,19 @@ export const saveDraft = mutation({
 
         ...(args.logoStorageId !== undefined
           ? {
-            logoStorageId: args.logoStorageId,
-          }
+              logoStorageId: args.logoStorageId,
+            }
           : {}),
 
         ...(args.bannerStorageId !== undefined
           ? {
-            bannerStorageId: args.bannerStorageId,
-          }
+              bannerStorageId: args.bannerStorageId,
+            }
           : {}),
         ...(args.uploadedArtworks !== undefined
           ? {
-            uploadedArtworks: args.uploadedArtworks,
-          }
+              uploadedArtworks: args.uploadedArtworks,
+            }
           : {}),
 
         primaryColor: args.primaryColor,
@@ -286,26 +283,20 @@ export const saveDraft = mutation({
 
     const storeId = await ctx.db.insert("stores", {
       createdBy: userId,
-
       organizationName,
       organizationSlug,
-
       activity: args.activity,
-
+      storeType: args.storeType,
       name: storeName,
       slug: storeSlug,
       description: storeDescription,
-
       logoStorageId: args.logoStorageId,
       bannerStorageId: args.bannerStorageId,
       uploadedArtworks: args.uploadedArtworks,
-
       primaryColor: args.primaryColor,
       secondaryColor: args.secondaryColor,
-
       currentStep: args.currentStep,
       status: "draft",
-
       createdAt: now,
       updatedAt: now,
     });
@@ -485,26 +476,19 @@ export const archiveStore = mutation({
 export const createOrganizationWithStore = mutation({
   args: {
     storeId: v.optional(v.id("stores")),
-
     organizationName: v.string(),
     organizationSlug: v.string(),
-
     activity: storeActivity,
-
+    storeType,
     storeName: v.string(),
     storeSlug: v.string(),
     storeDescription: v.optional(v.string()),
-
     logoStorageId: v.optional(v.id("_storage")),
-
     bannerStorageId: v.optional(v.id("_storage")),
     uploadedArtworks: v.optional(v.array(storeUploadedArtwork)),
-
     primaryColor: v.string(),
     secondaryColor: v.string(),
-
     currentStep: v.number(),
-
     productSelections: v.array(storeProductSelection),
   },
 
@@ -610,38 +594,34 @@ export const createOrganizationWithStore = mutation({
     if (args.storeId) {
       await ctx.db.patch(args.storeId, {
         organizationId,
-
         organizationName,
         organizationSlug,
-
         activity: args.activity,
-
+        storeType: args.storeType,
         name: storeName,
         slug: storeSlug,
         description: storeDescription,
 
         ...(args.logoStorageId !== undefined
           ? {
-            logoStorageId: args.logoStorageId,
-          }
+              logoStorageId: args.logoStorageId,
+            }
           : {}),
 
         ...(args.bannerStorageId !== undefined
           ? {
-            bannerStorageId: args.bannerStorageId,
-          }
+              bannerStorageId: args.bannerStorageId,
+            }
           : {}),
 
         ...(args.uploadedArtworks !== undefined
           ? {
-            uploadedArtworks: args.uploadedArtworks,
-          }
+              uploadedArtworks: args.uploadedArtworks,
+            }
           : {}),
 
         primaryColor: args.primaryColor,
-
         secondaryColor: args.secondaryColor,
-
         currentStep: args.currentStep,
         status: "active",
         updatedAt: now,
@@ -660,26 +640,20 @@ export const createOrganizationWithStore = mutation({
     const storeId = await ctx.db.insert("stores", {
       organizationId,
       createdBy: userId,
-
       organizationName,
       organizationSlug,
-
       activity: args.activity,
-
+      storeType: args.storeType,
       name: storeName,
       slug: storeSlug,
       description: storeDescription,
-
       logoStorageId: args.logoStorageId,
       bannerStorageId: args.bannerStorageId,
       uploadedArtworks: args.uploadedArtworks,
-
       primaryColor: args.primaryColor,
       secondaryColor: args.secondaryColor,
-
       currentStep: args.currentStep,
       status: "active",
-
       createdAt: now,
       updatedAt: now,
     });
@@ -741,9 +715,7 @@ export const listActiveStores = query({
 
   handler: async (ctx) => {
     const stores = await ctx.db.query("stores").collect();
-    const activeStores = stores.filter(
-      (store) => store.status === "active" && store.organizationSlug && store.slug,
-    );
+    const activeStores = stores.filter((store) => store.status === "active" && store.organizationSlug && store.slug);
 
     return await Promise.all(
       activeStores.map(async (store) => {
@@ -759,9 +731,7 @@ export const listActiveStores = query({
           name: store.name ?? store.organizationName ?? "Team Store",
           activity: store.activity,
           productCount: storeProducts.length,
-          logoUrl: store.logoStorageId
-            ? await ctx.storage.getUrl(store.logoStorageId)
-            : null,
+          logoUrl: store.logoStorageId ? await ctx.storage.getUrl(store.logoStorageId) : null,
         };
       }),
     );

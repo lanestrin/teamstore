@@ -160,6 +160,155 @@
   background: $error-background;
 }
 
+.storeTypeField {
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+
+.storeTypeField legend {
+  padding: 0;
+  margin-bottom: $space-3;
+  font-weight: $font-semibold;
+  color: $text-primary;
+}
+
+.storeTypeGrid {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+}
+
+.storeTypeCard {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  width: fit-content;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.storeTypeInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.storeTypeIndicator {
+  position: relative;
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  background: $white;
+  border: 2px solid $gray-400;
+  border-radius: $radius-round;
+  transition: border-color $transition-fast;
+}
+
+.storeTypeCard:hover .storeTypeIndicator {
+  border-color: $brand-red;
+}
+
+.storeTypeCard[data-selected="true"] .storeTypeIndicator {
+  border-color: $brand-red;
+}
+
+.storeTypeCard[data-selected="true"] .storeTypeIndicator::after {
+  position: absolute;
+  inset: 3px;
+  content: "";
+  background: $brand-red;
+  border-radius: $radius-round;
+}
+
+.storeTypeCard:focus-within .storeTypeIndicator {
+  outline: 2px solid rgba($brand-red, 0.2);
+  outline-offset: 3px;
+}
+
+.storeTypeContent {
+  min-width: 0;
+}
+
+.storeTypeTitle {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+}
+
+.storeTypeTitle strong {
+  color: $text-primary;
+  font-size: 0.9375rem;
+  font-weight: $font-semibold;
+}
+
+.storeTypeHelp {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: $text-muted;
+  cursor: help;
+  transition: color $transition-fast;
+
+  svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  &:hover {
+    color: $brand-red;
+  }
+
+  &:focus-visible {
+    color: $brand-red;
+    outline: 2px solid rgba($brand-red, 0.25);
+    outline-offset: 2px;
+    border-radius: $radius-round;
+  }
+}
+
+.storeTypeTooltip {
+  position: absolute;
+  z-index: $z-tooltip;
+  bottom: calc(100% + $space-2);
+  left: 50%;
+  width: 280px;
+  padding: $space-3;
+  font-size: 0.8125rem;
+  font-weight: $font-regular;
+  line-height: $line-height-body;
+  color: $white;
+  pointer-events: none;
+  visibility: hidden;
+  background: $gray-900;
+  border-radius: $radius-md;
+  opacity: 0;
+  transform: translateX(-50%);
+  transition: opacity $transition-fast;
+}
+
+.storeTypeHelp:hover .storeTypeTooltip,
+.storeTypeHelp:focus .storeTypeTooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+.storeTypeField .errorMessage {
+  margin-top: $space-2;
+}
+
+.storeTypeField .helper {
+  margin-top: $space-3;
+}
+
 @media (max-width: 520px) {
   .logoPreviewRow {
     align-items: flex-start;

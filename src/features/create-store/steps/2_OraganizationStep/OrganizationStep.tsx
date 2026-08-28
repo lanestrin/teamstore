@@ -1,13 +1,16 @@
 import { useRef, useState } from "react";
-import { LuTrash2, LuUpload } from "react-icons/lu";
 
 import WizardLayout from "../../components/WizardLayout/WizardLayout";
-import { useCreateStore } from "../../context/CreateStoreContext";
+import { useCreateStore, type StoreType } from "../../context/CreateStoreContext";
+
+import FormErrorSummary from "../../components/FormErrorSummary/FormErrorSummary";
+import OrganizationLogoUpload from "./components/OrganizationLogoUpload/OrganizationLogoUpload";
+import StoreTypeSelector from "./components/StoreTypeSelector/StoreTypeSelector";
+import { isValidStoreType } from "./components/StoreTypeSelector/storeTypeOptions";
 
 import formStyles from "../../styles/form.module.scss";
 import styles from "./OrganizationStep.module.scss";
 import useFileDataUrl from "../../hooks/useFileDataUrl";
-import FormErrorSummary from "../../components/FormErrorSummary/FormErrorSummary";
 
 const STORE_ACTIVITIES = [
   { value: "basketball", label: "Basketball" },
@@ -27,6 +30,7 @@ const MAX_LOGO_SIZE = 5 * 1024 * 1024;
 type ValidationErrors = {
   organizationName?: string;
   activity?: string;
+  storeType?: string;
   storeName?: string;
   logo?: string;
 };
@@ -53,6 +57,10 @@ function validateActivity(value: string): string | undefined {
   return isValidActivity ? undefined : "Select a valid store activity.";
 }
 
+function validateStoreType(value: string): string | undefined {
+  return isValidStoreType(value) ? undefined : "Select what type of store you want to create.";
+}
+
 function validateStoreName(value: string): string | undefined {
   return value.trim() ? undefined : "Enter your store name.";
 }
@@ -76,13 +84,14 @@ function validateLogo(file: File | null): string | undefined {
 }
 
 export default function OrganizationStep() {
-  const { currentStep, setCurrentStep, storeDraft, updateStoreDraft } = useCreateStore();
+  const { currentStep, setCurrentStep, storeDraft, updateStoreDraft, resetProductStep } = useCreateStore();
 
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [showErrorSummary, setShowErrorSummary] = useState(false);
 
   const organizationNameRef = useRef<HTMLInputElement>(null);
   const activityRef = useRef<HTMLSelectElement>(null);
+  const storeTypeRef = useRef<HTMLInputElement>(null);
   const storeNameRef = useRef<HTMLInputElement>(null);
   const logoRef = useRef<HTMLInputElement>(null);
 
@@ -107,12 +116,54 @@ export default function OrganizationStep() {
   }
 
   function handleActivityChange(value: string) {
+    if (value === storeDraft.activity) {
+      return;
+    }
+
+    const hasProductSelections = Object.keys(storeDraft.productSelections).length > 0;
+
+    if (hasProductSelections) {
+      const confirmed = window.confirm("Changing the activity will clear your current product selections. Continue?");
+
+      if (!confirmed) {
+        return;
+      }
+    }
+
     updateStoreDraft({
       activity: value,
     });
 
+    resetProductStep();
+
     if (errors.activity) {
       setFieldError("activity", validateActivity(value));
+    }
+  }
+
+  function handleStoreTypeChange(value: StoreType) {
+    if (value === storeDraft.storeType) {
+      return;
+    }
+
+    const hasProductSelections = Object.keys(storeDraft.productSelections).length > 0;
+
+    if (hasProductSelections) {
+      const confirmed = window.confirm("Changing the store type will clear your current product selections. Continue?");
+
+      if (!confirmed) {
+        return;
+      }
+    }
+
+    updateStoreDraft({
+      storeType: value,
+    });
+
+    resetProductStep();
+
+    if (errors.storeType) {
+      setFieldError("storeType", validateStoreType(value));
     }
   }
 
@@ -127,24 +178,27 @@ export default function OrganizationStep() {
     }
   }
 
-  function handleLogoChange(file: File | null) {
+  function handleLogoChange(file: File | null): boolean {
     const logoError = validateLogo(file);
 
     setFieldError("logo", logoError);
 
     if (logoError) {
-      return;
+      return false;
     }
 
     updateStoreDraft({
       logoFile: file,
     });
+
+    return true;
   }
 
   function focusAndScrollToField(field: keyof ValidationErrors) {
     const fieldRefs = {
       organizationName: organizationNameRef,
       activity: activityRef,
+      storeType: storeTypeRef,
       storeName: storeNameRef,
       logo: logoRef,
     };
@@ -165,8 +219,7 @@ export default function OrganizationStep() {
   }
 
   function scrollToFirstError(nextErrors: ValidationErrors) {
-    const fieldOrder: Array<keyof ValidationErrors> = ["organizationName", "activity", "storeName", "logo"];
-
+    const fieldOrder: Array<keyof ValidationErrors> = ["organizationName", "activity", "storeType", "storeName", "logo"];
     const firstErrorField = fieldOrder.find((field) => nextErrors[field]);
 
     if (firstErrorField) {
@@ -178,6 +231,7 @@ export default function OrganizationStep() {
     const nextErrors: ValidationErrors = {
       organizationName: validateOrganizationName(storeDraft.organizationName),
       activity: validateActivity(storeDraft.activity),
+      storeType: validateStoreType(storeDraft.storeType),
       storeName: validateStoreName(storeDraft.storeName),
       logo: validateLogo(storeDraft.logoFile),
     };
@@ -208,6 +262,11 @@ export default function OrganizationStep() {
       message: errors.activity,
     },
     {
+      field: "storeType" as const,
+      label: "Store Type",
+      message: errors.storeType,
+    },
+    {
       field: "storeName" as const,
       label: "Store Name",
       message: errors.storeName,
@@ -218,9 +277,6 @@ export default function OrganizationStep() {
       message: errors.logo,
     },
   ];
-
-  const logoExtension = storeDraft.logoFile ? storeDraft.logoFile.name.split(".").pop()?.toUpperCase() : null;
-  const logoSize = storeDraft.logoFile ? `${Math.round(storeDraft.logoFile.size / 1024)} KB` : null;
 
   return (
     <WizardLayout
@@ -301,6 +357,8 @@ export default function OrganizationStep() {
           </p>
         </div>
 
+        <StoreTypeSelector value={storeDraft.storeType} error={errors.storeType} inputRef={storeTypeRef} onChange={handleStoreTypeChange} />
+
         <div className={formStyles.field}>
           <label htmlFor="storeName">
             Store Name
@@ -344,76 +402,14 @@ export default function OrganizationStep() {
           <p className={styles.helper}>Your store address is generated automatically from the organization and store names.</p>
         </div>
 
-        <div className={formStyles.field}>
-          <label htmlFor="logo">Organization Logo</label>
-
-          <input
-            ref={logoRef}
-            id="logo"
-            type="file"
-            accept=".png,.jpg,.jpeg,.svg"
-            className={styles.fileInput}
-            aria-describedby={errors.logo ? "logo-helper logo-error" : "logo-helper"}
-            onChange={(event) => {
-              const file = event.target.files?.[0] ?? null;
-              const logoError = validateLogo(file);
-
-              handleLogoChange(file);
-
-              if (logoError) {
-                event.target.value = "";
-              }
-            }}
-          />
-
-          {storeDraft.logoFile ? (
-            <div className={`${styles.upload} ${styles.uploadWithLogo}`}>
-              <div className={styles.logoPreviewRow}>
-                <div className={styles.logoPreview}>
-                  {logoPreviewUrl && <img src={logoPreviewUrl} alt={`${storeDraft.organizationName || "Organization"} logo preview`} />}
-                </div>
-
-                <div className={styles.logoDetails}>
-                  <h3>{storeDraft.logoFile.name}</h3>
-                  <p>
-                    {logoExtension} • {logoSize}
-                  </p>
-
-                  <div className={styles.actions}>
-                    <label htmlFor="logo" className={styles.replaceLogo}>
-                      <LuUpload />
-                      Replace Logo
-                    </label>
-
-                    <button type="button" className={styles.removeLogo} onClick={() => handleLogoChange(null)}>
-                      <LuTrash2 />
-                      Remove Logo
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <label htmlFor="logo" className={`${styles.upload} ${errors.logo ? styles.invalidUpload : ""}`}>
-              <div className={styles.uploadIcon}>
-                <LuUpload />
-              </div>
-
-              <h3>Upload your logo</h3>
-              <p>PNG, JPG or SVG (max 5 MB)</p>
-            </label>
-          )}
-
-          {errors.logo && (
-            <p id="logo-error" className={styles.errorMessage} role="alert">
-              {errors.logo}
-            </p>
-          )}
-
-          <span id="logo-helper" className={styles.visuallyHidden}>
-            Accepted logo formats are PNG, JPG, JPEG, and SVG. Maximum file size is 5 MB.
-          </span>
-        </div>
+        <OrganizationLogoUpload
+          organizationName={storeDraft.organizationName}
+          logoFile={storeDraft.logoFile}
+          logoPreviewUrl={logoPreviewUrl}
+          error={errors.logo}
+          inputRef={logoRef}
+          onFileChange={handleLogoChange}
+        />
 
         <div className={formStyles.field}>
           <label htmlFor="description">

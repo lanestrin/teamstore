@@ -45,8 +45,10 @@ interface LoadedStoreDraft extends Omit<Doc<"stores">, "uploadedArtworks"> {
   }>;
 }
 
+export type StoreType = "fanwear" | "uniform" | "hybrid";
 export type ArtworkTemplatesDraft = Record<string, ArtworkTemplateDraft>;
 export type ArtworkSvgMap = Readonly<Record<string, string>>;
+export type ProductSelectionsDraft = Record<string, ProductSelectionDraft>;
 
 export interface ProductSelectionInput {
   productId: Id<"products">;
@@ -65,11 +67,11 @@ export interface ProductSelectionDraft {
   artworkPlacement?: ProductArtworkPlacement;
 }
 
-export type ProductSelectionsDraft = Record<string, ProductSelectionDraft>;
 export interface CreateStoreDraft {
   organizationName: string;
   organizationSlug: string;
   activity: string;
+  storeType: StoreType | "";
   storeName: string;
   storeSlug: string;
   storeDescription: string;
@@ -217,6 +219,7 @@ function createDefaultStoreDraft(): CreateStoreDraft {
     organizationName: "",
     organizationSlug: "",
     activity: "",
+    storeType: "",
     storeName: "",
     storeSlug: "",
     storeDescription: "",
@@ -561,6 +564,7 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
       organizationName: draft.organizationName ?? "",
       organizationSlug: draft.organizationSlug ?? "",
       activity: draft.activity ?? "",
+      storeType: draft.storeType ?? "",
       storeName: draft.name ?? "",
       storeSlug: draft.slug ?? "",
       storeDescription: draft.description ?? "",
