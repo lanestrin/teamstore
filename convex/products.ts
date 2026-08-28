@@ -296,6 +296,7 @@ function buildProductCardColorOptions(
 
           imageUrl: previewImage.imageUrl,
           imageView: previewImage.view,
+          decorationPreviewBounds: previewImage.decorationPreviewBounds,
 
           colorFamilies,
           primaryFamily: productColor?.primaryFamily ?? "unknown",

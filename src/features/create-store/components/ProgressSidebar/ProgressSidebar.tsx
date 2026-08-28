@@ -20,12 +20,12 @@ interface ProgressSidebarProps {
 
 const steps = [
   {
-    title: "Choose Colors",
-    description: "Pick your team colors",
-  },
-  {
     title: "Organization",
     description: "Tell us about your team",
+  },
+  {
+    title: "Choose Colors",
+    description: "Pick your team colors",
   },
   {
     title: "Artwork",

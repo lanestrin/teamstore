@@ -4,6 +4,7 @@ import { mutation, query } from "./_generated/server";
 import { classifyProductColor, extractProductColorHexValues, normalizeProductColorName } from "../src/lib/classifyProductColor";
 import { selectedCatalogSummary, selectedProducts } from "./docs/selectedProductsData";
 import { requirePlatformAdmin } from "./lib/authz";
+import { getDecorationPreviewBounds } from "./docs/decorationPreviewOverrides";
 
 const PROVIDER = "augusta-csv";
 const CONFIRMATION = "REPLACE_CATALOG";
@@ -386,6 +387,7 @@ export const importCatalogBatch = mutation({
         source: image.source,
         externalImageUrl: image.externalImageUrl,
         altText: normalizeOptionalText(image.altText),
+        decorationPreviewBounds: getDecorationPreviewBounds(product.providerProductId, image.colorKey, image.view),
         createdAt: now,
         updatedAt: now,
       });

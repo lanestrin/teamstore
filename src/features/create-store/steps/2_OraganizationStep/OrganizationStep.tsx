@@ -193,7 +193,7 @@ export default function OrganizationStep() {
     }
 
     setShowErrorSummary(false);
-    setCurrentStep(3);
+    setCurrentStep(2);
   }
 
   const errorSummaryItems = [
@@ -227,8 +227,8 @@ export default function OrganizationStep() {
       step={currentStep}
       title="Tell us about your organization"
       description="This information will help us create your store and customize your experience."
-      onBack={() => setCurrentStep(1)}
       onNext={handleNext}
+      hideBack
     >
       <div className={styles.form}>
         {showErrorSummary && <FormErrorSummary errors={errorSummaryItems} onErrorClick={focusAndScrollToField} />}

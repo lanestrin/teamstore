@@ -1,33 +1,23 @@
 .garmentArtworkPreview {
   position: relative;
-
   width: 100%;
   height: 100%;
-
   overflow: hidden;
-
   transition: transform $transition-base;
 }
 
 .garmentArtworkImage {
   display: block;
-
   width: 100%;
   height: 100%;
-
   object-fit: contain;
-
   pointer-events: none;
   user-select: none;
+  mix-blend-mode: darken;
 }
 
 .decorationZone {
   position: absolute;
-
-  /*
-   * left / top / width / height are supplied
-   * by the selected DecorationProfile.
-   */
   pointer-events: none;
 }
 
@@ -38,21 +28,13 @@
 
 .garmentArtworkOverlay {
   position: absolute;
-
-  /*
-   * x and y represent the center of the artwork
-   * inside the decoration zone.
-   */
   transform: translate(-50%, -50%);
-
   pointer-events: none;
 }
 
 .garmentArtworkOverlay > svg {
   display: block;
-
   width: 100%;
   height: auto;
-
   overflow: visible;
 }

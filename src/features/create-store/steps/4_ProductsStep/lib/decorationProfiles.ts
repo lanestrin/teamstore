@@ -1,4 +1,4 @@
-export type DecorationProfileId = "upper-front" | "left-leg" | "cap-front";
+export type DecorationProfileId = "upper-front" | "left-leg" | "left-thigh" | "cap-front";
 
 /*
  * Coordinates are normalized from 0–1.
@@ -65,8 +65,8 @@ export const DECORATION_PROFILES: Record<DecorationProfileId, DecorationProfile>
 
     defaultPlacement: {
       x: 0.5,
-      y: 0.42,
-      width: 0.68,
+      y: 0.32,
+      width: 0.55,
     },
   },
 
@@ -91,6 +91,32 @@ export const DECORATION_PROFILES: Record<DecorationProfileId, DecorationProfile>
       x: 0.5,
       y: 0.45,
       width: 0.68,
+    },
+  },
+
+  /*
+   * Used for pants and joggers.
+   *
+   * Pants occupy a narrower area in the product
+   * preview than shorts, so they need their own
+   * decoration region and smaller default artwork.
+   */
+  "left-thigh": {
+    id: "left-thigh",
+
+    label: "Left Thigh",
+
+    previewBounds: {
+      x: 0.35,
+      y: 0.2,
+      width: 0.16,
+      height: 0.42,
+    },
+
+    defaultPlacement: {
+      x: 0.5,
+      y: 0.28,
+      width: 0.5,
     },
   },
 
@@ -132,8 +158,12 @@ export function getDecorationProfileIdForProductCategory(category: string): Deco
     return "cap-front";
   }
 
-  if (normalizedCategory === "shorts" || normalizedCategory === "pants & joggers") {
+  if (normalizedCategory === "shorts") {
     return "left-leg";
+  }
+
+  if (normalizedCategory === "pants & joggers") {
+    return "left-thigh";
   }
 
   return "upper-front";

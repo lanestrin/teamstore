@@ -1,16 +1,24 @@
+import { useMemo } from "react";
+
 import {
   type DecorationProfileId,
   type ProductArtworkPlacement,
   getDecorationProfile,
   createDefaultProductArtworkPlacement,
+  type DecorationPreviewBounds,
 } from "../../lib/decorationProfiles";
+
 import styles from "./GarmentArtworkPreview.module.scss";
+import { applyArtworkContrast, type ArtworkSurfaceTone } from "../../lib/artworkContrast";
 
 interface GarmentArtworkPreviewProps {
   garmentImageUrl: string;
   garmentName: string;
   artworkSvg?: string;
+  surfaceHex?: string;
+  surfaceTone?: ArtworkSurfaceTone;
   decorationProfileId: DecorationProfileId;
+  decorationPreviewBounds?: DecorationPreviewBounds;
   placement?: ProductArtworkPlacement;
   showDecorationZone?: boolean;
 }
@@ -19,24 +27,32 @@ export default function GarmentArtworkPreview({
   garmentImageUrl,
   garmentName,
   artworkSvg,
+  surfaceHex,
+  surfaceTone,
   decorationProfileId,
+  decorationPreviewBounds,
   placement,
   showDecorationZone = false,
 }: GarmentArtworkPreviewProps) {
   const decorationProfile = getDecorationProfile(decorationProfileId);
   const artworkPlacement = placement ?? createDefaultProductArtworkPlacement(decorationProfileId);
-  const { previewBounds } = decorationProfile;
+  const previewBounds = decorationPreviewBounds ?? decorationProfile.previewBounds;
+
+  const renderedArtworkSvg = useMemo(
+    () => (artworkSvg ? applyArtworkContrast(artworkSvg, surfaceHex, surfaceTone) : undefined),
+    [artworkSvg, surfaceHex, surfaceTone],
+  );
 
   return (
     <div
       className={styles.garmentArtworkPreview}
       data-garment-artwork-preview
       role="img"
-      aria-label={artworkSvg ? `${garmentName} with artwork preview` : `${garmentName} preview`}
+      aria-label={renderedArtworkSvg ? `${garmentName} with artwork preview` : `${garmentName} preview`}
     >
       <img src={garmentImageUrl} alt="" aria-hidden="true" className={styles.garmentArtworkImage} />
 
-      {artworkSvg && (
+      {renderedArtworkSvg && (
         <div
           className={[styles.decorationZone, showDecorationZone ? styles.decorationZoneVisible : ""].filter(Boolean).join(" ")}
           style={{
@@ -54,7 +70,7 @@ export default function GarmentArtworkPreview({
               width: `${artworkPlacement.width * 100}%`,
             }}
             dangerouslySetInnerHTML={{
-              __html: artworkSvg,
+              __html: renderedArtworkSvg,
             }}
           />
         </div>

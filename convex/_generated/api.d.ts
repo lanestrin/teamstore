@@ -10,6 +10,7 @@
 
 import type * as auth from "../auth.js";
 import type * as csvDemoCatalog from "../csvDemoCatalog.js";
+import type * as docs_decorationPreviewOverrides from "../docs/decorationPreviewOverrides.js";
 import type * as docs_selectedProductsData from "../docs/selectedProductsData.js";
 import type * as http from "../http.js";
 import type * as lib_authz from "../lib/authz.js";
@@ -28,6 +29,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
   csvDemoCatalog: typeof csvDemoCatalog;
+  "docs/decorationPreviewOverrides": typeof docs_decorationPreviewOverrides;
   "docs/selectedProductsData": typeof docs_selectedProductsData;
   http: typeof http;
   "lib/authz": typeof lib_authz;

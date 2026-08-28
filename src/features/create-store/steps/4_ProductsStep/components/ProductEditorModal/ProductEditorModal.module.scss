@@ -2,23 +2,18 @@
   position: fixed;
   inset: 0;
   z-index: 1000;
-
   display: grid;
   place-items: center;
-
   padding: $space-6;
-
   background: rgb(15 23 42 / 72%);
 }
 
 .modal {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
-
   width: min(1120px, 100%);
   height: min(760px, calc(100dvh - 48px));
   overflow: hidden;
-
   background: $white;
   border-radius: 16px;
   box-shadow: 0 24px 80px rgb(0 0 0 / 30%);
@@ -30,7 +25,6 @@
   align-items: center;
   justify-content: space-between;
   gap: $space-4;
-
   padding: 18px 22px;
 }
 

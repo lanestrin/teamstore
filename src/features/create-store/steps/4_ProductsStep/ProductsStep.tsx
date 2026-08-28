@@ -384,7 +384,6 @@ export default function SelectProductsStep() {
   function handleSelectionChange(suggestion: GeneratedSuggestion, checked: boolean) {
     if (!checked) {
       const currentSelection = storeDraft.productSelections[suggestion.combinationKey];
-
       const artworkPlacement = currentSelection?.artworkPlacement;
 
       if (artworkPlacement) {
