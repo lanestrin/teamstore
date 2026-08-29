@@ -63,23 +63,17 @@ function getErrorMessage(error: unknown): string {
 
 export default function AccountPage() {
   const navigate = useNavigate();
-
   const currentUser = useQuery(api.users.current);
-
-  const drafts = useQuery(api.organizations.listMyDrafts);
-
-  const activeStores = useQuery(api.organizations.listMyActiveStores);
-
-  const deleteDraft = useMutation(api.organizations.deleteDraft);
-
-  const archiveStore = useMutation(api.organizations.archiveStore);
+  const drafts = useQuery(api.storeDrafts.listMyDrafts);
+  const deleteDraft = useMutation(api.storeDrafts.deleteDraft);
 
   const [deletingDraftId, setDeletingDraftId] = useState<Id<"stores"> | null>(null);
-
   const [archivingStoreId, setArchivingStoreId] = useState<Id<"stores"> | null>(null);
 
-  const displayName = getFirstName(currentUser?.name, currentUser?.email);
+  const activeStores = useQuery(api.stores.listMyActiveStores);
+  const archiveStore = useMutation(api.stores.archiveStore);
 
+  const displayName = getFirstName(currentUser?.name, currentUser?.email);
   const hasStores = (drafts?.length ?? 0) > 0 || (activeStores?.length ?? 0) > 0;
 
   async function handleDeleteDraft(storeId: Id<"stores">): Promise<void> {
