@@ -4,7 +4,7 @@ import type { ProductColorFamily } from "../../../../../types/productColor.types
 import type { DecorationProfileId, ProductArtworkPlacement } from "./decorationProfiles";
 import type { Id } from "../../../../../../convex/_generated/dataModel";
 
-type StoreCreationProducts = NonNullable<FunctionReturnType<typeof api.products.getStoreCreationProducts>>;
+type StoreCreationProducts = NonNullable<FunctionReturnType<typeof api.storeProductCatalog.getStoreCreationProducts>>;
 
 export type ProductOption = StoreCreationProducts["uniforms"][number];
 export type ProductColorOption = ProductOption["colorOptions"][number];

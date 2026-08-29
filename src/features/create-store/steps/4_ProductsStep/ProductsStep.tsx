@@ -140,7 +140,7 @@ export default function SelectProductsStep() {
    * Supplier IDs are no longer used to build the assortment.
    */
   const storeCreationProducts = useQuery(
-    api.products.getStoreCreationProducts,
+    api.storeProductCatalog.getStoreCreationProducts,
     isStoreActivity(storeDraft.activity)
       ? {
           activity: storeDraft.activity,

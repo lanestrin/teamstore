@@ -4,11 +4,7 @@ import { featureToggle } from "../../config/feature-toggle";
 import GoogleSignInButton from "./components/GoogleSignInButton/GoogleSignInButton";
 import styles from "./AuthForm.module.scss";
 
-type AuthMode =
-  | "signIn"
-  | "signUp"
-  | "forgotPassword"
-  | "resetPassword";
+type AuthMode = "signIn" | "signUp" | "forgotPassword" | "resetPassword";
 
 const MIN_PASSWORD_LENGTH = 8;
 const DEMO_EMAIL = "guest@teamstore.demo";
@@ -32,9 +28,7 @@ export default function AuthForm() {
   const isResetPassword = mode === "resetPassword";
   const isSignIn = mode === "signIn";
 
-  async function handleSubmit(
-    e: SyntheticEvent<HTMLFormElement, SubmitEvent>,
-  ) {
+  async function handleSubmit(e: SyntheticEvent<HTMLFormElement, SubmitEvent>) {
     e.preventDefault();
     setError("");
 
@@ -49,9 +43,7 @@ export default function AuthForm() {
     }
 
     if (isSignUp && password.length < MIN_PASSWORD_LENGTH) {
-      setError(
-        `Password must be at least ${MIN_PASSWORD_LENGTH} characters.`,
-      );
+      setError(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`);
       return;
     }
 
@@ -63,21 +55,12 @@ export default function AuthForm() {
     try {
       await signIn("password", formData);
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message.toLowerCase() : "";
+      const message = err instanceof Error ? err.message.toLowerCase() : "";
 
       if (message.includes("invalid password")) {
-        setError(
-          isSignUp
-            ? `Password must be at least ${MIN_PASSWORD_LENGTH} characters.`
-            : "Incorrect email or password.",
-        );
+        setError(isSignUp ? `Password must be at least ${MIN_PASSWORD_LENGTH} characters.` : "Incorrect email or password.");
       } else {
-        setError(
-          isSignUp
-            ? "Unable to create your account. Please try again."
-            : "Unable to sign in. Please try again.",
-        );
+        setError(isSignUp ? "Unable to create your account. Please try again." : "Unable to sign in. Please try again.");
       }
     } finally {
       setLoading(false);
@@ -101,9 +84,7 @@ export default function AuthForm() {
     } catch (err) {
       console.error("Password reset request failed:", err);
 
-      setError(
-        "Unable to send a password reset code. Please check your email and try again.",
-      );
+      setError("Unable to send a password reset code. Please check your email and try again.");
     } finally {
       setLoading(false);
     }
@@ -111,9 +92,7 @@ export default function AuthForm() {
 
   async function handleResetVerification() {
     if (newPassword.length < MIN_PASSWORD_LENGTH) {
-      setError(
-        `Password must be at least ${MIN_PASSWORD_LENGTH} characters.`,
-      );
+      setError(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`);
       return;
     }
 
@@ -129,15 +108,12 @@ export default function AuthForm() {
     try {
       await signIn("password", formData);
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message.toLowerCase() : "";
+      const message = err instanceof Error ? err.message.toLowerCase() : "";
 
       if (message.includes("invalid code")) {
         setError("The reset code is invalid or has expired.");
       } else {
-        setError(
-          "Unable to reset your password. Please request a new code and try again.",
-        );
+        setError("Unable to reset your password. Please request a new code and try again.");
       }
     } finally {
       setLoading(false);
@@ -158,9 +134,7 @@ export default function AuthForm() {
   }
 
   function toggleMode() {
-    setMode((currentMode) =>
-      currentMode === "signUp" ? "signIn" : "signUp",
-    );
+    setMode((currentMode) => (currentMode === "signUp" ? "signIn" : "signUp"));
 
     clearForm();
   }
@@ -275,30 +249,19 @@ export default function AuthForm() {
                 setDemoLoginSelected(false);
               }}
               minLength={isSignUp ? MIN_PASSWORD_LENGTH : undefined}
-              autoComplete={
-                isSignUp ? "new-password" : "current-password"
-              }
-              aria-describedby={
-                isSignUp ? "password-requirements" : undefined
-              }
+              autoComplete={isSignUp ? "new-password" : "current-password"}
+              aria-describedby={isSignUp ? "password-requirements" : undefined}
               required
             />
 
             {isSignUp && (
-              <p
-                id="password-requirements"
-                className={styles.helpText}
-              >
+              <p id="password-requirements" className={styles.helpText}>
                 Use at least {MIN_PASSWORD_LENGTH} characters.
               </p>
             )}
 
             {isSignIn && (
-              <button
-                type="button"
-                className={styles.forgotPasswordLink}
-                onClick={showForgotPassword}
-              >
+              <button type="button" className={styles.forgotPasswordLink} onClick={showForgotPassword}>
                 Forgot password?
               </button>
             )}
@@ -337,10 +300,7 @@ export default function AuthForm() {
                 required
               />
 
-              <p
-                id="new-password-requirements"
-                className={styles.helpText}
-              >
+              <p id="new-password-requirements" className={styles.helpText}>
                 Use at least {MIN_PASSWORD_LENGTH} characters.
               </p>
             </div>
@@ -364,43 +324,23 @@ export default function AuthForm() {
         </div>
       )}
 
-      {isSignIn && (
-        <GoogleSignInButton
-          onClick={handleGoogleSignIn}
-          disabled={loading}
-        />
-      )}
+      {isSignIn && <GoogleSignInButton onClick={handleGoogleSignIn} disabled={loading} />}
 
       <div className={styles.authActions}>
         {(isForgotPassword || isResetPassword) && (
-          <button
-            type="button"
-            className={styles.linkButton}
-            onClick={showSignIn}
-          >
+          <button type="button" className={styles.linkButton} onClick={showSignIn}>
             Back to sign in
           </button>
         )}
 
         {(isSignIn || isSignUp) && (
-          <button
-            type="button"
-            className={styles.linkButton}
-            onClick={toggleMode}
-            disabled={demoLoginSelected}
-          >
-            {isSignUp
-              ? "Already have an account?"
-              : "Create an account"}
+          <button type="button" className={styles.linkButton} onClick={toggleMode} disabled={demoLoginSelected}>
+            {isSignUp ? "Already have an account?" : "Create an account"}
           </button>
         )}
 
         {featureToggle.demoLogin && isSignIn && (
-          <button
-            type="button"
-            className={styles.demoLink}
-            onClick={fillDemoCredentials}
-          >
+          <button type="button" className={styles.demoLink} onClick={fillDemoCredentials}>
             Use Demo Account
           </button>
         )}

@@ -10,8 +10,7 @@
 
   box-sizing: border-box;
   display: grid;
-  grid-template-columns:
-    minmax(260px, 320px) minmax(0, 1fr) minmax(320px, 420px);
+  grid-template-columns: minmax(260px, 320px) minmax(0, 1fr) minmax(320px, 420px);
   align-items: start;
   gap: $space-9;
   width: 100%;
@@ -130,11 +129,11 @@
   transform: scale(1.08);
 }
 
-.supportItem+.supportItem {
+.supportItem + .supportItem {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.supportItem>div:last-child {
+.supportItem > div:last-child {
   min-width: 0;
 }
 

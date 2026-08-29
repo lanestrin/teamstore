@@ -1,112 +1,112 @@
 .banner {
-    width: 100%;
-    background: #ef3e38;
-    color: #fff;
-    position: relative;
-    z-index: 1000;
+  width: 100%;
+  background: #ef3e38;
+  color: #fff;
+  position: relative;
+  z-index: 1000;
 }
 
 .inner {
-    width: min(100% - 32px, 1280px);
-    min-height: 42px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 24px;
-    position: relative;
+  width: min(100% - 32px, 1280px);
+  min-height: 42px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  position: relative;
 }
 
 .message {
-    margin: 0;
-    font-size: 13px;
-    line-height: 1.4;
-    text-align: center;
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  text-align: center;
 
-    strong {
-        font-weight: 700;
-    }
+  strong {
+    font-weight: 700;
+  }
 }
 
 .demoLink {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
-    flex-shrink: 0;
-    padding: 6px 12px;
+  flex-shrink: 0;
+  padding: 6px 12px;
 
-    appearance: none;
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    border-radius: 4px;
-    background: transparent;
-    color: inherit;
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
 
-    font: inherit;
-    font-size: 11px;
-    font-weight: 700;
-    line-height: 1.2;
-    text-transform: uppercase;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: uppercase;
 
-    cursor: pointer;
+  cursor: pointer;
 
-    transition:
-        background-color 150ms ease,
-        color 150ms ease,
-        border-color 150ms ease;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease,
+    border-color 150ms ease;
 
-    &:hover {
-        background: #fff;
-        color: #ef3e38;
-    }
+  &:hover {
+    background: #fff;
+    color: #ef3e38;
+  }
 
-    &:focus-visible {
-        outline: 2px solid #fff;
-        outline-offset: 2px;
-    }
+  &:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
 }
 
 .closeButton {
-    position: absolute;
-    right: 0;
-    top: 50%;
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    transform: translateY(-50%);
-    border: 0;
-    background: transparent;
-    color: inherit;
-    cursor: pointer;
-    font-size: 24px;
-    font-weight: 300;
-    line-height: 1;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 24px;
+  font-weight: 300;
+  line-height: 1;
 
-    &:hover {
-        opacity: 0.75;
-    }
+  &:hover {
+    opacity: 0.75;
+  }
 }
 
 @media (max-width: 768px) {
-    .inner {
-        width: min(100% - 24px, 1280px);
-        min-height: 48px;
-        justify-content: flex-start;
-        padding-right: 36px;
-        gap: 12px;
-    }
+  .inner {
+    width: min(100% - 24px, 1280px);
+    min-height: 48px;
+    justify-content: flex-start;
+    padding-right: 36px;
+    gap: 12px;
+  }
 
-    .message {
-        text-align: left;
-        font-size: 11px;
+  .message {
+    text-align: left;
+    font-size: 11px;
 
-        span {
-            display: none;
-        }
+    span {
+      display: none;
     }
+  }
 
-    .demoLink {
-        margin-left: auto;
-        font-size: 10px;
-    }
+  .demoLink {
+    margin-left: auto;
+    font-size: 10px;
+  }
 }
