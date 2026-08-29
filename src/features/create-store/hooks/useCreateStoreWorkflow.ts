@@ -5,7 +5,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../../../../convex/_generated/api";
 import type { Id } from "../../../../convex/_generated/dataModel";
 
-import { useCreateStore, type ProductSelectionsDraft } from "../context/CreateStoreContext";
+import { useCreateStore } from "../context/CreateStoreContext";
+import type { ProductSelectionsDraft } from "../context/CreateStoreContext.types";
 
 const STORE_ACTIVITIES = [
   "basketball",
@@ -185,6 +186,7 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
     try {
       const organizationSlug = storeDraft.organizationSlug || slugify(storeDraft.organizationName);
       const uploadedArtworks = await prepareUploadedArtworks();
+      const productSelections = buildProductSelections(storeDraft.productSelections);
 
       const result = await saveDraftMutation({
         storeId: storeId ?? undefined,
@@ -199,6 +201,8 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
         uploadedArtworks,
         primaryColor,
         secondaryColor,
+        productSelections,
+        requiredItemsDeadline: normalizeOptionalText(storeDraft.requiredItemsDeadline),
         currentStep,
       });
 
@@ -262,6 +266,15 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
       return;
     }
 
+    const hasRequiredProducts = productSelections.some((selection) => selection.isRequired);
+    const requiredItemsDeadline = normalizeOptionalText(storeDraft.requiredItemsDeadline);
+
+    if (hasRequiredProducts && !requiredItemsDeadline) {
+      window.alert("Set a deadline for required products before creating the store.");
+
+      return;
+    }
+
     setIsFinalizing(true);
 
     try {
@@ -282,6 +295,7 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
         secondaryColor,
         currentStep,
         productSelections,
+        requiredItemsDeadline,
       });
 
       resetStoreDraft();

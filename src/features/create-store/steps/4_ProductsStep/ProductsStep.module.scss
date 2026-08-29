@@ -149,6 +149,80 @@
   color: $text-primary;
 }
 
+/*
+ * Shared ordering deadline for required products.
+ * This section only appears when at least one
+ * selected product is marked as required.
+ */
+
+.requiredItemsDeadline {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: $space-6;
+
+  padding: $space-6;
+
+  background: $gray-50;
+  border: 1px solid $border-light;
+  border-radius: $radius-lg;
+}
+
+.requiredItemsDeadline>div {
+  max-width: 560px;
+}
+
+.requiredItemsDeadline h2 {
+  margin: 0;
+
+  font-size: 1rem;
+  font-weight: $font-semibold;
+  line-height: 1.4;
+  color: $text-primary;
+}
+
+.requiredItemsDeadline p {
+  margin: $space-1 0 0;
+
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: $text-secondary;
+}
+
+.requiredItemsDeadlineField {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: $space-2;
+
+  min-width: 190px;
+}
+
+.requiredItemsDeadlineField span {
+  font-size: 0.8125rem;
+  font-weight: $font-semibold;
+  color: $text-primary;
+}
+
+.requiredItemsDeadlineField input {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 $space-3;
+
+  background: $white;
+  border: 1px solid $border-light;
+  border-radius: $radius-md;
+
+  font: inherit;
+  font-size: 0.875rem;
+  color: $text-primary;
+}
+
+.requiredItemsDeadlineField input:focus {
+  outline: 2px solid $text-primary;
+  outline-offset: 2px;
+}
+
 @media (max-width: 640px) {
   .productsStep {
     gap: $space-6;
@@ -167,4 +241,16 @@
     flex-direction: column;
     gap: $space-1;
   }
+
+    .requiredItemsDeadline {
+      align-items: stretch;
+      flex-direction: column;
+  
+      padding: $space-4;
+    }
+  
+    .requiredItemsDeadlineField {
+      width: 100%;
+      min-width: 0;
+    }
 }

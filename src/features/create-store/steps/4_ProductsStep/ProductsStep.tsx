@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { useQuery } from "convex/react";
 import { LuTriangleAlert } from "react-icons/lu";
 
@@ -52,6 +52,15 @@ function getProductColorLabel(family: ProductColorFamily | ""): string {
   }
 
   return PRODUCT_COLOR_OPTIONS.find((option) => option.value === family)?.label ?? "Product color";
+}
+
+function getTodayDateValue(): string {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
 }
 
 function readFileAsDataUrl(file: File): Promise<string> {
@@ -268,6 +277,16 @@ export default function SelectProductsStep() {
   );
 
   const selectedProductCount = Object.keys(storeDraft.productSelections).length;
+
+  const hasRequiredProducts = Object.values(storeDraft.productSelections).some((selection) => selection.isRequired);
+
+  const todayDate = getTodayDateValue();
+
+  const isRequiredItemsDeadlineMissing = hasRequiredProducts && !storeDraft.requiredItemsDeadline;
+
+  const isRequiredItemsDeadlinePast =
+    hasRequiredProducts && Boolean(storeDraft.requiredItemsDeadline) && storeDraft.requiredItemsDeadline < todayDate;
+
   const suggestions = useMemo<GeneratedSuggestion[]>(() => {
     if (!storeCreationProducts || !primaryColorFamily) {
       return [];
@@ -362,6 +381,7 @@ export default function SelectProductsStep() {
     updateStoreDraft({
       activity: nextActivity,
       productSelections: {},
+      requiredItemsDeadline: "",
       productGenerationSeed: storeDraft.productGenerationSeed + 1,
     });
   }
@@ -431,6 +451,12 @@ export default function SelectProductsStep() {
     }
 
     toggleProductRequired(suggestion.combinationKey);
+  }
+
+  function handleRequiredItemsDeadlineChange(event: ChangeEvent<HTMLInputElement>) {
+    updateStoreDraft({
+      requiredItemsDeadline: event.target.value,
+    });
   }
 
   function openProductEditor(suggestion: GeneratedSuggestion) {
@@ -506,7 +532,7 @@ export default function SelectProductsStep() {
         }
         onBack={() => setCurrentStep(3)}
         onNext={() => setCurrentStep(5)}
-        nextDisabled={isLoading || selectedProductCount === 0}
+        nextDisabled={isLoading || selectedProductCount === 0 || isRequiredItemsDeadlineMissing || isRequiredItemsDeadlinePast}
         width="wide"
       >
         <div className={styles.productsStep}>
@@ -524,6 +550,27 @@ export default function SelectProductsStep() {
             onSecondaryColorChange={handleSecondaryColorChange}
             onRegenerate={regenerateProductSuggestions}
           />
+
+          {hasRequiredProducts && (
+            <section className={styles.requiredItemsDeadline}>
+              <div>
+                <h2>Required items deadline</h2>
+
+                <p>Set the deadline for customers to order required products.</p>
+              </div>
+
+              <label className={styles.requiredItemsDeadlineField}>
+                <span>Order deadline</span>
+                <input
+                  type="date"
+                  value={storeDraft.requiredItemsDeadline}
+                  min={todayDate}
+                  onChange={handleRequiredItemsDeadlineChange}
+                  required
+                />
+              </label>
+            </section>
+          )}
 
           {!isLoading && availableProductColorFamilies.size === 0 ? (
             <div className={styles.emptyState}>

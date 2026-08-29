@@ -3,7 +3,7 @@ import { LuImage, LuPencil, LuUpload } from "react-icons/lu";
 
 import { ART_TEMPLATE_LIST, type ArtTemplate } from "../../../../assets/art-templates";
 import WizardLayout from "../../components/WizardLayout/WizardLayout";
-import { useCreateStore, type ArtworkTextDraft } from "../../context/CreateStoreContext";
+import { useCreateStore } from "../../context/CreateStoreContext";
 
 import ArtworkEditorModal from "./components/ArtworkEditorModal/ArtworkEditorModal";
 import ArtTemplatePreview from "./components/ArtTemplatePreview/ArtTemplatePreview";
@@ -12,6 +12,7 @@ import UploadedArtworkCard from "./components/UploadedArtworkCard/UploadedArtwor
 
 import styles from "./ArtworkStep.module.scss";
 import type { ArtworkAdjustments } from "./lib/artworkEditor";
+import type { ArtworkTextDraft } from "../../context/CreateStoreContext.types";
 
 const MAX_MASCOT_FILE_SIZE = 5 * 1024 * 1024;
 

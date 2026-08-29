@@ -1,5 +1,5 @@
 import type { ArtTemplateTextBinding, ArtTemplate, ArtTemplateEditableElement } from "../../../../../assets/art-templates";
-import type { ArtworkTextDraft } from "../../../context/CreateStoreContext";
+import type { ArtworkTextDraft } from "../../../context/CreateStoreContext.types";
 import { applyArtworkAdjustments, type ArtworkAdjustments } from "./artworkEditor";
 
 const SVG_NAMESPACE = "http://www.w3.org/2000/svg";

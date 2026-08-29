@@ -1,5 +1,6 @@
 import type { ProductColorFamily } from "../../../../../types/productColor.types";
-import { createProductCombinationKey, type ProductSelectionsDraft } from "../../../context/CreateStoreContext";
+import { createProductCombinationKey } from "../../../context/CreateStoreContext";
+import type { ProductSelectionsDraft } from "../../../context/CreateStoreContext.types";
 import { getDecorationProfileIdForProductCategory } from "./decorationProfiles";
 import type { GeneratedSuggestion, ProductOption, ProductSuggestionSection } from "./productStep.types";
 

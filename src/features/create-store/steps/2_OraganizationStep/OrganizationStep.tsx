@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 
 import WizardLayout from "../../components/WizardLayout/WizardLayout";
-import { useCreateStore, type StoreType } from "../../context/CreateStoreContext";
+import { useCreateStore } from "../../context/CreateStoreContext";
 
 import FormErrorSummary from "../../components/FormErrorSummary/FormErrorSummary";
 import OrganizationLogoUpload from "./components/OrganizationLogoUpload/OrganizationLogoUpload";
@@ -11,6 +11,7 @@ import { isValidStoreType } from "./components/StoreTypeSelector/storeTypeOption
 import formStyles from "../../styles/form.module.scss";
 import styles from "./OrganizationStep.module.scss";
 import useFileDataUrl from "../../hooks/useFileDataUrl";
+import type { StoreType } from "../../context/CreateStoreContext.types";
 
 const STORE_ACTIVITIES = [
   { value: "basketball", label: "Basketball" },
