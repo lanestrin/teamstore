@@ -1,8 +1,8 @@
 import type { Ref } from "react";
 import { LuCircleHelp } from "react-icons/lu";
-import type { StoreType } from "../../../../context/CreateStoreContext";
 import styles from "./StoreTypeSelector.module.scss";
 import { STORE_TYPES } from "./storeTypeOptions";
+import type { StoreType } from "../../../../context/CreateStoreContext.types";
 
 interface StoreTypeSelectorProps {
   value: StoreType | "";

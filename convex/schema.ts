@@ -186,6 +186,7 @@ export default defineSchema({
     uploadedArtworks: v.optional(v.array(storeUploadedArtwork)),
     primaryColor: v.optional(v.string()),
     secondaryColor: v.optional(v.string()),
+    requiredItemsDeadline: v.optional(v.string()),
     currentStep: v.number(),
     status: storeStatus,
     createdAt: v.number(),

@@ -1,6 +1,6 @@
 import { ART_TEMPLATE_LIST } from "../../../../../assets/art-templates";
+import type { ArtworkTemplatesDraft, ArtworkTextDraft } from "../../../context/CreateStoreContext.types";
 
-import type { ArtworkTemplatesDraft, ArtworkTextDraft } from "../../../context/CreateStoreContext";
 import { applySavedArtworkAdjustments, createCustomizedSvg } from "../../3_ArtworkStep/lib/artworkSvg";
 
 interface CreateProductArtworkSvgArgs {

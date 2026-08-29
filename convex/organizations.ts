@@ -1,10 +1,11 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
-import { ConvexError, v } from "convex/values";
+import { ConvexError, v, type Infer } from "convex/values";
 import { mutation, query, type MutationCtx } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const HEX_COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/;
+const DATE_ONLY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const MAX_STORE_PRODUCTS = 50;
 
 const storeActivity = v.union(
@@ -35,12 +36,7 @@ const storeUploadedArtwork = v.object({
   isSelected: v.boolean(),
 });
 
-interface StoreProductSelectionInput {
-  productId: Id<"products">;
-  colorKey: string;
-  artworkTemplateId: string;
-  isRequired: boolean;
-}
+type StoreProductSelectionInput = Infer<typeof storeProductSelection>;
 
 interface ResolvedStoreProductSelection {
   productId: Id<"products">;
@@ -62,6 +58,29 @@ function normalizeOptionalSlug(value: string | undefined): string | undefined {
   return normalizedValue || undefined;
 }
 
+function normalizeRequiredItemsDeadline(value: string | undefined): string | undefined {
+  const normalizedValue = value?.trim();
+
+  if (!normalizedValue) {
+    return undefined;
+  }
+
+  if (!DATE_ONLY_PATTERN.test(normalizedValue)) {
+    throw new ConvexError("Required items deadline must use the YYYY-MM-DD format.");
+  }
+
+  const [year, month, day] = normalizedValue.split("-").map(Number);
+  const parsedDate = new Date(Date.UTC(year, month - 1, day));
+
+  const isValidDate = parsedDate.getUTCFullYear() === year && parsedDate.getUTCMonth() === month - 1 && parsedDate.getUTCDate() === day;
+
+  if (!isValidDate) {
+    throw new ConvexError("Required items deadline must be a valid date.");
+  }
+
+  return normalizedValue;
+}
+
 function validateSlug(slug: string, label: string): void {
   if (!SLUG_PATTERN.test(slug)) {
     throw new ConvexError(`${label} must contain only lowercase letters, numbers, and hyphens.`);
@@ -74,8 +93,8 @@ function validateColor(color: string, label: string): void {
   }
 }
 
-function normalizeStoreProductSelections(selections: StoreProductSelectionInput[]): StoreProductSelectionInput[] {
-  if (selections.length === 0) {
+function normalizeStoreProductSelections(selections: StoreProductSelectionInput[], requireSelection = true): StoreProductSelectionInput[] {
+  if (requireSelection && selections.length === 0) {
     throw new ConvexError("Select at least one product for the store.");
   }
 
@@ -94,6 +113,13 @@ function normalizeStoreProductSelections(selections: StoreProductSelectionInput[
 
     return selection;
   });
+}
+
+function prepareDraftStoreProductSelections(selections: StoreProductSelectionInput[]): ResolvedStoreProductSelection[] {
+  return normalizeStoreProductSelections(selections, false).map((selection, sortOrder) => ({
+    ...selection,
+    sortOrder,
+  }));
 }
 
 async function resolveStoreProductSelections(
@@ -196,6 +222,8 @@ export const saveDraft = mutation({
     uploadedArtworks: v.optional(v.array(storeUploadedArtwork)),
     primaryColor: v.optional(v.string()),
     secondaryColor: v.optional(v.string()),
+    productSelections: v.array(storeProductSelection),
+    requiredItemsDeadline: v.optional(v.string()),
     currentStep: v.number(),
   },
 
@@ -215,6 +243,10 @@ export const saveDraft = mutation({
     const storeName = normalizeOptionalText(args.storeName);
     const storeSlug = normalizeOptionalSlug(args.storeSlug);
     const storeDescription = normalizeOptionalText(args.storeDescription);
+
+    const productSelections = prepareDraftStoreProductSelections(args.productSelections);
+    const hasRequiredProducts = productSelections.some((selection) => selection.isRequired);
+    const requiredItemsDeadline = hasRequiredProducts ? normalizeRequiredItemsDeadline(args.requiredItemsDeadline) : undefined;
 
     if (organizationSlug) {
       validateSlug(organizationSlug, "Organization slug");
@@ -246,6 +278,7 @@ export const saveDraft = mutation({
         organizationSlug,
 
         activity: args.activity,
+        storeType: args.storeType,
 
         name: storeName,
         slug: storeSlug,
@@ -262,6 +295,7 @@ export const saveDraft = mutation({
               bannerStorageId: args.bannerStorageId,
             }
           : {}),
+
         ...(args.uploadedArtworks !== undefined
           ? {
               uploadedArtworks: args.uploadedArtworks,
@@ -270,10 +304,13 @@ export const saveDraft = mutation({
 
         primaryColor: args.primaryColor,
         secondaryColor: args.secondaryColor,
+        requiredItemsDeadline,
 
         currentStep: args.currentStep,
         updatedAt: now,
       });
+
+      await replaceStoreProductSelections(ctx, args.storeId, productSelections, now);
 
       return {
         storeId: args.storeId,
@@ -293,13 +330,18 @@ export const saveDraft = mutation({
       logoStorageId: args.logoStorageId,
       bannerStorageId: args.bannerStorageId,
       uploadedArtworks: args.uploadedArtworks,
+
       primaryColor: args.primaryColor,
       secondaryColor: args.secondaryColor,
+      requiredItemsDeadline,
+
       currentStep: args.currentStep,
       status: "draft",
       createdAt: now,
       updatedAt: now,
     });
+
+    await replaceStoreProductSelections(ctx, storeId, productSelections, now);
 
     return {
       storeId,
@@ -329,6 +371,20 @@ export const getDraft = query({
       return null;
     }
 
+    const storeProducts = await ctx.db
+      .query("storeProducts")
+      .withIndex("by_store", (q) => q.eq("storeId", store._id))
+      .collect();
+
+    const productSelections = storeProducts
+      .sort((first, second) => first.sortOrder - second.sortOrder)
+      .map((storeProduct) => ({
+        productId: storeProduct.productId,
+        colorKey: storeProduct.colorKey,
+        artworkTemplateId: storeProduct.artworkTemplateId,
+        isRequired: storeProduct.isRequired,
+      }));
+
     const uploadedArtworks = await Promise.all(
       (store.uploadedArtworks ?? []).map(async (artwork) => ({
         ...artwork,
@@ -339,6 +395,7 @@ export const getDraft = query({
     return {
       ...store,
       uploadedArtworks,
+      productSelections,
     };
   },
 });
@@ -490,6 +547,7 @@ export const createOrganizationWithStore = mutation({
     secondaryColor: v.string(),
     currentStep: v.number(),
     productSelections: v.array(storeProductSelection),
+    requiredItemsDeadline: v.optional(v.string()),
   },
 
   handler: async (ctx, args) => {
@@ -542,6 +600,14 @@ export const createOrganizationWithStore = mutation({
     }
 
     const selectedProducts = await resolveStoreProductSelections(ctx, args.productSelections);
+
+    const hasRequiredProducts = selectedProducts.some((selection) => selection.isRequired);
+
+    const requiredItemsDeadline = hasRequiredProducts ? normalizeRequiredItemsDeadline(args.requiredItemsDeadline) : undefined;
+
+    if (hasRequiredProducts && !requiredItemsDeadline) {
+      throw new ConvexError("A required items deadline is required when the store has required products.");
+    }
 
     const existingOrganization = await ctx.db
       .query("organizations")
@@ -622,6 +688,8 @@ export const createOrganizationWithStore = mutation({
 
         primaryColor: args.primaryColor,
         secondaryColor: args.secondaryColor,
+        requiredItemsDeadline,
+
         currentStep: args.currentStep,
         status: "active",
         updatedAt: now,
@@ -650,8 +718,11 @@ export const createOrganizationWithStore = mutation({
       logoStorageId: args.logoStorageId,
       bannerStorageId: args.bannerStorageId,
       uploadedArtworks: args.uploadedArtworks,
+
       primaryColor: args.primaryColor,
       secondaryColor: args.secondaryColor,
+      requiredItemsDeadline,
+
       currentStep: args.currentStep,
       status: "active",
       createdAt: now,

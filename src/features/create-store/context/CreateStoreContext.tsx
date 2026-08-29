@@ -1,132 +1,26 @@
 /* eslint-disable react-refresh/only-export-components */
 
-import { createContext, useContext, useEffect, useMemo, useState, type Dispatch, type ReactNode, type SetStateAction } from "react";
-import type { Doc, Id } from "../../../../convex/_generated/dataModel";
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import type { Id } from "../../../../convex/_generated/dataModel";
 import { ART_TEMPLATE_LIST } from "../../../assets/art-templates";
 
-import useFileDataUrl from "../hooks/useFileDataUrl";
 import type { ProductColorFamily } from "../../../types/productColor.types";
-import type { ArtworkAdjustments } from "../steps/3_ArtworkStep/lib/artworkEditor";
+import useFileDataUrl from "../hooks/useFileDataUrl";
 import { createCustomizedSvg, applySavedArtworkAdjustments } from "../steps/3_ArtworkStep/lib/artworkSvg";
-import type { ProductArtworkPlacement } from "../steps/4_ProductsStep/lib/decorationProfiles";
+
+import type {
+  ArtworkTemplateDraft,
+  CreateStoreContextValue,
+  CreateStoreDraft,
+  LoadedStoreDraft,
+  ProductSelectionInput,
+  ProductSelectionsDraft,
+  ProductSelectionUpdates,
+} from "./CreateStoreContext.types";
 
 const DEFAULT_PRIMARY_COLOR = "#111827";
 const DEFAULT_SECONDARY_COLOR = "#DC2626";
 const DEFAULT_PRODUCT_GENERATION_SEED = 1;
-
-export interface ArtworkTextDraft {
-  organizationName: string;
-  yearEstablished: string;
-  mascotName: string;
-}
-
-export interface ArtworkTemplateDraft {
-  selectedArtTemplateId: string;
-  isSelected: boolean;
-  artworkAdjustments: ArtworkAdjustments;
-}
-
-export interface UploadedArtworkDraft {
-  id: string;
-  fileName: string;
-  file: File | null;
-  storageId: Id<"_storage"> | null;
-  storageUrl: string | null;
-  isSelected: boolean;
-}
-
-interface LoadedStoreDraft extends Omit<Doc<"stores">, "uploadedArtworks"> {
-  uploadedArtworks?: Array<{
-    id: string;
-    fileName: string;
-    storageId: Id<"_storage">;
-    storageUrl: string | null;
-    isSelected: boolean;
-  }>;
-}
-
-export type StoreType = "fanwear" | "uniform" | "hybrid";
-export type ArtworkTemplatesDraft = Record<string, ArtworkTemplateDraft>;
-export type ArtworkSvgMap = Readonly<Record<string, string>>;
-export type ProductSelectionsDraft = Record<string, ProductSelectionDraft>;
-
-export interface ProductSelectionInput {
-  productId: Id<"products">;
-  colorKey: string;
-  artworkTemplateId: string;
-  isRequired?: boolean;
-  artworkPlacement?: ProductArtworkPlacement;
-}
-
-export interface ProductSelectionDraft {
-  combinationKey: string;
-  productId: Id<"products">;
-  colorKey: string;
-  artworkTemplateId: string;
-  isRequired: boolean;
-  artworkPlacement?: ProductArtworkPlacement;
-}
-
-export interface CreateStoreDraft {
-  organizationName: string;
-  organizationSlug: string;
-  activity: string;
-  storeType: StoreType | "";
-  storeName: string;
-  storeSlug: string;
-  storeDescription: string;
-  logoFile: File | null;
-  logoStorageId: Id<"_storage"> | null;
-  artworkTemplates: ArtworkTemplatesDraft;
-  uploadedArtworks: UploadedArtworkDraft[];
-  artworkText: ArtworkTextDraft;
-  productColorFamily: ProductColorFamily | "";
-  productSecondaryColorFamily: ProductColorFamily | "";
-  productGenerationSeed: number;
-  productSelections: ProductSelectionsDraft;
-}
-
-interface CreateStoreContextValue {
-  storeId: Id<"stores"> | null;
-  setStoreId: Dispatch<SetStateAction<Id<"stores"> | null>>;
-
-  currentStep: number;
-  furthestStepReached: number;
-  setCurrentStep: (step: number) => void;
-
-  primaryColor: string;
-  secondaryColor: string;
-
-  setPrimaryColor: Dispatch<SetStateAction<string>>;
-  setSecondaryColor: Dispatch<SetStateAction<string>>;
-
-  storeDraft: CreateStoreDraft;
-
-  resolvedArtworkText: ArtworkTextDraft;
-  mascotDataUrl: string | null;
-  artworkBaseSvgsByTemplateId: ArtworkSvgMap;
-  artworkSvgsByTemplateId: ArtworkSvgMap;
-
-  updateStoreDraft: (updates: Partial<CreateStoreDraft>) => void;
-  updateArtworkTemplateDraft: (templateId: string, updates: Partial<Omit<ArtworkTemplateDraft, "selectedArtTemplateId">>) => void;
-  selectProduct: (selection: ProductSelectionInput) => void;
-  removeProduct: (combinationKey: string) => void;
-  toggleProductRequired: (combinationKey: string) => void;
-
-  updateProductSelection: (
-    combinationKey: string,
-    updates: {
-      colorKey?: string;
-      artworkTemplateId?: string;
-      artworkPlacement?: ProductArtworkPlacement;
-    },
-  ) => void;
-
-  regenerateProductSuggestions: () => void;
-  resetProductStep: () => void;
-  loadStoreDraft: (draft: LoadedStoreDraft) => void;
-  resetStoreDraft: () => void;
-}
 
 export function createProductCombinationKey(productId: string, colorKey: string, artworkTemplateId: string): string {
   return [productId.trim(), colorKey.trim(), artworkTemplateId.trim()].map((value) => encodeURIComponent(value)).join("__");
@@ -236,6 +130,7 @@ function createDefaultStoreDraft(): CreateStoreDraft {
     productSecondaryColorFamily: "",
     productGenerationSeed: DEFAULT_PRODUCT_GENERATION_SEED,
     productSelections: {},
+    requiredItemsDeadline: "",
   };
 }
 
@@ -316,7 +211,6 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
 
       return {
         ...currentDraft,
-
         productColorFamily: classifyHexColorFamily(primaryColor),
         productSecondaryColorFamily: classifyHexColorFamily(secondaryColor),
       };
@@ -368,10 +262,8 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
 
       return {
         ...currentDraft,
-
         productSelections: {
           ...currentDraft.productSelections,
-
           [combinationKey]: {
             combinationKey,
             productId,
@@ -394,20 +286,18 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
     }
 
     setStoreDraft((currentDraft) => {
-      const {
-        [normalizedCombinationKey]: removedSelection,
-
-        ...remainingSelections
-      } = currentDraft.productSelections;
+      const { [normalizedCombinationKey]: removedSelection, ...remainingSelections } = currentDraft.productSelections;
 
       if (!removedSelection) {
         return currentDraft;
       }
 
+      const hasRequiredProducts = Object.values(remainingSelections).some((selection) => selection.isRequired);
+
       return {
         ...currentDraft,
-
         productSelections: remainingSelections,
+        requiredItemsDeadline: hasRequiredProducts ? currentDraft.requiredItemsDeadline : "",
       };
     });
   }
@@ -426,30 +316,25 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
         return currentDraft;
       }
 
+      const nextProductSelections = {
+        ...currentDraft.productSelections,
+        [normalizedCombinationKey]: {
+          ...currentSelection,
+          isRequired: !currentSelection.isRequired,
+        },
+      };
+
+      const hasRequiredProducts = Object.values(nextProductSelections).some((selection) => selection.isRequired);
+
       return {
         ...currentDraft,
-
-        productSelections: {
-          ...currentDraft.productSelections,
-
-          [normalizedCombinationKey]: {
-            ...currentSelection,
-
-            isRequired: !currentSelection.isRequired,
-          },
-        },
+        productSelections: nextProductSelections,
+        requiredItemsDeadline: hasRequiredProducts ? currentDraft.requiredItemsDeadline : "",
       };
     });
   }
 
-  function updateProductSelection(
-    combinationKey: string,
-    updates: {
-      colorKey?: string;
-      artworkTemplateId?: string;
-      artworkPlacement?: ProductArtworkPlacement;
-    },
-  ) {
+  function updateProductSelection(combinationKey: string, updates: ProductSelectionUpdates) {
     const normalizedCombinationKey = combinationKey.trim();
 
     if (!normalizedCombinationKey) {
@@ -492,20 +377,14 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
 
       const existingNextSelection = currentDraft.productSelections[nextCombinationKey];
 
-      const {
-        [normalizedCombinationKey]: removedSelection,
-
-        ...remainingSelections
-      } = currentDraft.productSelections;
+      const { [normalizedCombinationKey]: removedSelection, ...remainingSelections } = currentDraft.productSelections;
 
       void removedSelection;
 
       return {
         ...currentDraft,
-
         productSelections: {
           ...remainingSelections,
-
           [nextCombinationKey]: {
             combinationKey: nextCombinationKey,
             productId: currentSelection.productId,
@@ -525,6 +404,7 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
         Boolean(currentDraft.productColorFamily) ||
         Boolean(currentDraft.productSecondaryColorFamily) ||
         Object.keys(currentDraft.productSelections).length > 0 ||
+        Boolean(currentDraft.requiredItemsDeadline) ||
         currentDraft.productGenerationSeed !== DEFAULT_PRODUCT_GENERATION_SEED;
 
       if (!hasProductStepState) {
@@ -537,6 +417,7 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
         productSecondaryColorFamily: "",
         productGenerationSeed: DEFAULT_PRODUCT_GENERATION_SEED,
         productSelections: {},
+        requiredItemsDeadline: "",
       };
     });
   }
@@ -544,7 +425,6 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
   function regenerateProductSuggestions() {
     setStoreDraft((currentDraft) => ({
       ...currentDraft,
-
       productGenerationSeed: currentDraft.productGenerationSeed + 1,
     }));
   }
@@ -553,6 +433,22 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
     if (draft.status !== "draft") {
       throw new Error("Only draft stores can be loaded into the store wizard.");
     }
+
+    const productSelections = (draft.productSelections ?? []).reduce<ProductSelectionsDraft>((selections, selection) => {
+      const combinationKey = createProductCombinationKey(selection.productId, selection.colorKey, selection.artworkTemplateId);
+
+      selections[combinationKey] = {
+        combinationKey,
+        productId: selection.productId,
+        colorKey: selection.colorKey,
+        artworkTemplateId: selection.artworkTemplateId,
+        isRequired: selection.isRequired,
+      };
+
+      return selections;
+    }, {});
+
+    const hasRequiredProducts = Object.values(productSelections).some((selection) => selection.isRequired);
 
     setStoreId(draft._id);
     setCurrentStepState(draft.currentStep);
@@ -590,13 +486,13 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
       productColorFamily: "",
       productSecondaryColorFamily: "",
       productGenerationSeed: DEFAULT_PRODUCT_GENERATION_SEED,
-      productSelections: {},
+      productSelections,
+      requiredItemsDeadline: hasRequiredProducts ? (draft.requiredItemsDeadline ?? "") : "",
     });
   }
 
   function setCurrentStep(step: number) {
     setCurrentStepState(step);
-
     setFurthestStepReached((currentFurthestStep) => Math.max(currentFurthestStep, step));
   }
 
@@ -624,6 +520,7 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
         secondaryColor,
         setPrimaryColor,
         setSecondaryColor,
+
         storeDraft,
 
         resolvedArtworkText,

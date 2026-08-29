@@ -1,4 +1,4 @@
-import type { StoreType } from "../../../../context/CreateStoreContext";
+import type { StoreType } from "../../../../context/CreateStoreContext.types";
 
 export interface StoreTypeOption {
   value: StoreType;
