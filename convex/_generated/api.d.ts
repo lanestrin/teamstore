@@ -14,10 +14,14 @@ import type * as docs_decorationPreviewOverrides from "../docs/decorationPreview
 import type * as docs_selectedProductsData from "../docs/selectedProductsData.js";
 import type * as http from "../http.js";
 import type * as lib_authz from "../lib/authz.js";
-import type * as organizations from "../organizations.js";
+import type * as lib_storeProducts from "../lib/storeProducts.js";
+import type * as lib_storeValidation from "../lib/storeValidation.js";
 import type * as productVariants from "../productVariants.js";
 import type * as products from "../products.js";
 import type * as resendOTPasswordReset from "../resendOTPasswordReset.js";
+import type * as storeDrafts from "../storeDrafts.js";
+import type * as storeUploads from "../storeUploads.js";
+import type * as stores from "../stores.js";
 import type * as users from "../users.js";
 
 import type {
@@ -33,10 +37,14 @@ declare const fullApi: ApiFromModules<{
   "docs/selectedProductsData": typeof docs_selectedProductsData;
   http: typeof http;
   "lib/authz": typeof lib_authz;
-  organizations: typeof organizations;
+  "lib/storeProducts": typeof lib_storeProducts;
+  "lib/storeValidation": typeof lib_storeValidation;
   productVariants: typeof productVariants;
   products: typeof products;
   resendOTPasswordReset: typeof resendOTPasswordReset;
+  storeDrafts: typeof storeDrafts;
+  storeUploads: typeof storeUploads;
+  stores: typeof stores;
   users: typeof users;
 }>;
 

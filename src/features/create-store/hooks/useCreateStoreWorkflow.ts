@@ -75,7 +75,7 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
   const draftIdParam = searchParams.get("draftId");
   const draftId = draftIdParam ? (draftIdParam as Id<"stores">) : null;
   const savedDraft = useQuery(
-    api.organizations.getDraft,
+    api.storeDrafts.getDraft,
     draftId
       ? {
           storeId: draftId,
@@ -83,9 +83,9 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
       : "skip",
   );
 
-  const generateArtworkUploadUrl = useMutation(api.organizations.generateArtworkUploadUrl);
-  const saveDraftMutation = useMutation(api.organizations.saveDraft);
-  const createOrganizationWithStore = useMutation(api.organizations.createOrganizationWithStore);
+  const generateArtworkUploadUrl = useMutation(api.storeUploads.generateArtworkUploadUrl);
+  const saveDraftMutation = useMutation(api.storeDrafts.saveDraft);
+  const finalizeStoreMutation = useMutation(api.stores.finalizeStore);
   const loadedDraftIdRef = useRef<Id<"stores"> | null>(null);
   const handledMissingDraftRef = useRef(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -280,7 +280,7 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
     try {
       const uploadedArtworks = await prepareUploadedArtworks();
 
-      const result = await createOrganizationWithStore({
+      const result = await finalizeStoreMutation({
         storeId: storeId ?? undefined,
         organizationName,
         organizationSlug,

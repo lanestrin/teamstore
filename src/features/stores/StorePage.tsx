@@ -90,12 +90,12 @@ export default function StorePage() {
 
   const isDemoRoute = organizationSlug === "demo";
   const liveStore = useQuery(
-    api.organizations.getActiveStoreBySlugs,
+    api.stores.getActiveStoreBySlugs,
     organizationSlug && storeSlug && !isDemoRoute
       ? {
-        organizationSlug,
-        storeSlug,
-      }
+          organizationSlug,
+          storeSlug,
+        }
       : "skip",
   );
   const demoStore = isDemoRoute ? getDemoStore(storeSlug) : null;
