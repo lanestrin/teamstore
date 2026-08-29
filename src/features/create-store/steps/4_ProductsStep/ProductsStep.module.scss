@@ -49,7 +49,7 @@
   text-align: left;
 }
 
-.emptyState>svg {
+.emptyState > svg {
   flex: 0 0 auto;
 
   width: 28px;
@@ -168,7 +168,7 @@
   border-radius: $radius-lg;
 }
 
-.requiredItemsDeadline>div {
+.requiredItemsDeadline > div {
   max-width: 560px;
 }
 
@@ -242,15 +242,15 @@
     gap: $space-1;
   }
 
-    .requiredItemsDeadline {
-      align-items: stretch;
-      flex-direction: column;
-  
-      padding: $space-4;
-    }
-  
-    .requiredItemsDeadlineField {
-      width: 100%;
-      min-width: 0;
-    }
+  .requiredItemsDeadline {
+    align-items: stretch;
+    flex-direction: column;
+
+    padding: $space-4;
+  }
+
+  .requiredItemsDeadlineField {
+    width: 100%;
+    min-width: 0;
+  }
 }

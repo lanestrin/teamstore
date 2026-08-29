@@ -1,121 +1,121 @@
 .field {
-    min-width: 0;
-    padding: 0;
-    margin: 0;
-    border: 0;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
 }
 
 .field legend {
-    padding: 0;
-    margin-bottom: $space-3;
-    font-weight: $font-semibold;
-    color: $text-primary;
+  padding: 0;
+  margin-bottom: $space-3;
+  font-weight: $font-semibold;
+  color: $text-primary;
 }
 
 .required {
-    margin-left: $space-1;
-    color: $error;
+  margin-left: $space-1;
+  color: $error;
 }
 
 .options {
-    display: flex;
-    flex-direction: column;
-    gap: $space-3;
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
 }
 
 .option {
-    display: flex;
-    align-items: center;
-    gap: $space-3;
-    width: fit-content;
-    cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  width: fit-content;
+  cursor: pointer;
 }
 
 .radio {
-    flex: 0 0 auto;
-    width: 18px;
-    height: 18px;
-    margin: 0;
-    accent-color: $brand-red;
-    cursor: pointer;
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: $brand-red;
+  cursor: pointer;
 }
 
 .title {
-    display: flex;
-    align-items: center;
-    gap: $space-2;
+  display: flex;
+  align-items: center;
+  gap: $space-2;
 }
 
 .title strong {
-    color: $text-primary;
-    font-size: 0.9375rem;
-    font-weight: $font-semibold;
+  color: $text-primary;
+  font-size: 0.9375rem;
+  font-weight: $font-semibold;
 }
 
 .help {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: $text-muted;
-    cursor: help;
-    transition: color $transition-fast;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: $text-muted;
+  cursor: help;
+  transition: color $transition-fast;
 
-    svg {
-        width: 17px;
-        height: 17px;
-    }
+  svg {
+    width: 17px;
+    height: 17px;
+  }
 
-    &:hover {
-        color: $brand-red;
-    }
+  &:hover {
+    color: $brand-red;
+  }
 
-    &:focus-visible {
-        color: $brand-red;
-        outline: 2px solid rgba($brand-red, 0.25);
-        outline-offset: 2px;
-        border-radius: $radius-round;
-    }
+  &:focus-visible {
+    color: $brand-red;
+    outline: 2px solid rgba($brand-red, 0.25);
+    outline-offset: 2px;
+    border-radius: $radius-round;
+  }
 }
 
 .tooltip {
-    position: absolute;
-    z-index: $z-tooltip;
-    bottom: calc(100% + $space-2);
-    left: 50%;
-    width: 280px;
-    padding: $space-3;
-    visibility: hidden;
-    color: $white;
-    pointer-events: none;
-    background: $gray-900;
-    border-radius: $radius-md;
-    font-size: 0.8125rem;
-    font-weight: $font-regular;
-    line-height: $line-height-body;
-    opacity: 0;
-    transform: translateX(-50%);
-    transition: opacity $transition-fast;
+  position: absolute;
+  z-index: $z-tooltip;
+  bottom: calc(100% + $space-2);
+  left: 50%;
+  width: 280px;
+  padding: $space-3;
+  visibility: hidden;
+  color: $white;
+  pointer-events: none;
+  background: $gray-900;
+  border-radius: $radius-md;
+  font-size: 0.8125rem;
+  font-weight: $font-regular;
+  line-height: $line-height-body;
+  opacity: 0;
+  transform: translateX(-50%);
+  transition: opacity $transition-fast;
 }
 
 .help:hover .tooltip,
 .help:focus .tooltip {
-    visibility: visible;
-    opacity: 1;
+  visibility: visible;
+  opacity: 1;
 }
 
 .error,
 .helper {
-    margin: 0;
-    font-size: 0.875rem;
+  margin: 0;
+  font-size: 0.875rem;
 }
 
 .error {
-    margin-top: $space-2;
-    color: $error;
+  margin-top: $space-2;
+  color: $error;
 }
 
 .helper {
-    margin-top: $space-3;
-    color: $text-secondary;
+  margin-top: $space-3;
+  color: $text-secondary;
 }

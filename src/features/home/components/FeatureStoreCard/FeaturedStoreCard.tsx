@@ -10,13 +10,7 @@ interface Props {
   organizationSlug: string;
 }
 
-export default function FeaturedStoreCard({
-  logo,
-  name,
-  products,
-  slug,
-  organizationSlug,
-}: Props) {
+export default function FeaturedStoreCard({ logo, name, products, slug, organizationSlug }: Props) {
   return (
     <Link to={`/store/${organizationSlug}/${slug}`} className={styles.card}>
       <div className={styles.logo}>

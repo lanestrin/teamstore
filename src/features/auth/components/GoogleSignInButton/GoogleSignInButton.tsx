@@ -5,26 +5,14 @@ interface GoogleSignInButtonProps {
   onClick: () => void;
 }
 
-export default function GoogleSignInButton({
-  disabled = false,
-  onClick,
-}: GoogleSignInButtonProps) {
+export default function GoogleSignInButton({ disabled = false, onClick }: GoogleSignInButtonProps) {
   return (
-    <button
-      type="button"
-      className={styles.googleButton}
-      onClick={onClick}
-      disabled={disabled}
-    >
+    <button type="button" className={styles.googleButton} onClick={onClick} disabled={disabled}>
       <span className={styles.googleButtonState} />
 
       <span className={styles.googleButtonContent}>
         <span className={styles.googleButtonIcon}>
-          <svg
-            viewBox="0 0 48 48"
-            aria-hidden="true"
-            focusable="false"
-          >
+          <svg viewBox="0 0 48 48" aria-hidden="true" focusable="false">
             <path
               fill="#EA4335"
               d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"
@@ -45,9 +33,7 @@ export default function GoogleSignInButton({
           </svg>
         </span>
 
-        <span className={styles.googleButtonText}>
-          Sign in with Google
-        </span>
+        <span className={styles.googleButtonText}>Sign in with Google</span>
       </span>
     </button>
   );

@@ -123,7 +123,7 @@
   user-select: none;
 }
 
-.preview>[data-garment-artwork-preview] {
+.preview > [data-garment-artwork-preview] {
   width: 100%;
   height: 100%;
   min-height: 0;
@@ -133,7 +133,7 @@
   cursor: grabbing;
 }
 
-.preview:not([data-dragging="true"])>[data-garment-artwork-preview] {
+.preview:not([data-dragging="true"]) > [data-garment-artwork-preview] {
   cursor: grab;
 }
 
@@ -182,7 +182,7 @@
   gap: $space-3;
 }
 
-.controlGroup+.controlGroup {
+.controlGroup + .controlGroup {
   padding-top: $space-5;
   border-top: 1px solid $border-light;
 }
@@ -391,7 +391,6 @@
 }
 
 @media (max-width: 520px) {
-
   .header,
   .footer {
     padding: $space-4;
