@@ -1,4 +1,4 @@
-import { useRef, useState, type ChangeEvent } from "react";
+import { useId, useRef, useState, type ChangeEvent } from "react";
 import { LuUpload } from "react-icons/lu";
 
 import styles from "./UploadedArtCard.module.scss";
@@ -22,6 +22,14 @@ function isSupportedArtworkFile(file: File): boolean {
 export default function UploadedArtCard({ onFilesAdded }: UploadedArtCardProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const id = useId();
+  const hintId = `${id}-hint`;
+  const errorId = `${id}-error`;
+
+  function openFilePicker() {
+    inputRef.current?.click();
+  }
 
   function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
     const selectedFiles = Array.from(event.currentTarget.files ?? []);
@@ -53,6 +61,9 @@ export default function UploadedArtCard({ onFilesAdded }: UploadedArtCardProps) 
 
     setError(errors.length > 0 ? errors.join(" ") : null);
 
+    /*
+     * Allow the same file to be selected again later.
+     */
     event.currentTarget.value = "";
   }
 
@@ -65,11 +76,17 @@ export default function UploadedArtCard({ onFilesAdded }: UploadedArtCardProps) 
 
         <div>
           <h3>Upload Art</h3>
+
           <p>Upload one or more finished artwork files to use on your products.</p>
         </div>
       </div>
 
-      <button type="button" className={styles.uploadedButton} onClick={() => inputRef.current?.click()}>
+      <button
+        type="button"
+        className={styles.uploadedButton}
+        aria-describedby={error ? `${hintId} ${errorId}` : hintId}
+        onClick={openFilePicker}
+      >
         <LuUpload aria-hidden="true" />
         Choose Artwork
       </button>
@@ -83,10 +100,12 @@ export default function UploadedArtCard({ onFilesAdded }: UploadedArtCardProps) 
         onChange={handleFileChange}
       />
 
-      <p className={styles.fileHint}>PNG, JPG, or SVG · 5 MB max per file</p>
+      <p id={hintId} className={styles.fileHint}>
+        PNG, JPG, or SVG · 5 MB max per file
+      </p>
 
       {error && (
-        <p className={styles.error} role="alert">
+        <p id={errorId} className={styles.error} role="alert">
           {error}
         </p>
       )}

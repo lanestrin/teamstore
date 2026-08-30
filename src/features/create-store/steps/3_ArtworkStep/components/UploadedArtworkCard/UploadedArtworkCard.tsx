@@ -14,7 +14,7 @@ export default function UploadedArtworkCard({ fileName, previewUrl, isSelected, 
   return (
     <article className={styles.card} data-selected={isSelected}>
       <div className={styles.cardHeader}>
-        <h3>{fileName}</h3>
+        <h3 title={fileName}>{fileName}</h3>
 
         <span className={styles.uploadedBadge}>
           <LuUpload aria-hidden="true" />
@@ -22,7 +22,9 @@ export default function UploadedArtworkCard({ fileName, previewUrl, isSelected, 
         </span>
       </div>
 
-      <div className={styles.preview}>{previewUrl ? <img src={previewUrl} alt={fileName} /> : <LuFileImage aria-hidden="true" />}</div>
+      <div className={styles.preview}>
+        {previewUrl ? <img src={previewUrl} alt={`Preview of ${fileName}`} /> : <LuFileImage aria-hidden="true" />}
+      </div>
 
       <div className={styles.actions}>
         <label className={styles.checkbox}>

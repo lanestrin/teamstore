@@ -14,6 +14,15 @@ import {
 
 const MOVE_STEP = 5;
 
+const FOCUSABLE_SELECTOR = [
+  "button:not([disabled])",
+  "[href]",
+  'input:not([disabled]):not([type="hidden"])',
+  "select:not([disabled])",
+  "textarea:not([disabled])",
+  '[tabindex]:not([tabindex="-1"])',
+].join(",");
+
 interface ArtworkEditorModalProps {
   isOpen: boolean;
   svg: string;
@@ -111,6 +120,12 @@ function getElementAdjustment(adjustments: ArtworkAdjustments, elementId: string
   );
 }
 
+function getFocusableElements(container: HTMLElement): HTMLElement[] {
+  return Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
+    (element) => element.tabIndex >= 0 && element.getAttribute("aria-hidden") !== "true",
+  );
+}
+
 export default function ArtworkEditorModal(props: ArtworkEditorModalProps) {
   if (!props.isOpen) {
     return null;
@@ -120,6 +135,7 @@ export default function ArtworkEditorModal(props: ArtworkEditorModalProps) {
 }
 
 function ArtworkEditorModalContent({ svg, editableElements, adjustments, onCancel, onSave }: ArtworkEditorModalProps) {
+  const modalRef = useRef<HTMLElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const dragStateRef = useRef<DragState | null>(null);
@@ -128,26 +144,76 @@ function ArtworkEditorModalContent({ svg, editableElements, adjustments, onCance
 
   const [selectedElementId, setSelectedElementId] = useState<string | null>(() => editableElements[0]?.id ?? null);
 
+  /*
+   * Lock the document while the modal is open, move focus into
+   * the dialog, and restore focus to the control that opened it
+   * when the modal closes.
+   */
   useEffect(() => {
+    const previouslyFocusedElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+
     const previousOverflow = document.body.style.overflow;
 
     document.body.style.overflow = "hidden";
 
-    requestAnimationFrame(() => {
+    const animationFrame = requestAnimationFrame(() => {
       closeButtonRef.current?.focus();
     });
 
     return () => {
+      cancelAnimationFrame(animationFrame);
+
       document.body.style.overflow = previousOverflow;
+
+      requestAnimationFrame(() => {
+        if (previouslyFocusedElement && previouslyFocusedElement.isConnected) {
+          previouslyFocusedElement.focus();
+        }
+      });
     };
   }, []);
 
+  /*
+   * Keep keyboard focus inside the modal and allow Escape to
+   * close it.
+   */
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
+    function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
+        event.preventDefault();
         onCancel();
+        return;
       }
-    };
+
+      if (event.key !== "Tab" || !modalRef.current) {
+        return;
+      }
+
+      const focusableElements = getFocusableElements(modalRef.current);
+
+      if (focusableElements.length === 0) {
+        event.preventDefault();
+        return;
+      }
+
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+      const activeElement = document.activeElement;
+
+      if (event.shiftKey) {
+        if (activeElement === firstElement || !modalRef.current.contains(activeElement)) {
+          event.preventDefault();
+          lastElement.focus();
+        }
+
+        return;
+      }
+
+      if (activeElement === lastElement) {
+        event.preventDefault();
+        firstElement.focus();
+      }
+    }
 
     window.addEventListener("keydown", handleKeyDown);
 
@@ -170,7 +236,7 @@ function ArtworkEditorModalContent({ svg, editableElements, adjustments, onCance
     [svg, editableElements, draftAdjustments, selectedElementId],
   );
 
-  const updateSelectedAdjustment = (deltaX: number, deltaY: number) => {
+  function updateSelectedAdjustment(deltaX: number, deltaY: number) {
     if (!selectedElement) {
       return;
     }
@@ -191,9 +257,9 @@ function ArtworkEditorModalContent({ svg, editableElements, adjustments, onCance
         [selectedElement.id]: nextAdjustment,
       };
     });
-  };
+  }
 
-  const resetSelectedAdjustment = () => {
+  function resetSelectedAdjustment() {
     if (!selectedElementId) {
       return;
     }
@@ -207,13 +273,13 @@ function ArtworkEditorModalContent({ svg, editableElements, adjustments, onCance
 
       return next;
     });
-  };
+  }
 
-  const resetAllAdjustments = () => {
+  function resetAllAdjustments() {
     setDraftAdjustments({});
-  };
+  }
 
-  const handlePreviewPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+  function handlePreviewPointerDown(event: ReactPointerEvent<HTMLDivElement>) {
     const target = event.target;
 
     if (!(target instanceof Element)) {
@@ -266,9 +332,9 @@ function ArtworkEditorModalContent({ svg, editableElements, adjustments, onCance
     event.currentTarget.setPointerCapture(event.pointerId);
 
     event.preventDefault();
-  };
+  }
 
-  const handlePreviewPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+  function handlePreviewPointerMove(event: ReactPointerEvent<HTMLDivElement>) {
     const dragState = dragStateRef.current;
 
     if (!dragState || dragState.pointerId !== event.pointerId) {
@@ -305,9 +371,9 @@ function ArtworkEditorModalContent({ svg, editableElements, adjustments, onCance
       ...current,
       [dragState.elementId]: nextAdjustment,
     }));
-  };
+  }
 
-  const finishDragging = (event: ReactPointerEvent<HTMLDivElement>) => {
+  function finishDragging(event: ReactPointerEvent<HTMLDivElement>) {
     if (dragStateRef.current?.pointerId !== event.pointerId) {
       return;
     }
@@ -317,7 +383,7 @@ function ArtworkEditorModalContent({ svg, editableElements, adjustments, onCance
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
-  };
+  }
 
   const canMoveHorizontally = selectedElement?.movement === "horizontal" || selectedElement?.movement === "both";
 
@@ -326,18 +392,25 @@ function ArtworkEditorModalContent({ svg, editableElements, adjustments, onCance
   return createPortal(
     <div
       className={styles.overlay}
-      onMouseDown={(event) => {
+      onPointerDown={(event) => {
         if (event.target === event.currentTarget) {
           onCancel();
         }
       }}
     >
-      <section className={styles.modal} role="dialog" aria-modal="true" aria-labelledby="artwork-editor-title">
+      <section
+        ref={modalRef}
+        className={styles.modal}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="artwork-editor-title"
+        aria-describedby="artwork-editor-description"
+      >
         <header className={styles.header}>
           <div>
             <h2 id="artwork-editor-title">Edit Artwork</h2>
 
-            <p>Select an element, then drag it or use the movement controls.</p>
+            <p id="artwork-editor-description">Select an element, then drag it or use the movement controls.</p>
           </div>
 
           <button ref={closeButtonRef} type="button" className={styles.close} aria-label="Close artwork editor" onClick={onCancel}>
@@ -349,41 +422,51 @@ function ArtworkEditorModalContent({ svg, editableElements, adjustments, onCance
           <div
             ref={previewRef}
             className={styles.canvas}
+            role="group"
+            aria-label="Artwork preview. Select an editable element by clicking or tapping it, or use the element controls."
             onPointerDown={handlePreviewPointerDown}
             onPointerMove={handlePreviewPointerMove}
             onPointerUp={finishDragging}
             onPointerCancel={finishDragging}
+            onLostPointerCapture={() => {
+              dragStateRef.current = null;
+            }}
             dangerouslySetInnerHTML={{
               __html: editorSvg,
             }}
           />
 
-          <aside className={styles.sidebar}>
+          <aside className={styles.sidebar} aria-label="Artwork editing controls">
             <div>
               <h3>Elements</h3>
             </div>
 
-            <div className={styles.elementList}>
-              {editableElements.map((element) => (
-                <button
-                  key={element.id}
-                  type="button"
-                  className={styles.elementButton}
-                  data-selected={element.id === selectedElementId}
-                  onClick={() => setSelectedElementId(element.id)}
-                >
-                  {element.label}
-                </button>
-              ))}
+            <div className={styles.elementList} role="group" aria-label="Editable artwork elements">
+              {editableElements.map((element) => {
+                const isSelected = element.id === selectedElementId;
+
+                return (
+                  <button
+                    key={element.id}
+                    type="button"
+                    className={styles.elementButton}
+                    data-selected={isSelected}
+                    aria-pressed={isSelected}
+                    onClick={() => setSelectedElementId(element.id)}
+                  >
+                    {element.label}
+                  </button>
+                );
+              })}
             </div>
 
-            <div>
+            <div className={styles.selectedElement}>
               <h3>{selectedElement?.label ?? "Select an element"}</h3>
 
-              {selectedElement?.movement === "none" && <p className={styles.position}>This element is locked.</p>}
+              {selectedElement?.movement === "none" && <p className={styles.lockedMessage}>This element is locked.</p>}
             </div>
 
-            <div className={styles.movement}>
+            <div className={styles.movement} role="group" aria-label="Move selected artwork element">
               <button
                 type="button"
                 className={`${styles.moveButton} ${styles.moveUp}`}

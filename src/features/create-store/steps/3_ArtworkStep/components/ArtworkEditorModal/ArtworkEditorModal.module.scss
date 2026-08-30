@@ -1,171 +1,377 @@
+@use "../../../../../../styles/variables" as *;
+
+/* ==========================================================================
+   Overlay / modal shell
+   ========================================================================== */
+
 .overlay {
   position: fixed;
+  z-index: $z-modal;
   inset: 0;
-  z-index: 1000;
+
   display: grid;
   place-items: center;
-  padding: 24px;
+
+  padding: $space-5;
+
   background: rgb(15 23 42 / 72%);
 }
 
 .modal {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
+
   width: min(1180px, 100%);
   height: min(820px, calc(100vh - 48px));
+
   overflow: hidden;
-  border-radius: 16px;
-  background: #fff;
+
+  background: $white;
+  border-radius: $radius-xl;
+
   box-shadow: 0 24px 80px rgb(0 0 0 / 30%);
 }
 
-.header,
-.footer {
+/* ==========================================================================
+   Header
+   ========================================================================== */
+
+.header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 18px 22px;
-  border-color: #e5e7eb;
+  gap: $space-4;
+
+  min-width: 0;
+  padding: $space-4 $space-5;
+
+  background: $white;
+  border-bottom: 1px solid $border-light;
 }
 
-.header {
-  border-bottom: 1px solid #e5e7eb;
-
-  h2,
-  p {
-    margin: 0;
-  }
-
-  p {
-    margin-top: 4px;
-    color: #64748b;
-    font-size: 14px;
-  }
+.header>div {
+  min-width: 0;
 }
 
-.footer {
-  justify-content: flex-end;
-  border-top: 1px solid #e5e7eb;
+.header h2,
+.header p {
+  margin: 0;
 }
 
-.close,
-.button,
-.moveButton,
-.elementButton {
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  background: #fff;
-  color: #111827;
-  cursor: pointer;
-  font: inherit;
+.header h2 {
+  color: $text-primary;
+
+  font-size: 1.25rem;
+  font-weight: $font-bold;
+  line-height: 1.2;
+}
+
+.header p {
+  margin-top: $space-1;
+
+  color: $text-secondary;
+
+  font-size: 0.875rem;
+  line-height: $line-height-body;
 }
 
 .close {
   display: grid;
-  width: 40px;
-  height: 40px;
   flex: 0 0 auto;
   place-items: center;
+
+  width: 44px;
+  height: 44px;
+  padding: 0;
+
+  background: $white;
+  border: 1px solid $border-medium;
+  border-radius: $radius-lg;
+
+  color: $text-primary;
+
+  cursor: pointer;
+
+  transition:
+    background-color $transition-fast,
+    border-color $transition-fast,
+    box-shadow $transition-fast;
 }
+
+.close svg {
+  width: 20px;
+  height: 20px;
+}
+
+.close:focus-visible {
+  outline: none;
+
+  border-color: $brand-red;
+  box-shadow: 0 0 0 3px rgba($brand-red, 0.15);
+}
+
+/* ==========================================================================
+   Main editor body
+   ========================================================================== */
 
 .body {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 280px;
+  grid-template-columns: minmax(0, 1fr) 300px;
+
+  min-width: 0;
   min-height: 0;
+
+  overflow: hidden;
 }
+
+/* ==========================================================================
+   Artwork canvas
+   ========================================================================== */
 
 .canvas {
   display: grid;
+  place-items: center;
+
   min-width: 0;
   min-height: 0;
-  padding: 28px;
-  place-items: center;
+  padding: $space-6;
+
   overflow: hidden;
+
   background:
-    linear-gradient(45deg, #eceff3 25%, transparent 25%), linear-gradient(-45deg, #eceff3 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #eceff3 75%), linear-gradient(-45deg, transparent 75%, #eceff3 75%);
+    linear-gradient(45deg,
+      #eceff3 25%,
+      transparent 25%),
+    linear-gradient(-45deg,
+      #eceff3 25%,
+      transparent 25%),
+    linear-gradient(45deg,
+      transparent 75%,
+      #eceff3 75%),
+    linear-gradient(-45deg,
+      transparent 75%,
+      #eceff3 75%);
+
   background-position:
     0 0,
     0 10px,
     10px -10px,
     -10px 0;
+
   background-size: 20px 20px;
+
+  /*
+   * Dragging artwork uses Pointer Events.
+   * Arrow controls remain available as the non-drag alternative.
+   */
   touch-action: none;
   user-select: none;
-
-  svg {
-    display: block;
-    width: min(72%, 620px);
-    height: auto;
-    max-width: 100%;
-    max-height: 82%;
-    overflow: visible;
-  }
-
-  [data-artwork-editor-element] {
-    cursor: grab;
-  }
-
-  [data-artwork-editor-movement="none"] {
-    cursor: default;
-  }
-
-  [data-artwork-editor-selected="true"] {
-    filter: drop-shadow(2px 0 0 #2563eb) drop-shadow(-2px 0 0 #2563eb) drop-shadow(0 2px 0 #2563eb) drop-shadow(0 -2px 0 #2563eb);
-  }
 }
+
+.canvas svg {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+  max-width: 760px;
+  max-height: 640px;
+
+  overflow: visible;
+}
+
+.canvas [data-artwork-editor-element] {
+  cursor: grab;
+}
+
+.canvas [data-artwork-editor-movement="none"] {
+  cursor: default;
+}
+
+.canvas [data-artwork-editor-selected="true"] {
+  filter:
+    drop-shadow(2px 0 0 #2563eb) drop-shadow(-2px 0 0 #2563eb) drop-shadow(0 2px 0 #2563eb) drop-shadow(0 -2px 0 #2563eb);
+}
+
+/* ==========================================================================
+   Editing sidebar
+   ========================================================================== */
 
 .sidebar {
-  display: grid;
-  align-content: start;
-  gap: 20px;
-  padding: 22px;
-  overflow-y: auto;
-  border-left: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  gap: $space-5;
 
-  h3,
-  p {
-    margin: 0;
-  }
+  min-width: 0;
+  min-height: 0;
+  padding: $space-5;
+
+  overflow-y: auto;
+
+  background: $white;
+  border-left: 1px solid $border-light;
 }
+
+.sidebar h3,
+.sidebar p {
+  margin: 0;
+}
+
+.sidebar h3 {
+  color: $text-primary;
+
+  font-size: 0.95rem;
+  font-weight: $font-bold;
+  line-height: 1.3;
+}
+
+/* ==========================================================================
+   Element list
+   ========================================================================== */
 
 .elementList {
   display: grid;
-  gap: 8px;
+  gap: $space-2;
 }
 
 .elementButton {
-  padding: 10px 12px;
+  width: 100%;
+  min-height: 44px;
+  padding: $space-2 $space-3;
+
+  background: $white;
+  border: 1px solid $border-medium;
+  border-radius: $radius-md;
+
+  color: $text-primary;
+
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: $font-semibold;
+  line-height: 1.3;
   text-align: left;
 
-  &[data-selected="true"] {
-    border-color: #2563eb;
-    background: #eff6ff;
-    color: #1d4ed8;
-  }
+  cursor: pointer;
+
+  transition:
+    background-color $transition-fast,
+    border-color $transition-fast,
+    box-shadow $transition-fast;
 }
+
+.elementButton[data-selected="true"] {
+  border-color: $brand-red;
+  background: rgba($brand-red, 0.06);
+  color: $brand-red;
+}
+
+.elementButton:focus-visible {
+  outline: none;
+
+  border-color: $brand-red;
+  box-shadow: 0 0 0 3px rgba($brand-red, 0.14);
+}
+
+/* ==========================================================================
+   Selected element
+   ========================================================================== */
+
+.selectedElement {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-3;
+
+  width: 100%;
+  min-width: 0;
+  padding: $space-3 $space-4;
+
+  background: $gray-50;
+  border: 1px solid $border-light;
+  border-radius: $radius-md;
+}
+
+.selectedElement h3 {
+  min-width: 0;
+  margin: 0;
+
+  color: $text-primary;
+
+  font-size: 0.875rem;
+  font-weight: $font-semibold;
+  line-height: 1.4;
+}
+
+.lockedMessage {
+  flex: 0 0 auto;
+
+  margin: 0;
+
+  color: $text-secondary;
+
+  font-size: 0.75rem;
+  line-height: 1.4;
+  text-align: right;
+
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   Movement controls
+   ========================================================================== */
 
 .movement {
   display: grid;
-  grid-template-columns: repeat(3, 44px);
-  grid-template-rows: repeat(3, 44px);
+  grid-template-columns: repeat(3, 48px);
+  grid-template-rows: repeat(3, 48px);
   justify-content: center;
-  gap: 6px;
+  gap: $space-2;
+
+  width: fit-content;
+  margin-inline: auto;
 }
 
 .moveButton {
   display: grid;
   place-items: center;
 
-  &:disabled {
-    cursor: not-allowed;
-    opacity: 0.4;
-  }
+  width: 48px;
+  height: 48px;
+  padding: 0;
+
+  background: $white;
+  border: 1px solid $border-medium;
+  border-radius: $radius-md;
+
+  color: $text-primary;
+
+  cursor: pointer;
+
+  transition:
+    background-color $transition-fast,
+    border-color $transition-fast,
+    box-shadow $transition-fast;
+}
+
+.moveButton svg {
+  width: 19px;
+  height: 19px;
+}
+
+.moveButton:focus-visible {
+  outline: none;
+
+  border-color: $brand-red;
+  box-shadow: 0 0 0 3px rgba($brand-red, 0.14);
+}
+
+.moveButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
 }
 
 .moveUp {
   grid-column: 2;
+  grid-row: 1;
 }
 
 .moveLeft {
@@ -189,51 +395,313 @@
 }
 
 .position {
-  color: #64748b;
-  font-size: 13px;
+  color: $text-secondary;
+
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+  font-size: 0.75rem;
+  line-height: 1.5;
   text-align: center;
 }
 
-.button {
-  min-height: 42px;
-  padding: 0 16px;
-  font-weight: 700;
+/* ==========================================================================
+   Shared editor buttons
+   ========================================================================== */
 
-  &:disabled {
-    cursor: not-allowed;
-    opacity: 0.4;
-  }
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 44px;
+  padding: 0 $space-4;
+
+  background: $white;
+  border: 1px solid $border-medium;
+  border-radius: $radius-lg;
+
+  color: $text-primary;
+
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: $font-bold;
+
+  cursor: pointer;
+
+  transition:
+    background-color $transition-fast,
+    border-color $transition-fast,
+    box-shadow $transition-fast;
+}
+
+.button:focus-visible {
+  outline: none;
+
+  border-color: $brand-red;
+  box-shadow: 0 0 0 3px rgba($brand-red, 0.14);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
 }
 
 .primaryButton {
-  border-color: #111827;
-  background: #111827;
-  color: #fff;
+  background: $brand-red;
+  border-color: $brand-red;
+  color: $white;
 }
 
 .resetAll {
   width: 100%;
 }
 
-@media (max-width: 760px) {
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: $space-3;
+
+  min-width: 0;
+  padding: $space-4 $space-5;
+
+  background: $white;
+  border-top: 1px solid $border-light;
+}
+
+/* ==========================================================================
+   Hover-capable devices
+   ========================================================================== */
+
+@media (hover: hover) and (pointer: fine) {
+
+  .close:hover,
+  .elementButton:hover,
+  .moveButton:not(:disabled):hover,
+  .button:not(.primaryButton):not(:disabled):hover {
+    background: $gray-50;
+    border-color: $gray-400;
+  }
+
+  .primaryButton:hover {
+    filter: brightness(0.94);
+  }
+
+  .canvas [data-artwork-editor-element]:hover {
+    filter: drop-shadow(0 0 6px rgb(37 99 235 / 55%));
+  }
+
+  .canvas [data-artwork-editor-selected="true"]:hover {
+    filter:
+      drop-shadow(2px 0 0 #2563eb) drop-shadow(-2px 0 0 #2563eb) drop-shadow(0 2px 0 #2563eb) drop-shadow(0 -2px 0 #2563eb);
+  }
+}
+
+/* ==========================================================================
+   Tablet
+   ========================================================================== */
+
+@media (max-width: 900px) {
+  .overlay {
+    padding: $space-3;
+  }
+
+  .modal {
+    width: min(760px, 100%);
+    height: calc(100vh - 24px);
+  }
+
+  .body {
+    display: grid;
+    grid-template-rows: 260px minmax(0, 1fr);
+    grid-template-columns: 1fr;
+
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .canvas {
+    min-height: 0;
+    padding: $space-4;
+
+    overflow: hidden;
+
+    border-bottom: 1px solid $border-light;
+  }
+
+  .canvas svg {
+    width: 100%;
+    height: 100%;
+
+    max-width: 520px;
+    max-height: 100%;
+  }
+
+  .sidebar {
+    min-height: 0;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    border-top: 0;
+    border-left: 0;
+  }
+
+  .elementList {
+    grid-template-columns: repeat(auto-fit,
+        minmax(140px, 1fr));
+  }
+}
+
+/* ==========================================================================
+   Mobile
+   ========================================================================== */
+
+@media (max-width: 640px) {
   .overlay {
     padding: 0;
   }
 
   .modal {
     width: 100%;
-    height: 100%;
+    height: 100vh;
+
     border-radius: 0;
   }
 
+  @supports (height: 100dvh) {
+    .modal {
+      height: 100dvh;
+    }
+  }
+
+  .header {
+    padding: $space-3 $space-4;
+  }
+
+  .header h2 {
+    font-size: 1.125rem;
+  }
+
+  .header p {
+    font-size: 0.8125rem;
+  }
+
   .body {
-    grid-template-columns: 1fr;
-    grid-template-rows: minmax(320px, 1fr) auto;
+    grid-template-rows: 220px minmax(0, 1fr);
+  }
+
+  .canvas {
+    min-height: 0;
+    padding: $space-3;
+  }
+
+  .canvas svg {
+    width: 100%;
+    height: 100%;
+
+    max-width: 360px;
+    max-height: 100%;
   }
 
   .sidebar {
-    max-height: 320px;
-    border-top: 1px solid #e5e7eb;
-    border-left: 0;
+    gap: $space-4;
+    padding: $space-4;
+  }
+
+  .elementList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-2;
+  }
+
+  .elementButton {
+    width: auto;
+    flex: 1 1 140px;
+
+    text-align: center;
+  }
+
+  .footer {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    padding: $space-3 $space-4;
+  }
+
+  .footer .button {
+    width: 100%;
+  }
+}
+
+/* ==========================================================================
+   Small phones
+   ========================================================================== */
+
+@media (max-width: 420px) {
+  .header {
+    gap: $space-3;
+  }
+
+  .header p {
+    display: none;
+  }
+
+  .body {
+    grid-template-rows: 190px minmax(0, 1fr);
+  }
+
+  .canvas {
+    padding: $space-2;
+  }
+
+  .canvas svg {
+    max-width: 300px;
+  }
+
+  .movement {
+    grid-template-columns: repeat(3, 52px);
+    grid-template-rows: repeat(3, 52px);
+  }
+
+  .moveButton {
+    width: 52px;
+    height: 52px;
+  }
+
+  .elementButton {
+    flex-basis: 100%;
+  }
+
+  .footer {
+    gap: $space-2;
+  }
+
+  .footer .button {
+    padding-inline: $space-3;
+    font-size: 0.8125rem;
+  }
+}
+
+/* ==========================================================================
+   Reduced motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .close,
+  .elementButton,
+  .moveButton,
+  .button {
+    transition: none;
   }
 }
