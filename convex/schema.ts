@@ -25,6 +25,17 @@ const storeUploadedArtwork = v.object({
   isSelected: v.boolean(),
 });
 
+const storeArtworkSnapshot = v.object({
+  artworkTemplateId: v.string(),
+  svg: v.string(),
+});
+
+const storeProductArtworkPlacement = v.object({
+  x: v.number(),
+  y: v.number(),
+  width: v.number(),
+});
+
 const productStatus = v.union(v.literal("draft"), v.literal("active"), v.literal("archived"));
 
 const productColorFamily = v.union(
@@ -183,10 +194,15 @@ export default defineSchema({
     description: v.optional(v.string()),
     logoStorageId: v.optional(v.id("_storage")),
     bannerStorageId: v.optional(v.id("_storage")),
+
     uploadedArtworks: v.optional(v.array(storeUploadedArtwork)),
+
+    artworkSnapshots: v.optional(v.array(storeArtworkSnapshot)),
+
     primaryColor: v.optional(v.string()),
     secondaryColor: v.optional(v.string()),
     requiredItemsDeadline: v.optional(v.string()),
+
     currentStep: v.number(),
     status: storeStatus,
     createdAt: v.number(),
@@ -241,6 +257,8 @@ export default defineSchema({
 
     colorKey: v.string(),
     artworkTemplateId: v.string(),
+
+    artworkPlacement: v.optional(storeProductArtworkPlacement),
 
     isRequired: v.boolean(),
     sortOrder: v.number(),
@@ -301,11 +319,16 @@ export default defineSchema({
     view: productImageView,
     providerView: v.optional(v.string()),
     sortOrder: v.number(),
+
     source: v.optional(v.union(v.literal("csv-main"), v.literal("verified-derived"), v.literal("manual-upload"))),
+
     imageStorageId: v.optional(v.id("_storage")),
+
     externalImageUrl: v.optional(v.string()),
     altText: v.optional(v.string()),
+
     decorationPreviewBounds: v.optional(decorationPreviewBounds),
+
     createdAt: v.number(),
     updatedAt: v.number(),
   })
@@ -326,14 +349,18 @@ export default defineSchema({
     size: v.string(),
     provider: v.optional(v.string()),
     providerVariantId: v.optional(v.string()),
+
     baseCostInCents: v.number(),
     directPriceInCents: v.number(),
     compareAtPriceInCents: v.optional(v.number()),
     currency: v.string(),
+
     weight: v.optional(v.number()),
     weightUnit: v.optional(v.string()),
+
     availability: variantAvailability,
     status: variantStatus,
+
     createdAt: v.number(),
     updatedAt: v.number(),
   })

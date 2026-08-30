@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { LuCheck } from "react-icons/lu";
 import { Link } from "react-router-dom";
 
@@ -25,11 +25,18 @@ export interface ProductCardData {
   availableSizeCount?: number;
 }
 
+interface ProductCardPreview {
+  imageUrl: string;
+  alt: string;
+}
+
 interface ProductCardProps {
   product: ProductCardData;
   preferredColorFamily?: string | null;
   showDeadline?: boolean;
   showRequiredStatus?: boolean;
+
+  renderPreview?: (preview: ProductCardPreview) => ReactNode;
 }
 
 export default function ProductCard({
@@ -37,6 +44,7 @@ export default function ProductCard({
   preferredColorFamily = null,
   showDeadline = false,
   showRequiredStatus = false,
+  renderPreview,
 }: ProductCardProps) {
   const colorOptions = useMemo(() => product.colorOptions ?? [], [product.colorOptions]);
 
@@ -49,6 +57,7 @@ export default function ProductCard({
   }, [colorOptions, preferredColorFamily]);
 
   const firstColorKey = colorOptions[0]?.colorKey ?? null;
+
   const preferredColorKey = preferredColorOption?.colorKey ?? null;
 
   const [manualColorSelection, setManualColorSelection] = useState<{
@@ -83,6 +92,11 @@ export default function ProductCard({
 
   const previewImageAlt = selectedColorOption ? `${product.name} in ${selectedColorOption.color}` : product.name;
 
+  const preview = {
+    imageUrl: previewImageUrl,
+    alt: previewImageAlt,
+  };
+
   return (
     <article className={styles.card}>
       {showRequiredStatus && (
@@ -95,7 +109,7 @@ export default function ProductCard({
 
       <Link to={product.productUrl} className={styles.cardLink} aria-label={`View ${product.name}`}>
         <div className={styles.imageWrapper}>
-          <img src={previewImageUrl} alt={previewImageAlt} loading="lazy" />
+          {renderPreview ? renderPreview(preview) : <img src={preview.imageUrl} alt={preview.alt} loading="lazy" />}
         </div>
 
         <div className={styles.content}>

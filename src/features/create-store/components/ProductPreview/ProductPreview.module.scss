@@ -31,12 +31,15 @@
 
 .products {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: $space-4;
+  align-items: start;
 }
 
 .productCard {
+  min-width: 0;
   padding: $space-3;
+  overflow: hidden;
   background: $white;
   border: 1px solid $border-light;
   border-radius: $radius-md;
@@ -50,11 +53,103 @@
   box-shadow: $shadow-md;
 }
 
-.productImage {
-  margin-bottom: $space-3;
+/*
+ * Every product gets the same square media area.
+ *
+ * This applies to:
+ * - normal product images
+ * - skeleton images
+ * - GarmentArtworkPreview
+ *
+ * GarmentArtworkPreview previously used its own natural image
+ * dimensions here, which caused tall products such as pants to
+ * stretch the entire card.
+ */
+.productImage,
+.productCard>[data-garment-artwork-preview] {
+  display: block;
+  width: 100%;
   aspect-ratio: 1;
+  margin-bottom: $space-3;
+  overflow: hidden;
   border-radius: $radius-sm;
-  background: linear-gradient(135deg, $gray-200, $gray-100);
+  background: $gray-100;
+}
+
+/*
+ * Regular catalog image.
+ */
+.productImage {
+  object-fit: contain;
+}
+
+/*
+ * Force the reusable garment/artwork renderer to behave like
+ * the regular storefront image area.
+ */
+.productCard>[data-garment-artwork-preview] {
+  position: relative;
+  height: auto;
+  min-height: 0;
+}
+
+/*
+ * GarmentArtworkPreview contains its own garment <img>.
+ * It must fill the square preview without changing the
+ * container height.
+ */
+.productCard>[data-garment-artwork-preview]>img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.productImagePlaceholder {
+  display: flex;
+  width: 100%;
+  aspect-ratio: 1;
+  margin-bottom: $space-3;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: $radius-sm;
+  background: $gray-100;
+  color: $gray-500;
+  font-size: 0.75rem;
+  font-weight: $font-medium;
+}
+
+.productName {
+  overflow: hidden;
+  margin: 0 0 $space-2;
+  color: $gray-900;
+  font-size: 0.85rem;
+  font-weight: $font-semibold;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.productPrice {
+  display: block;
+  margin-bottom: $space-2;
+  color: $gray-900;
+  font-size: 0.9rem;
+  font-weight: $font-bold;
+}
+
+.productStatus {
+  display: inline-flex;
+  padding: 0.2rem 0.45rem;
+  align-items: center;
+  border-radius: 999px;
+  background: $gray-100;
+  color: $gray-600;
+  font-size: 0.65rem;
+  font-weight: $font-semibold;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
 }
 
 .productTitleSkeleton {
@@ -71,4 +166,24 @@
 .productStatusSkeleton {
   width: 55%;
   height: 14px;
+}
+
+@media (max-width: 900px) {
+  .products {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .productSection {
+    padding: $space-4;
+  }
+
+  .products {
+    gap: $space-3;
+  }
+
+  .sectionHeader h4 {
+    font-size: 1.2rem;
+  }
 }

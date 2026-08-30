@@ -4,7 +4,6 @@ import { LuCheck, LuLogOut } from "react-icons/lu";
 import { images } from "../../../../assets/images";
 
 import styles from "./ProgressSidebar.module.scss";
-import ComingSoonBadge from "../../../../components/coming-soon-badge/ComingSoonBadge";
 
 interface ProgressSidebarProps {
   currentStep: number;
@@ -15,7 +14,6 @@ interface ProgressSidebarProps {
 
   onStepChange: (step: number) => void;
   onSaveAndExit: () => Promise<void>;
-  onCreateStore: () => Promise<void>;
 }
 
 const steps = [
@@ -38,7 +36,6 @@ const steps = [
   {
     title: "Review",
     description: "Review and publish",
-    comingSoon: true,
   },
 ];
 
@@ -49,7 +46,6 @@ export default function ProgressSidebar({
   isFinalizing,
   onStepChange,
   onSaveAndExit,
-  onCreateStore,
 }: ProgressSidebarProps) {
   const isWorking = isSaving || isFinalizing;
 
@@ -74,11 +70,7 @@ export default function ProgressSidebar({
           const isActive = stepNumber === currentStep;
           const isComplete = stepNumber < furthestStepReached;
 
-          /*
-           * Review is not implemented yet, so only
-           * Steps 1–4 can be used for sidebar navigation.
-           */
-          const canNavigate = stepNumber <= furthestStepReached && stepNumber <= 4 && !isWorking;
+          const canNavigate = stepNumber <= furthestStepReached && !isWorking;
 
           return (
             <button
@@ -98,8 +90,6 @@ export default function ProgressSidebar({
               <div className={styles.content}>
                 <div className={styles.stepTitle}>
                   <h3>{step.title}</h3>
-
-                  {step.comingSoon && <ComingSoonBadge />}
                 </div>
 
                 <p>{step.description}</p>
@@ -119,12 +109,6 @@ export default function ProgressSidebar({
             <small>Save your progress and return later</small>
           </div>
         </button>
-
-        {currentStep === 5 && (
-          <button type="button" className={styles.createButton} onClick={() => void onCreateStore()} disabled={isWorking}>
-            {isFinalizing ? "Creating Store..." : "Create Store"}
-          </button>
-        )}
       </div>
     </aside>
   );

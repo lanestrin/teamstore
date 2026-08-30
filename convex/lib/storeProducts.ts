@@ -5,11 +5,18 @@ import type { MutationCtx } from "../_generated/server";
 
 const MAX_STORE_PRODUCTS = 50;
 
+export const storeProductArtworkPlacement = v.object({
+  x: v.number(),
+  y: v.number(),
+  width: v.number(),
+});
+
 export const storeProductSelection = v.object({
   productId: v.id("products"),
   colorKey: v.string(),
   artworkTemplateId: v.string(),
   isRequired: v.boolean(),
+  artworkPlacement: v.optional(storeProductArtworkPlacement),
 });
 
 export type StoreProductSelectionInput = Infer<typeof storeProductSelection>;
@@ -19,11 +26,26 @@ export interface ResolvedStoreProductSelection {
   colorKey: string;
   artworkTemplateId: string;
   isRequired: boolean;
+  artworkPlacement?: {
+    x: number;
+    y: number;
+    width: number;
+  };
   sortOrder: number;
 }
 
+function createSelectionKey(selection: StoreProductSelectionInput): string {
+  return JSON.stringify([selection.productId, selection.colorKey.trim(), selection.artworkTemplateId.trim()]);
+}
+
 /**
- * Validates the basic structure of selected store products.
+ * Validates and normalizes selected store products.
+ *
+ * A product may appear more than once when it uses a different
+ * color or artwork combination.
+ *
+ * Only an exact product + color + artwork combination is treated
+ * as a duplicate.
  *
  * Final store creation requires at least one selection.
  * Drafts may temporarily contain no selected products.
@@ -37,16 +59,36 @@ function normalizeStoreProductSelections(selections: StoreProductSelectionInput[
     throw new ConvexError(`A store can contain a maximum of ${MAX_STORE_PRODUCTS} products during setup.`);
   }
 
-  const seenProductIds = new Set<Id<"products">>();
+  const seenSelections = new Set<string>();
 
   return selections.map((selection) => {
-    if (seenProductIds.has(selection.productId)) {
-      throw new ConvexError(`Product ${selection.productId} was selected more than once.`);
+    const colorKey = selection.colorKey.trim();
+
+    const artworkTemplateId = selection.artworkTemplateId.trim();
+
+    if (!colorKey) {
+      throw new ConvexError("A color is required for every selected product.");
     }
 
-    seenProductIds.add(selection.productId);
+    if (!artworkTemplateId) {
+      throw new ConvexError("Artwork is required for every selected product.");
+    }
 
-    return selection;
+    const normalizedSelection = {
+      ...selection,
+      colorKey,
+      artworkTemplateId,
+    };
+
+    const selectionKey = createSelectionKey(normalizedSelection);
+
+    if (seenSelections.has(selectionKey)) {
+      throw new ConvexError(`The same product, color, and artwork combination was selected more than once.`);
+    }
+
+    seenSelections.add(selectionKey);
+
+    return normalizedSelection;
   });
 }
 
@@ -90,11 +132,20 @@ export async function resolveStoreProductSelections(
         throw new ConvexError(`${product.name} currently has no available variants.`);
       }
 
+      const hasSelectedColor = activeVariants.some(
+        (variant) => variant.availability === "available" && variant.colorKey === selection.colorKey,
+      );
+
+      if (!hasSelectedColor) {
+        throw new ConvexError(`${product.name} is not currently available in the selected color.`);
+      }
+
       return {
         productId: product._id,
         colorKey: selection.colorKey,
         artworkTemplateId: selection.artworkTemplateId,
         isRequired: selection.isRequired,
+        artworkPlacement: selection.artworkPlacement,
         sortOrder,
       };
     }),
@@ -125,6 +176,7 @@ export async function replaceStoreProductSelections(
       productId: selection.productId,
       colorKey: selection.colorKey,
       artworkTemplateId: selection.artworkTemplateId,
+      artworkPlacement: selection.artworkPlacement,
       isRequired: selection.isRequired,
       sortOrder: selection.sortOrder,
       createdAt: now,
