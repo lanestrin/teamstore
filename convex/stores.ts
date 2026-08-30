@@ -4,7 +4,10 @@ import { ConvexError, v } from "convex/values";
 import type { Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 
+import { decorateProductCardFromData, getProductColorsForProduct, getVariantsForProduct } from "./lib/productCatalog";
+
 import { replaceStoreProductSelections, resolveStoreProductSelections, storeProductSelection } from "./lib/storeProducts";
+
 import { isValidSlug, normalizeOptionalText, normalizeRequiredItemsDeadline, validateColor, validateSlug } from "./lib/storeValidation";
 
 const storeActivity = v.union(
@@ -26,6 +29,11 @@ const storeUploadedArtwork = v.object({
   fileName: v.string(),
   storageId: v.id("_storage"),
   isSelected: v.boolean(),
+});
+
+const storeArtworkSnapshot = v.object({
+  artworkTemplateId: v.string(),
+  svg: v.string(),
 });
 
 /**
@@ -92,25 +100,38 @@ export const archiveStore = mutation({
  * - a store that has not previously been saved.
  *
  * The mutation creates or reuses the organization,
- * activates the store, and persists the selected products.
+ * activates the store, persists selected products,
+ * and snapshots the finalized template artwork used
+ * by the published storefront.
  */
 export const finalizeStore = mutation({
   args: {
     storeId: v.optional(v.id("stores")),
+
     organizationName: v.string(),
     organizationSlug: v.string(),
+
     activity: storeActivity,
     storeType,
+
     storeName: v.string(),
     storeSlug: v.string(),
     storeDescription: v.optional(v.string()),
+
     logoStorageId: v.optional(v.id("_storage")),
     bannerStorageId: v.optional(v.id("_storage")),
+
     uploadedArtworks: v.optional(v.array(storeUploadedArtwork)),
+
+    artworkSnapshots: v.optional(v.array(storeArtworkSnapshot)),
+
     primaryColor: v.string(),
     secondaryColor: v.string(),
+
     currentStep: v.number(),
+
     productSelections: v.array(storeProductSelection),
+
     requiredItemsDeadline: v.optional(v.string()),
   },
 
@@ -122,9 +143,11 @@ export const finalizeStore = mutation({
     }
 
     const organizationName = args.organizationName.trim();
+
     const organizationSlug = args.organizationSlug.trim().toLowerCase();
 
     const storeName = args.storeName.trim();
+
     const storeSlug = args.storeSlug.trim().toLowerCase();
 
     const storeDescription = normalizeOptionalText(args.storeDescription);
@@ -146,9 +169,11 @@ export const finalizeStore = mutation({
     }
 
     validateSlug(organizationSlug, "Organization slug");
+
     validateSlug(storeSlug, "Store slug");
 
     validateColor(args.primaryColor, "Primary color");
+
     validateColor(args.secondaryColor, "Secondary color");
 
     if (args.storeId) {
@@ -167,6 +192,31 @@ export const finalizeStore = mutation({
 
     if (hasRequiredProducts && !requiredItemsDeadline) {
       throw new ConvexError("A required items deadline is required when the store has required products.");
+    }
+
+    const artworkSnapshots = args.artworkSnapshots?.map((snapshot) => ({
+      artworkTemplateId: snapshot.artworkTemplateId.trim(),
+      svg: snapshot.svg,
+    }));
+
+    if (artworkSnapshots) {
+      const seenArtworkIds = new Set<string>();
+
+      for (const snapshot of artworkSnapshots) {
+        if (!snapshot.artworkTemplateId) {
+          throw new ConvexError("Artwork template ID is required.");
+        }
+
+        if (!snapshot.svg.trim()) {
+          throw new ConvexError(`Artwork ${snapshot.artworkTemplateId} is empty.`);
+        }
+
+        if (seenArtworkIds.has(snapshot.artworkTemplateId)) {
+          throw new ConvexError(`Artwork ${snapshot.artworkTemplateId} was provided more than once.`);
+        }
+
+        seenArtworkIds.add(snapshot.artworkTemplateId);
+      }
     }
 
     const existingOrganization = await ctx.db
@@ -222,8 +272,10 @@ export const finalizeStore = mutation({
         organizationId,
         organizationName,
         organizationSlug,
+
         activity: args.activity,
         storeType: args.storeType,
+
         name: storeName,
         slug: storeSlug,
         description: storeDescription,
@@ -246,11 +298,20 @@ export const finalizeStore = mutation({
             }
           : {}),
 
+        ...(artworkSnapshots !== undefined
+          ? {
+              artworkSnapshots,
+            }
+          : {}),
+
         primaryColor: args.primaryColor,
+
         secondaryColor: args.secondaryColor,
+
         requiredItemsDeadline,
 
         currentStep: args.currentStep,
+
         status: "active",
         updatedAt: now,
       });
@@ -268,22 +329,33 @@ export const finalizeStore = mutation({
     const storeId = await ctx.db.insert("stores", {
       organizationId,
       createdBy: userId,
+
       organizationName,
       organizationSlug,
+
       activity: args.activity,
       storeType: args.storeType,
+
       name: storeName,
       slug: storeSlug,
       description: storeDescription,
+
       logoStorageId: args.logoStorageId,
+
       bannerStorageId: args.bannerStorageId,
+
       uploadedArtworks: args.uploadedArtworks,
 
+      artworkSnapshots,
+
       primaryColor: args.primaryColor,
+
       secondaryColor: args.secondaryColor,
+
       requiredItemsDeadline,
 
       currentStep: args.currentStep,
+
       status: "active",
       createdAt: now,
       updatedAt: now,
@@ -357,11 +429,17 @@ export const listActiveStores = query({
 
         return {
           id: store._id,
+
           organizationSlug: store.organizationSlug!,
+
           slug: store.slug!,
+
           name: store.name ?? store.organizationName ?? "Team Store",
+
           activity: store.activity,
+
           productCount: storeProducts.length,
+
           logoUrl: store.logoStorageId ? await ctx.storage.getUrl(store.logoStorageId) : null,
         };
       }),
@@ -372,6 +450,9 @@ export const listActiveStores = query({
 /**
  * Returns an active public store using its organization
  * and store URL slugs.
+ *
+ * Store products are resolved into storefront-ready product data
+ * so the client does not need to reconstruct the catalog itself.
  */
 export const getActiveStoreBySlugs = query({
   args: {
@@ -393,6 +474,93 @@ export const getActiveStoreBySlugs = query({
       .withIndex("by_organization_slug_and_slug", (q) => q.eq("organizationSlug", organizationSlug).eq("slug", storeSlug))
       .collect();
 
-    return matchingStores.find((store) => store.status === "active") ?? null;
+    const store = matchingStores.find((candidate) => candidate.status === "active") ?? null;
+
+    if (!store) {
+      return null;
+    }
+
+    const storeProducts = await ctx.db
+      .query("storeProducts")
+      .withIndex("by_store", (q) => q.eq("storeId", store._id))
+      .collect();
+
+    const orderedStoreProducts = [...storeProducts].sort((first, second) => first.sortOrder - second.sortOrder);
+
+    const products = await Promise.all(
+      orderedStoreProducts.map(async (storeProduct) => {
+        const product = await ctx.db.get(storeProduct.productId);
+
+        if (!product || product.status !== "active") {
+          return null;
+        }
+
+        const [variants, productColors] = await Promise.all([
+          getVariantsForProduct(ctx, product._id),
+
+          getProductColorsForProduct(ctx, product._id),
+        ]);
+
+        const decoratedProduct = await decorateProductCardFromData(ctx, product, variants, productColors, "front");
+
+        const selectedColor = decoratedProduct.colorOptions.find((color) => color.colorKey === storeProduct.colorKey);
+
+        if (!selectedColor) {
+          return null;
+        }
+
+        return {
+          storeProductId: storeProduct._id,
+
+          productId: product._id,
+
+          name: product.name,
+          slug: product.slug,
+          category: product.category,
+
+          color: selectedColor.color,
+
+          colorKey: storeProduct.colorKey,
+
+          imageUrl: selectedColor.imageUrl,
+
+          primaryHexValue: selectedColor.primaryHexValue,
+
+          tone: selectedColor.tone,
+
+          decorationPreviewBounds: selectedColor.decorationPreviewBounds,
+
+          minPriceInCents: decoratedProduct.minPriceInCents,
+
+          maxPriceInCents: decoratedProduct.maxPriceInCents,
+
+          artworkTemplateId: storeProduct.artworkTemplateId,
+
+          artworkPlacement: storeProduct.artworkPlacement,
+
+          isRequired: storeProduct.isRequired,
+
+          sortOrder: storeProduct.sortOrder,
+        };
+      }),
+    );
+
+    const uploadedArtworks = await Promise.all(
+      (store.uploadedArtworks ?? []).map(async (artwork) => ({
+        ...artwork,
+
+        storageUrl: await ctx.storage.getUrl(artwork.storageId),
+      })),
+    );
+
+    return {
+      ...store,
+
+      uploadedArtworks,
+
+      logoUrl: store.logoStorageId ? await ctx.storage.getUrl(store.logoStorageId) : null,
+
+      products: products.flatMap((product) => (product ? [product] : [])),
+    };
   },
 });

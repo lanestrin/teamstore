@@ -29,17 +29,26 @@
     0 8px 24px rgb(16 24 40 / 8%);
 }
 
+/*
+ * All garment previews use the same square coordinate space.
+ *
+ * Artwork placement values are percentage-based, so keeping
+ * this geometry consistent with Review and the published store
+ * ensures the artwork appears in the same location everywhere.
+ */
 .productImageArea {
   position: relative;
   display: grid;
-  aspect-ratio: 4 / 3;
-  min-height: 240px;
+  width: 100%;
+  aspect-ratio: 1;
+  min-height: 0;
   padding: 1rem;
   place-items: center;
   overflow: hidden;
 
   background: $gray-50;
   border-bottom: 1px solid $border-light;
+  box-sizing: border-box;
 }
 
 .productImage {
@@ -59,7 +68,6 @@
   display: grid;
   width: 100%;
   height: 100%;
-  min-height: 220px;
   place-items: center;
 
   color: $text-secondary;
@@ -126,20 +134,17 @@
 .requiredButton[data-required="true"] {
   background: $text-primary;
   border-color: $text-primary;
-
   color: $white;
 }
 
 .requiredButton[data-required="true"]:hover:not(:disabled) {
   background: $text-primary;
   border-color: $text-primary;
-
   color: $white;
 }
 
 .requiredButton svg {
   flex: 0 0 auto;
-
   width: 15px;
   height: 15px;
 }
@@ -278,10 +283,6 @@
 }
 
 @media (max-width: 640px) {
-  .productImageArea {
-    min-height: 220px;
-  }
-
   .productTitleRow {
     grid-template-columns: 1fr;
     gap: 0.35rem;

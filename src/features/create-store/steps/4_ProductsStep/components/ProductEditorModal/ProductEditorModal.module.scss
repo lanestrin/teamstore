@@ -38,16 +38,15 @@
 }
 
 .header h2 {
+  color: $text-primary;
   font-size: 1.25rem;
   font-weight: $font-semibold;
-  color: $text-primary;
 }
 
 .header p {
   margin-top: $space-1;
-
-  font-size: 0.875rem;
   color: $text-secondary;
+  font-size: 0.875rem;
 }
 
 .close,
@@ -61,7 +60,6 @@
   border: 1px solid $gray-300;
   background: $white;
   color: $text-primary;
-
   cursor: pointer;
 
   transition:
@@ -78,13 +76,12 @@
   flex: 0 0 auto;
   padding: 0;
   place-items: center;
-
   border-radius: $radius-pill;
 }
 
 .close:hover {
-  background: $gray-50;
   border-color: $text-secondary;
+  background: $gray-50;
 }
 
 .close:focus-visible,
@@ -113,8 +110,8 @@
   grid-template-rows: minmax(0, 1fr) auto;
   min-width: 0;
   min-height: 0;
-
   padding: $space-6;
+  overflow: hidden;
 
   background: $gray-50;
   border-right: 1px solid $border-light;
@@ -123,36 +120,47 @@
   user-select: none;
 }
 
-.preview > [data-garment-artwork-preview] {
-  width: 100%;
-  height: 100%;
+/*
+ * The artwork editor must use the same square coordinate
+ * space as the product card, Review preview, and published
+ * storefront.
+ *
+ * Artwork placement values are percentage-based, so keeping
+ * this canvas square ensures x, y, and width render identically
+ * everywhere.
+ */
+.preview>[data-garment-artwork-preview] {
+  width: min(100%, 560px);
+  aspect-ratio: 1;
+  height: auto;
   min-height: 0;
+  align-self: center;
+  justify-self: center;
+  overflow: hidden;
 }
 
 .preview[data-dragging="true"] {
   cursor: grabbing;
 }
 
-.preview:not([data-dragging="true"]) > [data-garment-artwork-preview] {
+.preview:not([data-dragging="true"])>[data-garment-artwork-preview] {
   cursor: grab;
 }
 
 .previewHint {
   margin: $space-3 0 0;
-
+  color: $text-secondary;
   font-size: 0.8125rem;
   line-height: 1.45;
   text-align: center;
-  color: $text-secondary;
 }
 
 .sidebar {
   display: flex;
-  flex-direction: column;
   min-height: 0;
-  gap: $space-6;
-
   padding: 22px;
+  flex-direction: column;
+  gap: $space-6;
 
   overflow-y: auto;
   background: $white;
@@ -164,17 +172,16 @@
 }
 
 .sidebarHeading h3 {
+  color: $text-primary;
   font-size: 1rem;
   font-weight: $font-semibold;
-  color: $text-primary;
 }
 
 .sidebarHeading p {
   margin-top: $space-1;
-
+  color: $text-secondary;
   font-size: 0.8125rem;
   line-height: 1.5;
-  color: $text-secondary;
 }
 
 .controlGroup {
@@ -182,18 +189,18 @@
   gap: $space-3;
 }
 
-.controlGroup + .controlGroup {
+.controlGroup+.controlGroup {
   padding-top: $space-5;
   border-top: 1px solid $border-light;
 }
 
 .controlLabel {
+  color: $text-secondary;
   font-size: 0.75rem;
   font-weight: $font-semibold;
-  line-height: 1.25;
   letter-spacing: 0.05em;
+  line-height: 1.25;
   text-transform: uppercase;
-  color: $text-secondary;
 }
 
 .movement {
@@ -209,14 +216,13 @@
   display: grid;
   padding: 0;
   place-items: center;
-
   border-radius: $radius-md;
 }
 
 .moveButton:hover:not(:disabled),
 .sizeButton:hover:not(:disabled) {
-  background: $gray-50;
   border-color: $text-secondary;
+  background: $gray-50;
 }
 
 .moveButton:disabled,
@@ -244,7 +250,6 @@
 .resetPosition {
   grid-column: 2;
   grid-row: 2;
-
   background: $gray-50;
 }
 
@@ -260,10 +265,9 @@
 
 .positionValue {
   margin: 0;
-
+  color: $text-secondary;
   font-size: 0.75rem;
   text-align: center;
-  color: $text-secondary;
 }
 
 .sizeHeading {
@@ -274,9 +278,9 @@
 }
 
 .sizeHeading strong {
+  color: $text-primary;
   font-size: 0.8125rem;
   font-weight: $font-semibold;
-  color: $text-primary;
 }
 
 .sizeControls {
@@ -320,8 +324,8 @@
 }
 
 .resetAllButton:hover:not(:disabled) {
-  background: $gray-50;
   border-color: $text-secondary;
+  background: $gray-50;
 }
 
 .resetAllButton svg {
@@ -331,7 +335,6 @@
 
 .footer {
   justify-content: flex-end;
-
   border-top: 1px solid $border-light;
 }
 
@@ -350,13 +353,13 @@
 }
 
 .cancelButton:hover {
-  background: $gray-50;
   border-color: $text-secondary;
+  background: $gray-50;
 }
 
 .saveButton {
-  background: $text-primary;
   border-color: $text-primary;
+  background: $text-primary;
   color: $white;
 }
 
@@ -385,12 +388,17 @@
     border-bottom: 1px solid $border-light;
   }
 
+  .preview>[data-garment-artwork-preview] {
+    width: min(100%, 340px);
+  }
+
   .sidebar {
     max-height: 340px;
   }
 }
 
 @media (max-width: 520px) {
+
   .header,
   .footer {
     padding: $space-4;
@@ -399,6 +407,10 @@
   .preview,
   .sidebar {
     padding: $space-4;
+  }
+
+  .preview>[data-garment-artwork-preview] {
+    width: min(100%, 300px);
   }
 
   .footer {

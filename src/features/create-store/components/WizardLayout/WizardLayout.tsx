@@ -13,6 +13,7 @@ interface WizardLayoutProps {
   backLabel?: string;
   nextDisabled?: boolean;
   hideBack?: boolean;
+  hideNext?: boolean;
   width?: "standard" | "wide";
 }
 
@@ -27,6 +28,7 @@ export default function WizardLayout({
   backLabel = "Back",
   nextDisabled = false,
   hideBack = false,
+  hideNext = false,
   width = "standard",
 }: WizardLayoutProps) {
   const pageClassName = [styles.page, width === "wide" ? styles.wide : ""].filter(Boolean).join(" ");
@@ -52,9 +54,13 @@ export default function WizardLayout({
           </button>
         )}
 
-        <button type="button" className={styles.primaryButton} onClick={onNext} disabled={nextDisabled}>
-          {nextLabel}
-        </button>
+        {hideNext ? (
+          <div aria-hidden="true" />
+        ) : (
+          <button type="button" className={styles.primaryButton} onClick={onNext} disabled={nextDisabled}>
+            {nextLabel}
+          </button>
+        )}
       </footer>
     </section>
   );

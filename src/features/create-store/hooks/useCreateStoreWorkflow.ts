@@ -55,6 +55,7 @@ function buildProductSelections(selections: ProductSelectionsDraft) {
       productId: selection.productId,
       colorKey: selection.colorKey,
       artworkTemplateId: selection.artworkTemplateId,
+      artworkPlacement: selection.artworkPlacement,
       isRequired: selection.isRequired,
     }));
 }
@@ -70,10 +71,24 @@ interface CreateStoreWorkflow {
 export function useCreateStoreWorkflow(): CreateStoreWorkflow {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { storeId, setStoreId, currentStep, primaryColor, secondaryColor, storeDraft, updateStoreDraft, loadStoreDraft, resetStoreDraft } =
-    useCreateStore();
+
+  const {
+    storeId,
+    setStoreId,
+    currentStep,
+    primaryColor,
+    secondaryColor,
+    storeDraft,
+    artworkSvgsByTemplateId,
+    updateStoreDraft,
+    loadStoreDraft,
+    resetStoreDraft,
+  } = useCreateStore();
+
   const draftIdParam = searchParams.get("draftId");
+
   const draftId = draftIdParam ? (draftIdParam as Id<"stores">) : null;
+
   const savedDraft = useQuery(
     api.storeDrafts.getDraft,
     draftId
@@ -84,11 +99,17 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
   );
 
   const generateArtworkUploadUrl = useMutation(api.storeUploads.generateArtworkUploadUrl);
+
   const saveDraftMutation = useMutation(api.storeDrafts.saveDraft);
+
   const finalizeStoreMutation = useMutation(api.stores.finalizeStore);
+
   const loadedDraftIdRef = useRef<Id<"stores"> | null>(null);
+
   const handledMissingDraftRef = useRef(false);
+
   const [isSaving, setIsSaving] = useState(false);
+
   const [isFinalizing, setIsFinalizing] = useState(false);
 
   useEffect(() => {
@@ -176,6 +197,25 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
     return uploadedArtworks;
   }
 
+  function buildArtworkSnapshots(productSelections: ReturnType<typeof buildProductSelections>) {
+    const usedArtworkTemplateIds = [...new Set(productSelections.map((selection) => selection.artworkTemplateId))];
+
+    return usedArtworkTemplateIds.flatMap((artworkTemplateId) => {
+      const svg = artworkSvgsByTemplateId[artworkTemplateId];
+
+      if (!svg) {
+        return [];
+      }
+
+      return [
+        {
+          artworkTemplateId,
+          svg,
+        },
+      ];
+    });
+  }
+
   async function saveAndExit(): Promise<void> {
     if (isSaving) {
       return;
@@ -185,24 +225,39 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
 
     try {
       const organizationSlug = storeDraft.organizationSlug || slugify(storeDraft.organizationName);
+
       const uploadedArtworks = await prepareUploadedArtworks();
+
       const productSelections = buildProductSelections(storeDraft.productSelections);
 
       const result = await saveDraftMutation({
         storeId: storeId ?? undefined,
+
         organizationName: normalizeOptionalText(storeDraft.organizationName),
+
         organizationSlug: normalizeOptionalText(organizationSlug),
+
         activity: isStoreActivity(storeDraft.activity) ? storeDraft.activity : undefined,
+
         storeType: storeDraft.storeType || undefined,
+
         storeName: normalizeOptionalText(storeDraft.storeName),
+
         storeSlug: normalizeOptionalText(storeDraft.storeSlug),
+
         storeDescription: normalizeOptionalText(storeDraft.storeDescription),
+
         logoStorageId: storeDraft.logoStorageId ?? undefined,
+
         uploadedArtworks,
+
         primaryColor,
         secondaryColor,
+
         productSelections,
+
         requiredItemsDeadline: normalizeOptionalText(storeDraft.requiredItemsDeadline),
+
         currentStep,
       });
 
@@ -222,10 +277,15 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
     }
 
     const organizationName = storeDraft.organizationName.trim();
+
     const organizationSlug = storeDraft.organizationSlug.trim() || slugify(organizationName);
+
     const activity = storeDraft.activity.trim();
+
     const storeType = storeDraft.storeType;
+
     const storeName = storeDraft.storeName.trim();
+
     const storeSlug = storeDraft.storeSlug.trim();
 
     if (!organizationName) {
@@ -267,6 +327,7 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
     }
 
     const hasRequiredProducts = productSelections.some((selection) => selection.isRequired);
+
     const requiredItemsDeadline = normalizeOptionalText(storeDraft.requiredItemsDeadline);
 
     if (hasRequiredProducts && !requiredItemsDeadline) {
@@ -275,6 +336,8 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
       return;
     }
 
+    const artworkSnapshots = buildArtworkSnapshots(productSelections);
+
     setIsFinalizing(true);
 
     try {
@@ -282,18 +345,25 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
 
       const result = await finalizeStoreMutation({
         storeId: storeId ?? undefined,
+
         organizationName,
         organizationSlug,
         activity,
         storeType,
         storeName,
         storeSlug,
+
         storeDescription: normalizeOptionalText(storeDraft.storeDescription),
+
         logoStorageId: storeDraft.logoStorageId ?? undefined,
+
         uploadedArtworks,
+        artworkSnapshots,
+
         primaryColor,
         secondaryColor,
         currentStep,
+
         productSelections,
         requiredItemsDeadline,
       });
@@ -310,6 +380,7 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
 
   return {
     isLoadingDraft: draftId !== null && savedDraft === undefined,
+
     isSaving,
     isFinalizing,
     saveAndExit,

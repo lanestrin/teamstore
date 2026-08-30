@@ -1,17 +1,24 @@
 import { Outlet } from "react-router-dom";
 
 import { CreateStoreProvider, useCreateStore } from "../context/CreateStoreContext";
+import { useCreateStoreWorkflow } from "../hooks/useCreateStoreWorkflow";
 
 import LivePreview from "../components/LivePreview/LivePreview";
 import ProgressSidebar from "../components/ProgressSidebar/ProgressSidebar";
 import ResizablePanel from "../components/ResizablePanel/ResizablePanel";
 
 import styles from "./CreateStoreLayout.module.scss";
-import { useCreateStoreWorkflow } from "../hooks/useCreateStoreWorkflow";
+
+export interface CreateStoreOutletContext {
+  isFinalizing: boolean;
+  createStore: () => Promise<void>;
+}
 
 function CreateStoreContent() {
   const { currentStep, furthestStepReached, setCurrentStep } = useCreateStore();
+
   const { isLoadingDraft, isSaving, isFinalizing, saveAndExit, createStore } = useCreateStoreWorkflow();
+
   const showLivePreview = currentStep === 1 || currentStep === 2;
 
   if (isLoadingDraft) {
@@ -26,7 +33,14 @@ function CreateStoreContent() {
 
   const stepContent = (
     <main className={styles.contentInner}>
-      <Outlet />
+      <Outlet
+        context={
+          {
+            isFinalizing,
+            createStore,
+          } satisfies CreateStoreOutletContext
+        }
+      />
     </main>
   );
 
@@ -40,7 +54,6 @@ function CreateStoreContent() {
           isFinalizing={isFinalizing}
           onStepChange={setCurrentStep}
           onSaveAndExit={saveAndExit}
-          onCreateStore={createStore}
         />
       </aside>
 
