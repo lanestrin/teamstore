@@ -3,9 +3,12 @@
 .desktopSidebar {
   display: flex;
   flex-direction: column;
+
   width: 100%;
-  min-height: 100vh;
+  height: 100%;
+  min-height: 0;
   padding: $space-6;
+
   background: linear-gradient(180deg, #111111 0%, #0b0b0b 100%);
   color: $white;
 }
@@ -17,8 +20,10 @@
 .logo {
   display: flex;
   align-items: center;
+
   width: fit-content;
   margin-bottom: $space-4;
+
   text-decoration: none;
 }
 
@@ -30,14 +35,18 @@
 
 .logoImage {
   display: block;
+
   width: auto;
   height: 32px;
 }
 
 .label {
   display: block;
+
   margin-bottom: $space-3;
+
   color: rgba($white, 0.55);
+
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -46,7 +55,9 @@
 
 .header h2 {
   margin: 0;
+
   color: $white;
+
   font-size: 2rem;
   font-weight: 700;
   line-height: 1.15;
@@ -54,35 +65,47 @@
 
 .header p {
   margin: $space-3 0 0;
+
   color: rgba($white, 0.6);
+
   font-size: 0.95rem;
   line-height: 1.6;
 }
 
 .header::after {
   display: block;
+
   height: 1px;
-  margin-top: $space-6;
+  margin-top: $space-8;
+
   background: rgba($white, 0.08);
+
   content: "";
 }
 
 .steps {
   flex: 1;
+  min-height: 0;
+
   margin-top: $space-8;
 }
 
 .step {
   position: relative;
+
   display: flex;
   gap: $space-4;
+
   width: 100%;
-  padding: 0 0 $space-6;
+  padding: 0 0 $space-8;
+
   border: 0;
   background: transparent;
   color: inherit;
+
   font: inherit;
   text-align: left;
+
   cursor: pointer;
 }
 
@@ -98,10 +121,13 @@
 
 .line {
   position: absolute;
+
   top: 32px;
   left: 15px;
+
   width: 1px;
   height: calc(100% - 8px);
+
   background: rgba($white, 0.12);
 }
 
@@ -140,6 +166,7 @@
   border-color: $brand-red;
   background: $brand-red;
   color: $white;
+
   box-shadow: 0 0 0 6px rgba($brand-red, 0.1);
 }
 
@@ -155,28 +182,34 @@
 
 .stepTitle {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
+  flex-wrap: wrap;
   gap: $space-2;
 }
 
 .stepTitle h3 {
   margin: 2px 0 4px;
+
   color: $white;
+
   font-size: 0.96rem;
   font-weight: 600;
 }
 
 .content p {
   margin: 0;
+
   color: rgba($white, 0.5);
+
   font-size: 0.82rem;
   line-height: 1.45;
 }
 
 .footer {
   flex-shrink: 0;
+
   padding-top: $space-7;
+
   border-top: 1px solid rgba($white, 0.08);
 }
 
@@ -211,8 +244,11 @@
 
 .exitButton small {
   display: block;
+
   margin-top: 2px;
+
   color: rgba($white, 0.45);
+
   font-size: 0.72rem;
 }
 
@@ -227,7 +263,9 @@
   opacity: 0.6;
 }
 
-/* Mobile */
+/* -------------------------------------------------------------------------- */
+/* Mobile / tablet progress header                                             */
+/* -------------------------------------------------------------------------- */
 
 .mobileHeader {
   display: none;
@@ -247,15 +285,23 @@
   }
 }
 
-@media (max-width: 992px) {
+/*
+ * Full sidebar stops here.
+ *
+ * This intentionally matches the breakpoint used by CreateStoreLayout
+ * and the individual wizard steps.
+ */
+@media (max-width: 1180px) {
   .desktopSidebar {
     display: none;
   }
 
   .mobileHeader {
     display: block;
+
     width: 100%;
     padding: $space-3 $space-4;
+
     background: #0b0b0b;
     color: $white;
   }
@@ -265,27 +311,34 @@
     align-items: center;
     justify-content: space-between;
     gap: $space-4;
+
     min-width: 0;
   }
 
   .mobileStepInfo {
     display: flex;
     flex-direction: column;
+
     min-width: 0;
   }
 
   .mobileStepInfo span {
     color: rgba($white, 0.6);
+
     font-size: 0.75rem;
     font-weight: 600;
   }
 
   .mobileStepInfo strong {
     margin-top: 2px;
+
     overflow: hidden;
+
     color: $white;
+
     font-size: 1rem;
     font-weight: 700;
+
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -341,6 +394,7 @@
   .mobileSteps::before {
     position: absolute;
     z-index: 0;
+
     top: 21px;
     right: 10%;
     left: 10%;
@@ -397,6 +451,7 @@
     border-color: $brand-red;
     background: $brand-red;
     color: $white;
+
     box-shadow: 0 0 0 4px rgba($brand-red, 0.14);
   }
 
@@ -413,6 +468,20 @@
   }
 }
 
+@media (max-width: 520px) {
+  .mobileHeader {
+    padding: $space-3 $space-4;
+  }
+
+  .mobileTopRow {
+    gap: $space-3;
+  }
+
+  .mobileStepInfo strong {
+    white-space: normal;
+  }
+}
+
 @media (max-width: 360px) {
   .mobileHeader {
     padding-right: $space-3;
@@ -426,16 +495,13 @@
   .mobileExitButton {
     padding-right: $space-2;
     padding-left: $space-2;
+
     font-size: 0.75rem;
   }
 
   .mobileStepCircle {
     width: 28px;
     height: 28px;
-  }
-
-  .mobileSteps::before {
-    top: 21px;
   }
 }
 

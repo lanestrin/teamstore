@@ -1,62 +1,105 @@
 @use "../../../../styles/variables" as *;
 
-.page h2 {
-  margin: 0 0 $space-3;
-  color: $text-primary;
-  font-size: 1.25rem;
-  font-weight: $font-semibold;
+.colorSetup {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(420px, 480px);
+  align-items: start;
+
+  gap: $space-10;
+
+  width: 100%;
+  min-width: 0;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: $space-7;
+
+  min-width: 0;
+}
+
+.presets {
+  min-width: 0;
 }
 
 .sectionTitle {
-  margin: 0 0 $space-3;
+  margin: 0 0 $space-4;
+
   color: $text-primary;
+
   font-size: 1.25rem;
   font-weight: $font-semibold;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-  gap: $space-4;
-  max-width: 760px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: $space-3;
+
+  width: 100%;
+  min-width: 0;
 }
 
 .customColors {
-  display: flex;
-  flex-direction: column;
-  gap: $space-5;
-  max-width: 560px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: $space-4;
+
+  width: 100%;
+  min-width: 0;
 }
 
-.info {
-  max-width: 760px;
-  padding: $space-6;
-  background: $gray-50;
-  border: 1px solid $border-light;
-  border-radius: $radius-lg;
-}
-
-.info h3 {
-  margin: 0 0 $space-3;
-  color: $text-primary;
-  font-size: 1rem;
-  font-weight: $font-semibold;
-}
-
-.info p {
+.helper {
+  max-width: 620px;
   margin: 0;
+
   color: $text-secondary;
-  line-height: 1.7;
+
+  font-size: 0.875rem;
+  line-height: 1.6;
 }
 
-@media (max-width: 992px) {
-  .grid {
-    grid-template-columns: repeat(3, 1fr);
+/*
+ * Tablet:
+ * - desktop sidebar is already replaced by the compact progress header
+ * - Step 2 becomes one column
+ * - preview stays a useful width instead of stretching across the screen
+ */
+@media (max-width: 1180px) {
+  .colorSetup {
+    grid-template-columns: 1fr;
+    gap: $space-7;
+  }
+
+  .colorSetup> :last-child {
+    justify-self: center;
+
+    width: 100%;
+    max-width: 620px;
   }
 }
 
 @media (max-width: 640px) {
+  .controls {
+    gap: $space-6;
+  }
+
   .grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .customColors {
+    grid-template-columns: 1fr;
+  }
+
+  .sectionTitle {
+    font-size: 1.125rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .grid {
+    gap: $space-2;
   }
 }

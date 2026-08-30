@@ -4,45 +4,52 @@ import WizardLayout from "../../layouts/WizardLayout";
 import { useCreateStore } from "../../context/CreateStoreContext";
 
 import styles from "./ColorsStep.module.scss";
+import ColorThemePreview from "./components/ColorThemePreview/ColorThemePreview";
 
-const colorOptions = [
+const COLOR_PRESETS = [
   {
-    id: 1,
+    id: "navy-red",
+    name: "Navy + Red",
     primary: "#111827",
     secondary: "#DC2626",
   },
   {
-    id: 2,
+    id: "royal-white",
+    name: "Royal + White",
     primary: "#1D4ED8",
     secondary: "#FFFFFF",
   },
   {
-    id: 3,
+    id: "green-gold",
+    name: "Green + Gold",
     primary: "#15803D",
     secondary: "#FACC15",
   },
   {
-    id: 4,
+    id: "purple-gold",
+    name: "Purple + Gold",
     primary: "#7C3AED",
     secondary: "#FACC15",
   },
   {
-    id: 5,
+    id: "orange-navy",
+    name: "Orange + Navy",
     primary: "#EA580C",
     secondary: "#111827",
   },
   {
-    id: 6,
-    primary: "#B91C1C",
-    secondary: "#FFFFFF",
+    id: "maroon-gold",
+    name: "Maroon + Gold",
+    primary: "#7F1D1D",
+    secondary: "#FACC15",
   },
-];
+] as const;
 
 export default function ColorsStep() {
   const { currentStep, setCurrentStep, primaryColor, secondaryColor, setPrimaryColor, setSecondaryColor, resetProductStep } =
     useCreateStore();
 
-  const selectedColorId = colorOptions.find((option) => option.primary === primaryColor && option.secondary === secondaryColor)?.id;
+  const selectedPresetId = COLOR_PRESETS.find((preset) => preset.primary === primaryColor && preset.secondary === secondaryColor)?.id;
 
   function handlePresetSelect(primary: string, secondary: string) {
     if (primary === primaryColor && secondary === secondaryColor) {
@@ -76,36 +83,41 @@ export default function ColorsStep() {
     <WizardLayout
       step={currentStep}
       title="Choose Your Team Colors"
-      description="Choose one of our popular color combinations or customize your own. Your selected colors will be applied when your storefront preview is created."
+      description="Start with a popular team color combination or customize your own."
       onBack={() => setCurrentStep(1)}
       onNext={() => setCurrentStep(3)}
+      width="wide"
     >
-      <div>
-        <h2 className={styles.sectionTitle}>Popular Color Combinations</h2>
+      <div className={styles.colorSetup}>
+        <section className={styles.controls} aria-labelledby="popular-colors-heading">
+          <div className={styles.presets}>
+            <h2 id="popular-colors-heading" className={styles.sectionTitle}>
+              Popular Team Color Combinations
+            </h2>
 
-        <div className={styles.grid}>
-          {colorOptions.map((option) => (
-            <ColorCard
-              key={option.id}
-              primaryColor={option.primary}
-              secondaryColor={option.secondary}
-              selected={selectedColorId === option.id}
-              onClick={() => handlePresetSelect(option.primary, option.secondary)}
-            />
-          ))}
-        </div>
-      </div>
+            <div className={styles.grid}>
+              {COLOR_PRESETS.map((preset) => (
+                <ColorCard
+                  key={preset.id}
+                  name={preset.name}
+                  primaryColor={preset.primary}
+                  secondaryColor={preset.secondary}
+                  selected={selectedPresetId === preset.id}
+                  onClick={() => handlePresetSelect(preset.primary, preset.secondary)}
+                />
+              ))}
+            </div>
+          </div>
 
-      <div className={styles.customColors}>
-        <ColorPicker label="Primary Color" value={primaryColor} onChange={handlePrimaryColorChange} />
+          <div className={styles.customColors}>
+            <ColorPicker label="Primary Color" value={primaryColor} onChange={handlePrimaryColorChange} />
 
-        <ColorPicker label="Secondary Color" value={secondaryColor} onChange={handleSecondaryColorChange} />
-      </div>
+            <ColorPicker label="Secondary Color" value={secondaryColor} onChange={handleSecondaryColorChange} />
+          </div>
 
-      <div className={styles.info}>
-        <h3>Customize your colors</h3>
-
-        <p>Need an exact match for your organization? Use the color pickers above to choose any color or enter a custom hex value.</p>
+          <p className={styles.helper}>Choose a preset or use the color controls to match your organization’s exact colors.</p>
+        </section>
+        <ColorThemePreview primaryColor={primaryColor} secondaryColor={secondaryColor} />
       </div>
     </WizardLayout>
   );
