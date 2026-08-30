@@ -1,47 +1,67 @@
 .errorSummary {
+  width: 100%;
+  min-width: 0;
   padding: $space-4;
+
   background: $error-background;
   border: 1px solid $error-border;
   border-radius: $radius-md;
-  font-size: 0.8rem !important;
+  margin-bottom: $space-7;
 }
 
 .errorSummary h2 {
   margin: 0 0 $space-2;
+
+  color: $error;
+
   font-size: 1rem;
   font-weight: $font-semibold;
-  color: $error;
+  line-height: 1.4;
 }
 
 .errorSummary ul {
   display: flex;
   flex-direction: column;
-  gap: $space-1;
   margin: 0;
-  padding-left: $space-5;
+  padding: 0;
+  list-style: none;
+}
+
+.errorSummary li {
+  min-width: 0;
 }
 
 .errorSummary button {
-  padding: 0;
-  text-align: left;
-  background: transparent;
+  display: block;
+
+  width: 100%;
+  padding: $space-1 0;
+
   border: 0;
+  background: transparent;
   color: $error;
+
+  font: inherit;
+  font-size: 0.875rem;
+  text-align: left;
+
   cursor: pointer;
   text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.errorSummary button:hover {
-  text-decoration-thickness: 2px;
-}
-
-.errorSummary button:focus-visible {
-  outline: 2px solid $error;
-  outline-offset: 3px;
-  border-radius: $radius-sm;
+  overflow-wrap: anywhere;
 }
 
 .errorSummary button span {
   font-weight: $font-semibold;
+}
+
+.errorSummary button:focus-visible {
+  outline: 3px solid $error;
+  outline-offset: 2px;
+  border-radius: $radius-sm;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .errorSummary button:hover {
+    text-decoration-thickness: 2px;
+  }
 }

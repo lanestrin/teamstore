@@ -7,7 +7,7 @@ import { ART_TEMPLATE_LIST } from "../../../../assets/art-templates";
 
 import type { ProductPreviewItem } from "../../components/ProductPreview/ProductPreview";
 import StorefrontPreview from "../../components/StorefrontPreview/StorefrontPreview";
-import WizardLayout from "../../components/WizardLayout/WizardLayout";
+import WizardLayout from "../../layouts/WizardLayout";
 import { useCreateStore } from "../../context/CreateStoreContext";
 import useFileDataUrl from "../../hooks/useFileDataUrl";
 

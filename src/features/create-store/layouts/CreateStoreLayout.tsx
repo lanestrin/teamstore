@@ -3,9 +3,7 @@ import { Outlet } from "react-router-dom";
 import { CreateStoreProvider, useCreateStore } from "../context/CreateStoreContext";
 import { useCreateStoreWorkflow } from "../hooks/useCreateStoreWorkflow";
 
-import LivePreview from "../components/LivePreview/LivePreview";
 import ProgressSidebar from "../components/ProgressSidebar/ProgressSidebar";
-import ResizablePanel from "../components/ResizablePanel/ResizablePanel";
 
 import styles from "./CreateStoreLayout.module.scss";
 
@@ -19,34 +17,17 @@ function CreateStoreContent() {
 
   const { isLoadingDraft, isSaving, isFinalizing, saveAndExit, createStore } = useCreateStoreWorkflow();
 
-  const showLivePreview = currentStep === 1 || currentStep === 2;
-
   if (isLoadingDraft) {
     return (
-      <div className={styles.layout}>
-        <main className={styles.loading}>
-          <p>Loading saved draft...</p>
-        </main>
-      </div>
+      <main className={styles.loading}>
+        <p>Loading saved draft...</p>
+      </main>
     );
   }
 
-  const stepContent = (
-    <main className={styles.contentInner}>
-      <Outlet
-        context={
-          {
-            isFinalizing,
-            createStore,
-          } satisfies CreateStoreOutletContext
-        }
-      />
-    </main>
-  );
-
   return (
     <div className={styles.layout}>
-      <aside className={styles.sidebar}>
+      <div className={styles.sidebar}>
         <ProgressSidebar
           currentStep={currentStep}
           furthestStepReached={furthestStepReached}
@@ -55,23 +36,18 @@ function CreateStoreContent() {
           onStepChange={setCurrentStep}
           onSaveAndExit={saveAndExit}
         />
-      </aside>
+      </div>
 
-      {showLivePreview ? (
-        <ResizablePanel
-          className={styles.resizable}
-          storageKey="teamstore-create-store-layout"
-          defaultLeftPercent={50}
-          minLeftPercent={35}
-          maxLeftPercent={70}
-          leftClassName={styles.content}
-          rightClassName={styles.preview}
-          left={stepContent}
-          right={<LivePreview />}
+      <main className={styles.content}>
+        <Outlet
+          context={
+            {
+              isFinalizing,
+              createStore,
+            } satisfies CreateStoreOutletContext
+          }
         />
-      ) : (
-        stepContent
-      )}
+      </main>
     </div>
   );
 }

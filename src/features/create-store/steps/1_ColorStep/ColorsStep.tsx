@@ -1,6 +1,6 @@
 import ColorCard from "../../components/ColorCard/ColorCard";
 import ColorPicker from "../../components/ColorPicker/ColorPicker";
-import WizardLayout from "../../components/WizardLayout/WizardLayout";
+import WizardLayout from "../../layouts/WizardLayout";
 import { useCreateStore } from "../../context/CreateStoreContext";
 
 import styles from "./ColorsStep.module.scss";

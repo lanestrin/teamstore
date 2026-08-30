@@ -8,7 +8,6 @@ import type { Id } from "../../../convex/_generated/dataModel";
 
 import ActionCard from "./components/ActionCard/ActionCard";
 import FavoriteStores from "./components/FavoriteStores/FavoriteStores";
-import HelpCard from "./components/HelpCard/HelpCard";
 import RecentOrders from "./components/RecentOrders/RecentOrders";
 import ReplaceCatalogButton from "./components/ReplaceCatalogButton/ReplaceCatalogButton";
 
@@ -333,8 +332,6 @@ export default function AccountPage() {
 
           <RecentOrders orders={recentOrders} />
         </section>
-
-        <HelpCard />
       </div>
     </div>
   );

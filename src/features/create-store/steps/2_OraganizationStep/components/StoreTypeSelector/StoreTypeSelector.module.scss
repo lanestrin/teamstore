@@ -8,8 +8,10 @@
 .field legend {
   padding: 0;
   margin-bottom: $space-3;
-  font-weight: $font-semibold;
+
   color: $text-primary;
+
+  font-weight: $font-semibold;
 }
 
 .required {
@@ -20,86 +22,167 @@
 .options {
   display: flex;
   flex-direction: column;
-  gap: $space-3;
+  gap: $space-1;
+}
+
+.optionRow {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+
+  width: fit-content;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .option {
   display: flex;
   align-items: center;
   gap: $space-3;
-  width: fit-content;
+
+  min-width: 0;
+  min-height: 44px;
+  padding: $space-1 0;
+
   cursor: pointer;
 }
 
 .radio {
   flex: 0 0 auto;
-  width: 18px;
-  height: 18px;
+
+  width: 20px;
+  height: 20px;
   margin: 0;
+
   accent-color: $brand-red;
+
   cursor: pointer;
+}
+
+.radio:focus-visible {
+  outline: 3px solid rgba($brand-red, 0.25);
+  outline-offset: 3px;
 }
 
 .title {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: $space-2;
+
+  min-width: 0;
 }
 
 .title strong {
   color: $text-primary;
+
   font-size: 0.9375rem;
   font-weight: $font-semibold;
 }
 
-.help {
+.disabledOption {
+  cursor: not-allowed;
+}
+
+.disabledOption .radio {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.disabledOption .title strong {
+  color: $text-secondary;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Help tooltip                                                               */
+/* -------------------------------------------------------------------------- */
+
+.helpWrapper {
   position: relative;
+
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+}
+
+.helpButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: $text-muted;
-  cursor: help;
-  transition: color $transition-fast;
 
-  svg {
-    width: 17px;
-    height: 17px;
-  }
+  width: 44px;
+  height: 44px;
+  padding: 0;
 
-  &:hover {
-    color: $brand-red;
-  }
+  border: 0;
+  border-radius: $radius-round;
 
-  &:focus-visible {
-    color: $brand-red;
-    outline: 2px solid rgba($brand-red, 0.25);
-    outline-offset: 2px;
-    border-radius: $radius-round;
-  }
+  background: transparent;
+  color: $text-secondary;
+
+  cursor: pointer;
+}
+
+.helpButton svg {
+  width: 18px;
+  height: 18px;
+}
+
+.helpButton:focus-visible {
+  outline: 3px solid rgba($brand-red, 0.25);
+  outline-offset: 1px;
+
+  color: $brand-red;
 }
 
 .tooltip {
   position: absolute;
   z-index: $z-tooltip;
+
   bottom: calc(100% + $space-2);
   left: 50%;
-  width: 280px;
+
+  width: min(300px, calc(100vw - 32px));
   padding: $space-3;
+
   visibility: hidden;
-  color: $white;
+  opacity: 0;
   pointer-events: none;
+
   background: $gray-900;
   border-radius: $radius-md;
+
+  color: $white;
+
   font-size: 0.8125rem;
   font-weight: $font-regular;
   line-height: $line-height-body;
-  opacity: 0;
+
   transform: translateX(-50%);
+
   transition: opacity $transition-fast;
 }
 
-.help:hover .tooltip,
-.help:focus .tooltip {
+.tooltip::after {
+  position: absolute;
+
+  top: 100%;
+  left: 50%;
+
+  width: 0;
+  height: 0;
+
+  border: 6px solid transparent;
+  border-top-color: $gray-900;
+
+  content: "";
+
+  transform: translateX(-50%);
+}
+
+.helpWrapper:hover .tooltip,
+.helpWrapper:focus-within .tooltip,
+.tooltipOpen {
   visibility: visible;
   opacity: 1;
 }
@@ -107,7 +190,9 @@
 .error,
 .helper {
   margin: 0;
+
   font-size: 0.875rem;
+  line-height: $line-height-body;
 }
 
 .error {
@@ -118,4 +203,46 @@
 .helper {
   margin-top: $space-3;
   color: $text-secondary;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .helpButton:hover {
+    color: $brand-red;
+  }
+}
+
+@media (max-width: 520px) {
+  .optionRow {
+    width: 100%;
+  }
+
+  .option {
+    flex: 1 1 auto;
+  }
+
+  .helpWrapper {
+    margin-left: auto;
+  }
+
+  .tooltip {
+    right: 0;
+    bottom: calc(100% + $space-2);
+    left: auto;
+
+    width: min(300px, calc(100vw - 48px));
+    max-width: calc(100vw - 48px);
+
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: normal;
+
+    transform: none;
+  }
+
+  .tooltip::after {
+    right: 16px;
+    left: auto;
+
+    transform: none;
+  }
 }

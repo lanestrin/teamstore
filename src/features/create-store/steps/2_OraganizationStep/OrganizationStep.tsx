@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 
-import WizardLayout from "../../components/WizardLayout/WizardLayout";
+import WizardLayout from "../../layouts/WizardLayout";
 import { useCreateStore } from "../../context/CreateStoreContext";
 
 import FormErrorSummary from "../../components/FormErrorSummary/FormErrorSummary";
@@ -286,151 +286,142 @@ export default function OrganizationStep() {
       description="This information will help us create your store and customize your experience."
       onNext={handleNext}
       hideBack
+      width="wide"
     >
       <div className={styles.form}>
         {showErrorSummary && <FormErrorSummary errors={errorSummaryItems} onErrorClick={focusAndScrollToField} />}
 
-        <div className={formStyles.field}>
-          <label htmlFor="organizationName">
-            Organization Name
-            <span className={styles.required}>*</span>
-          </label>
+        <div className={styles.formGrid}>
+          <div className={styles.formColumn}>
+            <div className={formStyles.field}>
+              <label htmlFor="organizationName">
+                Organization Name
+                <span className={styles.required}>*</span>
+              </label>
 
-          <input
-            ref={organizationNameRef}
-            id="organizationName"
-            type="text"
-            placeholder="e.g. Smallville High School"
-            value={storeDraft.organizationName}
-            className={errors.organizationName ? styles.invalidControl : undefined}
-            aria-invalid={Boolean(errors.organizationName)}
-            aria-describedby={errors.organizationName ? "organizationName-helper organizationName-error" : "organizationName-helper"}
-            onChange={(event) => handleOrganizationNameChange(event.target.value)}
-            onBlur={() => setFieldError("organizationName", validateOrganizationName(storeDraft.organizationName))}
-          />
+              <input
+                ref={organizationNameRef}
+                id="organizationName"
+                type="text"
+                placeholder="e.g. Smallville High School"
+                value={storeDraft.organizationName}
+                className={errors.organizationName ? styles.invalidControl : undefined}
+                aria-invalid={Boolean(errors.organizationName)}
+                aria-describedby={errors.organizationName ? "organizationName-helper organizationName-error" : "organizationName-helper"}
+                onChange={(event) => handleOrganizationNameChange(event.target.value)}
+                onBlur={() => setFieldError("organizationName", validateOrganizationName(storeDraft.organizationName))}
+              />
 
-          {errors.organizationName && (
-            <p id="organizationName-error" className={styles.errorMessage} role="alert">
-              {errors.organizationName}
-            </p>
-          )}
+              {errors.organizationName && (
+                <p id="organizationName-error" className={styles.errorMessage} role="alert">
+                  {errors.organizationName}
+                </p>
+              )}
 
-          <p id="organizationName-helper" className={styles.helper}>
-            This is the name of your organization or club.
-          </p>
-        </div>
+              <p id="organizationName-helper" className={styles.helper}>
+                This is the name of your organization or club.
+              </p>
+            </div>
 
-        <div className={formStyles.field}>
-          <label htmlFor="activity">
-            Store Activity
-            <span className={styles.required}>*</span>
-          </label>
+            <div className={formStyles.field}>
+              <label htmlFor="activity">
+                Store Activity
+                <span className={styles.required}>*</span>
+              </label>
 
-          <select
-            ref={activityRef}
-            id="activity"
-            value={storeDraft.activity}
-            className={errors.activity ? styles.invalidControl : undefined}
-            aria-invalid={Boolean(errors.activity)}
-            aria-describedby={errors.activity ? "activity-helper activity-error" : "activity-helper"}
-            onChange={(event) => handleActivityChange(event.target.value)}
-            onBlur={() => setFieldError("activity", validateActivity(storeDraft.activity))}
-          >
-            <option value="" disabled>
-              Select an activity
-            </option>
+              <select
+                ref={activityRef}
+                id="activity"
+                value={storeDraft.activity}
+                className={errors.activity ? styles.invalidControl : undefined}
+                aria-invalid={Boolean(errors.activity)}
+                aria-describedby={errors.activity ? "activity-helper activity-error" : "activity-helper"}
+                onChange={(event) => handleActivityChange(event.target.value)}
+                onBlur={() => setFieldError("activity", validateActivity(storeDraft.activity))}
+              >
+                <option value="" disabled>
+                  Select an activity
+                </option>
 
-            {STORE_ACTIVITIES.map((activity) => (
-              <option key={activity.value} value={activity.value}>
-                {activity.label}
-              </option>
-            ))}
-          </select>
+                {STORE_ACTIVITIES.map((activity) => (
+                  <option key={activity.value} value={activity.value}>
+                    {activity.label}
+                  </option>
+                ))}
+              </select>
 
-          {errors.activity && (
-            <p id="activity-error" className={styles.errorMessage} role="alert">
-              {errors.activity}
-            </p>
-          )}
+              {errors.activity && (
+                <p id="activity-error" className={styles.errorMessage} role="alert">
+                  {errors.activity}
+                </p>
+              )}
 
-          <p id="activity-helper" className={styles.helper}>
-            We’ll use this to show relevant uniforms and fanwear.
-          </p>
-        </div>
+              <p id="activity-helper" className={styles.helper}>
+                We’ll use this to show relevant uniforms and fanwear.
+              </p>
+            </div>
 
-        <StoreTypeSelector value={storeDraft.storeType} error={errors.storeType} inputRef={storeTypeRef} onChange={handleStoreTypeChange} />
-
-        <div className={formStyles.field}>
-          <label htmlFor="storeName">
-            Store Name
-            <span className={styles.required}>*</span>
-          </label>
-
-          <input
-            ref={storeNameRef}
-            id="storeName"
-            type="text"
-            placeholder="e.g. 2026 Spring Store"
-            value={storeDraft.storeName}
-            className={errors.storeName ? styles.invalidControl : undefined}
-            aria-invalid={Boolean(errors.storeName)}
-            aria-describedby={errors.storeName ? "storeName-helper storeName-error" : "storeName-helper"}
-            onChange={(event) => handleStoreNameChange(event.target.value)}
-            onBlur={() => setFieldError("storeName", validateStoreName(storeDraft.storeName))}
-          />
-
-          {errors.storeName && (
-            <p id="storeName-error" className={styles.errorMessage} role="alert">
-              {errors.storeName}
-            </p>
-          )}
-
-          <p id="storeName-helper" className={styles.helper}>
-            This is the name displayed on your storefront.
-          </p>
-        </div>
-
-        <div className={formStyles.field}>
-          <label>Store Address</label>
-
-          <div className={styles.slug}>
-            <strong>
-              teamstore.com/store/
-              {storeDraft.organizationSlug || "your-organization"}/{storeDraft.storeSlug || "your-store-name"}
-            </strong>
+            <StoreTypeSelector
+              value={storeDraft.storeType}
+              error={errors.storeType}
+              inputRef={storeTypeRef}
+              onChange={handleStoreTypeChange}
+            />
           </div>
 
-          <p className={styles.helper}>Your store address is generated automatically from the organization and store names.</p>
-        </div>
+          <div className={styles.formColumn}>
+            <div className={formStyles.field}>
+              <label htmlFor="storeName">
+                Store Name
+                <span className={styles.required}>*</span>
+              </label>
 
-        <OrganizationLogoUpload
-          organizationName={storeDraft.organizationName}
-          logoFile={storeDraft.logoFile}
-          logoPreviewUrl={logoPreviewUrl}
-          error={errors.logo}
-          inputRef={logoRef}
-          onFileChange={handleLogoChange}
-        />
+              <input
+                ref={storeNameRef}
+                id="storeName"
+                type="text"
+                placeholder="e.g. 2026 Spring Store"
+                value={storeDraft.storeName}
+                className={errors.storeName ? styles.invalidControl : undefined}
+                aria-invalid={Boolean(errors.storeName)}
+                aria-describedby={errors.storeName ? "storeName-helper storeName-error" : "storeName-helper"}
+                onChange={(event) => handleStoreNameChange(event.target.value)}
+                onBlur={() => setFieldError("storeName", validateStoreName(storeDraft.storeName))}
+              />
 
-        <div className={formStyles.field}>
-          <label htmlFor="description">
-            Store Description
-            <span className={styles.optional}>(Optional)</span>
-          </label>
+              {errors.storeName && (
+                <p id="storeName-error" className={styles.errorMessage} role="alert">
+                  {errors.storeName}
+                </p>
+              )}
 
-          <textarea
-            id="description"
-            rows={5}
-            placeholder="Tell customers about your organization, season, or what makes your store unique."
-            value={storeDraft.storeDescription}
-            onChange={(event) =>
-              updateStoreDraft({
-                storeDescription: event.target.value,
-              })
-            }
-          />
+              <p id="storeName-helper" className={styles.helper}>
+                This is the name displayed on your storefront.
+              </p>
+            </div>
 
-          <p className={styles.helper}>This description appears on your store homepage.</p>
+            <div className={formStyles.field}>
+              <label>Store Address</label>
+
+              <div className={styles.slug}>
+                <strong>
+                  teamstore.com/store/
+                  {storeDraft.organizationSlug || "your-organization"}/{storeDraft.storeSlug || "your-store-name"}
+                </strong>
+              </div>
+
+              <p className={styles.helper}>Your store address is generated automatically from the organization and store names.</p>
+            </div>
+
+            <OrganizationLogoUpload
+              organizationName={storeDraft.organizationName}
+              logoFile={storeDraft.logoFile}
+              logoPreviewUrl={logoPreviewUrl}
+              error={errors.logo}
+              inputRef={logoRef}
+              onFileChange={handleLogoChange}
+            />
+          </div>
         </div>
       </div>
     </WizardLayout>
