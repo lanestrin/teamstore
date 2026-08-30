@@ -1,0 +1,340 @@
+@use "../../../../../../styles/variables" as *;
+
+.preview {
+    --preview-primary: #111827;
+    --preview-secondary: #dc2626;
+    --preview-primary-text: #ffffff;
+    --preview-secondary-text: #ffffff;
+
+    width: 100%;
+    min-width: 0;
+    padding: $space-5;
+
+    background: $gray-50;
+    border: 1px solid $border-light;
+    border-radius: $radius-lg;
+}
+
+.previewHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-4;
+
+    margin-bottom: $space-4;
+}
+
+.eyebrow {
+    display: block;
+    margin-bottom: $space-1;
+
+    color: $text-secondary;
+
+    font-size: 0.7rem;
+    font-weight: $font-bold;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.previewHeader h2 {
+    margin: 0;
+
+    color: $text-primary;
+
+    font-size: 1.25rem;
+    font-weight: $font-semibold;
+}
+
+.swatches {
+    display: flex;
+    gap: $space-2;
+}
+
+.primarySwatch,
+.secondarySwatch {
+    display: block;
+
+    width: 28px;
+    height: 28px;
+
+    border: 2px solid $white;
+    border-radius: $radius-round;
+
+    box-shadow: 0 0 0 1px $border-light;
+}
+
+.primarySwatch {
+    background: var(--preview-primary);
+}
+
+.secondarySwatch {
+    background: var(--preview-secondary);
+}
+
+.storePreview {
+    overflow: hidden;
+
+    background: $white;
+    border: 1px solid $border-light;
+    border-radius: $radius-md;
+}
+
+.storeHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-3;
+
+    min-height: 52px;
+    padding: 0 $space-4;
+
+    background: var(--preview-primary);
+    color: var(--preview-primary-text);
+}
+
+.storeBrand {
+    font-size: 1rem;
+    font-weight: $font-bold;
+    letter-spacing: 0.04em;
+}
+
+.storeNav {
+    display: flex;
+    gap: 6px;
+}
+
+.storeNav span {
+    display: block;
+
+    width: 22px;
+    height: 4px;
+
+    border-radius: $radius-pill;
+
+    background: currentColor;
+    opacity: 0.55;
+}
+
+.hero {
+    padding: $space-7 $space-5;
+
+    background:
+        linear-gradient(135deg,
+            var(--preview-primary) 0%,
+            var(--preview-primary) 64%,
+            var(--preview-secondary) 64%,
+            var(--preview-secondary) 100%);
+
+    color: var(--preview-primary-text);
+}
+
+.heroLabel {
+    display: block;
+
+    margin-bottom: $space-2;
+
+    font-size: 0.7rem;
+    font-weight: $font-bold;
+    letter-spacing: 0.08em;
+}
+
+.hero h3 {
+    max-width: 280px;
+    margin: 0;
+
+    font-size: 1.8rem;
+    font-weight: $font-bold;
+    line-height: 1;
+    text-transform: uppercase;
+}
+
+.hero p {
+    max-width: 280px;
+    margin: $space-3 0 0;
+
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+.cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 38px;
+    margin-top: $space-4;
+    padding: 0 $space-4;
+
+    background: var(--preview-secondary);
+    border: 2px solid var(--preview-secondary);
+
+    color: var(--preview-secondary-text);
+
+    font-size: 0.8rem;
+    font-weight: $font-bold;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.products {
+    padding: $space-5;
+}
+
+.productsHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-3;
+
+    margin-bottom: $space-4;
+}
+
+.productsHeader strong {
+    color: $text-primary;
+    font-size: 0.875rem;
+}
+
+.productsHeader span {
+    color: $text-secondary;
+    font-size: 0.7rem;
+}
+
+.productGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: $space-3;
+}
+
+.productCard {
+    min-width: 0;
+}
+
+.productImage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 115px;
+
+    overflow: hidden;
+
+    background: $gray-100;
+    border-radius: $radius-sm;
+}
+
+.shirtShape {
+    position: relative;
+
+    display: block;
+
+    width: 58px;
+    height: 68px;
+
+    background: var(--preview-primary);
+    border-radius: 5px 5px 10px 10px;
+}
+
+.shirtShape::before,
+.shirtShape::after {
+    position: absolute;
+
+    top: 5px;
+
+    width: 25px;
+    height: 30px;
+
+    background: var(--preview-primary);
+
+    content: "";
+}
+
+.shirtShape::before {
+    left: -17px;
+
+    transform: rotate(28deg);
+}
+
+.shirtShape::after {
+    right: -17px;
+
+    transform: rotate(-28deg);
+}
+
+.productLines {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    margin-top: $space-2;
+}
+
+.productLines span {
+    display: block;
+
+    height: 6px;
+
+    background: $gray-200;
+    border-radius: $radius-pill;
+}
+
+.productLines span:first-child {
+    width: 75%;
+}
+
+.productLines span:last-child {
+    width: 48%;
+}
+
+.colorBar {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: $space-1 $space-3;
+
+    padding: $space-3 $space-4;
+
+    background: $gray-100;
+    border-top: 1px solid $border-light;
+
+    font-size: 0.7rem;
+}
+
+.colorBar span {
+    color: $text-secondary;
+}
+
+.colorBar strong {
+    justify-self: end;
+
+    color: $text-primary;
+
+    font-family: monospace;
+    font-size: 0.72rem;
+}
+
+@media (max-width: 900px) {
+    .preview {
+        max-width: 560px;
+    }
+}
+
+@media (max-width: 520px) {
+    .preview {
+        padding: $space-4;
+    }
+
+    .hero {
+        padding: $space-6 $space-4;
+    }
+
+    .hero h3 {
+        font-size: 1.55rem;
+    }
+
+    .products {
+        padding: $space-4;
+    }
+
+    .productImage {
+        min-height: 95px;
+    }
+}

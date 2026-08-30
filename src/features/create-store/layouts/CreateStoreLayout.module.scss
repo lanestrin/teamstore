@@ -2,19 +2,16 @@
 
 .layout {
   display: grid;
-  grid-template-columns: 280px minmax(0, 1fr);
+  grid-template-columns: 320px minmax(0, 1fr);
+
   width: 100%;
   min-width: 0;
+
   background: $black;
 }
 
 .sidebar {
-  position: sticky;
-  top: 0;
-  align-self: start;
-
   width: 100%;
-  height: calc(100vh - 40px);
   min-width: 0;
 
   background: $black;
@@ -23,32 +20,46 @@
 .content {
   width: 100%;
   min-width: 0;
+
   background: $white;
 }
 
 .loading {
   display: grid;
+
   width: 100%;
   min-height: 60vh;
-  place-items: center;
   padding: $space-8;
+
+  place-items: center;
 }
 
 .loading p {
+  margin: 0;
   color: $text-secondary;
 }
 
-@media (max-width: 992px) {
+/*
+ * Tablet and mobile use the compact progress header.
+ * The browser remains responsible for page scrolling.
+ */
+@media (max-width: 1180px) {
   .layout {
     display: block;
+    background: $white;
   }
 
-    .sidebar {
-      position: static;
-      height: auto;
-    }
+  .sidebar {
+    width: 100%;
+    min-height: 0;
+
+    background: transparent;
+  }
 
   .content {
     width: 100%;
+    min-width: 0;
+
+    background: $white;
   }
 }
