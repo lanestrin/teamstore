@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ChangeEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import { LuImage, LuPencil, LuUpload } from "react-icons/lu";
 
 import { ART_TEMPLATE_LIST, type ArtTemplate } from "../../../../assets/art-templates";
@@ -14,7 +14,7 @@ import styles from "./ArtworkStep.module.scss";
 import type { ArtworkAdjustments } from "./lib/artworkEditor";
 import type { ArtworkTextDraft } from "../../context/CreateStoreContext.types";
 
-const MAX_MASCOT_FILE_SIZE = 5 * 1024 * 1024;
+const MAX_LOGO_FILE_SIZE = 5 * 1024 * 1024;
 
 interface ArtworkTemplateGalleryItem {
   template: ArtTemplate;
@@ -24,7 +24,7 @@ interface ArtworkTemplateGalleryItem {
   artworkAdjustments: ArtworkAdjustments;
 }
 
-function isSupportedMascotFile(file: File) {
+function isSupportedLogoFile(file: File) {
   const supportedTypes = ["image/png", "image/jpeg", "image/svg+xml"];
 
   if (supportedTypes.includes(file.type)) {
@@ -69,20 +69,25 @@ export default function SelectArtworksStep() {
     updateStoreDraft,
     updateArtworkTemplateDraft,
     resolvedArtworkText,
-    mascotDataUrl,
+    mascotDataUrl: logoDataUrl,
     artworkBaseSvgsByTemplateId,
     artworkSvgsByTemplateId,
   } = useCreateStore();
 
   const [editingTemplateId, setEditingTemplateId] = useState<string | null>(null);
-  const [mascotError, setMascotError] = useState<string | null>(null);
+  const [logoError, setLogoError] = useState<string | null>(null);
+
+  const logoInputRef = useRef<HTMLInputElement>(null);
 
   const templateGalleryItems = useMemo<ArtworkTemplateGalleryItem[]>(
     () =>
       ART_TEMPLATE_LIST.map((template) => {
         const templateDraft = storeDraft.artworkTemplates[template.id];
+
         const artworkAdjustments = templateDraft?.artworkAdjustments ?? {};
+
         const baseSvg = artworkBaseSvgsByTemplateId[template.id] ?? template.svg;
+
         const customizedSvg = artworkSvgsByTemplateId[template.id] ?? baseSvg;
 
         return {
@@ -184,32 +189,49 @@ export default function SelectArtworksStep() {
     });
   }
 
-  function handleMascotChange(event: ChangeEvent<HTMLInputElement>) {
+  function openLogoPicker() {
+    const input = logoInputRef.current;
+
+    if (!input) {
+      return;
+    }
+
+    /*
+     * Clear the native value first so selecting the same
+     * file again still triggers onChange.
+     */
+    input.value = "";
+    input.click();
+  }
+
+  function handleLogoChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.currentTarget.files?.[0];
 
     if (!file) {
       return;
     }
 
-    if (!isSupportedMascotFile(file)) {
-      setMascotError("Choose a PNG, JPG, JPEG, or SVG file.");
+    if (!isSupportedLogoFile(file)) {
+      setLogoError("Choose a PNG, JPG, JPEG, or SVG file.");
       event.currentTarget.value = "";
       return;
     }
 
-    if (file.size > MAX_MASCOT_FILE_SIZE) {
-      setMascotError("The mascot file must be 5 MB or smaller.");
+    if (file.size > MAX_LOGO_FILE_SIZE) {
+      setLogoError("The logo file must be 5 MB or smaller.");
       event.currentTarget.value = "";
       return;
     }
 
-    setMascotError(null);
+    setLogoError(null);
 
     updateStoreDraft({
       logoFile: file,
       logoStorageId: null,
     });
   }
+
+  const hasLogo = Boolean(storeDraft.logoFile || storeDraft.logoStorageId);
 
   return (
     <>
@@ -226,11 +248,13 @@ export default function SelectArtworksStep() {
             <div className={styles.controlSection}>
               <div className={styles.controlsHeading}>
                 <h2>Artwork Text</h2>
+
                 <p>Customize the text used across your artwork templates.</p>
               </div>
 
               <label className={styles.field}>
                 <span>Line 1</span>
+
                 <input
                   type="text"
                   placeholder="Line 1"
@@ -241,6 +265,7 @@ export default function SelectArtworksStep() {
 
               <label className={styles.field}>
                 <span>Line 2</span>
+
                 <input
                   type="text"
                   placeholder="Line 2"
@@ -251,6 +276,7 @@ export default function SelectArtworksStep() {
 
               <label className={styles.field}>
                 <span>Established year</span>
+
                 <input
                   type="text"
                   inputMode="numeric"
@@ -262,46 +288,58 @@ export default function SelectArtworksStep() {
               </label>
             </div>
 
-            <div className={styles.divider} />
+            <div className={styles.divider} aria-hidden="true" />
 
             <div className={styles.controlSection}>
               <div className={styles.controlsHeading}>
-                <h2>Mascot</h2>
-                <p>The mascot uploaded earlier is loaded automatically. Upload another file to replace it in every preview.</p>
+                <h2>Organization Logo</h2>
+
+                <p>
+                  Your organization logo from Step 1 is used automatically in supported artwork templates. You can replace it here if
+                  needed.
+                </p>
               </div>
 
               <div className={styles.mascotCard}>
                 <div className={styles.mascotThumbnail}>
-                  {mascotDataUrl ? <img src={mascotDataUrl} alt="Current mascot" /> : <LuImage aria-hidden="true" />}
+                  {logoDataUrl ? <img src={logoDataUrl} alt="Current organization logo" /> : <LuImage aria-hidden="true" />}
                 </div>
 
                 <div className={styles.mascotDetails}>
-                  <strong>{storeDraft.logoFile?.name ?? (storeDraft.logoStorageId ? "Saved mascot" : "No mascot uploaded")}</strong>
+                  <strong>
+                    {storeDraft.logoFile?.name ?? (storeDraft.logoStorageId ? "Saved organization logo" : "No logo uploaded")}
+                  </strong>
+
                   <span>{storeDraft.logoFile ? formatFileSize(storeDraft.logoFile.size) : "PNG, JPG, or SVG · Maximum 5 MB"}</span>
 
-                  <label className={styles.replaceButton}>
+                  <button type="button" className={styles.replaceButton} onClick={openLogoPicker}>
                     <LuUpload aria-hidden="true" />
-                    {storeDraft.logoFile || storeDraft.logoStorageId ? "Replace mascot" : "Upload mascot"}
-                    <input
-                      type="file"
-                      accept=".png,.jpg,.jpeg,.svg,image/png,image/jpeg,image/svg+xml"
-                      className={styles.fileInput}
-                      onChange={handleMascotChange}
-                    />
-                  </label>
+
+                    {hasLogo ? "Replace logo" : "Upload logo"}
+                  </button>
+
+                  <input
+                    ref={logoInputRef}
+                    type="file"
+                    accept=".png,.jpg,.jpeg,.svg,image/png,image/jpeg,image/svg+xml"
+                    className={styles.fileInput}
+                    tabIndex={-1}
+                    aria-label="Organization logo file"
+                    onChange={handleLogoChange}
+                  />
                 </div>
               </div>
 
-              {mascotError && (
+              {logoError && (
                 <p className={styles.error} role="alert">
-                  {mascotError}
+                  {logoError}
                 </p>
               )}
 
               {!storeDraft.logoFile && storeDraft.logoStorageId && (
                 <p className={styles.notice}>
-                  This draft has a stored mascot, but its public URL is not loaded in the current wizard state. Uploading a replacement will
-                  preview it immediately.
+                  This draft has a saved organization logo, but its public URL is not loaded in the current wizard state. Uploading a
+                  replacement will preview it immediately.
                 </p>
               )}
             </div>
@@ -312,24 +350,23 @@ export default function SelectArtworksStep() {
 
             {storeDraft.uploadedArtworks.length > 0 && (
               <div className={styles.uploadedArtworkGrid}>
-                {storeDraft.uploadedArtworks.map((artwork) => {
-                  return (
-                    <UploadedArtworkCard
-                      key={artwork.id}
-                      fileName={artwork.fileName}
-                      previewUrl={uploadedArtworkPreviews.get(artwork.id)}
-                      isSelected={artwork.isSelected}
-                      onSelectionChange={(checked) => handleUploadedArtworkSelectionChange(artwork.id, checked)}
-                      onRemove={() => handleArtworkRemove(artwork.id)}
-                    />
-                  );
-                })}
+                {storeDraft.uploadedArtworks.map((artwork) => (
+                  <UploadedArtworkCard
+                    key={artwork.id}
+                    fileName={artwork.fileName}
+                    previewUrl={uploadedArtworkPreviews.get(artwork.id)}
+                    isSelected={artwork.isSelected}
+                    onSelectionChange={(checked) => handleUploadedArtworkSelectionChange(artwork.id, checked)}
+                    onRemove={() => handleArtworkRemove(artwork.id)}
+                  />
+                ))}
               </div>
             )}
 
             <div className={styles.templateGalleryHeader}>
               <div>
                 <h2 id="artwork-template-gallery-title">Artwork Templates</h2>
+
                 <p>Select any templates you want to use, or continue without artwork.</p>
               </div>
 
@@ -360,6 +397,7 @@ export default function SelectArtworksStep() {
                           })
                         }
                       />
+
                       <span>Use this template</span>
                     </label>
 
@@ -370,6 +408,7 @@ export default function SelectArtworksStep() {
                       onClick={() => setEditingTemplateId(template.id)}
                     >
                       <LuPencil aria-hidden="true" />
+
                       <span>Edit art</span>
                     </button>
                   </div>
@@ -391,6 +430,7 @@ export default function SelectArtworksStep() {
             updateArtworkTemplateDraft(editingTemplate.template.id, {
               artworkAdjustments: nextAdjustments,
             });
+
             setEditingTemplateId(null);
           }}
         />
