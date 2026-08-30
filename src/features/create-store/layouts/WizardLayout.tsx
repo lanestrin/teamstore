@@ -45,23 +45,21 @@ export default function WizardLayout({
 
       <div className={styles.stepContent}>{children}</div>
 
-      <footer className={styles.actions}>
-        {hideBack ? (
-          <div aria-hidden="true" />
-        ) : (
-          <button type="button" className={styles.secondaryButton} onClick={onBack}>
-            {backLabel}
-          </button>
-        )}
+      {(!hideBack || !hideNext) && (
+        <footer className={styles.actions}>
+          {!hideBack && (
+            <button type="button" className={styles.secondaryButton} onClick={onBack}>
+              {backLabel}
+            </button>
+          )}
 
-        {hideNext ? (
-          <div aria-hidden="true" />
-        ) : (
-          <button type="button" className={styles.primaryButton} onClick={onNext} disabled={nextDisabled}>
-            {nextLabel}
-          </button>
-        )}
-      </footer>
+          {!hideNext && (
+            <button type="button" className={styles.primaryButton} onClick={onNext} disabled={nextDisabled}>
+              {nextLabel}
+            </button>
+          )}
+        </footer>
+      )}
     </section>
   );
 }

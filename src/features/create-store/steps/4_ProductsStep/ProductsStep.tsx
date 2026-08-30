@@ -5,7 +5,7 @@ import { LuTriangleAlert } from "react-icons/lu";
 import { api } from "../../../../../convex/_generated/api";
 import { ART_TEMPLATE_LIST } from "../../../../assets/art-templates";
 import type { ProductColorFamily } from "../../../../types/productColor.types";
-import WizardLayout from "../../components/WizardLayout/WizardLayout";
+import WizardLayout from "../../layouts/WizardLayout";
 import { useCreateStore } from "../../context/CreateStoreContext";
 
 import ProductEditorModal from "./components/ProductEditorModal/ProductEditorModal";

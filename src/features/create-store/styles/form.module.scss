@@ -6,16 +6,22 @@
   display: flex;
   flex-direction: column;
   gap: $space-3;
+
+  width: 100%;
+  min-width: 0;
 }
 
 .field label {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: $space-1;
+
+  color: $text-primary;
+
   font-size: 0.95rem;
   font-weight: $font-semibold;
   line-height: 1.4;
-  color: $text-primary;
 }
 
 /* ==========================================================
@@ -26,15 +32,32 @@
 .field textarea,
 .field select {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
   padding: $space-3 $space-4;
-  font: inherit;
+
   color: $text-primary;
+
   background: $white;
   border: 1px solid $border-light;
   border-radius: $radius-md;
+
+  /*
+   * Keep controls at 16px on mobile so iOS Safari does not
+   * zoom the page when an input receives focus.
+   */
+  font: inherit;
+  font-size: 1rem;
+
   transition:
     border-color $transition-base,
     box-shadow $transition-base;
+}
+
+.field input,
+.field select {
+  min-height: 44px;
 }
 
 .field input::placeholder,
@@ -53,7 +76,9 @@
 
 .field textarea {
   min-height: 120px;
+
   font-family: inherit;
+
   resize: vertical;
 }
 
@@ -66,6 +91,7 @@
 .field select:disabled {
   background: $gray-100;
   color: $text-secondary;
+
   cursor: not-allowed;
 }
 
@@ -84,8 +110,10 @@
 
 .optional {
   margin-left: $space-1;
-  font-weight: $font-regular;
+
   color: $text-secondary;
+
+  font-weight: $font-regular;
 }
 
 /* ==========================================================
@@ -94,9 +122,11 @@
 
 .helper {
   margin: $space-1 0 0;
+
+  color: $text-secondary;
+
   font-size: 0.875rem;
   line-height: 1.6;
-  color: $text-secondary;
 }
 
 /* ==========================================================
@@ -119,6 +149,7 @@
 
 .validationMessage {
   margin-top: $space-2;
+
   font-size: 0.875rem;
   font-weight: $font-medium;
   line-height: 1.5;

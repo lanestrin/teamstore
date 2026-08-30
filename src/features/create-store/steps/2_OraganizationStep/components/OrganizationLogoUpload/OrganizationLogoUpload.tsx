@@ -1,4 +1,4 @@
-import type { Ref } from "react";
+import type { RefObject } from "react";
 import { LuTrash2, LuUpload } from "react-icons/lu";
 
 import formStyles from "../../../../styles/form.module.scss";
@@ -9,7 +9,7 @@ interface OrganizationLogoUploadProps {
   logoFile: File | null;
   logoPreviewUrl: string | null;
   error?: string;
-  inputRef: Ref<HTMLInputElement>;
+  inputRef: RefObject<HTMLInputElement | null>;
   onFileChange: (file: File | null) => boolean;
 }
 
@@ -26,7 +26,28 @@ export default function OrganizationLogoUpload({
   onFileChange,
 }: OrganizationLogoUploadProps) {
   const logoExtension = logoFile ? logoFile.name.split(".").pop()?.toUpperCase() : null;
+
   const logoSize = logoFile ? formatFileSize(logoFile.size) : null;
+
+  function openFilePicker() {
+    const input = inputRef.current;
+
+    if (!input) {
+      return;
+    }
+
+    // Allows the same file to be selected again.
+    input.value = "";
+    input.click();
+  }
+
+  function removeLogo() {
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
+
+    onFileChange(null);
+  }
 
   return (
     <div className={formStyles.field}>
@@ -65,18 +86,12 @@ export default function OrganizationLogoUpload({
               </p>
 
               <div className={styles.actions}>
-                <label htmlFor="logo" className={styles.replaceLogo}>
+                <button type="button" className={styles.replaceLogo} onClick={openFilePicker}>
                   <LuUpload aria-hidden="true" />
                   Replace Logo
-                </label>
+                </button>
 
-                <button
-                  type="button"
-                  className={styles.removeLogo}
-                  onClick={() => {
-                    onFileChange(null);
-                  }}
-                >
+                <button type="button" className={styles.removeLogo} onClick={removeLogo}>
                   <LuTrash2 aria-hidden="true" />
                   Remove Logo
                 </button>
@@ -91,6 +106,7 @@ export default function OrganizationLogoUpload({
           </div>
 
           <h3>Upload your logo</h3>
+
           <p>PNG, JPG or SVG (max 5 MB)</p>
         </label>
       )}

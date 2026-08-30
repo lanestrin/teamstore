@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { LuImage, LuPencil, LuUpload } from "react-icons/lu";
 
 import { ART_TEMPLATE_LIST, type ArtTemplate } from "../../../../assets/art-templates";
-import WizardLayout from "../../components/WizardLayout/WizardLayout";
+import WizardLayout from "../../layouts/WizardLayout";
 import { useCreateStore } from "../../context/CreateStoreContext";
 
 import ArtworkEditorModal from "./components/ArtworkEditorModal/ArtworkEditorModal";

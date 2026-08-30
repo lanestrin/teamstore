@@ -1,344 +1,47 @@
 .form {
+  width: 100%;
+  min-width: 0;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: $space-8;
+  width: 100%;
+}
+
+.formColumn {
   display: flex;
   flex-direction: column;
   gap: $space-7;
+  min-width: 0;
 }
 
 .slug {
   display: flex;
   align-items: center;
+  min-width: 0;
   padding: $space-3 $space-4;
+
   background: $gray-100;
   border: 1px solid $border-light;
   border-radius: $radius-md;
-}
-
-.slug span {
-  color: $text-secondary;
 }
 
 .slug strong {
-  font-weight: $font-semibold;
+  min-width: 0;
+
   color: $text-primary;
+  font-weight: $font-semibold;
+
   overflow-wrap: anywhere;
-}
-
-.upload {
-  @include flex-center;
-  flex-direction: column;
-  gap: $space-3;
-  min-height: 220px;
-  padding: $space-8;
-  text-align: center;
-  background: $white;
-  border: 2px dashed $border-light;
-  border-radius: $radius-lg;
-  cursor: pointer;
-  transition:
-    border-color $transition-base,
-    background-color $transition-base,
-    transform $transition-base;
-}
-
-.upload:hover {
-  border-color: $gray-400;
-  background: rgba($gray-400, 0.03);
-}
-
-.uploadWithLogo {
-  align-items: stretch;
-  min-height: auto;
-  padding: $space-5;
-  text-align: left;
-  border-style: solid;
-  cursor: default;
-}
-
-.uploadIcon {
-  @include flex-center;
-  width: 56px;
-  height: 56px;
-  border: 1px solid $border-light;
-  border-radius: $radius-round;
-  background: $gray-50;
-  font-size: 1.5rem;
-  color: $text-secondary;
-  transition:
-    background-color $transition-base,
-    color $transition-base,
-    border-color $transition-base;
-}
-
-.logoPreviewRow {
-  display: flex;
-  align-items: center;
-  gap: $space-4;
-}
-
-.logoPreview {
-  @include flex-center;
-  flex: 0 0 auto;
-  width: 88px;
-  height: 88px;
-  padding: $space-2;
-  overflow: hidden;
-  background: $gray-50;
-  border: 1px solid $border-light;
-  border-radius: $radius-md;
-}
-
-.logoPreview img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.logoDetails {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: $space-1;
-  min-width: 0;
-}
-
-.upload h3,
-.logoDetails h3 {
-  margin: 0;
-  font-size: 1.125rem;
-  font-weight: $font-semibold;
-  color: $text-primary;
   word-break: break-word;
-}
-
-.upload p,
-.logoDetails p {
-  margin: 0;
-  font-size: 0.875rem;
-  color: $text-secondary;
-}
-
-.fileInput {
-  display: none;
-}
-
-.actions {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: $space-3;
-  margin-top: $space-3;
-}
-
-.replaceLogo,
-.removeLogo {
-  @include button-base;
-  gap: $space-2;
-  padding: $space-2 $space-4;
-  font-size: 0.875rem;
-  font-weight: $font-medium;
-}
-
-.replaceLogo {
-  background: $gray-100;
-  border: 1px solid $border-light;
-  color: $text-primary;
-  cursor: pointer;
-}
-
-.replaceLogo:hover {
-  background: $gray-200;
-}
-
-.removeLogo {
-  background: transparent;
-  border: 1px solid $error-border;
-  color: $error;
-}
-
-.removeLogo:hover {
-  background: $error-background;
-}
-
-.storeTypeField {
-  min-width: 0;
-  padding: 0;
-  margin: 0;
-  border: 0;
-}
-
-.storeTypeField legend {
-  padding: 0;
-  margin-bottom: $space-3;
-  font-weight: $font-semibold;
-  color: $text-primary;
-}
-
-.storeTypeGrid {
-  display: flex;
-  flex-direction: column;
-  gap: $space-3;
-}
-
-.storeTypeCard {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: $space-3;
-  width: fit-content;
-  padding: 0;
-  background: transparent;
-  border: 0;
-  cursor: pointer;
-}
-
-.storeTypeInput {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  overflow: hidden;
-  opacity: 0;
-}
-
-.storeTypeIndicator {
-  position: relative;
-  flex: 0 0 auto;
-  width: 18px;
-  height: 18px;
-  background: $white;
-  border: 2px solid $gray-400;
-  border-radius: $radius-round;
-  transition: border-color $transition-fast;
-}
-
-.storeTypeCard:hover .storeTypeIndicator {
-  border-color: $brand-red;
-}
-
-.storeTypeCard[data-selected="true"] .storeTypeIndicator {
-  border-color: $brand-red;
-}
-
-.storeTypeCard[data-selected="true"] .storeTypeIndicator::after {
-  position: absolute;
-  inset: 3px;
-  content: "";
-  background: $brand-red;
-  border-radius: $radius-round;
-}
-
-.storeTypeCard:focus-within .storeTypeIndicator {
-  outline: 2px solid rgba($brand-red, 0.2);
-  outline-offset: 3px;
-}
-
-.storeTypeContent {
-  min-width: 0;
-}
-
-.storeTypeTitle {
-  display: flex;
-  align-items: center;
-  gap: $space-2;
-}
-
-.storeTypeTitle strong {
-  color: $text-primary;
-  font-size: 0.9375rem;
-  font-weight: $font-semibold;
-}
-
-.storeTypeHelp {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: $text-muted;
-  cursor: help;
-  transition: color $transition-fast;
-
-  svg {
-    width: 17px;
-    height: 17px;
-  }
-
-  &:hover {
-    color: $brand-red;
-  }
-
-  &:focus-visible {
-    color: $brand-red;
-    outline: 2px solid rgba($brand-red, 0.25);
-    outline-offset: 2px;
-    border-radius: $radius-round;
-  }
-}
-
-.storeTypeTooltip {
-  position: absolute;
-  z-index: $z-tooltip;
-  bottom: calc(100% + $space-2);
-  left: 50%;
-  width: 280px;
-  padding: $space-3;
-  font-size: 0.8125rem;
-  font-weight: $font-regular;
-  line-height: $line-height-body;
-  color: $white;
-  pointer-events: none;
-  visibility: hidden;
-  background: $gray-900;
-  border-radius: $radius-md;
-  opacity: 0;
-  transform: translateX(-50%);
-  transition: opacity $transition-fast;
-}
-
-.storeTypeHelp:hover .storeTypeTooltip,
-.storeTypeHelp:focus .storeTypeTooltip {
-  visibility: visible;
-  opacity: 1;
-}
-
-.storeTypeField .errorMessage {
-  margin-top: $space-2;
-}
-
-.storeTypeField .helper {
-  margin-top: $space-3;
-}
-
-@media (max-width: 520px) {
-  .logoPreviewRow {
-    align-items: flex-start;
-  }
-
-  .logoPreview {
-    width: 72px;
-    height: 72px;
-  }
-
-  .actions {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .replaceLogo,
-  .removeLogo {
-    width: 100%;
-  }
 }
 
 .required {
   margin-left: $space-1;
   color: $error;
-}
-
-.optional {
-  margin-left: $space-2;
-  font-size: 0.875rem;
-  color: $text-secondary;
 }
 
 .helper,
@@ -364,19 +67,9 @@
   border-color: $error;
 }
 
-.invalidUpload {
-  border-color: $error-border;
-  background: $error-background;
-}
-
-.visuallyHidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+@media (max-width: 900px) {
+  .formGrid {
+    grid-template-columns: 1fr;
+    gap: $space-7;
+  }
 }

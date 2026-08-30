@@ -1,22 +1,29 @@
-.sidebar {
+@use "../../../../styles/variables" as *;
+
+.desktopSidebar {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  padding: 1.5rem;
+  width: 100%;
+  min-height: 100vh;
+  padding: $space-6;
   background: linear-gradient(180deg, #111111 0%, #0b0b0b 100%);
-  color: white;
+  color: $white;
+}
+
+.header {
+  flex-shrink: 0;
 }
 
 .logo {
   display: flex;
   align-items: center;
-  flex-shrink: 0;
+  width: fit-content;
   margin-bottom: $space-4;
   text-decoration: none;
 }
 
 .logo:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.9);
+  outline: 2px solid rgba($white, 0.9);
   outline-offset: 4px;
   border-radius: $radius-sm;
 }
@@ -25,57 +32,53 @@
   display: block;
   width: auto;
   height: 32px;
-  transition: transform $transition-base;
-}
-
-.logo:hover .logoImage {
-  transform: scale(1.02);
 }
 
 .label {
   display: block;
-  margin-bottom: 0.75rem;
+  margin-bottom: $space-3;
+  color: rgba($white, 0.55);
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.55);
 }
 
 .header h2 {
   margin: 0;
+  color: $white;
   font-size: 2rem;
-  line-height: 1.15;
   font-weight: 700;
+  line-height: 1.15;
 }
 
 .header p {
-  margin-top: 0.75rem;
-  color: rgba(255, 255, 255, 0.6);
-  line-height: 1.6;
+  margin: $space-3 0 0;
+  color: rgba($white, 0.6);
   font-size: 0.95rem;
+  line-height: 1.6;
 }
 
 .header::after {
-  content: "";
   display: block;
   height: 1px;
-  margin-top: 2rem;
-  background: rgba(255, 255, 255, 0.08);
+  margin-top: $space-6;
+  background: rgba($white, 0.08);
+  content: "";
 }
 
 .steps {
   flex: 1;
-  margin-top: 2rem;
+  margin-top: $space-8;
 }
 
 .step {
   position: relative;
   display: flex;
-  gap: 1rem;
+  gap: $space-4;
   width: 100%;
-  padding: 0 0 2rem;
-  border: none;
+  padding: 0 0 $space-6;
+  border: 0;
   background: transparent;
   color: inherit;
   font: inherit;
@@ -83,16 +86,8 @@
   cursor: pointer;
 }
 
-.step:not(:disabled):hover .content h3 {
-  color: white;
-}
-
-.step:not(:disabled):hover .circle {
-  border-color: rgba(255, 255, 255, 0.45);
-}
-
 .step:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.85);
+  outline: 2px solid rgba($white, 0.85);
   outline-offset: 4px;
   border-radius: $radius-sm;
 }
@@ -103,28 +98,38 @@
 
 .line {
   position: absolute;
-  left: 16px;
-  top: 36px;
+  top: 32px;
+  left: 15px;
   width: 1px;
-  height: calc(100% - 12px);
-  background: rgba(255, 255, 255, 0.12);
+  height: calc(100% - 8px);
+  background: rgba($white, 0.12);
+}
+
+.lineComplete {
+  background: rgba($white, 0.4);
 }
 
 .circle {
   position: relative;
   z-index: 2;
+
   display: flex;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
+
   width: 32px;
   height: 32px;
+
+  border: 2px solid rgba($white, 0.2);
   border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+
   background: #141414;
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba($white, 0.85);
+
   font-size: 0.85rem;
   font-weight: 700;
-  flex-shrink: 0;
+
   transition:
     border-color $transition-base,
     background-color $transition-base,
@@ -132,50 +137,70 @@
 }
 
 .active {
-  background: $brand-red;
   border-color: $brand-red;
-  color: white;
+  background: $brand-red;
+  color: $white;
   box-shadow: 0 0 0 6px rgba($brand-red, 0.1);
 }
 
 .complete {
-  background: #22c55e;
   border-color: #22c55e;
-  color: white;
+  background: #22c55e;
+  color: $white;
 }
 
-.content h3 {
+.content {
+  min-width: 0;
+}
+
+.stepTitle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $space-2;
+}
+
+.stepTitle h3 {
+  margin: 2px 0 4px;
+  color: $white;
   font-size: 0.96rem;
   font-weight: 600;
-  transition: color $transition-base;
 }
 
 .content p {
   margin: 0;
+  color: rgba($white, 0.5);
   font-size: 0.82rem;
   line-height: 1.45;
-  color: rgba(255, 255, 255, 0.5);
 }
 
 .footer {
-  padding-top: 1.75rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+  padding-top: $space-7;
+  border-top: 1px solid rgba($white, 0.08);
 }
 
 .exitButton {
   display: flex;
   align-items: center;
-  gap: 0.9rem;
+  gap: $space-3;
+
   width: 100%;
+  min-height: 44px;
   padding: 0;
-  border: none;
+
+  border: 0;
   background: transparent;
-  color: rgba(255, 255, 255, 0.88);
-  cursor: pointer;
+  color: rgba($white, 0.88);
+
+  font: inherit;
   text-align: left;
+
+  cursor: pointer;
 }
 
 .exitButton svg {
+  flex: 0 0 auto;
   font-size: 1.25rem;
 }
 
@@ -187,21 +212,235 @@
 .exitButton small {
   display: block;
   margin-top: 2px;
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba($white, 0.45);
   font-size: 0.72rem;
 }
 
-.exitButton:hover {
-  color: white;
+.exitButton:focus-visible {
+  outline: 2px solid rgba($white, 0.85);
+  outline-offset: 4px;
+  border-radius: $radius-sm;
 }
 
-.stepTitle {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
+.exitButton:disabled {
+  cursor: default;
+  opacity: 0.6;
 }
 
-.stepTitle h3 {
-  margin: 2px 0 4px;
+/* Mobile */
+
+.mobileHeader {
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .step:not(:disabled):hover .circle {
+    border-color: rgba($white, 0.45);
+  }
+
+  .step:not(:disabled):hover .stepTitle h3 {
+    color: $white;
+  }
+
+  .exitButton:not(:disabled):hover {
+    color: $white;
+  }
+}
+
+@media (max-width: 992px) {
+  .desktopSidebar {
+    display: none;
+  }
+
+  .mobileHeader {
+    display: block;
+    width: 100%;
+    padding: $space-3 $space-4;
+    background: #0b0b0b;
+    color: $white;
+  }
+
+  .mobileTopRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-4;
+    min-width: 0;
+  }
+
+  .mobileStepInfo {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .mobileStepInfo span {
+    color: rgba($white, 0.6);
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .mobileStepInfo strong {
+    margin-top: 2px;
+    overflow: hidden;
+    color: $white;
+    font-size: 1rem;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .mobileExitButton {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    gap: $space-2;
+
+    min-height: 44px;
+    padding: $space-2 $space-3;
+
+    border: 1px solid rgba($white, 0.2);
+    border-radius: $radius-md;
+
+    background: transparent;
+    color: $white;
+
+    font: inherit;
+    font-size: 0.8125rem;
+    font-weight: 600;
+
+    cursor: pointer;
+  }
+
+  .mobileExitButton svg {
+    flex: 0 0 auto;
+    font-size: 1rem;
+  }
+
+  .mobileExitButton:focus-visible {
+    outline: 2px solid $white;
+    outline-offset: 3px;
+  }
+
+  .mobileExitButton:disabled {
+    cursor: default;
+    opacity: 0.55;
+  }
+
+  .mobileSteps {
+    position: relative;
+
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+
+    width: 100%;
+    margin-top: $space-2;
+  }
+
+  .mobileSteps::before {
+    position: absolute;
+    z-index: 0;
+    top: 21px;
+    right: 10%;
+    left: 10%;
+
+    height: 2px;
+
+    background: rgba($white, 0.15);
+
+    content: "";
+  }
+
+  .mobileStep {
+    position: relative;
+    z-index: 1;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 0;
+    min-height: 44px;
+    padding: 0;
+
+    border: 0;
+    background: transparent;
+    color: rgba($white, 0.7);
+
+    cursor: pointer;
+  }
+
+  .mobileStep:disabled {
+    cursor: default;
+  }
+
+  .mobileStepCircle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 30px;
+    height: 30px;
+
+    border: 2px solid rgba($white, 0.25);
+    border-radius: 50%;
+
+    background: #141414;
+    color: inherit;
+
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  .mobileStepActive .mobileStepCircle {
+    border-color: $brand-red;
+    background: $brand-red;
+    color: $white;
+    box-shadow: 0 0 0 4px rgba($brand-red, 0.14);
+  }
+
+  .mobileStepComplete .mobileStepCircle {
+    border-color: #22c55e;
+    background: #22c55e;
+    color: $white;
+  }
+
+  .mobileStep:focus-visible {
+    outline: 2px solid $white;
+    outline-offset: 1px;
+    border-radius: $radius-sm;
+  }
+}
+
+@media (max-width: 360px) {
+  .mobileHeader {
+    padding-right: $space-3;
+    padding-left: $space-3;
+  }
+
+  .mobileTopRow {
+    gap: $space-2;
+  }
+
+  .mobileExitButton {
+    padding-right: $space-2;
+    padding-left: $space-2;
+    font-size: 0.75rem;
+  }
+
+  .mobileStepCircle {
+    width: 28px;
+    height: 28px;
+  }
+
+  .mobileSteps::before {
+    top: 21px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .circle {
+    transition: none;
+  }
 }

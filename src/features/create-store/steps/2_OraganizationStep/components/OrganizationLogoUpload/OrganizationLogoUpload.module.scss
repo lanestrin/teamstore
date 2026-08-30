@@ -1,62 +1,72 @@
 .upload {
   @include flex-center;
+
   flex-direction: column;
   gap: $space-3;
-  min-height: 220px;
-  padding: $space-8;
+
+  width: 100%;
+  min-height: 190px;
+  padding: $space-7;
+
   text-align: center;
+
   background: $white;
   border: 2px dashed $border-light;
   border-radius: $radius-lg;
+
   cursor: pointer;
+
   transition:
     border-color $transition-base,
-    background-color $transition-base,
-    transform $transition-base;
-}
-
-.upload:hover {
-  border-color: $gray-400;
-  background: rgba($gray-400, 0.03);
+    background-color $transition-base;
 }
 
 .uploadWithLogo {
   align-items: stretch;
+
   min-height: auto;
   padding: $space-5;
+
   text-align: left;
+
   border-style: solid;
   cursor: default;
 }
 
 .uploadIcon {
   @include flex-center;
+
   width: 56px;
   height: 56px;
+
   border: 1px solid $border-light;
   border-radius: $radius-round;
+
   background: $gray-50;
-  font-size: 1.5rem;
   color: $text-secondary;
-  transition:
-    background-color $transition-base,
-    color $transition-base,
-    border-color $transition-base;
+
+  font-size: 1.5rem;
 }
 
 .logoPreviewRow {
   display: flex;
   align-items: center;
   gap: $space-4;
+
+  min-width: 0;
 }
 
 .logoPreview {
   @include flex-center;
+
   flex: 0 0 auto;
+
   width: 88px;
   height: 88px;
   padding: $space-2;
+
   overflow: hidden;
+
   background: $gray-50;
   border: 1px solid $border-light;
   border-radius: $radius-md;
@@ -64,8 +74,10 @@
 
 .logoPreview img {
   display: block;
+
   width: 100%;
   height: 100%;
+
   object-fit: contain;
 }
 
@@ -74,27 +86,60 @@
   flex-direction: column;
   align-items: flex-start;
   gap: $space-1;
+
   min-width: 0;
 }
 
 .upload h3,
 .logoDetails h3 {
   margin: 0;
+
+  color: $text-primary;
+
   font-size: 1.125rem;
   font-weight: $font-semibold;
-  color: $text-primary;
-  word-break: break-word;
+
+  overflow-wrap: anywhere;
 }
 
 .upload p,
 .logoDetails p {
   margin: 0;
-  font-size: 0.875rem;
+
   color: $text-secondary;
+
+  font-size: 0.875rem;
 }
 
+/*
+ * Keep the native file input keyboard-accessible while
+ * visually hiding it.
+ */
 .fileInput {
-  display: none;
+  position: absolute;
+
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+
+  overflow: hidden;
+
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+
+  white-space: nowrap;
+
+  border: 0;
+}
+
+/*
+ * When the native file input receives keyboard focus,
+ * show that focus on the visible upload area.
+ */
+.fileInput:focus-visible+.upload {
+  outline: 3px solid $brand-red;
+  outline-offset: 3px;
 }
 
 .actions {
@@ -102,14 +147,23 @@
   align-items: center;
   flex-wrap: wrap;
   gap: $space-3;
+
   margin-top: $space-3;
 }
 
 .replaceLogo,
 .removeLogo {
   @include button-base;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
   gap: $space-2;
+
+  min-height: 44px;
   padding: $space-2 $space-4;
+
   font-size: 0.875rem;
   font-weight: $font-medium;
 }
@@ -118,11 +172,6 @@
   background: $gray-100;
   border: 1px solid $border-light;
   color: $text-primary;
-  cursor: pointer;
-}
-
-.replaceLogo:hover {
-  background: $gray-200;
 }
 
 .removeLogo {
@@ -131,14 +180,18 @@
   color: $error;
 }
 
-.removeLogo:hover {
-  background: $error-background;
+.replaceLogo:focus-visible,
+.removeLogo:focus-visible {
+  outline: 3px solid $brand-red;
+  outline-offset: 2px;
 }
 
 .errorMessage {
   margin: 0;
-  font-size: 0.875rem;
+
   color: $error;
+
+  font-size: 0.875rem;
 }
 
 .invalidUpload {
@@ -148,17 +201,43 @@
 
 .visuallyHidden {
   position: absolute;
+
   width: 1px;
   height: 1px;
   padding: 0;
   margin: -1px;
+
   overflow: hidden;
+
   clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+
   white-space: nowrap;
+
   border: 0;
 }
 
+@media (hover: hover) and (pointer: fine) {
+  .upload:not(.uploadWithLogo):hover {
+    border-color: $gray-400;
+    background: rgba($gray-400, 0.03);
+  }
+
+  .replaceLogo:hover {
+    background: $gray-200;
+  }
+
+  .removeLogo:hover {
+    background: $error-background;
+  }
+}
+
 @media (max-width: 520px) {
+  .upload {
+    min-height: 160px;
+    padding: $space-6 $space-4;
+  }
+
   .logoPreviewRow {
     align-items: flex-start;
   }
@@ -169,8 +248,10 @@
   }
 
   .actions {
-    align-items: stretch;
     flex-direction: column;
+    align-items: stretch;
+
+    width: 100%;
   }
 
   .replaceLogo,
