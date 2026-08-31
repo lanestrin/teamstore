@@ -2,9 +2,9 @@ import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } f
 import { createPortal } from "react-dom";
 import { LuArrowDown, LuArrowLeft, LuArrowRight, LuArrowUp, LuMinus, LuPlus, LuRotateCcw, LuX } from "react-icons/lu";
 
-import GarmentArtworkPreview from "../GarmentArtworkPreview/GarmentArtworkPreview";
 import { createDefaultProductArtworkPlacement, getDecorationProfile, type ProductArtworkPlacement } from "../../lib/decorationProfiles";
 import type { GeneratedSuggestion, ProductColorOption } from "../../lib/productStep.types";
+import GarmentArtworkPreview from "../GarmentArtworkPreview/GarmentArtworkPreview";
 
 import styles from "./ProductEditorModal.module.scss";
 
@@ -12,6 +12,15 @@ const MOVE_STEP = 0.02;
 const RESIZE_STEP = 0.05;
 const MIN_ARTWORK_WIDTH = 0.2;
 const MAX_ARTWORK_WIDTH = 1;
+
+const FOCUSABLE_SELECTOR = [
+  "button:not([disabled])",
+  "[href]",
+  'input:not([disabled]):not([type="hidden"])',
+  "select:not([disabled])",
+  "textarea:not([disabled])",
+  '[tabindex]:not([tabindex="-1"])',
+].join(",");
 
 interface ProductEditorModalProps {
   suggestion: GeneratedSuggestion;
@@ -36,6 +45,7 @@ function clamp(value: number, min: number, max: number): number {
 
 function constrainPlacement(placement: ProductArtworkPlacement): ProductArtworkPlacement {
   const width = clamp(placement.width, MIN_ARTWORK_WIDTH, MAX_ARTWORK_WIDTH);
+
   const halfWidth = width / 2;
 
   return {
@@ -43,6 +53,12 @@ function constrainPlacement(placement: ProductArtworkPlacement): ProductArtworkP
     y: clamp(placement.y, 0.05, 0.95),
     width,
   };
+}
+
+function getFocusableElements(container: HTMLElement): HTMLElement[] {
+  return Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)).filter(
+    (element) => element.tabIndex >= 0 && element.getAttribute("aria-hidden") !== "true",
+  );
 }
 
 export default function ProductEditorModal({
@@ -54,37 +70,93 @@ export default function ProductEditorModal({
   onSave,
   onClose,
 }: ProductEditorModalProps) {
+  const modalRef = useRef<HTMLElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const dragStateRef = useRef<DragState | null>(null);
 
   const [isDragging, setIsDragging] = useState(false);
+
   const productName = suggestion.product.name ?? suggestion.productId;
+
   const decorationProfile = getDecorationProfile(suggestion.decorationProfileId);
+
   const previewBounds = color.decorationPreviewBounds ?? decorationProfile.previewBounds;
+
   const defaultPlacement = createDefaultProductArtworkPlacement(suggestion.decorationProfileId);
+
   const canEditArtwork = Boolean(artworkSvg);
 
+  /*
+   * Lock the page while the modal is open, focus the modal,
+   * and return focus to the Edit Product button afterward.
+   */
   useEffect(() => {
+    const previouslyFocusedElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+
     const previousOverflow = document.body.style.overflow;
 
     document.body.style.overflow = "hidden";
 
-    requestAnimationFrame(() => {
+    const animationFrame = requestAnimationFrame(() => {
       closeButtonRef.current?.focus();
     });
 
     return () => {
+      cancelAnimationFrame(animationFrame);
+
       document.body.style.overflow = previousOverflow;
+
+      requestAnimationFrame(() => {
+        if (previouslyFocusedElement && previouslyFocusedElement.isConnected) {
+          previouslyFocusedElement.focus();
+        }
+      });
     };
   }, []);
 
+  /*
+   * Keep keyboard focus inside the dialog and allow Escape
+   * to close it.
+   */
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
+    function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
+        event.preventDefault();
         onClose();
+        return;
       }
-    };
+
+      if (event.key !== "Tab" || !modalRef.current) {
+        return;
+      }
+
+      const focusableElements = getFocusableElements(modalRef.current);
+
+      if (focusableElements.length === 0) {
+        event.preventDefault();
+        return;
+      }
+
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+
+      const activeElement = document.activeElement;
+
+      if (event.shiftKey) {
+        if (activeElement === firstElement || !modalRef.current.contains(activeElement)) {
+          event.preventDefault();
+          lastElement.focus();
+        }
+
+        return;
+      }
+
+      if (activeElement === lastElement) {
+        event.preventDefault();
+        firstElement.focus();
+      }
+    }
 
     window.addEventListener("keydown", handleKeyDown);
 
@@ -116,11 +188,27 @@ export default function ProductEditorModal({
   }
 
   function resetPlacement() {
-    onPlacementChange({ ...defaultPlacement });
+    onPlacementChange({
+      ...defaultPlacement,
+    });
   }
 
   function handlePreviewPointerDown(event: ReactPointerEvent<HTMLDivElement>) {
     if (!canEditArtwork || event.button !== 0) {
+      return;
+    }
+
+    const target = event.target;
+
+    if (!(target instanceof Element)) {
+      return;
+    }
+
+    /*
+     * Only start a drag when interacting with the garment
+     * preview rather than the help text beneath it.
+     */
+    if (!target.closest("[data-garment-artwork-preview]")) {
       return;
     }
 
@@ -134,6 +222,7 @@ export default function ProductEditorModal({
     setIsDragging(true);
 
     event.currentTarget.setPointerCapture(event.pointerId);
+
     event.preventDefault();
   }
 
@@ -151,7 +240,9 @@ export default function ProductEditorModal({
     }
 
     const previewRect = previewElement.getBoundingClientRect();
+
     const decorationZoneWidth = previewRect.width * previewBounds.width;
+
     const decorationZoneHeight = previewRect.height * previewBounds.height;
 
     if (decorationZoneWidth <= 0 || decorationZoneHeight <= 0) {
@@ -159,6 +250,7 @@ export default function ProductEditorModal({
     }
 
     const deltaX = (event.clientX - dragState.startClientX) / decorationZoneWidth;
+
     const deltaY = (event.clientY - dragState.startClientY) / decorationZoneHeight;
 
     onPlacementChange(
@@ -183,21 +275,34 @@ export default function ProductEditorModal({
     }
   }
 
+  function cancelDragging() {
+    dragStateRef.current = null;
+    setIsDragging(false);
+  }
+
   const sizePercent = Math.round(placement.width * 100);
 
   return createPortal(
     <div
       className={styles.overlay}
-      onMouseDown={(event) => {
+      onPointerDown={(event) => {
         if (event.target === event.currentTarget) {
           onClose();
         }
       }}
     >
-      <section className={styles.modal} role="dialog" aria-modal="true" aria-labelledby="product-editor-title">
+      <section
+        ref={modalRef}
+        className={styles.modal}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="product-editor-title"
+        aria-describedby="product-editor-description"
+      >
         <header className={styles.header}>
           <div>
             <h2 id="product-editor-title">Edit Product</h2>
+
             <p>{productName}</p>
           </div>
 
@@ -211,10 +316,13 @@ export default function ProductEditorModal({
             ref={previewRef}
             className={styles.preview}
             data-dragging={isDragging}
+            role="group"
+            aria-label="Product artwork preview"
             onPointerDown={handlePreviewPointerDown}
             onPointerMove={handlePreviewPointerMove}
             onPointerUp={finishDragging}
             onPointerCancel={finishDragging}
+            onLostPointerCapture={cancelDragging}
           >
             <GarmentArtworkPreview
               garmentImageUrl={color.imageUrl}
@@ -235,16 +343,17 @@ export default function ProductEditorModal({
             )}
           </div>
 
-          <aside className={styles.sidebar}>
+          <aside className={styles.sidebar} aria-label="Artwork placement controls">
             <div className={styles.sidebarHeading}>
               <h3>Artwork Placement</h3>
-              <p>Move and resize the artwork for this garment only.</p>
+
+              <p id="product-editor-description">Move and resize the artwork for this garment only.</p>
             </div>
 
             <div className={styles.controlGroup}>
               <span className={styles.controlLabel}>Position</span>
 
-              <div className={styles.movement}>
+              <div className={styles.movement} role="group" aria-label="Move artwork">
                 <button
                   type="button"
                   className={`${styles.moveButton} ${styles.moveUp}`}
@@ -304,6 +413,7 @@ export default function ProductEditorModal({
             <div className={styles.controlGroup}>
               <div className={styles.sizeHeading}>
                 <span className={styles.controlLabel}>Size</span>
+
                 <strong>{sizePercent}%</strong>
               </div>
 
@@ -326,7 +436,11 @@ export default function ProductEditorModal({
                   value={placement.width}
                   aria-label="Artwork size"
                   disabled={!canEditArtwork}
-                  onChange={(event) => updatePlacement({ width: Number(event.currentTarget.value) })}
+                  onChange={(event) =>
+                    updatePlacement({
+                      width: Number(event.currentTarget.value),
+                    })
+                  }
                 />
 
                 <button

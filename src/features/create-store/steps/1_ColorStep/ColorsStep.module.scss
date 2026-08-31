@@ -1,13 +1,23 @@
 @use "../../../../styles/variables" as *;
 
-.colorSetup {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(420px, 480px);
-  align-items: start;
+/* ==========================================================================
+   Main layout
+   ========================================================================== */
 
-  gap: $space-10;
+.colorSetup {
+  display: flex;
+  align-items: flex-start;
+  gap: $space-9;
 
   width: 100%;
+  min-width: 0;
+}
+
+.controls,
+.preview {
+  flex: 1 1 0;
+
+  width: 50%;
   min-width: 0;
 }
 
@@ -15,11 +25,18 @@
   display: flex;
   flex-direction: column;
   gap: $space-7;
-
-  min-width: 0;
 }
 
+.preview>* {
+  width: 100%;
+}
+
+/* ==========================================================================
+   Presets
+   ========================================================================== */
+
 .presets {
+  width: 100%;
   min-width: 0;
 }
 
@@ -30,6 +47,7 @@
 
   font-size: 1.25rem;
   font-weight: $font-semibold;
+  line-height: 1.3;
 }
 
 .grid {
@@ -40,6 +58,10 @@
   width: 100%;
   min-width: 0;
 }
+
+/* ==========================================================================
+   Custom colors
+   ========================================================================== */
 
 .customColors {
   display: grid;
@@ -60,25 +82,25 @@
   line-height: 1.6;
 }
 
-/*
- * Tablet:
- * - desktop sidebar is already replaced by the compact progress header
- * - Step 2 becomes one column
- * - preview stays a useful width instead of stretching across the screen
- */
+/* ==========================================================================
+   Tablet / compact wizard
+   ========================================================================== */
+
 @media (max-width: 1180px) {
   .colorSetup {
-    grid-template-columns: 1fr;
+    flex-direction: column;
     gap: $space-7;
   }
 
-  .colorSetup> :last-child {
-    justify-self: center;
-
+  .controls,
+  .preview {
     width: 100%;
-    max-width: 620px;
   }
 }
+
+/* ==========================================================================
+   Mobile
+   ========================================================================== */
 
 @media (max-width: 640px) {
   .controls {
@@ -97,6 +119,10 @@
     font-size: 1.125rem;
   }
 }
+
+/* ==========================================================================
+   Very small phones
+   ========================================================================== */
 
 @media (max-width: 360px) {
   .grid {

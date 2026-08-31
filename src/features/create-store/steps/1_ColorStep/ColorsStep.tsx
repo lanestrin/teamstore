@@ -115,9 +115,12 @@ export default function ColorsStep() {
             <ColorPicker label="Secondary Color" value={secondaryColor} onChange={handleSecondaryColorChange} />
           </div>
 
-          <p className={styles.helper}>Choose a preset or use the color controls to match your organization’s exact colors.</p>
+          <p className={styles.helper}>Choose a preset or use the color controls to match your organization&apos;s exact colors.</p>
         </section>
-        <ColorThemePreview primaryColor={primaryColor} secondaryColor={secondaryColor} />
+
+        <div className={styles.preview}>
+          <ColorThemePreview primaryColor={primaryColor} secondaryColor={secondaryColor} />
+        </div>
       </div>
     </WizardLayout>
   );

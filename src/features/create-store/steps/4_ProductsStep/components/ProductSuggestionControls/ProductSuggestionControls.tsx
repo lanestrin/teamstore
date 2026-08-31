@@ -1,6 +1,8 @@
 import { LuRefreshCw } from "react-icons/lu";
+
 import type { ProductColorFamily } from "../../../../../../types/productColor.types";
 import { PRODUCT_COLOR_OPTIONS } from "../../lib/productColorOptions";
+
 import styles from "./ProductSuggestionControls.module.scss";
 
 const STORE_ACTIVITIES = [
@@ -58,23 +60,47 @@ export default function ProductSuggestionControls({
   onRegenerate,
 }: ProductSuggestionControlsProps) {
   return (
-    <div className={styles.selectionSummary}>
-      <div className={styles.selectionSummaryText}>
-        <strong>{selectedCount} selected</strong>
+    <section className={styles.selectionSummary} aria-labelledby="product-controls-title" aria-busy={isLoading}>
+      <div className={styles.selectionSummaryText} aria-live="polite">
+        <strong id="product-controls-title">{selectedCount} selected</strong>
 
-        <span>Showing {suggestionCount} suggestions. Selected products are kept when you regenerate.</span>
+        <span>
+          {isLoading
+            ? "Loading product suggestions..."
+            : `Showing ${suggestionCount} suggestions. Selected products are kept when you regenerate.`}
+        </span>
       </div>
 
       <div className={styles.summaryActions}>
+        <label className={styles.summaryControl}>
+          <span className={styles.summaryControlLabel}>Activity</span>
+
+          <select
+            value={activity}
+            className={styles.summarySelect}
+            onChange={(event) => {
+              const nextActivity = event.currentTarget.value;
+
+              if (isStoreActivity(nextActivity)) {
+                onActivityChange(nextActivity);
+              }
+            }}
+          >
+            {STORE_ACTIVITIES.map((activityOption) => (
+              <option key={activityOption} value={activityOption}>
+                {getActivityLabel(activityOption)}
+              </option>
+            ))}
+          </select>
+        </label>
+
         <label className={styles.summaryControl}>
           <span className={styles.summaryControlLabel}>Primary Color</span>
 
           <select
             value={primaryColorFamily}
             className={styles.summarySelect}
-            onChange={(event) => {
-              onPrimaryColorChange(event.currentTarget.value as ProductColorFamily);
-            }}
+            onChange={(event) => onPrimaryColorChange(event.currentTarget.value as ProductColorFamily)}
           >
             {!primaryColorFamily && (
               <option value="" disabled>
@@ -100,9 +126,7 @@ export default function ProductSuggestionControls({
           <select
             value={secondaryColorFamily}
             className={styles.summarySelect}
-            onChange={(event) => {
-              onSecondaryColorChange(event.currentTarget.value as ProductColorFamily | "");
-            }}
+            onChange={(event) => onSecondaryColorChange(event.currentTarget.value as ProductColorFamily | "")}
           >
             <option value="">All</option>
 
@@ -111,40 +135,25 @@ export default function ProductSuggestionControls({
 
               return (
                 <option key={option.value} value={option.value} disabled={!isLoading && !isAvailable}>
-                  {isAvailable ? option.label : `${option.label} — Unavailable`}
+                  {isLoading || isAvailable ? option.label : `${option.label} — Unavailable`}
                 </option>
               );
             })}
           </select>
         </label>
 
-        <label className={styles.summaryControl}>
-          <span className={styles.summaryControlLabel}>Activity</span>
+        <div className={styles.regenerateControl}>
+          <span className={styles.summaryControlLabel} aria-hidden="true">
+            Suggestions
+          </span>
 
-          <select
-            value={activity}
-            className={styles.summarySelect}
-            onChange={(event) => {
-              const nextActivity = event.currentTarget.value;
+          <button type="button" className={styles.regenerateButton} disabled={isLoading || !canRegenerate} onClick={onRegenerate}>
+            <LuRefreshCw className={isLoading ? styles.spinning : undefined} aria-hidden="true" />
 
-              if (isStoreActivity(nextActivity)) {
-                onActivityChange(nextActivity);
-              }
-            }}
-          >
-            {STORE_ACTIVITIES.map((activityOption) => (
-              <option key={activityOption} value={activityOption}>
-                {getActivityLabel(activityOption)}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <button type="button" className={styles.regenerateButton} disabled={isLoading || !canRegenerate} onClick={onRegenerate}>
-          <LuRefreshCw aria-hidden="true" />
-          Regenerate Suggestions
-        </button>
+            {isLoading ? "Loading..." : "Regenerate Suggestions"}
+          </button>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
