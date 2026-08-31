@@ -105,19 +105,29 @@
 }
 
 .drawerButtonRed {
-  justify-content: space-between;
   background: $brand-red;
   color: $text-inverse;
 }
 
-.mobileDrawerCartMeta {
+.drawerButtonRed svg {
+  flex: 0 0 auto;
+  font-size: 1.125rem;
+}
+
+.cartCount {
   display: inline-flex;
   align-items: center;
-  gap: $space-2;
+  justify-content: center;
 
-  svg {
-    font-size: 1.125rem;
-  }
+  min-width: 22px;
+  height: 22px;
+  padding-inline: 6px;
+
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: $radius-pill;
+
+  font-size: 0.75rem;
+  line-height: 1;
 }
 
 .mobileDrawerNavigation {

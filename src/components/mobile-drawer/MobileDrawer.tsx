@@ -54,12 +54,9 @@ export default function MobileDrawer({ isOpen, onClose, cartCount }: MobileDrawe
           </Authenticated>
 
           <Link to="/cart" className={`${styles.drawerButton} ${styles.drawerButtonRed}`} onClick={onClose}>
+            <LuShoppingCart aria-hidden="true" />
             <span>My Cart</span>
-
-            <span className={styles.mobileDrawerCartMeta}>
-              {cartCount}
-              <LuShoppingCart />
-            </span>
+            <span className={styles.cartCount}>{cartCount}</span>
           </Link>
         </div>
 

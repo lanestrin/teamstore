@@ -597,7 +597,7 @@
   }
 
   .body {
-    grid-template-rows: 220px minmax(0, 1fr);
+    grid-template-rows: 300px minmax(0, 1fr);
   }
 
   .canvas {
@@ -606,10 +606,9 @@
   }
 
   .canvas svg {
-    width: 100%;
+    width: auto;
     height: 100%;
-
-    max-width: 360px;
+    max-width: 100%;
     max-height: 100%;
   }
 
@@ -642,7 +641,6 @@
     width: 100%;
   }
 }
-
 /* ==========================================================================
    Small phones
    ========================================================================== */
@@ -654,14 +652,6 @@
 
   .header p {
     display: none;
-  }
-
-  .body {
-    grid-template-rows: 190px minmax(0, 1fr);
-  }
-
-  .canvas {
-    padding: $space-2;
   }
 
   .canvas svg {
