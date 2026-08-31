@@ -95,7 +95,7 @@ function createUploadedArtworkPreviewSvg(imageUrl: string): string {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"><image href="${escapedImageUrl}" x="0" y="0" width="100" height="100" preserveAspectRatio="xMidYMid meet" /></svg>`;
 }
 
-export default function ReviewStep({ isFinalizing, onCreateStore }: ReviewStepProps) {
+export default function ReviewStep({ onCreateStore }: ReviewStepProps) {
   const { setCurrentStep, storeDraft, primaryColor, secondaryColor, artworkSvgsByTemplateId } = useCreateStore();
 
   const [uploadedArtworkPreviewSvgsById, setUploadedArtworkPreviewSvgsById] = useState<Record<string, string>>({});
@@ -271,8 +271,8 @@ export default function ReviewStep({ isFinalizing, onCreateStore }: ReviewStepPr
       description="See what customers will see and confirm everything is ready before publishing."
       onBack={() => setCurrentStep(4)}
       onNext={() => void onCreateStore()}
-      nextLabel={isFinalizing ? "Creating Store..." : "Create Store"}
-      nextDisabled={isFinalizing}
+      nextLabel="Create Store — Coming Soon"
+      nextDisabled
       width="wide"
     >
       <div className={styles.reviewStep}>
