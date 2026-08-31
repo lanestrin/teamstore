@@ -13,7 +13,8 @@
 }
 
 .wide {
-  max-width: 1120px;
+  width: 85%;
+  max-width: 1500px;
   margin-inline: auto;
 }
 
@@ -108,7 +109,7 @@
   color: $text-primary;
 }
 
-@media (max-width: 992px) {
+@media (max-width: 1180px) {
   .badge {
     display: none;
   }
