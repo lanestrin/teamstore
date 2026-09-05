@@ -37,3 +37,6 @@ dist-ssr
 # Product data
 product-data-std-all.csv
 scripts/output/
+
+# Environment variables
+.env
