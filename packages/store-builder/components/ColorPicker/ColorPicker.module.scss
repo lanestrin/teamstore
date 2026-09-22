@@ -1,81 +1,97 @@
 .wrapper {
   position: relative;
+
   display: flex;
   flex-direction: column;
-  gap: $space-2;
+  gap: var(--_tsb-space-2, 0.5rem);
 }
 
 .label {
+  color: var(--tsb-color-text, #111827);
+
   font-size: 0.875rem;
-  font-weight: $font-semibold;
-  color: $text-primary;
+  font-weight: 600;
 }
 
 .trigger {
   display: flex;
   align-items: center;
-  gap: $space-3;
+  gap: var(--_tsb-space-3, 0.75rem);
+
   width: 100%;
   height: 52px;
-  padding: 0 $space-4;
-  background: $white;
-  border: 1px solid $border-light;
-  border-radius: $radius-md;
-  cursor: pointer;
-  transition:
-    border-color $transition-base,
-    box-shadow $transition-base;
+  padding: 0 var(--_tsb-space-4, 1rem);
 
-  svg:last-child {
-    margin-left: auto;
-    color: $text-secondary;
-    font-size: 1rem;
-  }
+  background: var(--tsb-color-surface, #ffffff);
+  border: 1px solid var(--tsb-color-border, #e5e7eb);
+  border-radius: var(--tsb-radius-md, 0.5rem);
+
+  color: var(--tsb-color-text, #111827);
+  font: inherit;
+
+  cursor: pointer;
+
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.trigger svg:last-child {
+  margin-left: auto;
+
+  color: var(--_tsb-color-text-secondary, #6b7280);
+
+  font-size: 1rem;
 }
 
 .trigger:hover {
-  border-color: $brand-red;
+  border-color: var(--tsb-color-primary, #b91c1c);
 }
 
 .trigger:focus-visible {
+  border-color: var(--tsb-color-primary, #b91c1c);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--tsb-color-primary, #b91c1c) 15%, transparent);
   outline: none;
-  border-color: $brand-red;
-  box-shadow: 0 0 0 3px rgba($brand-red, 0.15);
 }
 
 .swatch {
   flex-shrink: 0;
+
   width: 22px;
   height: 22px;
-  border: 1px solid $border-light;
-  border-radius: $radius-round;
+
+  border: 1px solid var(--tsb-color-border, #e5e7eb);
+  border-radius: var(--tsb-radius-round, 9999px);
 }
 
 .hex {
+  color: var(--tsb-color-text, #111827);
+
   font-family: monospace;
   font-size: 0.95rem;
-  font-weight: $font-medium;
-  color: $text-primary;
+  font-weight: 500;
 }
 
 .popover {
   position: absolute;
   left: 0;
   z-index: 100;
+
   width: 320px;
-  padding: $space-5;
-  background: $white;
-  border: 1px solid $border-light;
-  border-radius: $radius-lg;
-  box-shadow: $shadow-md;
+  padding: var(--_tsb-space-5, 1.25rem);
+
+  background: var(--tsb-color-surface, #ffffff);
+  border: 1px solid var(--tsb-color-border, #e5e7eb);
+  border-radius: var(--tsb-radius-lg, 0.75rem);
+  box-shadow: var(--tsb-shadow-md, 0 10px 25px rgb(0 0 0 / 0.12));
 }
 
 .bottom {
-  top: calc(100% + #{$space-2});
+  top: calc(100% + var(--_tsb-space-2, 0.5rem));
 }
 
 .top {
-  bottom: calc(100% + #{$space-2});
+  bottom: calc(100% + var(--_tsb-space-2, 0.5rem));
 }
 
 .popover :global(.react-colorful) {
@@ -84,17 +100,19 @@
 }
 
 .popover :global(.react-colorful__saturation) {
-  border-radius: $radius-md;
-  margin-bottom: $space-4;
+  margin-bottom: var(--_tsb-space-4, 1rem);
+
+  border-radius: var(--tsb-radius-md, 0.5rem);
 }
 
 .popover :global(.react-colorful__hue) {
   height: 14px;
-  border-radius: $radius-pill;
+
+  border-radius: var(--tsb-radius-pill, 9999px);
 }
 
 .inputGroup {
-  margin-top: $space-5;
+  margin-top: var(--_tsb-space-5, 1.25rem);
 }
 
 .inputGroup input {
@@ -104,23 +122,74 @@
 .actions {
   display: flex;
   justify-content: flex-end;
-  gap: $space-3;
-  margin-top: $space-5;
+  gap: var(--_tsb-space-3, 0.75rem);
+
+  margin-top: var(--_tsb-space-5, 1.25rem);
+}
+
+.cancel,
+.apply {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 100px;
+  min-height: 44px;
+  padding: 0 var(--_tsb-space-4, 1rem);
+
+  border-radius: var(--tsb-radius-md, 0.5rem);
+
+  font: inherit;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
 }
 
 .cancel {
-  @include button-white;
-  min-width: 100px;
+  background: var(--tsb-color-surface, #ffffff);
+  border: 1px solid var(--tsb-color-border, #e5e7eb);
+
+  color: var(--tsb-color-text, #111827);
+}
+
+.cancel:hover {
+  border-color: var(--_tsb-color-border-strong, #9ca3af);
 }
 
 .apply {
-  @include button-red;
-  min-width: 100px;
+  background: var(--tsb-color-primary, #b91c1c);
+  border: 1px solid var(--tsb-color-primary, #b91c1c);
+
+  color: var(--_tsb-color-on-primary, #ffffff);
+}
+
+.apply:hover {
+  filter: brightness(0.95);
+}
+
+.cancel:focus-visible,
+.apply:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--tsb-color-primary, #b91c1c) 25%, transparent);
+  outline-offset: 2px;
 }
 
 @media (max-width: 768px) {
   .popover {
     width: 100%;
     min-width: 280px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .trigger,
+  .cancel,
+  .apply {
+    transition: none;
   }
 }

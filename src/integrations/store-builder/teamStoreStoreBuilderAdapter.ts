@@ -1,6 +1,7 @@
 import type { ConvexReactClient } from "convex/react";
 
 import type {
+  SaveColorsStepInput,
   StoreBuilderAdapter,
   StoreBuilderProductSelectionInput,
   StoreBuilderUploadedArtworkInput,
@@ -132,6 +133,14 @@ export function createTeamStoreStoreBuilderAdapter(client: ConvexReactClient): S
         storeId: result.storeId,
         created: result.created,
       };
+    },
+
+    async saveColorsStep(input: SaveColorsStepInput) {
+      await client.mutation(api.storeDrafts.saveColorsStep, {
+        storeId: toStoreId(input.storeId),
+        primaryColor: input.primaryColor,
+        secondaryColor: input.secondaryColor,
+      });
     },
 
     async saveDraft(input) {
