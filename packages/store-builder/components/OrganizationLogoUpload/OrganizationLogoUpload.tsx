@@ -1,7 +1,7 @@
 import type { RefObject } from "react";
 import { LuTrash2, LuUpload } from "react-icons/lu";
 
-import formStyles from "../../styles/Form.module.scss";
+import formStyles from "../../styles/form.module.scss";
 import styles from "./OrganizationLogoUpload.module.scss";
 
 interface OrganizationLogoUploadProps {
