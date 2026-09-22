@@ -1,0 +1,158 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--_tsb-space-5);
+
+  width: 100%;
+  min-width: 0;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--_tsb-space-4);
+
+  min-width: 0;
+}
+
+.sectionHeader>div {
+  min-width: 0;
+}
+
+.sectionHeader h2 {
+  margin: 0;
+
+  color: var(--_tsb-color-text);
+
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.sectionHeader p {
+  max-width: 680px;
+  margin: var(--_tsb-space-1) 0 0;
+
+  color: var(--_tsb-color-text-muted);
+
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.sectionCount {
+  flex: 0 0 auto;
+
+  padding: var(--_tsb-space-1) var(--_tsb-space-3);
+
+  background: var(--_tsb-color-surface-alt);
+  border-radius: 999px;
+
+  color: var(--_tsb-color-text-muted);
+
+  font-size: 0.75rem;
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   Products
+   ========================================================================== */
+
+.productGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--_tsb-space-5);
+
+  min-width: 0;
+}
+
+/* ==========================================================================
+   Loading
+   ========================================================================== */
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--_tsb-space-3);
+
+  min-height: 180px;
+  padding: var(--_tsb-space-8);
+
+  background: var(--_tsb-color-surface-alt);
+  border: 1px solid var(--_tsb-color-border);
+  border-radius: var(--_tsb-radius-lg);
+
+  color: var(--_tsb-color-text-muted);
+
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.loadingIcon {
+  flex: 0 0 auto;
+
+  width: 22px;
+  height: 22px;
+
+  animation: product-suggestion-spin 0.8s linear infinite;
+}
+
+@keyframes product-suggestion-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================================================
+   Current grid breakpoints
+   ========================================================================== */
+
+@media (min-width: 1500px) {
+  .productGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1100px) {
+  .productGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .sectionHeader {
+    flex-direction: column;
+    gap: var(--_tsb-space-3);
+  }
+
+  .sectionCount {
+    align-self: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .productGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .section {
+    gap: var(--_tsb-space-4);
+  }
+
+  .loading {
+    min-height: 140px;
+    padding: var(--_tsb-space-5);
+  }
+}
+
+/* ==========================================================================
+   Reduced motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .loadingIcon {
+    animation: none;
+  }
+}

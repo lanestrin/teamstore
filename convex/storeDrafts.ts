@@ -34,6 +34,133 @@ const storeUploadedArtwork = v.object({
 });
 
 /**
+ * Creates a draft store after the Organization step or updates
+ * the Organization fields on an existing draft.
+ *
+ * Large or step-specific data is intentionally not accepted here.
+ */
+export const saveOrganizationStep = mutation({
+  args: {
+    storeId: v.optional(v.id("stores")),
+
+    organizationName: v.string(),
+    organizationSlug: v.string(),
+
+    activity: storeActivity,
+    storeType,
+
+    storeName: v.string(),
+    storeSlug: v.string(),
+
+    logoStorageId: v.optional(v.id("_storage")),
+    removeLogo: v.optional(v.boolean()),
+  },
+
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+
+    if (userId === null) {
+      throw new ConvexError("You must be signed in to create a store.");
+    }
+
+    const organizationName = args.organizationName.trim();
+    const organizationSlug = args.organizationSlug.trim().toLowerCase();
+
+    const storeName = args.storeName.trim();
+    const storeSlug = args.storeSlug.trim().toLowerCase();
+
+    if (!organizationName) {
+      throw new ConvexError("Organization name is required.");
+    }
+
+    if (!organizationSlug) {
+      throw new ConvexError("Organization slug is required.");
+    }
+
+    if (!storeName) {
+      throw new ConvexError("Store name is required.");
+    }
+
+    if (!storeSlug) {
+      throw new ConvexError("Store slug is required.");
+    }
+
+    validateSlug(organizationSlug, "Organization slug");
+    validateSlug(storeSlug, "Store slug");
+
+    if (args.logoStorageId && args.removeLogo) {
+      throw new ConvexError("A logo cannot be uploaded and removed at the same time.");
+    }
+
+    const now = Date.now();
+
+    if (args.storeId) {
+      const existingStore = await ctx.db.get(args.storeId);
+
+      if (existingStore === null || existingStore.createdBy !== userId || existingStore.status !== "draft") {
+        throw new ConvexError("Draft store not found.");
+      }
+
+      await ctx.db.patch(args.storeId, {
+        organizationName,
+        organizationSlug,
+
+        activity: args.activity,
+        storeType: args.storeType,
+
+        name: storeName,
+        slug: storeSlug,
+
+        ...(args.logoStorageId !== undefined
+          ? {
+              logoStorageId: args.logoStorageId,
+            }
+          : {}),
+
+        ...(args.removeLogo
+          ? {
+              logoStorageId: undefined,
+            }
+          : {}),
+
+        updatedAt: now,
+      });
+
+      return {
+        storeId: args.storeId,
+        created: false,
+      };
+    }
+
+    const storeId = await ctx.db.insert("stores", {
+      createdBy: userId,
+
+      organizationName,
+      organizationSlug,
+
+      activity: args.activity,
+      storeType: args.storeType,
+
+      name: storeName,
+      slug: storeSlug,
+
+      logoStorageId: args.logoStorageId,
+
+      currentStep: 2,
+      status: "draft",
+
+      createdAt: now,
+      updatedAt: now,
+    });
+
+    return {
+      storeId,
+      created: true,
+    };
+  },
+});
+
+/**
  * Creates a new draft store or updates an existing draft.
  *
  * Empty form values are stored as missing optional fields.
@@ -226,8 +353,11 @@ export const getDraft = query({
       })),
     );
 
+    const logoUrl = store.logoStorageId ? await ctx.storage.getUrl(store.logoStorageId) : null;
+
     return {
       ...store,
+      logoUrl,
       uploadedArtworks,
       productSelections,
     };

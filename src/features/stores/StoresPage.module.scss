@@ -1,3 +1,5 @@
+@use "@/styles" as *;
+
 .page {
   background: $page-background;
   color: $text-primary;
@@ -404,7 +406,10 @@
   margin-top: $space-6;
   margin-bottom: $space-8;
   padding: $space-6 $space-7;
-  background: linear-gradient(90deg, $background-dark 0%, $background-dark-alt 70%, $brand-red-dark 100%);
+  background: linear-gradient(90deg,
+      $background-dark 0%,
+      $background-dark-alt 70%,
+      $brand-red-dark 100%);
   border-radius: $radius-md;
   color: $text-inverse;
 }

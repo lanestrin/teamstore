@@ -1,0 +1,365 @@
+.productCard {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+
+  overflow: hidden;
+
+  background: var(--_tsb-color-surface);
+  border: 1px solid var(--_tsb-color-border);
+  border-radius: var(--tsb-radius-lg, 0.75rem);
+
+  box-shadow: var(--_tsb-shadow-sm);
+
+  transition:
+    border-color var(--_tsb-transition-fast),
+    box-shadow var(--_tsb-transition-fast),
+    transform var(--_tsb-transition-fast);
+}
+
+.productCard:hover {
+  border-color: var(--_tsb-color-text-muted);
+
+  box-shadow: var(--_tsb-shadow-md);
+
+  transform: translateY(-2px);
+}
+
+.productCard[data-selected="true"] {
+  border-color: var(--_tsb-color-success);
+
+  box-shadow:
+    0 0 0 2px color-mix(in srgb,
+      var(--_tsb-color-success) 14%,
+      transparent),
+    var(--_tsb-shadow-md);
+}
+
+/*
+ * All garment previews use the same square coordinate space.
+ *
+ * Artwork placement values are percentage-based, so keeping
+ * this geometry consistent with Review and the published store
+ * ensures the artwork appears in the same location everywhere.
+ */
+.productImageArea {
+  position: relative;
+
+  display: grid;
+
+  width: 100%;
+  aspect-ratio: 1;
+  min-height: 0;
+  padding: var(--_tsb-space-4);
+
+  place-items: center;
+
+  overflow: hidden;
+
+  background: var(--_tsb-color-surface-alt);
+  border-bottom: 1px solid var(--_tsb-color-border);
+
+  box-sizing: border-box;
+}
+
+.productImage {
+  mix-blend-mode: darken;
+}
+
+.productImage,
+.productImageArea [data-garment-artwork-preview] {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+
+  object-fit: contain;
+}
+
+.productImagePlaceholder {
+  display: grid;
+
+  width: 100%;
+  height: 100%;
+
+  place-items: center;
+
+  color: var(--_tsb-color-text-muted);
+
+  font-size: 0.875rem;
+}
+
+.requiredButton {
+  position: absolute;
+  top: var(--_tsb-space-3);
+  right: var(--_tsb-space-3);
+  z-index: 2;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+
+  min-height: 36px;
+  padding: 0 var(--_tsb-space-3);
+
+  background: color-mix(in srgb,
+      var(--_tsb-color-surface) 96%,
+      transparent);
+  border: 1px solid var(--_tsb-color-border);
+  border-radius: 999px;
+
+  box-shadow: var(--_tsb-shadow-sm);
+
+  color: var(--_tsb-color-text-muted);
+
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+
+  transition:
+    background-color var(--_tsb-transition-fast),
+    border-color var(--_tsb-transition-fast),
+    box-shadow var(--_tsb-transition-fast),
+    color var(--_tsb-transition-fast);
+}
+
+.requiredButton:hover:not(:disabled) {
+  background: var(--_tsb-color-surface-alt);
+  border-color: var(--_tsb-color-text-muted);
+
+  color: var(--_tsb-color-text);
+}
+
+.requiredButton:focus-visible {
+  border-color: var(--tsb-color-text, #111827);
+
+  outline: none;
+
+  box-shadow:
+    0 0 0 3px color-mix(in srgb,
+      var(--tsb-color-text, #111827) 12%,
+      transparent),
+    var(--_tsb-shadow-sm);
+}
+
+.requiredButton:disabled {
+  background: color-mix(in srgb,
+      var(--_tsb-color-surface) 88%,
+      transparent);
+  border-color: var(--_tsb-color-border);
+
+  color: var(--_tsb-color-text-muted);
+
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.requiredButton[data-required="true"] {
+  background: var(--tsb-color-text, #111827);
+  border-color: var(--tsb-color-text, #111827);
+
+  color: var(--_tsb-color-surface);
+}
+
+.requiredButton[data-required="true"]:hover:not(:disabled) {
+  background: var(--tsb-color-text, #111827);
+  border-color: var(--tsb-color-text, #111827);
+
+  color: var(--_tsb-color-surface);
+}
+
+.requiredButton svg {
+  flex: 0 0 auto;
+
+  width: 15px;
+  height: 15px;
+}
+
+.requiredButton[data-required="true"] svg {
+  fill: currentColor;
+}
+
+.productCardBody {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+
+  min-width: 0;
+}
+
+.productInfo {
+  padding: var(--_tsb-space-4);
+}
+
+.productTitleRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--_tsb-space-4);
+}
+
+.productTitleRow h3 {
+  margin: 0;
+
+  color: var(--_tsb-color-text);
+
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.productPrice {
+  color: var(--_tsb-color-text);
+
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.35;
+
+  white-space: nowrap;
+}
+
+.productColorName {
+  margin: var(--_tsb-space-1) 0 0;
+
+  color: var(--_tsb-color-text-muted);
+
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.productCardActions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--_tsb-space-3);
+
+  margin-top: auto;
+  padding: 0.8rem var(--_tsb-space-4);
+
+  background: var(--_tsb-color-surface);
+  border-top: 1px solid var(--_tsb-color-border);
+}
+
+.productCheckbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+
+  min-width: 0;
+
+  color: var(--_tsb-color-text);
+
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.25;
+
+  cursor: pointer;
+}
+
+.productCheckbox input {
+  flex: 0 0 auto;
+
+  width: 18px;
+  height: 18px;
+  margin: 0;
+
+  accent-color: var(--_tsb-color-success);
+
+  cursor: pointer;
+}
+
+.productCheckbox span {
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.productCheckbox:focus-within {
+  border-radius: var(--_tsb-radius-sm);
+
+  outline: 3px solid color-mix(in srgb,
+      var(--_tsb-color-success) 18%,
+      transparent);
+  outline-offset: 3px;
+}
+
+.editProductButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+
+  min-height: 36px;
+  padding: 0 var(--_tsb-space-3);
+
+  background: var(--_tsb-color-surface);
+  border: 1px solid var(--_tsb-color-border);
+  border-radius: var(--_tsb-radius-lg);
+
+  color: var(--_tsb-color-text);
+
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+
+  transition:
+    background-color var(--_tsb-transition-fast),
+    border-color var(--_tsb-transition-fast),
+    box-shadow var(--_tsb-transition-fast);
+}
+
+.editProductButton:hover {
+  background: var(--_tsb-color-surface-alt);
+  border-color: var(--_tsb-color-text-muted);
+}
+
+.editProductButton:focus-visible {
+  border-color: var(--tsb-color-text, #111827);
+
+  outline: none;
+
+  box-shadow: 0 0 0 3px color-mix(in srgb,
+      var(--tsb-color-text, #111827) 12%,
+      transparent);
+}
+
+.editProductButton svg {
+  flex: 0 0 auto;
+
+  width: 15px;
+  height: 15px;
+}
+
+@media (max-width: 640px) {
+  .productTitleRow {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+  }
+
+  .productPrice {
+    white-space: normal;
+  }
+
+  .productCardActions {
+    grid-template-columns: 1fr;
+  }
+
+  .editProductButton {
+    width: 100%;
+  }
+}

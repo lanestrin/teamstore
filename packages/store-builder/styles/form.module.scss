@@ -1,0 +1,174 @@
+/* ==========================================================
+   Form Layout
+   ========================================================== */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--_tsb-space-3);
+
+  width: 100%;
+  min-width: 0;
+}
+
+.field label {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--_tsb-space-1);
+
+  color: var(--_tsb-color-text);
+
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* ==========================================================
+   Native Form Controls
+   ========================================================== */
+
+.field input,
+.field textarea,
+.field select {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  padding: var(--_tsb-space-3) var(--_tsb-space-4);
+
+  color: var(--_tsb-color-text);
+
+  background: var(--_tsb-color-surface);
+  border: 1px solid var(--_tsb-color-border);
+  border-radius: var(--_tsb-radius-md);
+
+  /*
+   * Keep controls at 16px on mobile so iOS Safari does not
+   * zoom the page when an input receives focus.
+   */
+  font: inherit;
+  font-size: 1rem;
+
+  transition:
+    border-color var(--_tsb-transition-base),
+    box-shadow var(--_tsb-transition-base);
+}
+
+.field input,
+.field select {
+  min-height: 44px;
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
+  color: var(--_tsb-color-text-muted);
+  opacity: 0.8;
+}
+
+.field input:focus,
+.field textarea:focus,
+.field select:focus {
+  outline: none;
+
+  border-color: var(--_tsb-color-primary);
+
+  box-shadow: 0 0 0 3px color-mix(in srgb,
+      var(--_tsb-color-primary) 12%,
+      transparent);
+}
+
+.field textarea {
+  min-height: 120px;
+
+  font-family: inherit;
+
+  resize: vertical;
+}
+
+.field select {
+  cursor: pointer;
+}
+
+.field input:disabled,
+.field textarea:disabled,
+.field select:disabled {
+  background: var(--_tsb-color-surface-alt);
+  color: var(--_tsb-color-text-muted);
+
+  cursor: not-allowed;
+}
+
+.field input[readonly],
+.field textarea[readonly] {
+  background: var(--_tsb-color-surface-alt);
+}
+
+/* ==========================================================
+   Labels
+   ========================================================== */
+
+.required {
+  color: var(--_tsb-color-danger);
+}
+
+.optional {
+  margin-left: var(--_tsb-space-1);
+
+  color: var(--_tsb-color-text-muted);
+
+  font-weight: 400;
+}
+
+/* ==========================================================
+   Helper Text
+   ========================================================== */
+
+.helper {
+  margin: var(--_tsb-space-1) 0 0;
+
+  color: var(--_tsb-color-text-muted);
+
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+/* ==========================================================
+   Validation
+   ========================================================== */
+
+.field.error input,
+.field.error textarea,
+.field.error select {
+  border-color: var(--_tsb-color-danger);
+
+  box-shadow: 0 0 0 3px color-mix(in srgb,
+      var(--_tsb-color-danger) 12%,
+      transparent);
+}
+
+.field.success input,
+.field.success textarea,
+.field.success select {
+  border-color: var(--_tsb-color-success);
+
+  box-shadow: 0 0 0 3px color-mix(in srgb,
+      var(--_tsb-color-success) 12%,
+      transparent);
+}
+
+.validationMessage {
+  margin-top: var(--_tsb-space-2);
+
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.field.error .validationMessage {
+  color: var(--_tsb-color-danger);
+}
+
+.field.success .validationMessage {
+  color: var(--_tsb-color-success);
+}

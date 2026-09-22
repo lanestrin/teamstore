@@ -1,0 +1,242 @@
+.selectionSummary {
+  display: grid;
+  gap: var(--_tsb-space-5);
+
+  width: 100%;
+  min-width: 0;
+  padding: var(--_tsb-space-5);
+
+  background: var(--_tsb-color-surface-alt);
+  border: 1px solid var(--_tsb-color-border);
+  border-radius: var(--_tsb-radius-lg);
+}
+
+.selectionSummaryText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--_tsb-space-1);
+
+  min-width: 0;
+}
+
+.selectionSummaryText strong {
+  color: var(--_tsb-color-text);
+
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.selectionSummaryText span {
+  max-width: 70ch;
+
+  color: var(--_tsb-color-text-muted);
+
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+/* ==========================================================================
+   Controls
+   ========================================================================== */
+
+.summaryActions {
+  display: grid;
+  grid-template-columns:
+    minmax(150px, 1fr) minmax(150px, 1fr) minmax(150px, 1fr) auto;
+  align-items: end;
+  gap: var(--_tsb-space-3);
+
+  width: 100%;
+  min-width: 0;
+}
+
+.summaryControl,
+.regenerateControl {
+  display: flex;
+  flex-direction: column;
+  gap: var(--_tsb-space-2);
+
+  min-width: 0;
+}
+
+.summaryControlLabel {
+  color: var(--_tsb-color-text-muted);
+
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.summarySelect {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 var(--_tsb-space-8) 0 var(--_tsb-space-3);
+
+  background: var(--_tsb-color-surface);
+  border: 1px solid var(--_tsb-color-border);
+  border-radius: var(--_tsb-radius-md);
+
+  color: var(--_tsb-color-text);
+
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    border-color var(--_tsb-transition-base),
+    box-shadow var(--_tsb-transition-base);
+}
+
+.summarySelect:focus-visible {
+  outline: none;
+
+  border-color: var(--_tsb-color-primary);
+  box-shadow:
+    0 0 0 3px color-mix(in srgb,
+      var(--_tsb-color-primary) 12%,
+      transparent);
+}
+
+.summarySelect option:disabled {
+  color: var(--_tsb-color-text-muted);
+}
+
+/* ==========================================================================
+   Regenerate
+   ========================================================================== */
+
+.regenerateButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--_tsb-space-2);
+
+  min-height: 44px;
+  padding: var(--_tsb-space-2) var(--_tsb-space-4);
+
+  background: var(--_tsb-color-surface);
+  border: 1px solid var(--_tsb-color-border);
+  border-radius: var(--_tsb-radius-md);
+
+  color: var(--_tsb-color-text);
+
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    background-color var(--_tsb-transition-base),
+    border-color var(--_tsb-transition-base),
+    box-shadow var(--_tsb-transition-base),
+    opacity var(--_tsb-transition-base);
+}
+
+.regenerateButton:focus-visible {
+  outline: none;
+
+  border-color: var(--_tsb-color-primary);
+  box-shadow:
+    0 0 0 3px color-mix(in srgb,
+      var(--_tsb-color-primary) 12%,
+      transparent);
+}
+
+.regenerateButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.regenerateButton svg {
+  flex: 0 0 auto;
+
+  width: 16px;
+  height: 16px;
+}
+
+.spinning {
+  animation: product-controls-spin 0.8s linear infinite;
+}
+
+@keyframes product-controls-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================================================
+   Hover-capable devices
+   ========================================================================== */
+
+@media (hover: hover) and (pointer: fine) {
+  .summarySelect:hover {
+    border-color:
+      color-mix(in srgb,
+        var(--_tsb-color-border) 65%,
+        var(--_tsb-color-text-muted));
+  }
+
+  .regenerateButton:not(:disabled):hover {
+    background: var(--_tsb-color-surface-alt);
+    border-color:
+      color-mix(in srgb,
+        var(--_tsb-color-border) 65%,
+        var(--_tsb-color-text-muted));
+  }
+}
+
+/* ==========================================================================
+   Tablet
+   ========================================================================== */
+
+@media (max-width: 1180px) {
+  .summaryActions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .regenerateButton {
+    width: 100%;
+  }
+}
+
+/* ==========================================================================
+   Mobile
+   ========================================================================== */
+
+@media (max-width: 640px) {
+  .selectionSummary {
+    gap: var(--_tsb-space-4);
+    padding: var(--_tsb-space-4);
+  }
+
+  .summaryActions {
+    grid-template-columns: 1fr;
+  }
+
+  .summarySelect,
+  .regenerateButton {
+    width: 100%;
+  }
+}
+
+/* ==========================================================================
+   Reduced motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .summarySelect,
+  .regenerateButton {
+    transition: none;
+  }
+
+  .spinning {
+    animation: none;
+  }
+}

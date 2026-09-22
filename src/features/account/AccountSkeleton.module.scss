@@ -1,3 +1,5 @@
+@use "@/styles" as *;
+
 .page {
   min-height: 100vh;
   padding: $space-8 0;
@@ -163,6 +165,7 @@
 }
 
 @media (max-width: 992px) {
+
   .actions,
   .contentGrid {
     grid-template-columns: 1fr;

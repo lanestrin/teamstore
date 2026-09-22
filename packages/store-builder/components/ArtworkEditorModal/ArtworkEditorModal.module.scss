@@ -1,0 +1,707 @@
+/* ==========================================================================
+   Overlay / modal shell
+   ========================================================================== */
+
+.overlay {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+
+  display: grid;
+  place-items: center;
+
+  padding: var(--_tsb-space-5);
+
+  background: rgb(15 23 42 / 72%);
+}
+
+.modal {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+
+  width: min(1180px, 100%);
+  height: min(820px, calc(100vh - 48px));
+
+  overflow: hidden;
+
+  background: var(--_tsb-color-surface);
+  border-radius: 1rem;
+
+  box-shadow: 0 24px 80px rgb(0 0 0 / 30%);
+}
+
+/* ==========================================================================
+   Header
+   ========================================================================== */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--_tsb-space-4);
+
+  min-width: 0;
+  padding: var(--_tsb-space-4) var(--_tsb-space-5);
+
+  background: var(--_tsb-color-surface);
+  border-bottom: 1px solid var(--_tsb-color-border);
+}
+
+.header>div {
+  min-width: 0;
+}
+
+.header h2,
+.header p {
+  margin: 0;
+}
+
+.header h2 {
+  color: var(--_tsb-color-text);
+
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.header p {
+  margin-top: var(--_tsb-space-1);
+
+  color: var(--_tsb-color-text-muted);
+
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.close {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+
+  width: 44px;
+  height: 44px;
+  padding: 0;
+
+  background: var(--_tsb-color-surface);
+  border: 1px solid var(--_tsb-color-border);
+  border-radius: var(--_tsb-radius-lg);
+
+  color: var(--_tsb-color-text);
+
+  cursor: pointer;
+
+  transition:
+    background-color var(--_tsb-transition-fast),
+    border-color var(--_tsb-transition-fast),
+    box-shadow var(--_tsb-transition-fast);
+}
+
+.close svg {
+  width: 20px;
+  height: 20px;
+}
+
+.close:focus-visible {
+  outline: none;
+
+  border-color: var(--_tsb-color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb,
+      var(--_tsb-color-primary) 15%,
+      transparent);
+}
+
+/* ==========================================================================
+   Main editor body
+   ========================================================================== */
+
+.body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+
+  min-width: 0;
+  min-height: 0;
+
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   Artwork canvas
+   ========================================================================== */
+
+.canvas {
+  display: grid;
+  place-items: center;
+
+  min-width: 0;
+  min-height: 0;
+  padding: var(--_tsb-space-6);
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(45deg,
+      var(--tsb-artwork-canvas-checker, #eceff3) 25%,
+      transparent 25%),
+    linear-gradient(-45deg,
+      var(--tsb-artwork-canvas-checker, #eceff3) 25%,
+      transparent 25%),
+    linear-gradient(45deg,
+      transparent 75%,
+      var(--tsb-artwork-canvas-checker, #eceff3) 75%),
+    linear-gradient(-45deg,
+      transparent 75%,
+      var(--tsb-artwork-canvas-checker, #eceff3) 75%);
+
+  background-position:
+    0 0,
+    0 10px,
+    10px -10px,
+    -10px 0;
+
+  background-size: 20px 20px;
+
+  touch-action: none;
+  user-select: none;
+}
+
+.canvas svg {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+  max-width: 760px;
+  max-height: 640px;
+
+  overflow: visible;
+}
+
+.canvas [data-artwork-editor-element] {
+  cursor: grab;
+}
+
+.canvas [data-artwork-editor-movement="none"] {
+  cursor: default;
+}
+
+.canvas [data-artwork-editor-selected="true"] {
+  filter:
+    drop-shadow(2px 0 0 var(--tsb-artwork-selection, #2563eb)) drop-shadow(-2px 0 0 var(--tsb-artwork-selection, #2563eb)) drop-shadow(0 2px 0 var(--tsb-artwork-selection, #2563eb)) drop-shadow(0 -2px 0 var(--tsb-artwork-selection, #2563eb));
+}
+
+/* ==========================================================================
+   Editing sidebar
+   ========================================================================== */
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--_tsb-space-5);
+
+  min-width: 0;
+  min-height: 0;
+  padding: var(--_tsb-space-5);
+
+  overflow-y: auto;
+
+  background: var(--_tsb-color-surface);
+  border-left: 1px solid var(--_tsb-color-border);
+}
+
+.sidebar h3,
+.sidebar p {
+  margin: 0;
+}
+
+.sidebar h3 {
+  color: var(--_tsb-color-text);
+
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+/* ==========================================================================
+   Element list
+   ========================================================================== */
+
+.elementList {
+  display: grid;
+  gap: var(--_tsb-space-2);
+}
+
+.elementButton {
+  width: 100%;
+  min-height: 44px;
+  padding: var(--_tsb-space-2) var(--_tsb-space-3);
+
+  background: var(--_tsb-color-surface);
+  border: 1px solid var(--_tsb-color-border);
+  border-radius: var(--_tsb-radius-md);
+
+  color: var(--_tsb-color-text);
+
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.3;
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    background-color var(--_tsb-transition-fast),
+    border-color var(--_tsb-transition-fast),
+    box-shadow var(--_tsb-transition-fast);
+}
+
+.elementButton[data-selected="true"] {
+  border-color: var(--_tsb-color-primary);
+
+  background: color-mix(in srgb,
+      var(--_tsb-color-primary) 6%,
+      transparent);
+
+  color: var(--_tsb-color-primary);
+}
+
+.elementButton:focus-visible {
+  outline: none;
+
+  border-color: var(--_tsb-color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb,
+      var(--_tsb-color-primary) 14%,
+      transparent);
+}
+
+/* ==========================================================================
+   Selected element
+   ========================================================================== */
+
+.selectedElement {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--_tsb-space-3);
+
+  width: 100%;
+  min-width: 0;
+  padding: var(--_tsb-space-3) var(--_tsb-space-4);
+
+  background: var(--_tsb-color-surface-alt);
+  border: 1px solid var(--_tsb-color-border);
+  border-radius: var(--_tsb-radius-md);
+}
+
+.selectedElement h3 {
+  min-width: 0;
+  margin: 0;
+
+  color: var(--_tsb-color-text);
+
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.lockedMessage {
+  flex: 0 0 auto;
+
+  margin: 0;
+
+  color: var(--_tsb-color-text-muted);
+
+  font-size: 0.75rem;
+  line-height: 1.4;
+  text-align: right;
+
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   Movement controls
+   ========================================================================== */
+
+.movement {
+  display: grid;
+  grid-template-columns: repeat(3, 48px);
+  grid-template-rows: repeat(3, 48px);
+  justify-content: center;
+  gap: var(--_tsb-space-2);
+
+  width: fit-content;
+  margin-inline: auto;
+}
+
+.moveButton {
+  display: grid;
+  place-items: center;
+
+  width: 48px;
+  height: 48px;
+  padding: 0;
+
+  background: var(--_tsb-color-surface);
+  border: 1px solid var(--_tsb-color-border);
+  border-radius: var(--_tsb-radius-md);
+
+  color: var(--_tsb-color-text);
+
+  cursor: pointer;
+
+  transition:
+    background-color var(--_tsb-transition-fast),
+    border-color var(--_tsb-transition-fast),
+    box-shadow var(--_tsb-transition-fast);
+}
+
+.moveButton svg {
+  width: 19px;
+  height: 19px;
+}
+
+.moveButton:focus-visible {
+  outline: none;
+
+  border-color: var(--_tsb-color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb,
+      var(--_tsb-color-primary) 14%,
+      transparent);
+}
+
+.moveButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.moveUp {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.moveLeft {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.resetSelected {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.moveRight {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.moveDown {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+.position {
+  color: var(--_tsb-color-text-muted);
+
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    monospace;
+
+  font-size: 0.75rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* ==========================================================================
+   Shared editor buttons
+   ========================================================================== */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 44px;
+  padding: 0 var(--_tsb-space-4);
+
+  background: var(--_tsb-color-surface);
+  border: 1px solid var(--_tsb-color-border);
+  border-radius: var(--_tsb-radius-lg);
+
+  color: var(--_tsb-color-text);
+
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background-color var(--_tsb-transition-fast),
+    border-color var(--_tsb-transition-fast),
+    box-shadow var(--_tsb-transition-fast);
+}
+
+.button:focus-visible {
+  outline: none;
+
+  border-color: var(--_tsb-color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb,
+      var(--_tsb-color-primary) 14%,
+      transparent);
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.primaryButton {
+  background: var(--_tsb-color-primary);
+  border-color: var(--_tsb-color-primary);
+  color: #ffffff;
+}
+
+.resetAll {
+  width: 100%;
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--_tsb-space-3);
+
+  min-width: 0;
+  padding: var(--_tsb-space-4) var(--_tsb-space-5);
+
+  background: var(--_tsb-color-surface);
+  border-top: 1px solid var(--_tsb-color-border);
+}
+
+/* ==========================================================================
+   Hover-capable devices
+   ========================================================================== */
+
+@media (hover: hover) and (pointer: fine) {
+
+  .close:hover,
+  .elementButton:hover,
+  .moveButton:not(:disabled):hover,
+  .button:not(.primaryButton):not(:disabled):hover {
+    background: var(--_tsb-color-surface-alt);
+    border-color: color-mix(in srgb, var(--_tsb-color-border) 55%, var(--_tsb-color-text-muted));
+  }
+
+  .primaryButton:hover {
+    filter: brightness(0.94);
+  }
+
+  .canvas [data-artwork-editor-element]:hover {
+    filter: drop-shadow(0 0 6px color-mix(in srgb,
+          var(--tsb-artwork-selection, #2563eb) 55%,
+          transparent));
+  }
+
+  .canvas [data-artwork-editor-selected="true"]:hover {
+    filter:
+      drop-shadow(2px 0 0 var(--tsb-artwork-selection, #2563eb)) drop-shadow(-2px 0 0 var(--tsb-artwork-selection, #2563eb)) drop-shadow(0 2px 0 var(--tsb-artwork-selection, #2563eb)) drop-shadow(0 -2px 0 var(--tsb-artwork-selection, #2563eb));
+  }
+}
+
+/* ==========================================================================
+   Tablet
+   ========================================================================== */
+
+@media (max-width: 900px) {
+  .overlay {
+    padding: var(--_tsb-space-3);
+  }
+
+  .modal {
+    width: min(760px, 100%);
+    height: calc(100vh - 24px);
+  }
+
+  .body {
+    display: grid;
+    grid-template-rows: 260px minmax(0, 1fr);
+    grid-template-columns: 1fr;
+
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .canvas {
+    min-height: 0;
+    padding: var(--_tsb-space-4);
+
+    overflow: hidden;
+
+    border-bottom: 1px solid var(--_tsb-color-border);
+  }
+
+  .canvas svg {
+    width: 100%;
+    height: 100%;
+
+    max-width: 520px;
+    max-height: 100%;
+  }
+
+  .sidebar {
+    min-height: 0;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    border-top: 0;
+    border-left: 0;
+  }
+
+  .elementList {
+    grid-template-columns: repeat(auto-fit,
+        minmax(140px, 1fr));
+  }
+}
+
+/* ==========================================================================
+   Mobile
+   ========================================================================== */
+
+@media (max-width: 640px) {
+  .overlay {
+    padding: 0;
+  }
+
+  .modal {
+    width: 100%;
+    height: 100vh;
+
+    border-radius: 0;
+  }
+
+  @supports (height: 100dvh) {
+    .modal {
+      height: 100dvh;
+    }
+  }
+
+  .header {
+    padding: var(--_tsb-space-3) var(--_tsb-space-4);
+  }
+
+  .header h2 {
+    font-size: 1.125rem;
+  }
+
+  .header p {
+    font-size: 0.8125rem;
+  }
+
+  .body {
+    grid-template-rows: 300px minmax(0, 1fr);
+  }
+
+  .canvas {
+    min-height: 0;
+    padding: var(--_tsb-space-3);
+  }
+
+  .canvas svg {
+    width: auto;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  .sidebar {
+    gap: var(--_tsb-space-4);
+    padding: var(--_tsb-space-4);
+  }
+
+  .elementList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--_tsb-space-2);
+  }
+
+  .elementButton {
+    width: auto;
+    flex: 1 1 140px;
+
+    text-align: center;
+  }
+
+  .footer {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    padding: var(--_tsb-space-3) var(--_tsb-space-4);
+  }
+
+  .footer .button {
+    width: 100%;
+  }
+}
+
+/* ==========================================================================
+   Small phones
+   ========================================================================== */
+
+@media (max-width: 420px) {
+  .header {
+    gap: var(--_tsb-space-3);
+  }
+
+  .header p {
+    display: none;
+  }
+
+  .canvas svg {
+    max-width: 300px;
+  }
+
+  .movement {
+    grid-template-columns: repeat(3, 52px);
+    grid-template-rows: repeat(3, 52px);
+  }
+
+  .moveButton {
+    width: 52px;
+    height: 52px;
+  }
+
+  .elementButton {
+    flex-basis: 100%;
+  }
+
+  .footer {
+    gap: var(--_tsb-space-2);
+  }
+
+  .footer .button {
+    padding-inline: var(--_tsb-space-3);
+    font-size: 0.8125rem;
+  }
+}
+
+/* ==========================================================================
+   Reduced motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .close,
+  .elementButton,
+  .moveButton,
+  .button {
+    transition: none;
+  }
+}

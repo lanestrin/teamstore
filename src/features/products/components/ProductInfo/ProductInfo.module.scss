@@ -1,3 +1,5 @@
+@use "@/styles" as *;
+
 .info {
   display: flex;
   flex-direction: column;
@@ -334,3 +336,4 @@
     gap: $space-1;
   }
 }
+

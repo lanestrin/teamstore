@@ -1,6 +1,5 @@
 import { useState, type SyntheticEvent } from "react";
 import { useAuthActions } from "@convex-dev/auth/react";
-import { featureToggle } from "../../config/feature-toggle";
 import GoogleSignInButton from "./components/GoogleSignInButton/GoogleSignInButton";
 import styles from "./AuthForm.module.scss";
 
@@ -339,7 +338,7 @@ export default function AuthForm() {
           </button>
         )}
 
-        {featureToggle.demoLogin && isSignIn && (
+        {isSignIn && (
           <button type="button" className={styles.demoLink} onClick={fillDemoCredentials}>
             Use Demo Account
           </button>

@@ -11,17 +11,6 @@ export default defineConfig({
     },
   },
 
-  css: {
-    preprocessorOptions: {
-      scss: {
-        additionalData: `
-          @use "@/styles/variables" as *;
-          @use "@/styles/mixins" as *;
-        `,
-      },
-    },
-  },
-
   server: {
     watch: {
       ignored: ["**/.vs/**", "**/node_modules/**", "**/bin/**", "**/obj/**"],

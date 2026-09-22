@@ -1,0 +1,309 @@
+.card {
+  position: relative;
+
+  display: grid;
+  grid-template-rows: auto minmax(220px, 1fr) auto;
+
+  min-width: 0;
+
+  overflow: hidden;
+
+  background: var(--_tsb-color-surface);
+  border: 1px solid var(--_tsb-color-border);
+  border-radius: 1rem;
+
+  box-shadow: var(--_tsb-shadow-sm);
+
+  transition:
+    border-color var(--_tsb-transition-fast),
+    box-shadow var(--_tsb-transition-fast),
+    transform var(--_tsb-transition-fast);
+}
+
+.card[data-selected="true"] {
+  border-color: var(--_tsb-color-success);
+
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--_tsb-color-success) 16%, transparent),
+    var(--_tsb-shadow-md);
+}
+
+/* ==========================================================================
+   Header
+   ========================================================================== */
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--_tsb-space-3);
+
+  min-height: 48px;
+  padding: var(--_tsb-space-3) var(--_tsb-space-4);
+
+  background: var(--_tsb-color-surface);
+  border-bottom: 1px solid var(--_tsb-color-border);
+}
+
+.cardHeader h3 {
+  min-width: 0;
+  margin: 0;
+
+  overflow: hidden;
+
+  color: var(--_tsb-color-text);
+
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.3;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.uploadedBadge {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--_tsb-space-1);
+
+  padding: var(--_tsb-space-1) var(--_tsb-space-2);
+
+  background: var(--_tsb-color-surface-alt);
+  border-radius: 999px;
+
+  color: var(--_tsb-color-text-muted);
+
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.uploadedBadge svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* ==========================================================================
+   Artwork preview
+   ========================================================================== */
+
+.preview {
+  display: grid;
+  place-items: center;
+
+  min-height: 220px;
+  padding: var(--_tsb-space-4);
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(45deg,
+      var(--_tsb-color-surface-alt) 25%,
+      transparent 25%),
+    linear-gradient(-45deg,
+      var(--_tsb-color-surface-alt) 25%,
+      transparent 25%),
+    linear-gradient(45deg,
+      transparent 75%,
+      var(--_tsb-color-surface-alt) 75%),
+    linear-gradient(-45deg,
+      transparent 75%,
+      var(--_tsb-color-surface-alt) 75%),
+    color-mix(in srgb, var(--_tsb-color-surface-alt) 55%, var(--_tsb-color-surface));
+
+  background-position:
+    0 0,
+    0 8px,
+    8px -8px,
+    -8px 0;
+
+  background-size: 16px 16px;
+}
+
+.preview img {
+  display: block;
+
+  width: 100%;
+  max-width: 100%;
+  max-height: 280px;
+
+  object-fit: contain;
+}
+
+.preview svg {
+  width: 28px;
+  height: 28px;
+
+  color: var(--_tsb-color-text-muted);
+}
+
+/* ==========================================================================
+   Actions
+   ========================================================================== */
+
+.actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--_tsb-space-3);
+
+  padding: var(--_tsb-space-3) var(--_tsb-space-4);
+
+  background: var(--_tsb-color-surface);
+  border-top: 1px solid var(--_tsb-color-border);
+}
+
+.checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--_tsb-space-2);
+
+  min-width: 0;
+  min-height: 44px;
+
+  color: var(--_tsb-color-text);
+
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.3;
+
+  cursor: pointer;
+}
+
+.checkbox input {
+  flex: 0 0 auto;
+
+  width: 20px;
+  height: 20px;
+  margin: 0;
+
+  accent-color: var(--_tsb-color-success);
+
+  cursor: pointer;
+}
+
+.checkbox span {
+  min-width: 0;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.checkbox:focus-within {
+  outline: 3px solid color-mix(in srgb, var(--_tsb-color-success) 18%, transparent);
+  outline-offset: 2px;
+  border-radius: var(--_tsb-radius-md);
+}
+
+.removeButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--_tsb-space-2);
+
+  min-height: 44px;
+  padding: var(--_tsb-space-2) var(--_tsb-space-3);
+
+  background: var(--_tsb-color-surface);
+  border: 1px solid var(--_tsb-color-border);
+  border-radius: var(--_tsb-radius-lg);
+
+  color: var(--_tsb-color-text);
+
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 700;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    background-color var(--_tsb-transition-fast),
+    border-color var(--_tsb-transition-fast),
+    box-shadow var(--_tsb-transition-fast);
+}
+
+.removeButton svg {
+  flex: 0 0 auto;
+
+  width: 16px;
+  height: 16px;
+}
+
+.removeButton:focus-visible {
+  outline: none;
+
+  border-color: var(--_tsb-color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--_tsb-color-primary) 14%, transparent);
+}
+
+/* ==========================================================================
+   Hover-capable devices
+   ========================================================================== */
+
+@media (hover: hover) and (pointer: fine) {
+  .card:hover {
+    border-color: color-mix(in srgb, var(--_tsb-color-border) 55%, var(--_tsb-color-text-muted));
+    box-shadow: var(--_tsb-shadow-md);
+    transform: translateY(-1px);
+  }
+
+  .card[data-selected="true"]:hover {
+    border-color: var(--_tsb-color-success);
+  }
+
+  .removeButton:hover {
+    background: color-mix(in srgb, var(--_tsb-color-surface-alt) 55%, var(--_tsb-color-surface));
+    border-color: color-mix(in srgb, var(--_tsb-color-border) 55%, var(--_tsb-color-text-muted));
+  }
+}
+
+/* ==========================================================================
+   Mobile
+   ========================================================================== */
+
+@media (max-width: 640px) {
+  .card {
+    grid-template-rows: auto minmax(200px, 1fr) auto;
+  }
+
+  .preview {
+    min-height: 200px;
+  }
+}
+
+@media (max-width: 420px) {
+  .actions {
+    grid-template-columns: 1fr;
+    gap: var(--_tsb-space-2);
+  }
+
+  .checkbox {
+    width: 100%;
+  }
+
+  .checkbox span {
+    white-space: normal;
+  }
+
+  .removeButton {
+    width: 100%;
+  }
+}
+
+/* ==========================================================================
+   Reduced motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .card,
+  .removeButton {
+    transition: none;
+  }
+}
