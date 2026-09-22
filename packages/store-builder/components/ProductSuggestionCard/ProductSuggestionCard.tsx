@@ -1,7 +1,7 @@
 import { LuPencil, LuStar } from "react-icons/lu";
 import styles from "./ProductSuggestionCard.module.scss";
 import type { ProductArtworkPlacement } from "../../lib/decorationProfiles";
-import type { GeneratedSuggestion, ProductColorOption } from "../../lib/productStep.types";
+import type { GeneratedSuggestion, ProductColorOption } from "../../types/productStep";
 import GarmentArtworkPreview from "../GarmentArtworkPreview/GarmentArtworkPreview";
 
 interface ProductSuggestionCardProps {

@@ -1,4 +1,4 @@
-import type { ProductColorFamily } from "../../../src/types/productColor.types";
+import type { ProductColorFamily } from "../types/productColor";
 
 export const PRODUCT_COLOR_OPTIONS: readonly {
   value: ProductColorFamily;

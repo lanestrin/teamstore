@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
-import { useOutletContext } from "react-router-dom";
 
 import { useCreateStore } from "./context/CreateStoreContext";
-import type { CreateStoreOutletContext } from "./layouts/CreateStoreLayout";
 
 import ColorsStep from "./steps/2_ColorStep/ColorsStep";
 import ColorsStepSkeleton from "./steps/2_ColorStep/ColorsStepSkeleton";
@@ -11,12 +9,16 @@ import SelectArtworkStep from "./steps/3_ArtworkStep/ArtworkStep";
 import SelectProductStep from "./steps/4_ProductsStep/ProductsStep";
 import ReviewStep from "./steps/5_ReviewStep/ReviewStep";
 
-export default function CreateStorePage() {
+interface CreateStorePageProps {
+  isFinalizing: boolean;
+  onCreateStore: () => Promise<void>;
+  onDraftIdChange: (draftId: string) => void;
+}
+
+export default function CreateStorePage({ isFinalizing, onCreateStore, onDraftIdChange }: CreateStorePageProps) {
   const [isLoading, setIsLoading] = useState(true);
 
   const { currentStep } = useCreateStore();
-
-  const { isFinalizing, createStore } = useOutletContext<CreateStoreOutletContext>();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -32,7 +34,7 @@ export default function CreateStorePage() {
 
   switch (currentStep) {
     case 1:
-      return <OrganizationStep />;
+      return <OrganizationStep onDraftIdChange={onDraftIdChange} />;
 
     case 2:
       return <ColorsStep />;
@@ -44,9 +46,9 @@ export default function CreateStorePage() {
       return <SelectProductStep />;
 
     case 5:
-      return <ReviewStep isFinalizing={isFinalizing} onCreateStore={createStore} />;
+      return <ReviewStep isFinalizing={isFinalizing} onCreateStore={onCreateStore} />;
 
     default:
-      return <OrganizationStep />;
+      return <OrganizationStep onDraftIdChange={onDraftIdChange} />;
   }
 }

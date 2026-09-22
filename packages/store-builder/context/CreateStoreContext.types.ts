@@ -1,11 +1,19 @@
 import type { Dispatch, SetStateAction } from "react";
-import type { Doc, Id } from "../../../convex/_generated/dataModel";
 
-import type { ProductColorFamily } from "../../../src/types/productColor.types";
 import type { ArtworkAdjustments } from "../lib/artworkEditor";
 import type { ProductArtworkPlacement } from "../lib/decorationProfiles";
+import type {
+  LoadedProductSelection as BackendLoadedProductSelection,
+  LoadedStoreDraft as BackendLoadedStoreDraft,
+  StoreBuilderId,
+  StoreBuilderStorageId,
+  StoreType as BackendStoreType,
+} from "../types/backend";
+import type { ProductColorFamily } from "../types/productColor";
 
-export type StoreType = "fanwear" | "uniform" | "hybrid";
+export type StoreType = BackendStoreType;
+export type LoadedProductSelection = BackendLoadedProductSelection;
+export type LoadedStoreDraft = BackendLoadedStoreDraft;
 
 export interface ArtworkTextDraft {
   organizationName: string;
@@ -23,37 +31,16 @@ export interface UploadedArtworkDraft {
   id: string;
   fileName: string;
   file: File | null;
-  storageId: Id<"_storage"> | null;
+  storageId: StoreBuilderStorageId | null;
   storageUrl: string | null;
   isSelected: boolean;
-}
-
-export interface LoadedProductSelection {
-  productId: Id<"products">;
-  colorKey: string;
-  artworkTemplateId: string;
-  isRequired: boolean;
-}
-
-export interface LoadedStoreDraft extends Omit<Doc<"stores">, "uploadedArtworks"> {
-  logoUrl: string | null;
-
-  uploadedArtworks?: Array<{
-    id: string;
-    fileName: string;
-    storageId: Id<"_storage">;
-    storageUrl: string | null;
-    isSelected: boolean;
-  }>;
-
-  productSelections?: LoadedProductSelection[];
 }
 
 export type ArtworkTemplatesDraft = Record<string, ArtworkTemplateDraft>;
 export type ArtworkSvgMap = Readonly<Record<string, string>>;
 
 export interface ProductSelectionInput {
-  productId: Id<"products">;
+  productId: StoreBuilderId;
   colorKey: string;
   artworkTemplateId: string;
   isRequired?: boolean;
@@ -62,7 +49,7 @@ export interface ProductSelectionInput {
 
 export interface ProductSelectionDraft {
   combinationKey: string;
-  productId: Id<"products">;
+  productId: StoreBuilderId;
   colorKey: string;
   artworkTemplateId: string;
   isRequired: boolean;
@@ -88,7 +75,7 @@ export interface CreateStoreDraft {
   storeDescription: string;
 
   logoFile: File | null;
-  logoStorageId: Id<"_storage"> | null;
+  logoStorageId: StoreBuilderStorageId | null;
   logoUrl: string | null;
 
   artworkTemplates: ArtworkTemplatesDraft;
@@ -103,8 +90,8 @@ export interface CreateStoreDraft {
 }
 
 export interface CreateStoreContextValue {
-  storeId: Id<"stores"> | null;
-  setStoreId: Dispatch<SetStateAction<Id<"stores"> | null>>;
+  storeId: StoreBuilderId | null;
+  setStoreId: Dispatch<SetStateAction<StoreBuilderId | null>>;
 
   currentStep: number;
   furthestStepReached: number;

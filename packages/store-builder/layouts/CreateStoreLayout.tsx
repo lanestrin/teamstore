@@ -1,21 +1,39 @@
-import { Outlet } from "react-router-dom";
-
-import { CreateStoreProvider, useCreateStore } from "../context/CreateStoreContext";
-import { useCreateStoreWorkflow } from "../hooks/useCreateStoreWorkflow";
-
+import CreateStorePage from "../CreateStorePage";
 import ProgressSidebar from "../components/ProgressSidebar/ProgressSidebar";
+import { CreateStoreProvider, useCreateStore } from "../context/CreateStoreContext";
+import { StoreBuilderAdapterContext } from "../context/StoreBuilderAdapterContext";
+import { useCreateStoreWorkflow } from "../hooks/useCreateStoreWorkflow";
+import type { FinalizeStoreResult, StoreBuilderAdapter } from "../types/backend";
+import type { StoreBuilderBranding } from "../types/branding";
 
 import styles from "./CreateStoreLayout.module.scss";
 
-export interface CreateStoreOutletContext {
-  isFinalizing: boolean;
-  createStore: () => Promise<void>;
+export interface CreateStoreLayoutProps {
+  branding: StoreBuilderBranding;
+  adapter: StoreBuilderAdapter;
+  draftId: string | null;
+  onDraftIdChange: (draftId: string) => void;
+  onExit: () => void;
+  onComplete: (result: FinalizeStoreResult) => void;
 }
 
-function CreateStoreContent() {
+interface CreateStoreContentProps {
+  branding: StoreBuilderBranding;
+  draftId: string | null;
+  onDraftIdChange: (draftId: string) => void;
+  onExit: () => void;
+  onComplete: (result: FinalizeStoreResult) => void;
+}
+
+function CreateStoreContent({ branding, draftId, onDraftIdChange, onExit, onComplete }: CreateStoreContentProps) {
   const { currentStep, furthestStepReached, setCurrentStep, storeDraft } = useCreateStore();
 
-  const { isLoadingDraft, isSaving, isFinalizing, saveAndExit, createStore } = useCreateStoreWorkflow();
+  const { isLoadingDraft, isSaving, isFinalizing, saveAndExit, createStore } = useCreateStoreWorkflow({
+    draftId,
+    onDraftIdChange,
+    onExit,
+    onComplete,
+  });
 
   if (isLoadingDraft) {
     return (
@@ -32,6 +50,7 @@ function CreateStoreContent() {
           currentStep={currentStep}
           furthestStepReached={furthestStepReached}
           storeType={storeDraft.storeType}
+          branding={branding}
           isSaving={isSaving}
           isFinalizing={isFinalizing}
           onStepChange={setCurrentStep}
@@ -40,25 +59,26 @@ function CreateStoreContent() {
       </div>
 
       <main className={styles.content}>
-        <Outlet
-          context={
-            {
-              isFinalizing,
-              createStore,
-            } satisfies CreateStoreOutletContext
-          }
-        />
+        <CreateStorePage isFinalizing={isFinalizing} onCreateStore={createStore} onDraftIdChange={onDraftIdChange} />
       </main>
     </div>
   );
 }
 
-export default function CreateStoreLayout() {
+export default function CreateStoreLayout({ branding, adapter, draftId, onDraftIdChange, onExit, onComplete }: CreateStoreLayoutProps) {
   return (
-    <CreateStoreProvider>
-      <div className={styles.storeBuilder}>
-        <CreateStoreContent />
-      </div>
-    </CreateStoreProvider>
+    <StoreBuilderAdapterContext.Provider value={adapter}>
+      <CreateStoreProvider>
+        <div className={styles.storeBuilder}>
+          <CreateStoreContent
+            branding={branding}
+            draftId={draftId}
+            onDraftIdChange={onDraftIdChange}
+            onExit={onExit}
+            onComplete={onComplete}
+          />
+        </div>
+      </CreateStoreProvider>
+    </StoreBuilderAdapterContext.Provider>
   );
 }

@@ -1,10 +1,10 @@
 /* eslint-disable react-refresh/only-export-components */
 
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import type { Id } from "../../../convex/_generated/dataModel";
+import type { StoreBuilderId } from "../types/backend";
 import { ART_TEMPLATE_LIST } from "../assets/art-templates";
 
-import type { ProductColorFamily } from "../../../src/types/productColor.types";
+import type { ProductColorFamily } from "../types/productColor";
 import useFileDataUrl from "../hooks/useFileDataUrl";
 import { createCustomizedSvg, applySavedArtworkAdjustments } from "../lib/artworkSvg";
 
@@ -142,7 +142,7 @@ interface CreateStoreProviderProps {
 }
 
 export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
-  const [storeId, setStoreId] = useState<Id<"stores"> | null>(null);
+  const [storeId, setStoreId] = useState<StoreBuilderId | null>(null);
   const [currentStep, setCurrentStepState] = useState(1);
   const [furthestStepReached, setFurthestStepReached] = useState(1);
   const [primaryColor, setPrimaryColor] = useState(DEFAULT_PRIMARY_COLOR);
@@ -248,7 +248,7 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
   }
 
   function selectProduct(selection: ProductSelectionInput) {
-    const productId = selection.productId.trim() as Id<"products">;
+    const productId = selection.productId.trim();
     const colorKey = selection.colorKey.trim();
     const artworkTemplateId = selection.artworkTemplateId.trim();
 

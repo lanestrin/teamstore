@@ -1,4 +1,4 @@
-import Skeleton from "../../../../src/components/skeleton/Skeleton";
+import Skeleton from "../../components/Skeleton/Skeleton";
 import styles from "./ColorsStepSkeleton.module.scss";
 
 export default function ColorsStepSkeleton() {

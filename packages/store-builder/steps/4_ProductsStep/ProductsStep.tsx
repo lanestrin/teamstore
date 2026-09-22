@@ -1,12 +1,11 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from "react";
-import { useQuery } from "convex/react";
 import { LuTriangleAlert } from "react-icons/lu";
 
-import { api } from "../../../../convex/_generated/api";
 import { ART_TEMPLATE_LIST } from "../../assets/art-templates";
-import type { ProductColorFamily } from "../../../../src/types/productColor.types";
+import type { ProductColorFamily } from "../../types/productColor";
 import WizardLayout from "../../layouts/WizardLayout";
 import { useCreateStore } from "../../context/CreateStoreContext";
+import { useStoreCreationProducts } from "../../hooks/useStoreCreationProducts";
 
 import ProductEditorModal from "../../components/ProductEditorModal/ProductEditorModal";
 import ProductSuggestionControls from "../../components/ProductSuggestionControls/ProductSuggestionControls";
@@ -14,7 +13,7 @@ import ProductSuggestionSection from "../../components/ProductSuggestionSection/
 import { createDefaultProductArtworkPlacement, type ProductArtworkPlacement } from "../../lib/decorationProfiles";
 import { PRODUCT_COLOR_OPTIONS } from "../../lib/productColorOptions";
 import { createUploadedArtworkId, generateProductSuggestions, getUploadedArtworkId } from "../../lib/productGeneration";
-import type { EditingProductState, GeneratedSuggestion, ProductColorOption, ProductOption } from "../../lib/productStep.types";
+import type { EditingProductState, GeneratedSuggestion, ProductColorOption, ProductOption } from "../../types/productStep";
 import styles from "./ProductsStep.module.scss";
 
 const STORE_ACTIVITIES = [
@@ -139,15 +138,14 @@ export default function SelectProductsStep() {
    *
    * Supplier IDs are no longer used to build the assortment.
    */
-  const storeCreationProducts = useQuery(
-    api.storeProductCatalog.getStoreCreationProducts,
+  const { data: storeCreationProducts, isLoading } = useStoreCreationProducts(
     isStoreActivity(storeDraft.activity)
       ? {
           activity: storeDraft.activity,
           colorFamily: primaryColorFamily && primaryColorFamily !== "unknown" ? primaryColorFamily : undefined,
           selectedProductIds: preservedProductIds,
         }
-      : "skip",
+      : null,
   );
 
   /*
@@ -174,8 +172,6 @@ export default function SelectProductsStep() {
 
     return [];
   }, [storeCreationProducts, storeDraft.storeType]);
-
-  const isLoading = isStoreActivity(storeDraft.activity) && storeCreationProducts === undefined;
 
   /*
    * A selected secondary color should only be treated as an exact match
