@@ -1,0 +1,738 @@
+/* ==========================================================================
+   Step layout
+   ========================================================================== */
+
+.editor {
+  display: grid;
+  grid-template-columns: minmax(320px, 360px) minmax(0, 1fr);
+  align-items: start;
+  gap: var(--_tsb-space-6);
+
+  width: 100%;
+  min-width: 0;
+}
+
+/* ==========================================================================
+   Artwork controls
+   ========================================================================== */
+
+.controls {
+  display: grid;
+  gap: var(--_tsb-space-5);
+
+  min-width: 0;
+  padding: var(--_tsb-space-5);
+
+  background: var(--_tsb-color-surface);
+  border: 1px solid var(--_tsb-color-border);
+  border-radius: 1rem;
+}
+
+.controlSection {
+  display: grid;
+  gap: var(--_tsb-space-4);
+
+  min-width: 0;
+}
+
+.controlsHeading {
+  display: grid;
+  gap: var(--_tsb-space-1);
+}
+
+.controlsHeading h2,
+.controlsHeading p {
+  margin: 0;
+}
+
+.controlsHeading h2 {
+  color: var(--_tsb-color-text);
+
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.controlsHeading p {
+  color: var(--_tsb-color-text-muted);
+
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.field {
+  display: grid;
+  gap: var(--_tsb-space-2);
+
+  min-width: 0;
+}
+
+.field>span {
+  color: var(--_tsb-color-text);
+
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.field input {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: var(--_tsb-space-3) var(--_tsb-space-4);
+
+  background: var(--_tsb-color-surface);
+  border: 1px solid color-mix(in srgb, var(--_tsb-color-border) 70%, var(--_tsb-color-text-muted));
+  border-radius: var(--_tsb-radius-lg);
+
+  color: var(--_tsb-color-text);
+
+  font: inherit;
+  font-size: 1rem;
+
+  transition:
+    border-color var(--_tsb-transition-fast),
+    box-shadow var(--_tsb-transition-fast);
+}
+
+.field input:focus {
+  outline: none;
+
+  border-color: var(--_tsb-color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb,
+      var(--_tsb-color-primary) 12%,
+      transparent);
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+
+  background: var(--_tsb-color-border);
+}
+
+/* ==========================================================================
+   Organization logo
+   ========================================================================== */
+
+.mascotCard {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--_tsb-space-4);
+
+  min-width: 0;
+}
+
+.mascotThumbnail {
+  display: grid;
+  place-items: center;
+
+  width: 76px;
+  aspect-ratio: 1;
+
+  overflow: hidden;
+
+  background: var(--_tsb-color-border);
+  border: 1px solid var(--_tsb-color-border);
+  border-radius: var(--_tsb-radius-lg);
+
+  color: var(--_tsb-color-text-muted);
+}
+
+.mascotThumbnail img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+  padding: var(--_tsb-space-2);
+
+  object-fit: contain;
+}
+
+.mascotThumbnail svg {
+  width: 28px;
+  height: 28px;
+}
+
+.mascotDetails {
+  display: grid;
+  gap: var(--_tsb-space-1);
+
+  min-width: 0;
+}
+
+.mascotDetails strong {
+  min-width: 0;
+
+  overflow: hidden;
+
+  color: var(--_tsb-color-text);
+
+  font-size: 0.875rem;
+  font-weight: 600;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mascotDetails>span {
+  min-width: 0;
+
+  overflow: hidden;
+
+  color: var(--_tsb-color-text-muted);
+
+  font-size: 0.75rem;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.replaceButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--_tsb-space-2);
+
+  width: fit-content;
+  min-height: 44px;
+  margin-top: var(--_tsb-space-2);
+  padding: var(--_tsb-space-2) var(--_tsb-space-4);
+
+  background: var(--_tsb-color-surface);
+  border: 1px solid color-mix(in srgb, var(--_tsb-color-border) 70%, var(--_tsb-color-text-muted));
+  border-radius: var(--_tsb-radius-lg);
+
+  color: var(--_tsb-color-text);
+
+  font-size: 0.8125rem;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color var(--_tsb-transition-fast),
+    border-color var(--_tsb-transition-fast),
+    box-shadow var(--_tsb-transition-fast);
+}
+
+.replaceButton svg {
+  flex: 0 0 auto;
+
+  width: 16px;
+  height: 16px;
+}
+
+.replaceButton:focus-within {
+  border-color: var(--_tsb-color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb,
+      var(--_tsb-color-primary) 12%,
+      transparent);
+}
+
+/*
+ * Keep the native file input accessible while hiding it visually.
+ */
+.fileInput {
+  position: absolute;
+
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+
+  overflow: hidden;
+
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+
+  white-space: nowrap;
+
+  border: 0;
+}
+
+.error,
+.notice {
+  margin: 0;
+
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.error {
+  color: var(--_tsb-color-danger);
+}
+
+.notice {
+  color: var(--_tsb-color-text-muted);
+}
+
+/* ==========================================================================
+   Artwork gallery
+   ========================================================================== */
+
+.templateGallery {
+  display: grid;
+  gap: var(--_tsb-space-5);
+
+  min-width: 0;
+}
+
+.uploadedArtworkGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,
+      minmax(min(100%, 240px), 1fr));
+  gap: var(--_tsb-space-4);
+
+  min-width: 0;
+}
+
+.templateGalleryHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--_tsb-space-4);
+
+  min-width: 0;
+}
+
+.templateGalleryHeader>div {
+  display: grid;
+  gap: var(--_tsb-space-1);
+
+  min-width: 0;
+}
+
+.templateGalleryHeader h2,
+.templateGalleryHeader p {
+  margin: 0;
+}
+
+.templateGalleryHeader h2 {
+  color: var(--_tsb-color-text);
+
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.templateGalleryHeader>div>p {
+  max-width: 60ch;
+
+  color: var(--_tsb-color-text-muted);
+
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.selectionCount {
+  flex: 0 0 auto;
+
+  padding: var(--_tsb-space-2) var(--_tsb-space-3);
+
+  background: var(--_tsb-color-surface);
+  border: 1px solid var(--_tsb-color-border);
+  border-radius: 999px;
+
+  color: var(--_tsb-color-text-muted);
+
+  font-size: 0.8125rem;
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+.templateGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: var(--_tsb-space-4);
+
+  min-width: 0;
+}
+
+/* ==========================================================================
+   Template cards
+   ========================================================================== */
+
+.templateCard {
+  position: relative;
+
+  display: grid;
+  grid-template-rows: auto minmax(180px, 1fr) auto;
+
+  min-width: 0;
+
+  overflow: hidden;
+
+  background: var(--_tsb-color-surface);
+  border: 1px solid var(--_tsb-color-border);
+  border-radius: 1rem;
+
+  box-shadow: var(--_tsb-shadow-sm);
+
+  transition:
+    border-color var(--_tsb-transition-fast),
+    box-shadow var(--_tsb-transition-fast),
+    transform var(--_tsb-transition-fast);
+}
+
+.templateCard[data-selected="true"] {
+  border-color: var(--_tsb-color-success);
+
+  box-shadow:
+    0 0 0 2px color-mix(in srgb,
+      var(--_tsb-color-success) 16%,
+      transparent),
+    var(--_tsb-shadow-md);
+}
+
+.templateCardHeader {
+  display: flex;
+  align-items: center;
+
+  min-height: 48px;
+  padding: var(--_tsb-space-3) var(--_tsb-space-4);
+
+  border-bottom: 1px solid var(--_tsb-color-border);
+}
+
+.templateCardHeader h3 {
+  min-width: 0;
+  margin: 0;
+
+  overflow: hidden;
+
+  color: var(--_tsb-color-text);
+
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.3;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.templateThumbnail {
+  display: grid;
+  place-items: center;
+
+  min-height: 180px;
+  padding: var(--_tsb-space-3);
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(45deg,
+      var(--_tsb-color-border) 25%,
+      transparent 25%),
+    linear-gradient(-45deg,
+      var(--_tsb-color-border) 25%,
+      transparent 25%),
+    linear-gradient(45deg,
+      transparent 75%,
+      var(--_tsb-color-border) 75%),
+    linear-gradient(-45deg,
+      transparent 75%,
+      var(--_tsb-color-border) 75%),
+    var(--_tsb-color-surface-alt);
+
+  background-position:
+    0 0,
+    0 8px,
+    8px -8px,
+    -8px 0;
+
+  background-size: 16px 16px;
+}
+
+.templateThumbnail>div {
+  display: grid;
+  place-items: center;
+
+  width: 100%;
+  height: 100%;
+}
+
+.templateThumbnail svg {
+  display: block;
+
+  width: 100%;
+  max-width: 100%;
+  max-height: 220px;
+
+  object-fit: contain;
+}
+
+.templateCardActions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--_tsb-space-3);
+
+  padding: var(--_tsb-space-3) var(--_tsb-space-4);
+
+  background: var(--_tsb-color-surface);
+  border-top: 1px solid var(--_tsb-color-border);
+}
+
+/* ==========================================================================
+   Template selection
+   ========================================================================== */
+
+.templateCheckbox {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--_tsb-space-2);
+
+  min-width: 0;
+  min-height: 44px;
+
+  color: var(--_tsb-color-text);
+
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.3;
+
+  cursor: pointer;
+}
+
+.templateCheckbox input {
+  flex: 0 0 auto;
+
+  width: 20px;
+  height: 20px;
+  margin: 0;
+
+  accent-color: var(--_tsb-color-success);
+
+  cursor: pointer;
+}
+
+.templateCheckbox span {
+  min-width: 0;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.templateCheckbox:focus-within {
+  outline: 3px solid color-mix(in srgb,
+      var(--_tsb-color-success) 18%,
+      transparent);
+
+  outline-offset: 2px;
+  border-radius: var(--_tsb-radius-md);
+}
+
+/* ==========================================================================
+   Edit artwork button
+   ========================================================================== */
+
+.editArtworkButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--_tsb-space-2);
+
+  min-height: 44px;
+  padding: var(--_tsb-space-2) var(--_tsb-space-3);
+
+  background: var(--_tsb-color-surface);
+  border: 1px solid color-mix(in srgb, var(--_tsb-color-border) 70%, var(--_tsb-color-text-muted));
+  border-radius: var(--_tsb-radius-lg);
+
+  color: var(--_tsb-color-text);
+
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    background-color var(--_tsb-transition-fast),
+    border-color var(--_tsb-transition-fast),
+    box-shadow var(--_tsb-transition-fast);
+}
+
+.editArtworkButton svg {
+  flex: 0 0 auto;
+
+  width: 16px;
+  height: 16px;
+}
+
+.editArtworkButton:focus-visible {
+  outline: none;
+
+  border-color: var(--_tsb-color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb,
+      var(--_tsb-color-primary) 12%,
+      transparent);
+}
+
+/* ==========================================================================
+   Hover-capable devices
+   ========================================================================== */
+
+@media (hover: hover) and (pointer: fine) {
+
+  .replaceButton:hover,
+  .editArtworkButton:hover {
+    background: var(--_tsb-color-surface-alt);
+    border-color: color-mix(in srgb, var(--_tsb-color-border) 65%, var(--_tsb-color-text-muted));
+  }
+
+  .templateCard:hover {
+    border-color: color-mix(in srgb, var(--_tsb-color-border) 65%, var(--_tsb-color-text-muted));
+
+    box-shadow: var(--_tsb-shadow-md);
+
+    transform: translateY(-1px);
+  }
+
+  .templateCard[data-selected="true"]:hover {
+    border-color: var(--_tsb-color-success);
+  }
+}
+
+/* ==========================================================================
+   Tablet
+   ========================================================================== */
+
+@media (max-width: 1180px) {
+  .editor {
+    grid-template-columns: 1fr;
+    gap: var(--_tsb-space-7);
+  }
+
+  /*
+   * Use the extra tablet width rather than stacking all control
+   * content into one very tall card.
+   */
+  .controls {
+    grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr);
+    align-items: start;
+    gap: var(--_tsb-space-5);
+  }
+
+  .divider {
+    width: 1px;
+    height: 100%;
+    min-height: 100%;
+
+    align-self: stretch;
+  }
+
+  .templateGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .templateGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ==========================================================================
+   Mobile
+   ========================================================================== */
+
+@media (max-width: 640px) {
+  .editor {
+    gap: var(--_tsb-space-6);
+  }
+
+  .controls {
+    grid-template-columns: 1fr;
+    gap: var(--_tsb-space-5);
+
+    padding: var(--_tsb-space-4);
+  }
+
+  .divider {
+    width: 100%;
+    height: 1px;
+    min-height: 0;
+  }
+
+  .templateGalleryHeader {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--_tsb-space-3);
+  }
+
+  .selectionCount {
+    align-self: flex-start;
+  }
+
+  .templateGrid,
+  .uploadedArtworkGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .templateCard {
+    grid-template-rows: auto minmax(180px, 1fr) auto;
+  }
+
+  .templateThumbnail {
+    min-height: 180px;
+  }
+}
+
+/* ==========================================================================
+   Small phones
+   ========================================================================== */
+
+@media (max-width: 420px) {
+  .mascotCard {
+    grid-template-columns: 64px minmax(0, 1fr);
+    gap: var(--_tsb-space-3);
+  }
+
+  .mascotThumbnail {
+    width: 64px;
+  }
+
+  .mascotDetails strong,
+  .mascotDetails>span {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .replaceButton {
+    width: 100%;
+  }
+
+  .templateCardActions {
+    grid-template-columns: 1fr;
+    gap: var(--_tsb-space-2);
+  }
+
+  .editArtworkButton {
+    width: 100%;
+  }
+
+  .templateCheckbox span {
+    white-space: normal;
+  }
+}
+
+/* ==========================================================================
+   Reduced motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .templateCard,
+  .replaceButton,
+  .editArtworkButton {
+    transition: none;
+  }
+}

@@ -1,0 +1,145 @@
+.storeBuilder {
+  /*
+   * ----------------------------------------------------------
+   * Public theme contract
+   * ----------------------------------------------------------
+   *
+   * Consumers may override the --tsb-* properties on this
+   * element or any ancestor.
+   *
+   * Typography intentionally inherits from the host app.
+   */
+
+  --_tsb-color-primary: var(--tsb-color-primary, #e53935);
+
+  --_tsb-color-background: var(--tsb-color-background, #ffffff);
+  --_tsb-color-surface: var(--tsb-color-surface, #ffffff);
+  --_tsb-color-surface-alt: var(--tsb-color-surface-alt, #f8fafc);
+
+  --_tsb-color-text: var(--tsb-color-text, inherit);
+  --_tsb-color-text-muted: var(--tsb-color-text-muted, #6b7280);
+
+  --_tsb-color-border: var(--tsb-color-border, #e5e7eb);
+
+  --_tsb-color-success: var(--tsb-color-success, #16a34a);
+  --_tsb-color-warning: var(--tsb-color-warning, #f59e0b);
+  --_tsb-color-danger: var(--tsb-color-danger, #dc2626);
+
+  --_tsb-color-sidebar: var(--tsb-color-sidebar, #050505);
+
+  --_tsb-radius-sm: var(--tsb-radius-sm, 0.125rem);
+  --_tsb-radius-md: var(--tsb-radius-md, 0.25rem);
+  --_tsb-radius-lg: var(--tsb-radius-lg, 0.5rem);
+
+  --_tsb-shadow-sm: var(--tsb-shadow-sm,
+      0 2px 8px rgb(0 0 0 / 6%));
+
+  --_tsb-shadow-md: var(--tsb-shadow-md,
+      0 4px 8px rgb(0 0 0 / 8%));
+
+  /*
+   * ----------------------------------------------------------
+   * Private implementation tokens
+   * ----------------------------------------------------------
+   *
+   * These are intentionally not part of the public theme API.
+   */
+
+  --_tsb-space-1: 0.25rem;
+  --_tsb-space-2: 0.5rem;
+  --_tsb-space-3: 0.75rem;
+  --_tsb-space-4: 1rem;
+  --_tsb-space-5: 1.5rem;
+  --_tsb-space-6: 2rem;
+  --_tsb-space-7: 3rem;
+  --_tsb-space-8: 4rem;
+
+  --_tsb-transition-fast: 150ms ease;
+  --_tsb-transition-base: 200ms ease;
+
+  width: 100%;
+  min-width: 0;
+
+  color: inherit;
+
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.storeBuilder,
+.storeBuilder *,
+.storeBuilder *::before,
+.storeBuilder *::after {
+  box-sizing: border-box;
+}
+
+.storeBuilder :where(button, input, select, textarea) {
+  font: inherit;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+
+  width: 100%;
+  min-width: 0;
+
+  background: var(--_tsb-color-sidebar);
+}
+
+.sidebar {
+  width: 100%;
+  min-width: 0;
+
+  background: var(--_tsb-color-sidebar);
+}
+
+.content {
+  width: 100%;
+  min-width: 0;
+
+  background: var(--_tsb-color-background);
+}
+
+.loading {
+  display: grid;
+
+  width: 100%;
+  min-height: 60vh;
+  padding: var(--_tsb-space-8);
+
+  place-items: center;
+}
+
+.loading p {
+  margin: 0;
+
+  color: var(--_tsb-color-text-muted);
+}
+
+/*
+ * Tablet and mobile use the compact progress header.
+ * The browser remains responsible for page scrolling.
+ */
+@media (max-width: 73.75rem) {
+  .layout {
+    display: block;
+
+    background: var(--_tsb-color-background);
+  }
+
+  .sidebar {
+    width: 100%;
+    min-height: 0;
+
+    background: transparent;
+  }
+
+  .content {
+    width: 100%;
+    min-width: 0;
+
+    background: var(--_tsb-color-background);
+  }
+}

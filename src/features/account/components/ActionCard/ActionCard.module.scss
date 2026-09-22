@@ -1,3 +1,5 @@
+@use "@/styles" as *;
+
 .card {
   @include card;
   display: flex;

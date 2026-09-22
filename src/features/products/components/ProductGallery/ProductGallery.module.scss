@@ -1,3 +1,5 @@
+@use "@/styles" as *;
+
 .gallery {
   display: grid;
   grid-template-columns: 88px minmax(0, 1fr);
@@ -142,3 +144,4 @@
     max-height: 310px;
   }
 }
+
