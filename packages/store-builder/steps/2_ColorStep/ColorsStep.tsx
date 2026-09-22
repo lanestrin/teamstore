@@ -1,51 +1,163 @@
-import Skeleton from "../../components/Skeleton/Skeleton";
+import { useState } from "react";
 
-import styles from "./ColorsStepSkeleton.module.scss";
+import ColorCard from "../../components/ColorCard/ColorCard";
+import ColorPicker from "../../components/ColorPicker/ColorPicker";
+import { useCreateStore } from "../../context/CreateStoreContext";
+import { useStoreBuilderAdapter } from "../../context/StoreBuilderAdapterContext";
+import WizardLayout from "../../layouts/WizardLayout";
 
-export default function ColorsStepSkeleton() {
+import styles from "./ColorsStep.module.scss";
+import ColorThemePreview from "../../components/ColorThemePreview/ColorThemePreview";
+
+const COLOR_PRESETS = [
+  {
+    id: "navy-red",
+    name: "Navy + Red",
+    primary: "#111827",
+    secondary: "#DC2626",
+  },
+  {
+    id: "royal-white",
+    name: "Royal + White",
+    primary: "#1D4ED8",
+    secondary: "#FFFFFF",
+  },
+  {
+    id: "green-gold",
+    name: "Green + Gold",
+    primary: "#15803D",
+    secondary: "#FACC15",
+  },
+  {
+    id: "purple-gold",
+    name: "Purple + Gold",
+    primary: "#7C3AED",
+    secondary: "#FACC15",
+  },
+  {
+    id: "orange-navy",
+    name: "Orange + Navy",
+    primary: "#EA580C",
+    secondary: "#111827",
+  },
+  {
+    id: "maroon-gold",
+    name: "Maroon + Gold",
+    primary: "#7F1D1D",
+    secondary: "#FACC15",
+  },
+] as const;
+
+export default function ColorsStep() {
+  const { storeId, currentStep, setCurrentStep, primaryColor, secondaryColor, setPrimaryColor, setSecondaryColor, resetProductStep } =
+    useCreateStore();
+
+  const { saveColorsStep } = useStoreBuilderAdapter();
+
+  const [isSavingColors, setIsSavingColors] = useState(false);
+
+  const selectedPresetId = COLOR_PRESETS.find((preset) => preset.primary === primaryColor && preset.secondary === secondaryColor)?.id;
+
+  function handlePresetSelect(primary: string, secondary: string) {
+    if (primary === primaryColor && secondary === secondaryColor) {
+      return;
+    }
+
+    resetProductStep();
+    setPrimaryColor(primary);
+    setSecondaryColor(secondary);
+  }
+
+  function handlePrimaryColorChange(nextPrimaryColor: string) {
+    if (nextPrimaryColor === primaryColor) {
+      return;
+    }
+
+    resetProductStep();
+    setPrimaryColor(nextPrimaryColor);
+  }
+
+  function handleSecondaryColorChange(nextSecondaryColor: string) {
+    if (nextSecondaryColor === secondaryColor) {
+      return;
+    }
+
+    resetProductStep();
+    setSecondaryColor(nextSecondaryColor);
+  }
+
+  async function handleNext() {
+    if (isSavingColors) {
+      return;
+    }
+
+    if (!storeId) {
+      window.alert("Save your organization before choosing store colors.");
+      return;
+    }
+
+    setIsSavingColors(true);
+
+    try {
+      await saveColorsStep({
+        storeId,
+        primaryColor,
+        secondaryColor,
+      });
+
+      setCurrentStep(3);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Could not save your store colors.";
+
+      window.alert(message);
+    } finally {
+      setIsSavingColors(false);
+    }
+  }
+
   return (
-    <section className={styles.page}>
-      <Skeleton className={styles.step} />
+    <WizardLayout
+      step={currentStep}
+      title="Choose Your Team Colors"
+      description="Start with a popular team color combination or customize your own."
+      onBack={() => setCurrentStep(1)}
+      onNext={() => void handleNext()}
+      nextLabel={isSavingColors ? "Saving..." : "Next"}
+      nextDisabled={isSavingColors}
+      width="wide"
+    >
+      <div className={styles.colorSetup}>
+        <section className={styles.controls} aria-labelledby="popular-colors-heading">
+          <div className={styles.presets}>
+            <h2 id="popular-colors-heading" className={styles.sectionTitle}>
+              Popular Team Color Combinations
+            </h2>
 
-      <div>
-        <Skeleton className={styles.title} />
+            <div className={styles.grid}>
+              {COLOR_PRESETS.map((preset) => (
+                <ColorCard
+                  key={preset.id}
+                  name={preset.name}
+                  primaryColor={preset.primary}
+                  secondaryColor={preset.secondary}
+                  selected={selectedPresetId === preset.id}
+                  onClick={() => handlePresetSelect(preset.primary, preset.secondary)}
+                />
+              ))}
+            </div>
+          </div>
 
-        <Skeleton className={styles.description} />
+          <div className={styles.customColors}>
+            <ColorPicker label="Primary Color" value={primaryColor} onChange={handlePrimaryColorChange} />
 
-        <Skeleton className={styles.descriptionShort} />
+            <ColorPicker label="Secondary Color" value={secondaryColor} onChange={handleSecondaryColorChange} />
+          </div>
+
+          <p className={styles.helper}>Choose a preset or use the color controls to match your organization’s exact colors.</p>
+        </section>
+
+        <ColorThemePreview primaryColor={primaryColor} secondaryColor={secondaryColor} />
       </div>
-
-      <div>
-        <Skeleton className={styles.heading} />
-
-        <div className={styles.grid}>
-          {Array.from({ length: 6 }).map((_, index) => (
-            <Skeleton key={index} className={styles.colorCard} />
-          ))}
-        </div>
-      </div>
-
-      <div className={styles.customColors}>
-        <Skeleton className={styles.colorPicker} />
-
-        <Skeleton className={styles.colorPicker} />
-      </div>
-
-      <div className={styles.info}>
-        <Skeleton className={styles.infoTitle} />
-
-        <Skeleton className={styles.infoLine} />
-
-        <Skeleton className={styles.infoLine} />
-
-        <Skeleton className={styles.infoLineShort} />
-      </div>
-
-      <div className={styles.actions}>
-        <Skeleton className={styles.button} />
-
-        <Skeleton className={styles.button} />
-      </div>
-    </section>
+    </WizardLayout>
   );
 }

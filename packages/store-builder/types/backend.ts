@@ -125,6 +125,12 @@ export interface SaveOrganizationStepResult {
   created: boolean;
 }
 
+export interface SaveColorsStepInput {
+  storeId: StoreBuilderId;
+  primaryColor: string;
+  secondaryColor: string;
+}
+
 export interface SaveDraftInput {
   storeId?: StoreBuilderId;
 
@@ -198,6 +204,8 @@ export interface StoreBuilderAdapter {
   uploadFile(file: File): Promise<StoreBuilderStorageId>;
 
   saveOrganizationStep(input: SaveOrganizationStepInput): Promise<SaveOrganizationStepResult>;
+
+  saveColorsStep(input: SaveColorsStepInput): Promise<void>;
 
   saveDraft(input: SaveDraftInput): Promise<SaveDraftResult>;
 

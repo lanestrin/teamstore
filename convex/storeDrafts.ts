@@ -161,6 +161,44 @@ export const saveOrganizationStep = mutation({
 });
 
 /**
+ * Saves the Colors step for an existing draft.
+ *
+ * Organization creates the draft before this step, so this mutation
+ * only updates the selected colors and advances draft progress.
+ */
+export const saveColorsStep = mutation({
+  args: {
+    storeId: v.id("stores"),
+    primaryColor: v.string(),
+    secondaryColor: v.string(),
+  },
+
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+
+    if (userId === null) {
+      throw new ConvexError("You must be signed in to update a store.");
+    }
+
+    const existingStore = await ctx.db.get(args.storeId);
+
+    if (existingStore === null || existingStore.createdBy !== userId || existingStore.status !== "draft") {
+      throw new ConvexError("Draft store not found.");
+    }
+
+    validateColor(args.primaryColor, "Primary color");
+    validateColor(args.secondaryColor, "Secondary color");
+
+    await ctx.db.patch(args.storeId, {
+      primaryColor: args.primaryColor,
+      secondaryColor: args.secondaryColor,
+      currentStep: Math.max(existingStore.currentStep, 3),
+      updatedAt: Date.now(),
+    });
+  },
+});
+
+/**
  * Creates a new draft store or updates an existing draft.
  *
  * Empty form values are stored as missing optional fields.

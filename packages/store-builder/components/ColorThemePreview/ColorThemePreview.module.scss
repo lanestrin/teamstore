@@ -1,0 +1,335 @@
+.preview {
+    --preview-primary: #111827;
+    --preview-secondary: #dc2626;
+    --preview-primary-text: #ffffff;
+    --preview-secondary-text: #ffffff;
+
+    width: 100%;
+    min-width: 0;
+    padding: var(--_tsb-space-5, 1.25rem);
+
+    background: var(--tsb-color-background, #f9fafb);
+    border: 1px solid var(--tsb-color-border, #e5e7eb);
+    border-radius: var(--tsb-radius-lg, 0.75rem);
+}
+
+.previewHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--_tsb-space-4, 1rem);
+
+    margin-bottom: var(--_tsb-space-4, 1rem);
+}
+
+.eyebrow {
+    display: block;
+    margin-bottom: var(--_tsb-space-1, 0.25rem);
+
+    color: var(--_tsb-color-text-secondary, #6b7280);
+
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.previewHeader h2 {
+    margin: 0;
+
+    color: var(--tsb-color-text, #111827);
+
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.swatches {
+    display: flex;
+    gap: var(--_tsb-space-2, 0.5rem);
+}
+
+.primarySwatch,
+.secondarySwatch {
+    display: block;
+
+    width: 28px;
+    height: 28px;
+
+    border: 2px solid var(--tsb-color-surface, #ffffff);
+    border-radius: var(--tsb-radius-round, 9999px);
+
+    box-shadow: 0 0 0 1px var(--tsb-color-border, #e5e7eb);
+}
+
+.primarySwatch {
+    background: var(--preview-primary);
+}
+
+.secondarySwatch {
+    background: var(--preview-secondary);
+}
+
+.storePreview {
+    overflow: hidden;
+
+    background: var(--tsb-color-surface, #ffffff);
+    border: 1px solid var(--tsb-color-border, #e5e7eb);
+    border-radius: var(--tsb-radius-md, 0.5rem);
+}
+
+.storeHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--_tsb-space-3, 0.75rem);
+
+    min-height: 52px;
+    padding: 0 var(--_tsb-space-4, 1rem);
+
+    background: var(--preview-primary);
+    color: var(--preview-primary-text);
+}
+
+.storeBrand {
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+.storeNav {
+    display: flex;
+    gap: 6px;
+}
+
+.storeNav span {
+    display: block;
+
+    width: 22px;
+    height: 4px;
+
+    border-radius: var(--tsb-radius-pill, 9999px);
+
+    background: currentColor;
+    opacity: 0.55;
+}
+
+.hero {
+    padding: var(--_tsb-space-7, 1.75rem) var(--_tsb-space-5, 1.25rem);
+
+    background:
+        linear-gradient(135deg,
+            var(--preview-primary) 0%,
+            var(--preview-primary) 64%,
+            var(--preview-secondary) 64%,
+            var(--preview-secondary) 100%);
+
+    color: var(--preview-primary-text);
+}
+
+.heroLabel {
+    display: block;
+
+    margin-bottom: var(--_tsb-space-2, 0.5rem);
+
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+.hero h3 {
+    max-width: 280px;
+    margin: 0;
+
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1;
+    text-transform: uppercase;
+}
+
+.hero p {
+    max-width: 280px;
+    margin: var(--_tsb-space-3, 0.75rem) 0 0;
+
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+.cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 38px;
+    margin-top: var(--_tsb-space-4, 1rem);
+    padding: 0 var(--_tsb-space-4, 1rem);
+
+    background: var(--preview-secondary);
+    border: 2px solid var(--preview-secondary);
+
+    color: var(--preview-secondary-text);
+
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.products {
+    padding: var(--_tsb-space-5, 1.25rem);
+}
+
+.productsHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--_tsb-space-3, 0.75rem);
+
+    margin-bottom: var(--_tsb-space-4, 1rem);
+}
+
+.productsHeader strong {
+    color: var(--tsb-color-text, #111827);
+    font-size: 0.875rem;
+}
+
+.productsHeader span {
+    color: var(--_tsb-color-text-secondary, #6b7280);
+    font-size: 0.7rem;
+}
+
+.productGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--_tsb-space-3, 0.75rem);
+}
+
+.productCard {
+    min-width: 0;
+}
+
+.productImage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 115px;
+
+    overflow: hidden;
+
+    background: var(--_tsb-color-surface-muted, #f3f4f6);
+    border-radius: var(--tsb-radius-sm, 0.375rem);
+}
+
+.shirtShape {
+    position: relative;
+
+    display: block;
+
+    width: 58px;
+    height: 68px;
+
+    background: var(--preview-primary);
+    border-radius: 5px 5px 10px 10px;
+}
+
+.shirtShape::before,
+.shirtShape::after {
+    position: absolute;
+    top: 5px;
+
+    width: 25px;
+    height: 30px;
+
+    background: var(--preview-primary);
+
+    content: "";
+}
+
+.shirtShape::before {
+    left: -17px;
+    transform: rotate(28deg);
+}
+
+.shirtShape::after {
+    right: -17px;
+    transform: rotate(-28deg);
+}
+
+.productLines {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    margin-top: var(--_tsb-space-2, 0.5rem);
+}
+
+.productLines span {
+    display: block;
+
+    height: 6px;
+
+    background: var(--tsb-color-border, #e5e7eb);
+    border-radius: var(--tsb-radius-pill, 9999px);
+}
+
+.productLines span:first-child {
+    width: 75%;
+}
+
+.productLines span:last-child {
+    width: 48%;
+}
+
+.colorBar {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--_tsb-space-1, 0.25rem) var(--_tsb-space-3, 0.75rem);
+
+    padding: var(--_tsb-space-3, 0.75rem) var(--_tsb-space-4, 1rem);
+
+    background: var(--_tsb-color-surface-muted, #f3f4f6);
+    border-top: 1px solid var(--tsb-color-border, #e5e7eb);
+
+    font-size: 0.7rem;
+}
+
+.colorBar span {
+    color: var(--_tsb-color-text-secondary, #6b7280);
+}
+
+.colorBar strong {
+    justify-self: end;
+
+    color: var(--tsb-color-text, #111827);
+
+    font-family: monospace;
+    font-size: 0.72rem;
+}
+
+@media (max-width: 900px) {
+    .preview {
+        max-width: 560px;
+    }
+}
+
+@media (max-width: 520px) {
+    .preview {
+        padding: var(--_tsb-space-4, 1rem);
+    }
+
+    .hero {
+        padding: var(--_tsb-space-6, 1.5rem) var(--_tsb-space-4, 1rem);
+    }
+
+    .hero h3 {
+        font-size: 1.55rem;
+    }
+
+    .products {
+        padding: var(--_tsb-space-4, 1rem);
+    }
+
+    .productImage {
+        min-height: 95px;
+    }
+}

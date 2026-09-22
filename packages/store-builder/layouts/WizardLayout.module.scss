@@ -90,7 +90,9 @@
   align-items: center;
   justify-content: center;
 
+  box-sizing: border-box;
   width: 160px;
+  height: 46px;
   min-height: 46px;
   padding: 0 var(--_tsb-space-5);
 
@@ -124,12 +126,10 @@
 }
 
 .secondaryButton {
-  background: transparent;
-  border: 2px solid color-mix(in srgb,
-      var(--_tsb-color-text) 30%,
-      transparent);
+  background: var(--tsb-color-surface, #ffffff);
+  border: 2px solid #111827;
 
-  color: var(--_tsb-color-text);
+  color: var(--tsb-color-text, #111827);
 }
 
 .primaryButton:focus-visible,
@@ -156,10 +156,10 @@
   }
 
   .secondaryButton:hover:not(:disabled) {
-    background: var(--_tsb-color-surface);
-    border-color: var(--_tsb-color-primary);
+    background: #111827;
+    border-color: #111827;
 
-    color: var(--_tsb-color-primary);
+    color: #ffffff;
 
     transform: translateY(-1px);
   }
