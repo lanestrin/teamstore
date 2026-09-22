@@ -1,6 +1,6 @@
 import { images } from "../assets/images";
-import type { FavoriteStore } from "../features/account/models/FavoriteStore";
-import type { RecentOrder } from "../features/account/models/RecentOrder";
+import type { FavoriteStore } from "../types/favorietStore.types";
+import type { RecentOrder } from "../types/recentOrder.types";
 
 export const favoriteStores: FavoriteStore[] = [
   {

@@ -1,4 +1,4 @@
-import Skeleton from "../../components/skeleton/Skeleton";
+import Skeleton from "../../app/layouts/components/Skeleton/Skeleton";
 import styles from "./AccountSkeleton.module.scss";
 
 export default function AccountSkeleton() {

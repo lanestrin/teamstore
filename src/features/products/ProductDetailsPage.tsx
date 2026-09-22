@@ -5,9 +5,9 @@ import { Link, useParams } from "react-router-dom";
 
 import { api } from "../../../convex/_generated/api";
 import { useCart } from "../cart/CartContext";
-import ProductDetails from "./components/ProductDetails/ProductDetails";
-import ProductGallery from "./components/ProductGallery/ProductGallery";
-import ProductInfo from "./components/ProductInfo/ProductInfo";
+import ProductDetails from "../../components/ProductDetails/ProductDetails";
+import ProductGallery from "../../components/ProductGallery/ProductGallery";
+import ProductInfo from "../../components/ProductInfo/ProductInfo";
 import styles from "./ProductDetailsPage.module.scss";
 
 function formatPrice(minPriceInCents: number | null, maxPriceInCents: number | null) {

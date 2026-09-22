@@ -6,10 +6,10 @@ import { useNavigate } from "react-router-dom";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 
-import ActionCard from "./components/ActionCard/ActionCard";
-import FavoriteStores from "./components/FavoriteStores/FavoriteStores";
-import RecentOrders from "./components/RecentOrders/RecentOrders";
-import ReplaceCatalogButton from "./components/ReplaceCatalogButton/ReplaceCatalogButton";
+import ActionCard from "../../components/ActionCard/ActionCard";
+import FavoriteStores from "../../components/FavoriteStores/FavoriteStores";
+import RecentOrders from "../../components/RecentOrders/RecentOrders";
+import ReplaceCatalogButton from "../../components/ReplaceCatalogButton/ReplaceCatalogButton";
 
 import { favoriteStores, recentOrders } from "../../mocks/account";
 
