@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type PropsWithChildren } from "react";
 
-import type { AddCartItem, CartItem } from "./cart.types";
+import type { AddCartItem, CartItem } from "../../types/cart.types";
 
 const CART_STORAGE_KEY = "teamstore-cart";
 

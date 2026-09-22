@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 
-import ComingSoon from "../components/coming-soon/ComingSoon";
+import ComingSoon from "../components/ComingSoon/ComingSoon";
 import AccountPage from "../features/account/AccountPage";
 import LoginPage from "../features/auth/LoginPage";
 import ProtectedRoute from "../features/auth/ProtectedRoute";

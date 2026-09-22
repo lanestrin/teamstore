@@ -1,4 +1,4 @@
-import Skeleton from "../../components/skeleton/Skeleton";
+import Skeleton from "../../app/layouts/components/Skeleton/Skeleton";
 import pageStyles from "./CatalogPage.module.scss";
 import styles from "./CatalogSkeleton.module.scss";
 

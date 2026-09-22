@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 
 import { useCart } from "./CartContext";
-import CartEmptyState from "./components/CartEmptyState/CartEmptyState";
-import CartItem from "./components/CartItem/CartItem";
-import CartSummary from "./components/CartSummary/CartSummary";
+import CartEmptyState from "../../components/CartEmptyState/CartEmptyState";
+import CartItem from "../../components/CartItem/CartItem";
+import CartSummary from "../../components/CartSummary/CartSummary";
 import styles from "./CartPage.module.scss";
 
 export default function CartPage() {

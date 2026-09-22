@@ -3,7 +3,7 @@ import { useQuery } from "convex/react";
 import { LuChevronDown, LuSearch, LuX } from "react-icons/lu";
 
 import { api } from "../../../convex/_generated/api";
-import ProductCard from "../../components/product-card/ProductCard";
+import ProductCard from "../../components/ProductCard/ProductCard";
 import styles from "./CatalogPage.module.scss";
 import CatalogSkeleton from "./CatalogSkeleton";
 

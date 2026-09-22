@@ -9,7 +9,7 @@ import lionsLogo from "../../assets/images/lions_logo.png";
 import tigersLogo from "../../assets/images/tigers_logo.png";
 import trojanLogo from "../../assets/images/trojan_logo.png";
 
-import ProductCard from "../../components/product-card/ProductCard";
+import ProductCard from "../../components/ProductCard/ProductCard";
 
 import GarmentArtworkPreview from "../../../packages/store-builder/components/GarmentArtworkPreview/GarmentArtworkPreview";
 import { getDecorationProfileIdForProductCategory } from "../../../packages/store-builder/lib/decorationProfiles";

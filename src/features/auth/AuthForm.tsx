@@ -1,6 +1,6 @@
 import { useState, type SyntheticEvent } from "react";
 import { useAuthActions } from "@convex-dev/auth/react";
-import GoogleSignInButton from "./components/GoogleSignInButton/GoogleSignInButton";
+import GoogleSignInButton from "../../components/GoogleSignInButton/GoogleSignInButton";
 import styles from "./AuthForm.module.scss";
 
 type AuthMode = "signIn" | "signUp" | "forgotPassword" | "resetPassword";
