@@ -1,58 +1,116 @@
 import { useRef, useState } from "react";
-import { useMutation } from "convex/react";
-import { useNavigate } from "react-router-dom";
 
-import { api } from "../../../../convex/_generated/api";
+import WizardLayout from "../../layouts/WizardLayout";
+import { useCreateStore } from "../../context/CreateStoreContext";
 
 import FormErrorSummary from "../../components/FormErrorSummary/FormErrorSummary";
-import { STORE_ACTIVITIES, isStoreActivity } from "../../config/storeActivities";
-import { useCreateStore } from "../../context/CreateStoreContext";
-import type { StoreType } from "../../context/CreateStoreContext.types";
-import useFileDataUrl from "../../hooks/useFileDataUrl";
-import WizardLayout from "../../layouts/WizardLayout";
-
-import OrganizationLogoUpload from "../../components/OrganizationLogoUpload/OrganizationLogoUpload";
-import StoreTypeSelector from "../../components/StoreTypeSelector/StoreTypeSelector";
-import { isValidStoreType } from "../../components/StoreTypeSelector/storeTypeOptions";
-import {
-  type OrganizationValidationErrors,
-  slugify,
-  validateActivity,
-  validateLogo,
-  validateOrganizationName,
-  validateStoreName,
-  validateStoreType,
-} from "./organizationStep.validation";
 
 import formStyles from "../../styles/form.module.scss";
 import styles from "./OrganizationStep.module.scss";
+import useFileDataUrl from "../../hooks/useFileDataUrl";
+import type { StoreType } from "../../context/CreateStoreContext.types";
+import OrganizationLogoUpload from "../../components/OrganizationLogoUpload/OrganizationLogoUpload";
+import { isValidStoreType } from "../../components/StoreTypeSelector/storeTypeOptions";
+import StoreTypeSelector from "../../components/StoreTypeSelector/StoreTypeSelector";
+import { useStoreBuilderAdapter } from "../../context/StoreBuilderAdapterContext";
 
-const VALIDATION_FIELD_ORDER: Array<keyof OrganizationValidationErrors> = [
-  "organizationName",
-  "activity",
-  "storeType",
-  "storeName",
-  "logo",
-];
+const STORE_ACTIVITIES = [
+  { value: "basketball", label: "Basketball" },
+  { value: "baseball", label: "Baseball" },
+  { value: "football", label: "Football" },
+  { value: "soccer", label: "Soccer" },
+  { value: "softball", label: "Softball" },
+  { value: "volleyball", label: "Volleyball" },
+  { value: "wrestling", label: "Wrestling" },
+  { value: "spirit-wear", label: "Spirit Wear" },
+  { value: "other", label: "Other" },
+] as const;
 
-export default function OrganizationStep() {
+type StoreActivity = (typeof STORE_ACTIVITIES)[number]["value"];
+
+function isStoreActivity(value: string): value is StoreActivity {
+  return STORE_ACTIVITIES.some((activity) => activity.value === value);
+}
+
+const ALLOWED_LOGO_EXTENSIONS = ["png", "jpg", "jpeg", "svg"];
+const MAX_LOGO_SIZE = 5 * 1024 * 1024;
+
+type ValidationErrors = {
+  organizationName?: string;
+  activity?: string;
+  storeType?: string;
+  storeName?: string;
+  logo?: string;
+};
+
+function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function validateOrganizationName(value: string): string | undefined {
+  return value.trim() ? undefined : "Enter your organization name.";
+}
+
+function validateActivity(value: string): string | undefined {
+  if (!value) {
+    return "Select a store activity.";
+  }
+
+  return isStoreActivity(value) ? undefined : "Select a valid store activity.";
+}
+
+function validateStoreType(value: string): string | undefined {
+  return isValidStoreType(value) ? undefined : "Select what type of store you want to create.";
+}
+
+function validateStoreName(value: string): string | undefined {
+  return value.trim() ? undefined : "Enter your store name.";
+}
+
+function validateLogo(file: File | null): string | undefined {
+  if (!file) {
+    return undefined;
+  }
+
+  const extension = file.name.split(".").pop()?.toLowerCase();
+
+  if (!extension || !ALLOWED_LOGO_EXTENSIONS.includes(extension)) {
+    return "Upload a PNG, JPG, JPEG, or SVG file.";
+  }
+
+  if (file.size > MAX_LOGO_SIZE) {
+    return "Logo must be 5 MB or smaller.";
+  }
+
+  return undefined;
+}
+
+interface OrganizationStepProps {
+  onDraftIdChange: (draftId: string) => void;
+}
+
+export default function OrganizationStep({ onDraftIdChange }: OrganizationStepProps) {
   const { storeId, setStoreId, currentStep, setCurrentStep, storeDraft, updateStoreDraft, resetProductStep } = useCreateStore();
-  const navigate = useNavigate();
-  const generateUploadUrl = useMutation(api.storeUploads.generateUploadUrl);
-  const saveOrganizationStep = useMutation(api.storeDrafts.saveOrganizationStep);
-  const [errors, setErrors] = useState<OrganizationValidationErrors>({});
-  const [showErrorSummary, setShowErrorSummary] = useState(false);
+  const adapter = useStoreBuilderAdapter();
   const [isSavingOrganization, setIsSavingOrganization] = useState(false);
   const [logoWasRemoved, setLogoWasRemoved] = useState(false);
+
+  const [errors, setErrors] = useState<ValidationErrors>({});
+  const [showErrorSummary, setShowErrorSummary] = useState(false);
+
   const organizationNameRef = useRef<HTMLInputElement>(null);
   const activityRef = useRef<HTMLSelectElement>(null);
   const storeTypeRef = useRef<HTMLInputElement>(null);
   const storeNameRef = useRef<HTMLInputElement>(null);
   const logoRef = useRef<HTMLInputElement>(null);
-  const localLogoPreviewUrl = useFileDataUrl(storeDraft.logoFile);
-  const logoPreviewUrl = logoWasRemoved ? null : (localLogoPreviewUrl ?? storeDraft.logoUrl);
 
-  function setFieldError(field: keyof OrganizationValidationErrors, error?: string) {
+  const logoPreviewUrl = useFileDataUrl(storeDraft.logoFile);
+
+  function setFieldError(field: keyof ValidationErrors, error?: string) {
     setErrors((current) => ({
       ...current,
       [field]: error,
@@ -70,24 +128,19 @@ export default function OrganizationStep() {
     }
   }
 
-  function handleStoreNameChange(value: string) {
-    updateStoreDraft({
-      storeName: value,
-      storeSlug: slugify(value),
-    });
-
-    if (errors.storeName) {
-      setFieldError("storeName", validateStoreName(value));
-    }
-  }
-
   function handleActivityChange(value: string) {
     if (value === storeDraft.activity) {
       return;
     }
 
-    if (!confirmProductStepReset("activity")) {
-      return;
+    const hasProductSelections = Object.keys(storeDraft.productSelections).length > 0;
+
+    if (hasProductSelections) {
+      const confirmed = window.confirm("Changing the activity will clear your current product selections. Continue?");
+
+      if (!confirmed) {
+        return;
+      }
     }
 
     updateStoreDraft({
@@ -106,8 +159,14 @@ export default function OrganizationStep() {
       return;
     }
 
-    if (!confirmProductStepReset("store type")) {
-      return;
+    const hasProductSelections = Object.keys(storeDraft.productSelections).length > 0;
+
+    if (hasProductSelections) {
+      const confirmed = window.confirm("Changing the store type will clear your current product selections. Continue?");
+
+      if (!confirmed) {
+        return;
+      }
     }
 
     updateStoreDraft({
@@ -121,14 +180,15 @@ export default function OrganizationStep() {
     }
   }
 
-  function confirmProductStepReset(fieldLabel: string): boolean {
-    const hasProductSelections = Object.keys(storeDraft.productSelections).length > 0;
+  function handleStoreNameChange(value: string) {
+    updateStoreDraft({
+      storeName: value,
+      storeSlug: slugify(value),
+    });
 
-    if (!hasProductSelections) {
-      return true;
+    if (errors.storeName) {
+      setFieldError("storeName", validateStoreName(value));
     }
-
-    return window.confirm(`Changing the ${fieldLabel} will clear your current product selections. Continue?`);
   }
 
   function handleLogoChange(file: File | null): boolean {
@@ -149,7 +209,7 @@ export default function OrganizationStep() {
     return true;
   }
 
-  function focusAndScrollToField(field: keyof OrganizationValidationErrors) {
+  function focusAndScrollToField(field: keyof ValidationErrors) {
     const fieldRefs = {
       organizationName: organizationNameRef,
       activity: activityRef,
@@ -165,10 +225,7 @@ export default function OrganizationStep() {
     }
 
     requestAnimationFrame(() => {
-      element.focus({
-        preventScroll: true,
-      });
-
+      element.focus({ preventScroll: true });
       element.scrollIntoView({
         behavior: "smooth",
         block: "center",
@@ -176,52 +233,27 @@ export default function OrganizationStep() {
     });
   }
 
-  function scrollToFirstError(nextErrors: OrganizationValidationErrors) {
-    const firstErrorField = VALIDATION_FIELD_ORDER.find((field) => nextErrors[field]);
+  function scrollToFirstError(nextErrors: ValidationErrors) {
+    const fieldOrder: Array<keyof ValidationErrors> = ["organizationName", "activity", "storeType", "storeName", "logo"];
+    const firstErrorField = fieldOrder.find((field) => nextErrors[field]);
 
     if (firstErrorField) {
       focusAndScrollToField(firstErrorField);
     }
   }
 
-  function validateStep(): OrganizationValidationErrors {
-    return {
-      organizationName: validateOrganizationName(storeDraft.organizationName),
-
-      activity: validateActivity(storeDraft.activity),
-
-      storeType: validateStoreType(storeDraft.storeType),
-
-      storeName: validateStoreName(storeDraft.storeName),
-
-      logo: validateLogo(storeDraft.logoFile),
-    };
-  }
-
-  async function uploadLogo() {
+  async function uploadLogo(): Promise<typeof storeDraft.logoStorageId> {
     if (!storeDraft.logoFile) {
       return storeDraft.logoStorageId;
     }
 
-    const uploadUrl = await generateUploadUrl();
+    const storageId = await adapter.uploadFile(storeDraft.logoFile);
 
-    const response = await fetch(uploadUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": storeDraft.logoFile.type || "application/octet-stream",
-      },
-      body: storeDraft.logoFile,
+    updateStoreDraft({
+      logoStorageId: storageId,
     });
 
-    if (!response.ok) {
-      throw new Error("Could not upload the organization logo.");
-    }
-
-    const result = (await response.json()) as {
-      storageId: NonNullable<typeof storeDraft.logoStorageId>;
-    };
-
-    return result.storageId;
+    return storageId;
   }
 
   async function handleNext() {
@@ -229,7 +261,13 @@ export default function OrganizationStep() {
       return;
     }
 
-    const nextErrors = validateStep();
+    const nextErrors: ValidationErrors = {
+      organizationName: validateOrganizationName(storeDraft.organizationName),
+      activity: validateActivity(storeDraft.activity),
+      storeType: validateStoreType(storeDraft.storeType),
+      storeName: validateStoreName(storeDraft.storeName),
+      logo: validateLogo(storeDraft.logoFile),
+    };
 
     setErrors(nextErrors);
 
@@ -251,12 +289,15 @@ export default function OrganizationStep() {
     try {
       const logoStorageId = logoWasRemoved ? null : await uploadLogo();
 
-      const result = await saveOrganizationStep({
+      const result = await adapter.saveOrganizationStep({
         storeId: storeId ?? undefined,
+
         organizationName: storeDraft.organizationName,
         organizationSlug: storeDraft.organizationSlug,
+
         activity: storeDraft.activity,
         storeType: storeDraft.storeType,
+
         storeName: storeDraft.storeName,
         storeSlug: storeDraft.storeSlug,
 
@@ -274,23 +315,7 @@ export default function OrganizationStep() {
       });
 
       setStoreId(result.storeId);
-
-      if (logoWasRemoved) {
-        updateStoreDraft({
-          logoFile: null,
-          logoStorageId: null,
-          logoUrl: null,
-        });
-      } else if (logoStorageId) {
-        updateStoreDraft({
-          logoStorageId,
-        });
-      }
-
-      navigate(`/create-store?draftId=${result.storeId}`, {
-        replace: true,
-      });
-
+      onDraftIdChange(result.storeId);
       setCurrentStep(2);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Could not save your organization.";
@@ -409,7 +434,7 @@ export default function OrganizationStep() {
               )}
 
               <p id="activity-helper" className={styles.helper}>
-                We’ll use this to show relevant uniforms and fanwear.
+                Weâ€™ll use this to show relevant uniforms and fanwear.
               </p>
             </div>
 

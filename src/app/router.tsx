@@ -1,21 +1,19 @@
 import { createBrowserRouter } from "react-router-dom";
 
-import MainLayout from "./layouts/MainLayout";
-import RootLayout from "./layouts/RootLayout";
-
+import ComingSoon from "../components/coming-soon/ComingSoon";
 import AccountPage from "../features/account/AccountPage";
 import LoginPage from "../features/auth/LoginPage";
 import ProtectedRoute from "../features/auth/ProtectedRoute";
 import CartPage from "../features/cart/CartPage";
 import CatalogPage from "../features/catalog/CatalogPage";
-import CreateStorePage from "../../packages/store-builder/CreateStorePage";
-import CreateStoreLayout from "../../packages/store-builder/layouts/CreateStoreLayout";
 import HomePage from "../features/home/HomePage";
+import { HowItWorksPage } from "../features/how-it-works/HowItWorksPage";
 import ProductDetailsPage from "../features/products/ProductDetailsPage";
 import StorePage from "../features/stores/StorePage";
 import StoresPage from "../features/stores/StoresPage";
-import { HowItWorksPage } from "../features/how-it-works/HowItWorksPage";
-import ComingSoon from "../components/coming-soon/ComingSoon";
+import TeamStoreCreateStoreLayout from "../integrations/store-builder/TeamStoreCreateStoreLayout";
+import MainLayout from "./layouts/MainLayout";
+import RootLayout from "./layouts/RootLayout";
 
 export const router = createBrowserRouter([
   {
@@ -167,17 +165,12 @@ export const router = createBrowserRouter([
         ],
       },
       {
+        path: "create-store",
         element: (
           <ProtectedRoute>
-            <CreateStoreLayout />
+            <TeamStoreCreateStoreLayout />
           </ProtectedRoute>
         ),
-        children: [
-          {
-            path: "create-store",
-            element: <CreateStorePage />,
-          },
-        ],
       },
     ],
   },

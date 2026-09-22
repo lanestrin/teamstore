@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { useQuery } from "convex/react";
 import { LuCheck, LuPencil } from "react-icons/lu";
 
-import { api } from "../../../../convex/_generated/api";
 import { ART_TEMPLATE_LIST } from "../../assets/art-templates";
 
 import type { ProductPreviewItem } from "../../components/ProductPreview/ProductPreview";
@@ -10,10 +8,11 @@ import StorefrontPreview from "../../components/StorefrontPreview/StorefrontPrev
 import WizardLayout from "../../layouts/WizardLayout";
 import { useCreateStore } from "../../context/CreateStoreContext";
 import useFileDataUrl from "../../hooks/useFileDataUrl";
+import { useStoreCreationProducts } from "../../hooks/useStoreCreationProducts";
 
 import { getDecorationProfileIdForProductCategory } from "../../lib/decorationProfiles";
 import { createUploadedArtworkId } from "../../lib/productGeneration";
-import type { ProductOption } from "../../lib/productStep.types";
+import type { ProductOption } from "../../types/productStep";
 
 import styles from "./ReviewStep.module.scss";
 
@@ -163,14 +162,13 @@ export default function ReviewStep({ onCreateStore }: ReviewStepProps) {
     [storeDraft.productSelections],
   );
 
-  const storeCreationProducts = useQuery(
-    api.storeProductCatalog.getStoreCreationProducts,
+  const { data: storeCreationProducts } = useStoreCreationProducts(
     isStoreActivity(storeDraft.activity)
       ? {
           activity: storeDraft.activity,
           selectedProductIds,
         }
-      : "skip",
+      : null,
   );
 
   const productsById = useMemo<Map<ProductOption["_id"], ProductOption>>(() => {

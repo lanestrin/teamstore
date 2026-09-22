@@ -1,6 +1,6 @@
 import { LuRefreshCw } from "react-icons/lu";
 
-import type { ProductColorFamily } from "../../../../src/types/productColor.types";
+import type { ProductColorFamily } from "../../types/productColor";
 import { PRODUCT_COLOR_OPTIONS } from "../../lib/productColorOptions";
 
 import styles from "./ProductSuggestionControls.module.scss";

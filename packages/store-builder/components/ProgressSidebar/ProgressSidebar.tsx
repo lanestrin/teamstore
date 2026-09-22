@@ -1,22 +1,17 @@
-import { Link } from "react-router-dom";
 import { LuCheck, LuLogOut } from "react-icons/lu";
-
-import { images } from "../../../../src/assets/images";
-
-import type { StoreType } from "../../context/CreateStoreContext.types";
 import { getCreateStoreSteps } from "../../config/createStoresSteps";
+import type { StoreType } from "../../context/CreateStoreContext.types";
+import type { StoreBuilderBranding } from "../../types/branding";
 
 import styles from "./ProgressSidebar.module.scss";
 
 interface ProgressSidebarProps {
   currentStep: number;
   furthestStepReached: number;
-
   storeType: StoreType | "";
-
+  branding: StoreBuilderBranding;
   isSaving: boolean;
   isFinalizing: boolean;
-
   onStepChange: (step: number) => void;
   onSaveAndExit: () => Promise<void>;
 }
@@ -25,13 +20,13 @@ export default function ProgressSidebar({
   currentStep,
   furthestStepReached,
   storeType,
+  branding,
   isSaving,
   isFinalizing,
   onStepChange,
   onSaveAndExit,
 }: ProgressSidebarProps) {
   const steps = getCreateStoreSteps(storeType);
-
   const isWorking = isSaving || isFinalizing;
   const currentStepData = steps[currentStep - 1];
 
@@ -39,13 +34,13 @@ export default function ProgressSidebar({
     <>
       <aside className={styles.desktopSidebar}>
         <div className={styles.header}>
-          <Link to="/" className={styles.logo}>
-            <img src={images.teamstore.teamstoreLogo} alt="TeamStore" className={styles.logoImage} />
-          </Link>
+          <a href={branding.homeHref} className={styles.logo}>
+            <img src={branding.logoSrc} alt={branding.logoAlt ?? branding.name} className={styles.logoImage} />
+          </a>
 
           <span className={styles.label}>Create Your Store</span>
 
-          <h2>TeamStore Setup</h2>
+          <h2>{branding.name} Setup</h2>
 
           <p>Build your online store in just a few minutes.</p>
         </div>

@@ -1,0 +1,16 @@
+export type ProductColorFamily =
+  | "black"
+  | "white"
+  | "gray"
+  | "silver"
+  | "red"
+  | "orange"
+  | "yellow"
+  | "green"
+  | "blue"
+  | "navy"
+  | "purple"
+  | "pink"
+  | "brown"
+  | "multicolor"
+  | "unknown";

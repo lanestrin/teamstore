@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { LuArrowDown, LuArrowLeft, LuArrowRight, LuArrowUp, LuMinus, LuPlus, LuRotateCcw, LuX } from "react-icons/lu";
 
 import { createDefaultProductArtworkPlacement, getDecorationProfile, type ProductArtworkPlacement } from "../../lib/decorationProfiles";
-import type { GeneratedSuggestion, ProductColorOption } from "../../lib/productStep.types";
+import type { GeneratedSuggestion, ProductColorOption } from "../../types/productStep";
 import GarmentArtworkPreview from "../GarmentArtworkPreview/GarmentArtworkPreview";
 
 import styles from "./ProductEditorModal.module.scss";

@@ -1,4 +1,4 @@
-import { images } from "../../../../src/assets/images";
+import polyBackground from "../../assets/poly-bg.webp";
 import { getContrastTextColor, isLightColor } from "./color";
 
 export interface StoreTheme {
@@ -108,7 +108,7 @@ export function createStoreTheme(primaryColor: string, secondaryColor: string): 
   return {
     hero: {
       backgroundColor: primaryColor,
-      backgroundImage: `url(${images.heroBg.polyBG})`,
+      backgroundImage: `url(${polyBackground})`,
       text: getContrastTextColor(primaryColor),
       disableGradients: isPrimaryWhite,
     },

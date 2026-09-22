@@ -1,8 +1,8 @@
-import type { ProductColorFamily } from "../../../src/types/productColor.types";
+import type { ProductColorFamily } from "../types/productColor";
 import { createProductCombinationKey } from "../context/CreateStoreContext";
 import type { ProductSelectionsDraft } from "../context/CreateStoreContext.types";
 import { getDecorationProfileIdForProductCategory } from "./decorationProfiles";
-import type { GeneratedSuggestion, ProductOption, ProductSuggestionSection } from "./productStep.types";
+import type { GeneratedSuggestion, ProductOption, ProductSuggestionSection } from "../types/productStep";
 
 export const MAX_UNIFORM_SUGGESTIONS = 8;
 export const MAX_FANWEAR_SUGGESTIONS = 12;

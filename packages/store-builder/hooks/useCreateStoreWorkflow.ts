@@ -1,13 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { useMutation, useQuery } from "convex/react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-
-import { api } from "../../../convex/_generated/api";
-import type { Id } from "../../../convex/_generated/dataModel";
 
 import { isStoreActivity } from "../config/storeActivities";
 import { useCreateStore } from "../context/CreateStoreContext";
 import type { ProductSelectionsDraft } from "../context/CreateStoreContext.types";
+import type { FinalizeStoreResult } from "../types/backend";
+import { useStoreBuilderAdapter } from "../context/StoreBuilderAdapterContext";
 
 function normalizeOptionalText(value: string): string | undefined {
   const normalizedValue = value.trim();
@@ -43,6 +40,13 @@ function buildProductSelections(selections: ProductSelectionsDraft) {
     }));
 }
 
+interface CreateStoreWorkflowOptions {
+  draftId: string | null;
+  onDraftIdChange: (draftId: string) => void;
+  onExit: () => void;
+  onComplete: (result: FinalizeStoreResult) => void;
+}
+
 interface CreateStoreWorkflow {
   isLoadingDraft: boolean;
   isSaving: boolean;
@@ -51,9 +55,8 @@ interface CreateStoreWorkflow {
   createStore: () => Promise<void>;
 }
 
-export function useCreateStoreWorkflow(): CreateStoreWorkflow {
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+export function useCreateStoreWorkflow({ draftId, onDraftIdChange, onExit, onComplete }: CreateStoreWorkflowOptions): CreateStoreWorkflow {
+  const adapter = useStoreBuilderAdapter();
 
   const {
     storeId,
@@ -68,30 +71,37 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
     resetStoreDraft,
   } = useCreateStore();
 
-  const draftIdParam = searchParams.get("draftId");
-  const draftId = draftIdParam ? (draftIdParam as Id<"stores">) : null;
-
-  const savedDraft = useQuery(
-    api.storeDrafts.getDraft,
-    draftId
-      ? {
-          storeId: draftId,
-        }
-      : "skip",
-  );
-
-  const generateUploadUrl = useMutation(api.storeUploads.generateUploadUrl);
-  const saveDraftMutation = useMutation(api.storeDrafts.saveDraft);
-  const finalizeStoreMutation = useMutation(api.stores.finalizeStore);
-  const loadedDraftIdRef = useRef<Id<"stores"> | null>(null);
+  const loadedDraftIdRef = useRef<string | null>(null);
   const handledMissingDraftRef = useRef(false);
+  const [loadedDraftRequest, setLoadedDraftRequest] = useState<{
+    draftId: string;
+    draft: Awaited<ReturnType<typeof adapter.loadDraft>>;
+  } | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isFinalizing, setIsFinalizing] = useState(false);
 
   useEffect(() => {
-    loadedDraftIdRef.current = null;
-    handledMissingDraftRef.current = false;
-  }, [draftId]);
+    if (!draftId) {
+      return;
+    }
+
+    let isCancelled = false;
+
+    void adapter.loadDraft(draftId).then((draft) => {
+      if (!isCancelled) {
+        setLoadedDraftRequest({
+          draftId,
+          draft,
+        });
+      }
+    });
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [adapter, draftId]);
+
+  const savedDraft = draftId && loadedDraftRequest?.draftId === draftId ? loadedDraftRequest.draft : undefined;
 
   useEffect(() => {
     if (!draftId || savedDraft === undefined) {
@@ -107,12 +117,12 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
 
       window.alert("This draft could not be found or you do not have access to it.");
 
-      navigate("/account", {
-        replace: true,
-      });
+      onExit();
 
       return;
     }
+
+    handledMissingDraftRef.current = false;
 
     if (loadedDraftIdRef.current === savedDraft._id) {
       return;
@@ -121,7 +131,7 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
     loadStoreDraft(savedDraft);
 
     loadedDraftIdRef.current = savedDraft._id;
-  }, [draftId, savedDraft, loadStoreDraft, navigate]);
+  }, [draftId, savedDraft, loadStoreDraft, onExit]);
 
   async function prepareUploadedArtworks() {
     const uploadedArtworks = await Promise.all(
@@ -133,25 +143,7 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
             throw new Error(`${artwork.fileName} needs to be uploaded again.`);
           }
 
-          const uploadUrl = await generateUploadUrl();
-
-          const response = await fetch(uploadUrl, {
-            method: "POST",
-            headers: {
-              "Content-Type": artwork.file.type || "application/octet-stream",
-            },
-            body: artwork.file,
-          });
-
-          if (!response.ok) {
-            throw new Error(`Could not upload ${artwork.fileName}.`);
-          }
-
-          const result = (await response.json()) as {
-            storageId: Id<"_storage">;
-          };
-
-          storageId = result.storageId;
+          storageId = await adapter.uploadFile(artwork.file);
         }
 
         return {
@@ -204,7 +196,7 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
       const organizationSlug = storeDraft.organizationSlug || slugify(storeDraft.organizationName);
       const uploadedArtworks = await prepareUploadedArtworks();
       const productSelections = buildProductSelections(storeDraft.productSelections);
-      const result = await saveDraftMutation({
+      const result = await adapter.saveDraft({
         storeId: storeId ?? undefined,
         organizationName: normalizeOptionalText(storeDraft.organizationName),
         organizationSlug: normalizeOptionalText(organizationSlug),
@@ -223,8 +215,8 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
       });
 
       setStoreId(result.storeId);
-
-      navigate("/account");
+      onDraftIdChange(result.storeId);
+      onExit();
     } catch (error) {
       window.alert(getErrorMessage(error));
     } finally {
@@ -297,7 +289,7 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
 
     try {
       const uploadedArtworks = await prepareUploadedArtworks();
-      const result = await finalizeStoreMutation({
+      const result = await adapter.finalizeStore({
         storeId: storeId ?? undefined,
 
         organizationName,
@@ -318,8 +310,7 @@ export function useCreateStoreWorkflow(): CreateStoreWorkflow {
       });
 
       resetStoreDraft();
-
-      navigate(`/store/${result.organizationSlug}/${result.storeSlug}`);
+      onComplete(result);
     } catch (error) {
       window.alert(getErrorMessage(error));
     } finally {

@@ -3,7 +3,7 @@ import { LuLoaderCircle } from "react-icons/lu";
 
 import type { ProductArtworkPlacement } from "../../lib/decorationProfiles";
 import { NO_ARTWORK_TEMPLATE_ID } from "../../lib/productGeneration";
-import type { GeneratedSuggestion, ProductColorOption } from "../../lib/productStep.types";
+import type { GeneratedSuggestion, ProductColorOption } from "../../types/productStep";
 import ProductSuggestionCard from "../ProductSuggestionCard/ProductSuggestionCard";
 
 import styles from "./ProductSuggestionSection.module.scss";
