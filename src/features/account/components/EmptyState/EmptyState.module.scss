@@ -1,3 +1,5 @@
+@use "@/styles" as *;
+
 .emptyState {
   @include flex-center;
   flex: 1;

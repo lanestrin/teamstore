@@ -1,0 +1,141 @@
+.page {
+  display: flex;
+  flex-direction: column;
+
+  height: 100%;
+  padding: var(--_tsb-space-5);
+  gap: 50px;
+
+  background: var(--_tsb-color-background);
+}
+
+.step {
+  width: 100px;
+  height: 32px;
+
+  border-radius: 999px;
+}
+
+.title {
+  width: 360px;
+  max-width: 100%;
+  height: 54px;
+  margin-bottom: var(--_tsb-space-4);
+}
+
+.description {
+  width: 700px;
+  max-width: 100%;
+  height: 18px;
+  margin-bottom: var(--_tsb-space-2);
+}
+
+.descriptionShort {
+  width: 520px;
+  max-width: 100%;
+  height: 18px;
+}
+
+.heading {
+  width: 240px;
+  height: 28px;
+  margin-bottom: var(--_tsb-space-4);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(110px, 1fr)
+  );
+
+  gap: var(--_tsb-space-4);
+
+  max-width: 760px;
+}
+
+.colorCard {
+  height: 76px;
+
+  border-radius: var(--_tsb-radius-lg);
+}
+
+.customColors {
+  display: grid;
+  grid-template-columns: repeat(
+    2,
+    minmax(220px, 280px)
+  );
+
+  gap: var(--_tsb-space-5);
+}
+
+.colorPicker {
+  height: 82px;
+
+  border-radius: var(--_tsb-radius-lg);
+}
+
+.info {
+  max-width: 760px;
+  padding: var(--_tsb-space-6);
+
+  border: 1px solid var(--_tsb-color-border);
+  border-radius: var(--_tsb-radius-lg);
+}
+
+.infoTitle {
+  width: 220px;
+  height: 22px;
+  margin-bottom: var(--_tsb-space-4);
+}
+
+.infoLine {
+  width: 100%;
+  height: 16px;
+  margin-bottom: var(--_tsb-space-2);
+}
+
+.infoLineShort {
+  width: 70%;
+  height: 16px;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+
+  margin-top: auto;
+}
+
+.button {
+  width: 140px;
+  height: 48px;
+
+  border-radius: var(--_tsb-radius-md);
+}
+
+@media (max-width: 992px) {
+  .page {
+    padding: var(--_tsb-space-6);
+  }
+
+  .customColors {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    flex-direction: column-reverse;
+    gap: var(--_tsb-space-3);
+  }
+
+  .button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

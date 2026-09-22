@@ -11,9 +11,9 @@ import trojanLogo from "../../assets/images/trojan_logo.png";
 
 import ProductCard from "../../components/product-card/ProductCard";
 
-import GarmentArtworkPreview from "../create-store/steps/4_ProductsStep/components/GarmentArtworkPreview/GarmentArtworkPreview";
-import { getDecorationProfileIdForProductCategory } from "../create-store/steps/4_ProductsStep/lib/decorationProfiles";
-import { getUploadedArtworkId } from "../create-store/steps/4_ProductsStep/lib/productGeneration";
+import GarmentArtworkPreview from "../../../packages/store-builder/components/GarmentArtworkPreview/GarmentArtworkPreview";
+import { getDecorationProfileIdForProductCategory } from "../../../packages/store-builder/lib/decorationProfiles";
+import { getUploadedArtworkId } from "../../../packages/store-builder/lib/productGeneration";
 
 import { fanwearProducts, requiredProducts } from "../../mocks/products";
 

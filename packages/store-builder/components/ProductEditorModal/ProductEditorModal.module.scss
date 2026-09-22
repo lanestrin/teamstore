@@ -1,0 +1,630 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+
+  display: grid;
+  place-items: center;
+
+  padding: var(--_tsb-space-6);
+
+  background: rgb(15 23 42 / 72%);
+}
+
+.modal {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+
+  width: min(1120px, 100%);
+  height: min(760px, calc(100vh - 48px));
+
+  overflow: hidden;
+
+  background: var(--_tsb-color-surface);
+  border-radius: 1rem;
+
+  box-shadow: 0 24px 80px rgb(0 0 0 / 30%);
+}
+
+@supports (height: 100dvh) {
+  .modal {
+    height: min(760px, calc(100dvh - 48px));
+  }
+}
+
+/* ==========================================================================
+   Header / footer
+   ========================================================================== */
+
+.header,
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--_tsb-space-4);
+
+  padding: 18px 22px;
+}
+
+.header {
+  border-bottom: 1px solid var(--_tsb-color-border);
+}
+
+.header>div {
+  min-width: 0;
+}
+
+.header h2,
+.header p {
+  margin: 0;
+}
+
+.header h2 {
+  color: var(--_tsb-color-text);
+
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.header p {
+  margin-top: var(--_tsb-space-1);
+
+  overflow: hidden;
+
+  color: var(--_tsb-color-text-muted);
+
+  font-size: 0.875rem;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.footer {
+  justify-content: flex-end;
+
+  border-top: 1px solid var(--_tsb-color-border);
+}
+
+/* ==========================================================================
+   Shared controls
+   ========================================================================== */
+
+.close,
+.moveButton,
+.sizeButton,
+.resetAllButton,
+.cancelButton,
+.saveButton {
+  min-height: 44px;
+  padding: 0 var(--_tsb-space-4);
+
+  background: var(--_tsb-color-surface);
+  border: 1px solid var(--_tsb-color-border);
+  border-radius: var(--_tsb-radius-md);
+
+  color: var(--_tsb-color-text);
+
+  font: inherit;
+  font-weight: 600;
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    background-color var(--_tsb-transition-base),
+    border-color var(--_tsb-transition-base),
+    box-shadow var(--_tsb-transition-base),
+    opacity var(--_tsb-transition-base);
+}
+
+.close {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+
+  width: 44px;
+  height: 44px;
+  padding: 0;
+
+  border-radius: 999px;
+}
+
+.close svg {
+  width: 18px;
+  height: 18px;
+}
+
+.close:focus-visible,
+.moveButton:focus-visible,
+.sizeButton:focus-visible,
+.resetAllButton:focus-visible,
+.cancelButton:focus-visible,
+.saveButton:focus-visible {
+  outline: none;
+
+  border-color: var(--_tsb-color-text);
+
+  box-shadow:
+    0 0 0 3px color-mix(in srgb,
+      var(--_tsb-color-text) 12%,
+      transparent);
+}
+
+/* ==========================================================================
+   Main content
+   ========================================================================== */
+
+.body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+
+  min-width: 0;
+  min-height: 0;
+
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   Preview
+   ========================================================================== */
+
+.preview {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+
+  min-width: 0;
+  min-height: 0;
+  padding: var(--_tsb-space-6);
+
+  overflow: hidden;
+
+  background: var(--_tsb-color-surface-alt);
+  border-right: 1px solid var(--_tsb-color-border);
+
+  touch-action: none;
+  user-select: none;
+}
+
+.preview>[data-garment-artwork-preview] {
+  align-self: center;
+  justify-self: center;
+
+  width: min(100%, 560px);
+  height: auto;
+  min-height: 0;
+
+  aspect-ratio: 1;
+
+  overflow: hidden;
+}
+
+.preview[data-dragging="true"]>[data-garment-artwork-preview] {
+  cursor: grabbing;
+}
+
+.preview:not([data-dragging="true"])>[data-garment-artwork-preview] {
+  cursor: grab;
+}
+
+.previewHint {
+  margin: var(--_tsb-space-3) 0 0;
+
+  color: var(--_tsb-color-text-muted);
+
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  text-align: center;
+}
+
+/* ==========================================================================
+   Sidebar
+   ========================================================================== */
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--_tsb-space-6);
+
+  min-width: 0;
+  min-height: 0;
+  padding: 22px;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  background: var(--_tsb-color-surface);
+}
+
+.sidebarHeading h3,
+.sidebarHeading p {
+  margin: 0;
+}
+
+.sidebarHeading h3 {
+  color: var(--_tsb-color-text);
+
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.sidebarHeading p {
+  margin-top: var(--_tsb-space-1);
+
+  color: var(--_tsb-color-text-muted);
+
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.controlGroup {
+  display: grid;
+  gap: var(--_tsb-space-3);
+}
+
+.controlGroup+.controlGroup {
+  padding-top: var(--_tsb-space-5);
+
+  border-top: 1px solid var(--_tsb-color-border);
+}
+
+.controlLabel {
+  color: var(--_tsb-color-text-muted);
+
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+/* ==========================================================================
+   Movement controls
+   ========================================================================== */
+
+.movement {
+  display: grid;
+  grid-template-columns: repeat(3, 44px);
+  grid-template-rows: repeat(3, 44px);
+  justify-content: center;
+  gap: 6px;
+}
+
+.moveButton,
+.sizeButton {
+  display: grid;
+  place-items: center;
+
+  padding: 0;
+
+  border-radius: var(--_tsb-radius-md);
+}
+
+.moveButton {
+  width: 44px;
+  height: 44px;
+}
+
+.moveButton:disabled,
+.sizeButton:disabled,
+.resetAllButton:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.4;
+}
+
+.moveButton svg,
+.sizeButton svg {
+  width: 17px;
+  height: 17px;
+}
+
+.moveUp {
+  grid-column: 2;
+}
+
+.moveLeft {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.resetPosition {
+  grid-column: 2;
+  grid-row: 2;
+
+  background: var(--_tsb-color-surface-alt);
+}
+
+.moveRight {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.moveDown {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+.positionValue {
+  margin: 0;
+
+  color: var(--_tsb-color-text-muted);
+
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+/* ==========================================================================
+   Size controls
+   ========================================================================== */
+
+.sizeHeading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--_tsb-space-3);
+}
+
+.sizeHeading strong {
+  color: var(--_tsb-color-text);
+
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.sizeControls {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  align-items: center;
+  gap: var(--_tsb-space-3);
+}
+
+.sizeButton {
+  width: 44px;
+  height: 44px;
+}
+
+.sizeControls input[type="range"] {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  margin: 0;
+
+  accent-color: var(--_tsb-color-primary);
+
+  cursor: pointer;
+}
+
+.sizeControls input[type="range"]:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.4;
+}
+
+/* ==========================================================================
+   Reset
+   ========================================================================== */
+
+.resetAllButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--_tsb-space-2);
+
+  min-height: 44px;
+  margin-top: auto;
+  padding: 0 var(--_tsb-space-4);
+
+  font-size: 0.8125rem;
+}
+
+.resetAllButton svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ==========================================================================
+   Footer buttons
+   ========================================================================== */
+
+.cancelButton,
+.saveButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 128px;
+  min-height: 44px;
+  padding: 0 var(--_tsb-space-4);
+
+  font-size: 0.875rem;
+}
+
+.saveButton {
+  background: var(--_tsb-color-primary);
+  border-color: var(--_tsb-color-primary);
+
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   Hover-capable devices
+   ========================================================================== */
+
+@media (hover: hover) and (pointer: fine) {
+
+  .close:hover,
+  .moveButton:hover:not(:disabled),
+  .sizeButton:hover:not(:disabled),
+  .resetAllButton:hover:not(:disabled),
+  .cancelButton:hover {
+    background: var(--_tsb-color-surface-alt);
+    border-color: var(--_tsb-color-text-muted);
+  }
+
+  .saveButton:hover {
+    opacity: 0.9;
+  }
+}
+
+/* ==========================================================================
+   Tablet
+   ========================================================================== */
+
+@media (max-width: 820px) {
+  .overlay {
+    padding: var(--_tsb-space-3);
+  }
+
+  .modal {
+    width: min(760px, 100%);
+    height: calc(100vh - 24px);
+  }
+
+  @supports (height: 100dvh) {
+    .modal {
+      height: calc(100dvh - 24px);
+    }
+  }
+
+  .body {
+    grid-template-columns: 1fr;
+    grid-template-rows: 280px minmax(0, 1fr);
+  }
+
+  .preview {
+    padding: var(--_tsb-space-4);
+
+    border-right: 0;
+    border-bottom: 1px solid var(--_tsb-color-border);
+  }
+
+  .preview>[data-garment-artwork-preview] {
+    width: min(100%, 220px);
+    max-height: 220px;
+  }
+
+  .previewHint {
+    margin-top: var(--_tsb-space-2);
+  }
+
+  .sidebar {
+    padding: var(--_tsb-space-5);
+
+    overflow-y: auto;
+  }
+}
+
+/* ==========================================================================
+   Mobile
+   ========================================================================== */
+
+@media (max-width: 520px) {
+  .overlay {
+    padding: 0;
+  }
+
+  .modal {
+    width: 100%;
+    height: 100vh;
+
+    border-radius: 0;
+  }
+
+  @supports (height: 100dvh) {
+    .modal {
+      height: 100dvh;
+    }
+  }
+
+  .header,
+  .footer {
+    padding: var(--_tsb-space-3) var(--_tsb-space-4);
+  }
+
+  .header h2 {
+    font-size: 1.125rem;
+  }
+
+  .header p {
+    font-size: 0.8125rem;
+  }
+
+  .body {
+    grid-template-rows: 240px minmax(0, 1fr);
+  }
+
+  .preview {
+    padding: var(--_tsb-space-3);
+  }
+
+  .preview>[data-garment-artwork-preview] {
+    width: min(100%, 185px);
+    max-height: 185px;
+  }
+
+  .previewHint {
+    margin-top: var(--_tsb-space-1);
+
+    font-size: 0.75rem;
+  }
+
+  .sidebar {
+    gap: var(--_tsb-space-4);
+    padding: var(--_tsb-space-4);
+  }
+
+  .controlGroup+.controlGroup {
+    padding-top: var(--_tsb-space-4);
+  }
+
+  .footer {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--_tsb-space-2);
+  }
+
+  .cancelButton,
+  .saveButton {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+/* ==========================================================================
+   Very small phones
+   ========================================================================== */
+
+@media (max-width: 380px) {
+  .header p {
+    max-width: 220px;
+  }
+
+  .body {
+    grid-template-rows: 220px minmax(0, 1fr);
+  }
+
+  .preview>[data-garment-artwork-preview] {
+    width: min(100%, 165px);
+    max-height: 165px;
+  }
+
+  .sidebar {
+    padding: var(--_tsb-space-3) var(--_tsb-space-4);
+  }
+}
+
+/* ==========================================================================
+   Reduced motion
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .close,
+  .moveButton,
+  .sizeButton,
+  .resetAllButton,
+  .cancelButton,
+  .saveButton {
+    transition: none;
+  }
+}

@@ -1,3 +1,5 @@
+@use "@/styles" as *;
+
 .mobileDrawerOverlay {
   position: fixed;
   inset: 0;
@@ -160,3 +162,4 @@
 .activeDrawerLink {
   color: $brand-red !important;
 }
+

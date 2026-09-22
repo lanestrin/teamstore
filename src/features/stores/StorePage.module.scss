@@ -1,3 +1,5 @@
+@use "@/styles" as *;
+
 .page {
   background: $page-background;
 }
@@ -8,7 +10,9 @@
 
 .hero {
   padding: $space-8 $space-5;
-  background: linear-gradient(135deg, $background-dark 0%, $background-dark-alt 100%);
+  background: linear-gradient(135deg,
+      $background-dark 0%,
+      $background-dark-alt 100%);
   color: $text-inverse;
 }
 
@@ -213,6 +217,7 @@
    ========================= */
 
 @media (max-width: 992px) {
+
   .requiredGrid,
   .fanwearGrid {
     grid-template-columns: repeat(2, 1fr);

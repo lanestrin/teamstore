@@ -1,0 +1,76 @@
+.errorSummary {
+  width: 100%;
+  min-width: 0;
+  padding: var(--_tsb-space-4);
+  margin-bottom: var(--_tsb-space-7);
+
+  background: color-mix(in srgb,
+      var(--_tsb-color-danger) 8%,
+      transparent);
+  border: 1px solid color-mix(in srgb,
+      var(--_tsb-color-danger) 30%,
+      transparent);
+  border-radius: var(--_tsb-radius-md);
+}
+
+.errorSummary h2 {
+  margin: 0 0 var(--_tsb-space-2);
+
+  color: var(--_tsb-color-danger);
+
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.errorSummary ul {
+  display: flex;
+  flex-direction: column;
+
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+}
+
+.errorSummary li {
+  min-width: 0;
+}
+
+.errorSummary button {
+  display: block;
+
+  width: 100%;
+  padding: var(--_tsb-space-1) 0;
+
+  background: transparent;
+  border: 0;
+
+  color: var(--_tsb-color-danger);
+
+  font: inherit;
+  font-size: 0.875rem;
+  text-align: left;
+
+  cursor: pointer;
+
+  overflow-wrap: anywhere;
+  text-decoration: underline;
+}
+
+.errorSummary button span {
+  font-weight: 600;
+}
+
+.errorSummary button:focus-visible {
+  border-radius: var(--_tsb-radius-sm);
+
+  outline: 3px solid var(--_tsb-color-danger);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .errorSummary button:hover {
+    text-decoration-thickness: 2px;
+  }
+}

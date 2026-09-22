@@ -1,0 +1,222 @@
+.productSection {
+  padding: var(--_tsb-space-5);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: var(--_tsb-space-4);
+}
+
+.sectionHeader h4 {
+  margin: 0;
+
+  font-family: inherit;
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.viewAll {
+  padding: 0;
+
+  background: none;
+  border: none;
+
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+
+  cursor: default;
+  user-select: none;
+}
+
+.viewAll:hover {
+  opacity: 0.7;
+}
+
+.products {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--_tsb-space-4);
+  align-items: start;
+}
+
+.productCard {
+  min-width: 0;
+  padding: var(--_tsb-space-3);
+
+  overflow: hidden;
+
+  background: var(--_tsb-color-surface);
+  border: 1px solid var(--_tsb-color-border);
+  border-radius: var(--_tsb-radius-md);
+
+  transition:
+    transform var(--_tsb-transition-base),
+    box-shadow var(--_tsb-transition-base);
+}
+
+.productCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--_tsb-shadow-md);
+}
+
+/*
+ * Every product gets the same square media area.
+ *
+ * This applies to:
+ * - normal product images
+ * - skeleton images
+ * - GarmentArtworkPreview
+ *
+ * GarmentArtworkPreview previously used its own natural image
+ * dimensions here, which caused tall products such as pants to
+ * stretch the entire card.
+ */
+.productImage,
+.productCard>[data-garment-artwork-preview] {
+  display: block;
+
+  width: 100%;
+  aspect-ratio: 1;
+  margin-bottom: var(--_tsb-space-3);
+
+  overflow: hidden;
+
+  background: var(--_tsb-color-surface-alt);
+  border-radius: var(--_tsb-radius-sm);
+}
+
+/*
+ * Regular catalog image.
+ */
+.productImage {
+  object-fit: contain;
+}
+
+/*
+ * Force the reusable garment/artwork renderer to behave like
+ * the regular storefront image area.
+ */
+.productCard>[data-garment-artwork-preview] {
+  position: relative;
+
+  height: auto;
+  min-height: 0;
+}
+
+/*
+ * GarmentArtworkPreview contains its own garment <img>.
+ * It must fill the square preview without changing the
+ * container height.
+ */
+.productCard>[data-garment-artwork-preview]>img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+}
+
+.productImagePlaceholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+  aspect-ratio: 1;
+  margin-bottom: var(--_tsb-space-3);
+
+  overflow: hidden;
+
+  background: var(--_tsb-color-surface-alt);
+  border-radius: var(--_tsb-radius-sm);
+
+  color: var(--_tsb-color-text-muted);
+
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.productName {
+  overflow: hidden;
+
+  margin: 0 0 var(--_tsb-space-2);
+
+  color: var(--_tsb-color-text);
+
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.35;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.productPrice {
+  display: block;
+
+  margin-bottom: var(--_tsb-space-2);
+
+  color: var(--_tsb-color-text);
+
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.productStatus {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 0.2rem 0.45rem;
+
+  background: var(--_tsb-color-surface-alt);
+  border-radius: 999px;
+
+  color: var(--_tsb-color-text-muted);
+
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.productTitleSkeleton {
+  height: 16px;
+  margin-bottom: var(--_tsb-space-2);
+}
+
+.productPriceSkeleton {
+  width: 45%;
+  height: 18px;
+  margin-bottom: var(--_tsb-space-2);
+}
+
+.productStatusSkeleton {
+  width: 55%;
+  height: 14px;
+}
+
+@media (max-width: 900px) {
+  .products {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .productSection {
+    padding: var(--_tsb-space-4);
+  }
+
+  .products {
+    gap: var(--_tsb-space-3);
+  }
+
+  .sectionHeader h4 {
+    font-size: 1.2rem;
+  }
+}
