@@ -26,6 +26,24 @@ const storeActivity = v.union(
 
 const storeType = v.union(v.literal("fanwear"), v.literal("uniform"), v.literal("hybrid"));
 
+const productColorFamily = v.union(
+  v.literal("black"),
+  v.literal("white"),
+  v.literal("gray"),
+  v.literal("silver"),
+  v.literal("red"),
+  v.literal("orange"),
+  v.literal("yellow"),
+  v.literal("green"),
+  v.literal("blue"),
+  v.literal("navy"),
+  v.literal("purple"),
+  v.literal("pink"),
+  v.literal("brown"),
+  v.literal("multicolor"),
+  v.literal("unknown"),
+);
+
 const storeUploadedArtwork = v.object({
   id: v.string(),
   fileName: v.string(),
@@ -275,6 +293,70 @@ export const saveArtworkStep = mutation({
 });
 
 /**
+ * Saves the Products step for an existing draft.
+ *
+ * Product selections are normalized and replaced as one durable set.
+ * Temporary UI-only suggestion placement overrides are intentionally
+ * not persisted here.
+ */
+export const saveProductsStep = mutation({
+  args: {
+    storeId: v.id("stores"),
+
+    activity: storeActivity,
+    productColorFamily,
+    productSecondaryColorFamily: v.optional(productColorFamily),
+    productGenerationSeed: v.number(),
+
+    productSelections: v.array(storeProductSelection),
+    requiredItemsDeadline: v.optional(v.string()),
+  },
+
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+
+    if (userId === null) {
+      throw new ConvexError("You must be signed in to update a store.");
+    }
+
+    const existingStore = await ctx.db.get(args.storeId);
+
+    if (existingStore === null || existingStore.createdBy !== userId || existingStore.status !== "draft") {
+      throw new ConvexError("Draft store not found.");
+    }
+
+    if (!Number.isInteger(args.productGenerationSeed) || args.productGenerationSeed < 1) {
+      throw new ConvexError("Product generation seed must be a positive whole number.");
+    }
+
+    const productSelections = prepareDraftStoreProductSelections(args.productSelections);
+
+    if (productSelections.length === 0) {
+      throw new ConvexError("Select at least one product before continuing.");
+    }
+
+    const hasRequiredProducts = productSelections.some((selection) => selection.isRequired);
+
+    const requiredItemsDeadline = hasRequiredProducts ? normalizeRequiredItemsDeadline(args.requiredItemsDeadline) : undefined;
+
+    const now = Date.now();
+
+    await ctx.db.patch(args.storeId, {
+      activity: args.activity,
+      productColorFamily: args.productColorFamily,
+      productSecondaryColorFamily: args.productSecondaryColorFamily,
+      productGenerationSeed: args.productGenerationSeed,
+      requiredItemsDeadline,
+
+      currentStep: Math.max(existingStore.currentStep, 5),
+      updatedAt: now,
+    });
+
+    await replaceStoreProductSelections(ctx, args.storeId, productSelections, now);
+  },
+});
+
+/**
  * Creates a new draft store or updates an existing draft.
  *
  * Empty form values are stored as missing optional fields.
@@ -457,6 +539,7 @@ export const getDraft = query({
         productId: storeProduct.productId,
         colorKey: storeProduct.colorKey,
         artworkTemplateId: storeProduct.artworkTemplateId,
+        artworkPlacement: storeProduct.artworkPlacement,
         isRequired: storeProduct.isRequired,
       }));
 

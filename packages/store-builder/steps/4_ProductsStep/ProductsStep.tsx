@@ -5,6 +5,7 @@ import { ART_TEMPLATE_LIST } from "../../assets/art-templates";
 import type { ProductColorFamily } from "../../types/productColor";
 import WizardLayout from "../../layouts/WizardLayout";
 import { useCreateStore } from "../../context/CreateStoreContext";
+import { useStoreBuilderAdapter } from "../../context/StoreBuilderAdapterContext";
 import { useStoreCreationProducts } from "../../hooks/useStoreCreationProducts";
 
 import ProductEditorModal from "../../components/ProductEditorModal/ProductEditorModal";
@@ -89,6 +90,7 @@ function createUploadedArtworkPreviewSvg(imageUrl: string): string {
 
 export default function SelectProductsStep() {
   const {
+    storeId,
     currentStep,
     setCurrentStep,
     storeDraft,
@@ -107,7 +109,9 @@ export default function SelectProductsStep() {
   const showUniforms = storeDraft.storeType === "uniform" || storeDraft.storeType === "hybrid";
   const showFanwear = storeDraft.storeType === "fanwear" || storeDraft.storeType === "hybrid";
 
+  const adapter = useStoreBuilderAdapter();
   const [editingProduct, setEditingProduct] = useState<EditingProductState | null>(null);
+  const [isSavingProducts, setIsSavingProducts] = useState(false);
 
   /*
    * Product artwork placement can be edited before a suggestion is selected.
@@ -509,6 +513,54 @@ export default function SelectProductsStep() {
     setEditingProduct(null);
   }
 
+  async function handleNext() {
+    if (isSavingProducts) {
+      return;
+    }
+
+    if (!storeId) {
+      window.alert("The store draft has not been created yet.");
+      return;
+    }
+
+    if (!isStoreActivity(storeDraft.activity)) {
+      window.alert("Select an activity before continuing.");
+      return;
+    }
+
+    if (!storeDraft.productColorFamily) {
+      window.alert("Select a primary product color before continuing.");
+      return;
+    }
+
+    setIsSavingProducts(true);
+
+    try {
+      await adapter.saveProductsStep({
+        storeId,
+        activity: storeDraft.activity,
+        productColorFamily: storeDraft.productColorFamily,
+        productSecondaryColorFamily: storeDraft.productSecondaryColorFamily || undefined,
+        productGenerationSeed: storeDraft.productGenerationSeed,
+        productSelections: Object.values(storeDraft.productSelections).map((selection) => ({
+          productId: selection.productId,
+          colorKey: selection.colorKey,
+          artworkTemplateId: selection.artworkTemplateId,
+          artworkPlacement: selection.artworkPlacement,
+          isRequired: selection.isRequired,
+        })),
+        requiredItemsDeadline: storeDraft.requiredItemsDeadline || undefined,
+      });
+
+      setCurrentStep(5);
+    } catch (error) {
+      console.error("Could not save the Products step.", error);
+      window.alert(error instanceof Error ? error.message : "Could not save the Products step.");
+    } finally {
+      setIsSavingProducts(false);
+    }
+  }
+
   const activityLabel = getActivityLabel(storeDraft.activity);
   const primaryColorLabel = getProductColorLabel(primaryColorFamily);
   const secondaryColorLabel = getProductColorLabel(secondaryColorFamily);
@@ -527,8 +579,11 @@ export default function SelectProductsStep() {
             : `Choose ${primaryColorLabel} products with any secondary color.`
         }
         onBack={() => setCurrentStep(3)}
-        onNext={() => setCurrentStep(5)}
-        nextDisabled={isLoading || selectedProductCount === 0 || isRequiredItemsDeadlineMissing || isRequiredItemsDeadlinePast}
+        onNext={() => void handleNext()}
+        nextLabel={isSavingProducts ? "Saving..." : "Next"}
+        nextDisabled={
+          isSavingProducts || isLoading || selectedProductCount === 0 || isRequiredItemsDeadlineMissing || isRequiredItemsDeadlinePast
+        }
         width="wide"
       >
         <div className={styles.productsStep}>

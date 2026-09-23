@@ -16,6 +16,7 @@ export interface LoadedProductSelection {
   productId: StoreBuilderId;
   colorKey: string;
   artworkTemplateId: string;
+  artworkPlacement?: ProductArtworkPlacement;
   isRequired: boolean;
 }
 
@@ -64,6 +65,10 @@ export interface LoadedStoreDraft {
 
   primaryColor?: string;
   secondaryColor?: string;
+
+  productColorFamily?: ProductColorFamily;
+  productSecondaryColorFamily?: ProductColorFamily;
+  productGenerationSeed?: number;
   requiredItemsDeadline?: string;
 
   artworkText?: StoreBuilderArtworkText;
@@ -161,6 +166,18 @@ export interface SaveArtworkStepInput {
   uploadedArtworks: StoreBuilderUploadedArtworkInput[];
 }
 
+export interface SaveProductsStepInput {
+  storeId: StoreBuilderId;
+
+  activity: StoreActivity;
+  productColorFamily: ProductColorFamily;
+  productSecondaryColorFamily?: ProductColorFamily;
+  productGenerationSeed: number;
+
+  productSelections: StoreBuilderProductSelectionInput[];
+  requiredItemsDeadline?: string;
+}
+
 export interface SaveDraftInput {
   storeId?: StoreBuilderId;
 
@@ -238,6 +255,8 @@ export interface StoreBuilderAdapter {
   saveColorsStep(input: SaveColorsStepInput): Promise<void>;
 
   saveArtworkStep(input: SaveArtworkStepInput): Promise<void>;
+
+  saveProductsStep(input: SaveProductsStepInput): Promise<void>;
 
   saveDraft(input: SaveDraftInput): Promise<SaveDraftResult>;
 
