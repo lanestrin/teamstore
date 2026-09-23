@@ -25,6 +25,24 @@ const storeUploadedArtwork = v.object({
   isSelected: v.boolean(),
 });
 
+const storeArtworkText = v.object({
+  organizationName: v.string(),
+  mascotName: v.string(),
+  yearEstablished: v.string(),
+});
+
+const storeArtworkAdjustment = v.object({
+  elementId: v.string(),
+  x: v.number(),
+  y: v.number(),
+});
+
+const storeArtworkTemplate = v.object({
+  artworkTemplateId: v.string(),
+  isSelected: v.boolean(),
+  adjustments: v.array(storeArtworkAdjustment),
+});
+
 const storeArtworkSnapshot = v.object({
   artworkTemplateId: v.string(),
   svg: v.string(),
@@ -196,6 +214,8 @@ export default defineSchema({
     bannerStorageId: v.optional(v.id("_storage")),
 
     uploadedArtworks: v.optional(v.array(storeUploadedArtwork)),
+    artworkText: v.optional(storeArtworkText),
+    artworkTemplates: v.optional(v.array(storeArtworkTemplate)),
 
     artworkSnapshots: v.optional(v.array(storeArtworkSnapshot)),
 

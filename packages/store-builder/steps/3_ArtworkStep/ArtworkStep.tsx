@@ -4,6 +4,7 @@ import { LuImage, LuPencil, LuUpload } from "react-icons/lu";
 import { ART_TEMPLATE_LIST, type ArtTemplate } from "../../assets/art-templates";
 import WizardLayout from "../../layouts/WizardLayout";
 import { useCreateStore } from "../../context/CreateStoreContext";
+import { useStoreBuilderAdapter } from "../../context/StoreBuilderAdapterContext";
 
 import ArtworkEditorModal from "../../components/ArtworkEditorModal/ArtworkEditorModal";
 import ArtTemplatePreview from "../../components/ArtTemplatePreview/ArtTemplatePreview";
@@ -65,6 +66,7 @@ export default function SelectArtworksStep() {
   const {
     currentStep,
     setCurrentStep,
+    storeId,
     storeDraft,
     updateStoreDraft,
     updateArtworkTemplateDraft,
@@ -74,8 +76,11 @@ export default function SelectArtworksStep() {
     artworkSvgsByTemplateId,
   } = useCreateStore();
 
+  const adapter = useStoreBuilderAdapter();
+
   const [editingTemplateId, setEditingTemplateId] = useState<string | null>(null);
   const [logoError, setLogoError] = useState<string | null>(null);
+  const [isSavingArtwork, setIsSavingArtwork] = useState(false);
 
   const logoInputRef = useRef<HTMLInputElement>(null);
 
@@ -231,6 +236,84 @@ export default function SelectArtworksStep() {
     });
   }
 
+  async function handleNext() {
+    if (isSavingArtwork) {
+      return;
+    }
+
+    if (!storeId) {
+      window.alert("Create the store draft before saving artwork.");
+      return;
+    }
+
+    setIsSavingArtwork(true);
+
+    try {
+      let logoStorageId = storeDraft.logoStorageId;
+
+      if (!logoStorageId && storeDraft.logoFile) {
+        logoStorageId = await adapter.uploadFile(storeDraft.logoFile);
+      }
+
+      const savedUploadedArtworks = await Promise.all(
+        storeDraft.uploadedArtworks.map(async (artwork) => {
+          let storageId = artwork.storageId;
+
+          if (!storageId && artwork.file) {
+            storageId = await adapter.uploadFile(artwork.file);
+          }
+
+          if (!storageId) {
+            throw new Error(`Could not save ${artwork.fileName}.`);
+          }
+
+          return {
+            id: artwork.id,
+            fileName: artwork.fileName,
+            storageId,
+            isSelected: artwork.isSelected,
+          };
+        }),
+      );
+
+      const artworkTemplates = Object.values(storeDraft.artworkTemplates).map((templateDraft) => ({
+        artworkTemplateId: templateDraft.selectedArtTemplateId,
+        isSelected: templateDraft.isSelected,
+        adjustments: Object.entries(templateDraft.artworkAdjustments).map(([elementId, adjustment]) => ({
+          elementId,
+          x: adjustment.x,
+          y: adjustment.y,
+        })),
+      }));
+
+      await adapter.saveArtworkStep({
+        storeId,
+        logoStorageId: logoStorageId ?? undefined,
+        artworkText: storeDraft.artworkText,
+        artworkTemplates,
+        uploadedArtworks: savedUploadedArtworks,
+      });
+
+      const storageIdsByArtworkId = new Map(savedUploadedArtworks.map((artwork) => [artwork.id, artwork.storageId]));
+
+      updateStoreDraft({
+        logoStorageId,
+        uploadedArtworks: storeDraft.uploadedArtworks.map((artwork) => ({
+          ...artwork,
+          storageId: storageIdsByArtworkId.get(artwork.id) ?? artwork.storageId,
+        })),
+      });
+
+      setCurrentStep(4);
+    } catch (error) {
+      console.error("Could not save artwork step.", error);
+
+      window.alert(error instanceof Error ? error.message : "Could not save artwork. Please try again.");
+    } finally {
+      setIsSavingArtwork(false);
+    }
+  }
+
   const hasLogo = Boolean(storeDraft.logoFile || storeDraft.logoStorageId);
 
   return (
@@ -240,7 +323,9 @@ export default function SelectArtworksStep() {
         title="Choose Your Artwork"
         description="Customize a template, upload your own art, or continue without artwork."
         onBack={() => setCurrentStep(2)}
-        onNext={() => setCurrentStep(4)}
+        onNext={() => void handleNext()}
+        nextLabel={isSavingArtwork ? "Saving..." : "Next"}
+        nextDisabled={isSavingArtwork}
         width="wide"
       >
         <div className={styles.editor}>
@@ -333,13 +418,6 @@ export default function SelectArtworksStep() {
               {logoError && (
                 <p className={styles.error} role="alert">
                   {logoError}
-                </p>
-              )}
-
-              {!storeDraft.logoFile && storeDraft.logoStorageId && (
-                <p className={styles.notice}>
-                  This draft has a saved organization logo, but its public URL is not loaded in the current wizard state. Uploading a
-                  replacement will preview it immediately.
                 </p>
               )}
             </div>
