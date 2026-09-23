@@ -229,39 +229,8 @@ export function useCreateStoreWorkflow({ draftId, onDraftIdChange, onExit, onCom
       return;
     }
 
-    const organizationName = storeDraft.organizationName.trim();
-    const organizationSlug = storeDraft.organizationSlug.trim() || slugify(organizationName);
-    const activity = storeDraft.activity.trim();
-    const storeType = storeDraft.storeType;
-    const storeName = storeDraft.storeName.trim();
-    const storeSlug = storeDraft.storeSlug.trim();
-
-    if (!organizationName) {
-      window.alert("Organization name is required.");
-
-      return;
-    }
-
-    if (!storeName) {
-      window.alert("Store name is required.");
-
-      return;
-    }
-
-    if (!storeSlug) {
-      window.alert("Store address is required.");
-
-      return;
-    }
-
-    if (!storeType) {
-      window.alert("Store type is required.");
-
-      return;
-    }
-
-    if (!isStoreActivity(activity)) {
-      window.alert("Store activity is required.");
+    if (!storeId) {
+      window.alert("Save the store before publishing.");
 
       return;
     }
@@ -274,39 +243,14 @@ export function useCreateStoreWorkflow({ draftId, onDraftIdChange, onExit, onCom
       return;
     }
 
-    const hasRequiredProducts = productSelections.some((selection) => selection.isRequired);
-    const requiredItemsDeadline = normalizeOptionalText(storeDraft.requiredItemsDeadline);
-
-    if (hasRequiredProducts && !requiredItemsDeadline) {
-      window.alert("Set a deadline for required products before creating the store.");
-
-      return;
-    }
-
     const artworkSnapshots = buildArtworkSnapshots(productSelections);
 
     setIsFinalizing(true);
 
     try {
-      const uploadedArtworks = await prepareUploadedArtworks();
       const result = await adapter.finalizeStore({
-        storeId: storeId ?? undefined,
-
-        organizationName,
-        organizationSlug,
-        activity,
-        storeType,
-        storeName,
-        storeSlug,
-        storeDescription: normalizeOptionalText(storeDraft.storeDescription),
-        logoStorageId: storeDraft.logoStorageId ?? undefined,
-        uploadedArtworks,
+        storeId,
         artworkSnapshots,
-        primaryColor,
-        secondaryColor,
-        currentStep,
-        productSelections,
-        requiredItemsDeadline,
       });
 
       resetStoreDraft();

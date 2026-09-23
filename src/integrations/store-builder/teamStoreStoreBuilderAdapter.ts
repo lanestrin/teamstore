@@ -214,30 +214,8 @@ export function createTeamStoreStoreBuilderAdapter(client: ConvexReactClient): S
 
     async finalizeStore(input) {
       const result = await client.mutation(api.stores.finalizeStore, {
-        storeId: input.storeId ? toStoreId(input.storeId) : undefined,
-
-        organizationName: input.organizationName,
-        organizationSlug: input.organizationSlug,
-
-        activity: input.activity,
-        storeType: input.storeType,
-
-        storeName: input.storeName,
-        storeSlug: input.storeSlug,
-        storeDescription: input.storeDescription,
-
-        logoStorageId: input.logoStorageId ? toStorageId(input.logoStorageId) : undefined,
-
-        uploadedArtworks: toUploadedArtworks(input.uploadedArtworks),
+        storeId: toStoreId(input.storeId),
         artworkSnapshots: input.artworkSnapshots,
-
-        primaryColor: input.primaryColor,
-        secondaryColor: input.secondaryColor,
-
-        currentStep: input.currentStep,
-
-        productSelections: toProductSelections(input.productSelections),
-        requiredItemsDeadline: input.requiredItemsDeadline,
       });
 
       return {

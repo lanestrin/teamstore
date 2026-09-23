@@ -94,17 +94,13 @@ function createUploadedArtworkPreviewSvg(imageUrl: string): string {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"><image href="${escapedImageUrl}" x="0" y="0" width="100" height="100" preserveAspectRatio="xMidYMid meet" /></svg>`;
 }
 
-export default function ReviewStep({ onCreateStore }: ReviewStepProps) {
+export default function ReviewStep({ isFinalizing, onCreateStore }: ReviewStepProps) {
   const { setCurrentStep, storeDraft, primaryColor, secondaryColor, artworkSvgsByTemplateId } = useCreateStore();
-
   const [uploadedArtworkPreviewSvgsById, setUploadedArtworkPreviewSvgsById] = useState<Record<string, string>>({});
-
-  const logoUrl = useFileDataUrl(storeDraft.logoFile);
-
+  const uploadedLogoUrl = useFileDataUrl(storeDraft.logoFile);
+  const logoUrl = uploadedLogoUrl ?? storeDraft.logoUrl;
   const organizationName = storeDraft.organizationName || "Your Organization";
-
   const storeName = storeDraft.storeName || "Your Team Store";
-
   const storeDescription = storeDraft.storeDescription || "Show your pride. Represent your team.";
 
   useEffect(() => {
@@ -185,31 +181,20 @@ export default function ReviewStep({ onCreateStore }: ReviewStepProps) {
     () =>
       Object.values(storeDraft.productSelections).map((selection) => {
         const product = productsById.get(selection.productId);
-
         const color = product?.colorOptions.find((candidate) => candidate.colorKey === selection.colorKey);
 
         const previewItem: ProductPreviewItem = {
           id: selection.combinationKey,
           name: product?.name ?? "Selected product",
-
           imageUrl: color?.imageUrl ?? null,
-
           minPriceInCents: product?.minPriceInCents ?? null,
-
           maxPriceInCents: product?.maxPriceInCents ?? null,
-
           statusLabel: selection.isRequired ? "Required" : "Optional",
-
           artworkSvg: artworkPreviewSvgsById[selection.artworkTemplateId] ?? null,
-
           surfaceHex: color?.primaryHexValue,
-
           surfaceTone: color?.tone,
-
           decorationProfileId: product ? getDecorationProfileIdForProductCategory(product.category) : undefined,
-
           decorationPreviewBounds: color?.decorationPreviewBounds,
-
           placement: selection.artworkPlacement,
         };
 
@@ -236,13 +221,9 @@ export default function ReviewStep({ onCreateStore }: ReviewStepProps) {
       : selectedProducts.filter(({ selection }) => !selection.isRequired).map(({ previewItem }) => previewItem);
 
   const selectedProductCount = Object.keys(storeDraft.productSelections).length;
-
   const requiredProductCount = Object.values(storeDraft.productSelections).filter((selection) => selection.isRequired).length;
-
   const selectedTemplateArtworkCount = Object.values(storeDraft.artworkTemplates).filter((template) => template.isSelected).length;
-
   const selectedUploadedArtworkCount = storeDraft.uploadedArtworks.filter((artwork) => artwork.isSelected).length;
-
   const selectedArtworkCount = selectedTemplateArtworkCount + selectedUploadedArtworkCount;
 
   const selectedArtworkNames = [
@@ -269,8 +250,8 @@ export default function ReviewStep({ onCreateStore }: ReviewStepProps) {
       description="See what customers will see and confirm everything is ready before publishing."
       onBack={() => setCurrentStep(4)}
       onNext={() => void onCreateStore()}
-      nextLabel="Create Store — Coming Soon"
-      nextDisabled
+      nextLabel={isFinalizing ? "Creating..." : "Create Store"}
+      nextDisabled={isFinalizing}
       width="wide"
     >
       <div className={styles.reviewStep}>
