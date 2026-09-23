@@ -446,6 +446,7 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
         colorKey: selection.colorKey,
         artworkTemplateId: selection.artworkTemplateId,
         isRequired: selection.isRequired,
+        artworkPlacement: selection.artworkPlacement ? { ...selection.artworkPlacement } : undefined,
       };
 
       return selections;
@@ -505,9 +506,9 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
         yearEstablished: new Date().getFullYear().toString(),
       },
 
-      productColorFamily: "",
-      productSecondaryColorFamily: "",
-      productGenerationSeed: DEFAULT_PRODUCT_GENERATION_SEED,
+      productColorFamily: draft.productColorFamily ?? "",
+      productSecondaryColorFamily: draft.productSecondaryColorFamily ?? "",
+      productGenerationSeed: draft.productGenerationSeed ?? DEFAULT_PRODUCT_GENERATION_SEED,
       productSelections,
       requiredItemsDeadline: hasRequiredProducts ? (draft.requiredItemsDeadline ?? "") : "",
     });

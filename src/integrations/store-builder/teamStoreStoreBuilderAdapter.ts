@@ -3,6 +3,7 @@ import type { ConvexReactClient } from "convex/react";
 import type {
   SaveArtworkStepInput,
   SaveColorsStepInput,
+  SaveProductsStepInput,
   StoreBuilderAdapter,
   StoreBuilderProductSelectionInput,
   StoreBuilderUploadedArtworkInput,
@@ -71,6 +72,10 @@ export function createTeamStoreStoreBuilderAdapter(client: ConvexReactClient): S
 
         primaryColor: draft.primaryColor,
         secondaryColor: draft.secondaryColor,
+
+        productColorFamily: draft.productColorFamily,
+        productSecondaryColorFamily: draft.productSecondaryColorFamily,
+        productGenerationSeed: draft.productGenerationSeed,
         requiredItemsDeadline: draft.requiredItemsDeadline,
 
         artworkText: draft.artworkText,
@@ -88,6 +93,7 @@ export function createTeamStoreStoreBuilderAdapter(client: ConvexReactClient): S
           productId: selection.productId,
           colorKey: selection.colorKey,
           artworkTemplateId: selection.artworkTemplateId,
+          artworkPlacement: selection.artworkPlacement,
           isRequired: selection.isRequired,
         })),
       };
@@ -156,6 +162,20 @@ export function createTeamStoreStoreBuilderAdapter(client: ConvexReactClient): S
         artworkText: input.artworkText,
         artworkTemplates: input.artworkTemplates,
         uploadedArtworks: toUploadedArtworks(input.uploadedArtworks),
+      });
+    },
+
+    async saveProductsStep(input: SaveProductsStepInput) {
+      await client.mutation(api.storeDrafts.saveProductsStep, {
+        storeId: toStoreId(input.storeId),
+
+        activity: input.activity,
+        productColorFamily: input.productColorFamily,
+        productSecondaryColorFamily: input.productSecondaryColorFamily,
+        productGenerationSeed: input.productGenerationSeed,
+
+        productSelections: toProductSelections(input.productSelections),
+        requiredItemsDeadline: input.requiredItemsDeadline,
       });
     },
 

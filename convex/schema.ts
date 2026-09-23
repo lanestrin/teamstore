@@ -221,6 +221,10 @@ export default defineSchema({
 
     primaryColor: v.optional(v.string()),
     secondaryColor: v.optional(v.string()),
+
+    productColorFamily: v.optional(productColorFamily),
+    productSecondaryColorFamily: v.optional(productColorFamily),
+    productGenerationSeed: v.optional(v.number()),
     requiredItemsDeadline: v.optional(v.string()),
 
     currentStep: v.number(),
