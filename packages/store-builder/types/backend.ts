@@ -27,6 +27,24 @@ export interface LoadedUploadedArtwork {
   isSelected: boolean;
 }
 
+export interface StoreBuilderArtworkText {
+  organizationName: string;
+  mascotName: string;
+  yearEstablished: string;
+}
+
+export interface StoreBuilderArtworkAdjustment {
+  elementId: string;
+  x: number;
+  y: number;
+}
+
+export interface StoreBuilderArtworkTemplate {
+  artworkTemplateId: string;
+  isSelected: boolean;
+  adjustments: StoreBuilderArtworkAdjustment[];
+}
+
 export interface LoadedStoreDraft {
   _id: StoreBuilderId;
   status: "draft" | "active" | "archived";
@@ -48,6 +66,8 @@ export interface LoadedStoreDraft {
   secondaryColor?: string;
   requiredItemsDeadline?: string;
 
+  artworkText?: StoreBuilderArtworkText;
+  artworkTemplates?: StoreBuilderArtworkTemplate[];
   uploadedArtworks?: LoadedUploadedArtwork[];
   productSelections?: LoadedProductSelection[];
 }
@@ -131,6 +151,16 @@ export interface SaveColorsStepInput {
   secondaryColor: string;
 }
 
+export interface SaveArtworkStepInput {
+  storeId: StoreBuilderId;
+
+  logoStorageId?: StoreBuilderStorageId;
+
+  artworkText: StoreBuilderArtworkText;
+  artworkTemplates: StoreBuilderArtworkTemplate[];
+  uploadedArtworks: StoreBuilderUploadedArtworkInput[];
+}
+
 export interface SaveDraftInput {
   storeId?: StoreBuilderId;
 
@@ -206,6 +236,8 @@ export interface StoreBuilderAdapter {
   saveOrganizationStep(input: SaveOrganizationStepInput): Promise<SaveOrganizationStepResult>;
 
   saveColorsStep(input: SaveColorsStepInput): Promise<void>;
+
+  saveArtworkStep(input: SaveArtworkStepInput): Promise<void>;
 
   saveDraft(input: SaveDraftInput): Promise<SaveDraftResult>;
 

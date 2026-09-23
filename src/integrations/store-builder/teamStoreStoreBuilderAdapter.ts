@@ -1,6 +1,7 @@
 import type { ConvexReactClient } from "convex/react";
 
 import type {
+  SaveArtworkStepInput,
   SaveColorsStepInput,
   StoreBuilderAdapter,
   StoreBuilderProductSelectionInput,
@@ -72,6 +73,9 @@ export function createTeamStoreStoreBuilderAdapter(client: ConvexReactClient): S
         secondaryColor: draft.secondaryColor,
         requiredItemsDeadline: draft.requiredItemsDeadline,
 
+        artworkText: draft.artworkText,
+        artworkTemplates: draft.artworkTemplates,
+
         uploadedArtworks: draft.uploadedArtworks?.map((artwork) => ({
           id: artwork.id,
           fileName: artwork.fileName,
@@ -140,6 +144,18 @@ export function createTeamStoreStoreBuilderAdapter(client: ConvexReactClient): S
         storeId: toStoreId(input.storeId),
         primaryColor: input.primaryColor,
         secondaryColor: input.secondaryColor,
+      });
+    },
+
+    async saveArtworkStep(input: SaveArtworkStepInput) {
+      await client.mutation(api.storeDrafts.saveArtworkStep, {
+        storeId: toStoreId(input.storeId),
+
+        logoStorageId: input.logoStorageId ? toStorageId(input.logoStorageId) : undefined,
+
+        artworkText: input.artworkText,
+        artworkTemplates: input.artworkTemplates,
+        uploadedArtworks: toUploadedArtworks(input.uploadedArtworks),
       });
     },
 

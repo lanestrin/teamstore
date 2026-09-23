@@ -33,6 +33,24 @@ const storeUploadedArtwork = v.object({
   isSelected: v.boolean(),
 });
 
+const storeArtworkText = v.object({
+  organizationName: v.string(),
+  mascotName: v.string(),
+  yearEstablished: v.string(),
+});
+
+const storeArtworkAdjustment = v.object({
+  elementId: v.string(),
+  x: v.number(),
+  y: v.number(),
+});
+
+const storeArtworkTemplate = v.object({
+  artworkTemplateId: v.string(),
+  isSelected: v.boolean(),
+  adjustments: v.array(storeArtworkAdjustment),
+});
+
 /**
  * Creates a draft store after the Organization step or updates
  * the Organization fields on an existing draft.
@@ -193,6 +211,64 @@ export const saveColorsStep = mutation({
       primaryColor: args.primaryColor,
       secondaryColor: args.secondaryColor,
       currentStep: Math.max(existingStore.currentStep, 3),
+      updatedAt: Date.now(),
+    });
+  },
+});
+
+/**
+ * Saves the Artwork step for an existing draft.
+ *
+ * New files are uploaded by the Store Builder adapter before this
+ * mutation runs. This mutation stores only durable storage references
+ * plus the artwork configuration needed to reconstruct the step.
+ */
+export const saveArtworkStep = mutation({
+  args: {
+    storeId: v.id("stores"),
+
+    logoStorageId: v.optional(v.id("_storage")),
+
+    artworkText: storeArtworkText,
+    artworkTemplates: v.array(storeArtworkTemplate),
+    uploadedArtworks: v.array(storeUploadedArtwork),
+  },
+
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+
+    if (userId === null) {
+      throw new ConvexError("You must be signed in to update a store.");
+    }
+
+    const existingStore = await ctx.db.get(args.storeId);
+
+    if (existingStore === null || existingStore.createdBy !== userId || existingStore.status !== "draft") {
+      throw new ConvexError("Draft store not found.");
+    }
+
+    const artworkText = {
+      organizationName: args.artworkText.organizationName.trim(),
+      mascotName: args.artworkText.mascotName.trim(),
+      yearEstablished: args.artworkText.yearEstablished.trim(),
+    };
+
+    if (artworkText.yearEstablished && !/^\d{1,4}$/.test(artworkText.yearEstablished)) {
+      throw new ConvexError("Established year must contain up to 4 digits.");
+    }
+
+    await ctx.db.patch(args.storeId, {
+      ...(args.logoStorageId !== undefined
+        ? {
+            logoStorageId: args.logoStorageId,
+          }
+        : {}),
+
+      artworkText,
+      artworkTemplates: args.artworkTemplates,
+      uploadedArtworks: args.uploadedArtworks,
+
+      currentStep: Math.max(existingStore.currentStep, 4),
       updatedAt: Date.now(),
     });
   },

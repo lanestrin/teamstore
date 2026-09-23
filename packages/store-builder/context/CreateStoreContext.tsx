@@ -10,6 +10,7 @@ import { createCustomizedSvg, applySavedArtworkAdjustments } from "../lib/artwor
 
 import type {
   ArtworkTemplateDraft,
+  ArtworkTemplatesDraft,
   CreateStoreContextValue,
   CreateStoreDraft,
   LoadedStoreDraft,
@@ -148,7 +149,8 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
   const [primaryColor, setPrimaryColor] = useState(DEFAULT_PRIMARY_COLOR);
   const [secondaryColor, setSecondaryColor] = useState(DEFAULT_SECONDARY_COLOR);
   const [storeDraft, setStoreDraft] = useState<CreateStoreDraft>(createDefaultStoreDraft);
-  const mascotDataUrl = useFileDataUrl(storeDraft.logoFile);
+  const uploadedLogoDataUrl = useFileDataUrl(storeDraft.logoFile);
+  const mascotDataUrl = uploadedLogoDataUrl ?? storeDraft.logoUrl;
   const [fontLoadVersion, setFontLoadVersion] = useState(0);
   const resolvedArtworkText = storeDraft.artworkText;
 
@@ -451,6 +453,24 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
 
     const hasRequiredProducts = Object.values(productSelections).some((selection) => selection.isRequired);
 
+    const artworkTemplates = (draft.artworkTemplates ?? []).reduce<ArtworkTemplatesDraft>((templates, template) => {
+      templates[template.artworkTemplateId] = {
+        selectedArtTemplateId: template.artworkTemplateId,
+        isSelected: template.isSelected,
+        artworkAdjustments: Object.fromEntries(
+          template.adjustments.map((adjustment) => [
+            adjustment.elementId,
+            {
+              x: adjustment.x,
+              y: adjustment.y,
+            },
+          ]),
+        ),
+      };
+
+      return templates;
+    }, {});
+
     setStoreId(draft._id);
     setCurrentStepState(draft.currentStep);
     setFurthestStepReached(draft.currentStep);
@@ -468,7 +488,7 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
       logoFile: null,
       logoStorageId: draft.logoStorageId ?? null,
       logoUrl: draft.logoUrl ?? null,
-      artworkTemplates: {},
+      artworkTemplates,
 
       uploadedArtworks: (draft.uploadedArtworks ?? []).map((artwork) => ({
         id: artwork.id,
@@ -479,7 +499,7 @@ export function CreateStoreProvider({ children }: CreateStoreProviderProps) {
         isSelected: artwork.isSelected,
       })),
 
-      artworkText: {
+      artworkText: draft.artworkText ?? {
         organizationName: "YOUR TEAM",
         mascotName: "Mascot",
         yearEstablished: new Date().getFullYear().toString(),
