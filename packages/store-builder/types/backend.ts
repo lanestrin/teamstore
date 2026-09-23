@@ -209,29 +209,8 @@ export interface SaveDraftResult {
 }
 
 export interface FinalizeStoreInput {
-  storeId?: StoreBuilderId;
-
-  organizationName: string;
-  organizationSlug: string;
-
-  activity: StoreActivity;
-  storeType: StoreType;
-
-  storeName: string;
-  storeSlug: string;
-  storeDescription?: string;
-
-  logoStorageId?: StoreBuilderStorageId;
-  uploadedArtworks: StoreBuilderUploadedArtworkInput[];
+  storeId: StoreBuilderId;
   artworkSnapshots: StoreBuilderArtworkSnapshotInput[];
-
-  primaryColor: string;
-  secondaryColor: string;
-
-  currentStep: number;
-
-  productSelections: StoreBuilderProductSelectionInput[];
-  requiredItemsDeadline?: string;
 }
 
 export interface FinalizeStoreResult {

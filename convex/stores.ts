@@ -6,30 +6,9 @@ import { mutation, query } from "./_generated/server";
 
 import { decorateProductCardFromData, getProductColorsForProduct, getVariantsForProduct } from "./lib/productCatalog";
 
-import { replaceStoreProductSelections, resolveStoreProductSelections, storeProductSelection } from "./lib/storeProducts";
+import { replaceStoreProductSelections, resolveStoreProductSelections } from "./lib/storeProducts";
 
 import { isValidSlug, normalizeOptionalText, normalizeRequiredItemsDeadline, validateColor, validateSlug } from "./lib/storeValidation";
-
-const storeActivity = v.union(
-  v.literal("basketball"),
-  v.literal("baseball"),
-  v.literal("football"),
-  v.literal("soccer"),
-  v.literal("softball"),
-  v.literal("volleyball"),
-  v.literal("wrestling"),
-  v.literal("spirit-wear"),
-  v.literal("other"),
-);
-
-const storeType = v.union(v.literal("fanwear"), v.literal("uniform"), v.literal("hybrid"));
-
-const storeUploadedArtwork = v.object({
-  id: v.string(),
-  fileName: v.string(),
-  storageId: v.id("_storage"),
-  isSelected: v.boolean(),
-});
 
 const storeArtworkSnapshot = v.object({
   artworkTemplateId: v.string(),
@@ -94,45 +73,16 @@ export const archiveStore = mutation({
 });
 
 /**
- * Finalizes either:
+ * Finalizes an existing persisted draft.
  *
- * - an existing saved draft, or
- * - a store that has not previously been saved.
- *
- * The mutation creates or reuses the organization,
- * activates the store, persists selected products,
- * and snapshots the finalized template artwork used
- * by the published storefront.
+ * Convex is the source of truth for all wizard-owned state. The client
+ * supplies only the draft ID plus the browser-derived artwork snapshots
+ * needed by the published storefront.
  */
 export const finalizeStore = mutation({
   args: {
-    storeId: v.optional(v.id("stores")),
-
-    organizationName: v.string(),
-    organizationSlug: v.string(),
-
-    activity: storeActivity,
-    storeType,
-
-    storeName: v.string(),
-    storeSlug: v.string(),
-    storeDescription: v.optional(v.string()),
-
-    logoStorageId: v.optional(v.id("_storage")),
-    bannerStorageId: v.optional(v.id("_storage")),
-
-    uploadedArtworks: v.optional(v.array(storeUploadedArtwork)),
-
-    artworkSnapshots: v.optional(v.array(storeArtworkSnapshot)),
-
-    primaryColor: v.string(),
-    secondaryColor: v.string(),
-
-    currentStep: v.number(),
-
-    productSelections: v.array(storeProductSelection),
-
-    requiredItemsDeadline: v.optional(v.string()),
+    storeId: v.id("stores"),
+    artworkSnapshots: v.array(storeArtworkSnapshot),
   },
 
   handler: async (ctx, args) => {
@@ -142,15 +92,22 @@ export const finalizeStore = mutation({
       throw new ConvexError("You must be signed in to create a store.");
     }
 
-    const organizationName = args.organizationName.trim();
+    const existingDraft = await ctx.db.get(args.storeId);
 
-    const organizationSlug = args.organizationSlug.trim().toLowerCase();
+    if (existingDraft === null || existingDraft.createdBy !== userId || existingDraft.status !== "draft") {
+      throw new ConvexError("Draft store not found.");
+    }
 
-    const storeName = args.storeName.trim();
+    if (existingDraft.currentStep < 5) {
+      throw new ConvexError("Complete store setup before publishing.");
+    }
 
-    const storeSlug = args.storeSlug.trim().toLowerCase();
+    const organizationName = existingDraft.organizationName?.trim() ?? "";
+    const organizationSlug = existingDraft.organizationSlug?.trim().toLowerCase() ?? "";
 
-    const storeDescription = normalizeOptionalText(args.storeDescription);
+    const storeName = existingDraft.name?.trim() ?? "";
+    const storeSlug = existingDraft.slug?.trim().toLowerCase() ?? "";
+    const storeDescription = normalizeOptionalText(existingDraft.description);
 
     if (!organizationName) {
       throw new ConvexError("Organization name is required.");
@@ -168,55 +125,70 @@ export const finalizeStore = mutation({
       throw new ConvexError("Store slug is required.");
     }
 
-    validateSlug(organizationSlug, "Organization slug");
-
-    validateSlug(storeSlug, "Store slug");
-
-    validateColor(args.primaryColor, "Primary color");
-
-    validateColor(args.secondaryColor, "Secondary color");
-
-    if (args.storeId) {
-      const existingDraft = await ctx.db.get(args.storeId);
-
-      if (existingDraft === null || existingDraft.createdBy !== userId || existingDraft.status !== "draft") {
-        throw new ConvexError("Draft store not found.");
-      }
+    if (!existingDraft.activity) {
+      throw new ConvexError("Store activity is required.");
     }
 
-    const selectedProducts = await resolveStoreProductSelections(ctx, args.productSelections);
+    if (!existingDraft.storeType) {
+      throw new ConvexError("Store type is required.");
+    }
+
+    if (!existingDraft.primaryColor || !existingDraft.secondaryColor) {
+      throw new ConvexError("Store colors are required.");
+    }
+
+    validateSlug(organizationSlug, "Organization slug");
+    validateSlug(storeSlug, "Store slug");
+
+    validateColor(existingDraft.primaryColor, "Primary color");
+    validateColor(existingDraft.secondaryColor, "Secondary color");
+
+    const persistedStoreProducts = await ctx.db
+      .query("storeProducts")
+      .withIndex("by_store", (q) => q.eq("storeId", args.storeId))
+      .collect();
+
+    const productSelections = [...persistedStoreProducts]
+      .sort((first, second) => first.sortOrder - second.sortOrder)
+      .map((storeProduct) => ({
+        productId: storeProduct.productId,
+        colorKey: storeProduct.colorKey,
+        artworkTemplateId: storeProduct.artworkTemplateId,
+        artworkPlacement: storeProduct.artworkPlacement,
+        isRequired: storeProduct.isRequired,
+      }));
+
+    const selectedProducts = await resolveStoreProductSelections(ctx, productSelections);
 
     const hasRequiredProducts = selectedProducts.some((selection) => selection.isRequired);
 
-    const requiredItemsDeadline = hasRequiredProducts ? normalizeRequiredItemsDeadline(args.requiredItemsDeadline) : undefined;
+    const requiredItemsDeadline = hasRequiredProducts ? normalizeRequiredItemsDeadline(existingDraft.requiredItemsDeadline) : undefined;
 
     if (hasRequiredProducts && !requiredItemsDeadline) {
       throw new ConvexError("A required items deadline is required when the store has required products.");
     }
 
-    const artworkSnapshots = args.artworkSnapshots?.map((snapshot) => ({
+    const artworkSnapshots = args.artworkSnapshots.map((snapshot) => ({
       artworkTemplateId: snapshot.artworkTemplateId.trim(),
       svg: snapshot.svg,
     }));
 
-    if (artworkSnapshots) {
-      const seenArtworkIds = new Set<string>();
+    const seenArtworkIds = new Set<string>();
 
-      for (const snapshot of artworkSnapshots) {
-        if (!snapshot.artworkTemplateId) {
-          throw new ConvexError("Artwork template ID is required.");
-        }
-
-        if (!snapshot.svg.trim()) {
-          throw new ConvexError(`Artwork ${snapshot.artworkTemplateId} is empty.`);
-        }
-
-        if (seenArtworkIds.has(snapshot.artworkTemplateId)) {
-          throw new ConvexError(`Artwork ${snapshot.artworkTemplateId} was provided more than once.`);
-        }
-
-        seenArtworkIds.add(snapshot.artworkTemplateId);
+    for (const snapshot of artworkSnapshots) {
+      if (!snapshot.artworkTemplateId) {
+        throw new ConvexError("Artwork template ID is required.");
       }
+
+      if (!snapshot.svg.trim()) {
+        throw new ConvexError(`Artwork ${snapshot.artworkTemplateId} is empty.`);
+      }
+
+      if (seenArtworkIds.has(snapshot.artworkTemplateId)) {
+        throw new ConvexError(`Artwork ${snapshot.artworkTemplateId} was provided more than once.`);
+      }
+
+      seenArtworkIds.add(snapshot.artworkTemplateId);
     }
 
     const existingOrganization = await ctx.db
@@ -267,105 +239,36 @@ export const finalizeStore = mutation({
       });
     }
 
-    if (args.storeId) {
-      await ctx.db.patch(args.storeId, {
-        organizationId,
-        organizationName,
-        organizationSlug,
-
-        activity: args.activity,
-        storeType: args.storeType,
-
-        name: storeName,
-        slug: storeSlug,
-        description: storeDescription,
-
-        ...(args.logoStorageId !== undefined
-          ? {
-              logoStorageId: args.logoStorageId,
-            }
-          : {}),
-
-        ...(args.bannerStorageId !== undefined
-          ? {
-              bannerStorageId: args.bannerStorageId,
-            }
-          : {}),
-
-        ...(args.uploadedArtworks !== undefined
-          ? {
-              uploadedArtworks: args.uploadedArtworks,
-            }
-          : {}),
-
-        ...(artworkSnapshots !== undefined
-          ? {
-              artworkSnapshots,
-            }
-          : {}),
-
-        primaryColor: args.primaryColor,
-
-        secondaryColor: args.secondaryColor,
-
-        requiredItemsDeadline,
-
-        currentStep: args.currentStep,
-
-        status: "active",
-        updatedAt: now,
-      });
-
-      await replaceStoreProductSelections(ctx, args.storeId, selectedProducts, now);
-
-      return {
-        organizationId,
-        storeId: args.storeId,
-        organizationSlug,
-        storeSlug,
-      };
-    }
-
-    const storeId = await ctx.db.insert("stores", {
+    await ctx.db.patch(args.storeId, {
       organizationId,
-      createdBy: userId,
-
       organizationName,
       organizationSlug,
 
-      activity: args.activity,
-      storeType: args.storeType,
+      activity: existingDraft.activity,
+      storeType: existingDraft.storeType,
 
       name: storeName,
       slug: storeSlug,
       description: storeDescription,
 
-      logoStorageId: args.logoStorageId,
-
-      bannerStorageId: args.bannerStorageId,
-
-      uploadedArtworks: args.uploadedArtworks,
-
       artworkSnapshots,
 
-      primaryColor: args.primaryColor,
-
-      secondaryColor: args.secondaryColor,
+      primaryColor: existingDraft.primaryColor,
+      secondaryColor: existingDraft.secondaryColor,
 
       requiredItemsDeadline,
 
-      currentStep: args.currentStep,
+      currentStep: Math.max(existingDraft.currentStep, 5),
 
       status: "active",
-      createdAt: now,
       updatedAt: now,
     });
 
-    await replaceStoreProductSelections(ctx, storeId, selectedProducts, now);
+    await replaceStoreProductSelections(ctx, args.storeId, selectedProducts, now);
 
     return {
       organizationId,
-      storeId,
+      storeId: args.storeId,
       organizationSlug,
       storeSlug,
     };
