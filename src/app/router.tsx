@@ -60,6 +60,19 @@ export const router = createBrowserRouter([
             ),
           },
           {
+            path: "account/stores/:storeId/edit",
+            element: (
+              <ProtectedRoute>
+                <ComingSoon
+                  title="Store Editing Is Coming Soon"
+                  description="Editing published stores is currently in development. You can still view or archive this store from your account."
+                  actionLabel="Return to Account"
+                  actionHref="/account"
+                />
+              </ProtectedRoute>
+            ),
+          },
+          {
             path: "login",
             element: <LoginPage />,
           },

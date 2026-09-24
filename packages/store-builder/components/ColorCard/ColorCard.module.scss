@@ -60,8 +60,13 @@
 }
 
 .selected {
-  border-color: var(--tsb-color-primary, #b91c1c);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--tsb-color-primary, #b91c1c) 12%, transparent);
+  border-color: var(--tsb-color-success, #16a34a);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--tsb-color-success, #16a34a) 12%, transparent);
+}
+
+
+.selected:hover {
+  border-color: var(--tsb-color-success, #16a34a);
 }
 
 .check {
@@ -76,7 +81,7 @@
   width: 24px;
   height: 24px;
 
-  background: var(--tsb-color-primary, #b91c1c);
+  background: var(--tsb-color-success, #16a34a);
   border: 2px solid var(--tsb-color-surface, #ffffff);
   border-radius: var(--tsb-radius-round, 9999px);
 
@@ -99,10 +104,6 @@
   .card:hover {
     border-color: var(--_tsb-color-border-strong, #9ca3af);
     transform: translateY(-1px);
-  }
-
-  .selected:hover {
-    border-color: var(--tsb-color-primary, #b91c1c);
   }
 }
 
