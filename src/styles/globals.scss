@@ -24,6 +24,35 @@ body,
   min-height: 100%;
 }
 
+
+// ======================================================
+// Runtime design tokens
+// ======================================================
+// Expose the Sass design tokens as CSS custom properties so components
+// rendered through React portals (for example, modals mounted on <body>)
+// can use the same TeamStore theme values.
+
+:root {
+  --_tsb-color-surface: #{$page-background};
+  --_tsb-color-surface-alt: #{$page-background-alt};
+  --_tsb-color-text: #{$text-primary};
+  --_tsb-color-text-muted: #{$text-muted};
+  --_tsb-color-border: #{$border-light};
+  --_tsb-color-primary: #{$brand-red};
+
+  --_tsb-space-1: #{$space-1};
+  --_tsb-space-2: #{$space-2};
+  --_tsb-space-3: #{$space-3};
+  --_tsb-space-4: #{$space-4};
+  --_tsb-space-5: #{$space-5};
+  --_tsb-space-6: #{$space-6};
+
+  --_tsb-radius-md: #{$radius-md};
+  --_tsb-radius-lg: #{$radius-lg};
+
+  --_tsb-transition-fast: #{$transition-fast};
+}
+
 // ======================================================
 // Global
 // ======================================================

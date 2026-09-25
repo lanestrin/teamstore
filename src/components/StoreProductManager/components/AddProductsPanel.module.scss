@@ -1,0 +1,76 @@
+@use "@/styles" as *;
+
+.editor {
+    display: flex;
+    flex-direction: column;
+    gap: $space-6;
+}
+
+.deadline {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: $space-5;
+    padding: $space-5;
+    border: 1px solid $border-light;
+    border-radius: $radius-lg;
+    background: $page-background-alt;
+
+    h3,
+    p {
+        margin: 0;
+    }
+
+    p {
+        margin-top: $space-1;
+        color: $text-secondary;
+    }
+
+    label {
+        display: flex;
+        flex-direction: column;
+        gap: $space-2;
+        font-weight: $font-semibold;
+    }
+
+    input {
+        min-height: 42px;
+        padding: 0 $space-3;
+        border: 1px solid $border-light;
+        border-radius: $radius-md;
+        background: $card-background;
+        color: $text-primary;
+    }
+}
+
+.validationMessage,
+.fallbackNotice {
+    margin: 0;
+    padding: $space-3 $space-4;
+    border: 1px solid $border-light;
+    border-radius: $radius-md;
+    color: $text-secondary;
+}
+
+.emptyState {
+    display: grid;
+    place-items: center;
+    gap: $space-2;
+    padding: $space-8;
+    text-align: center;
+    color: $text-secondary;
+
+    h3,
+    p {
+        margin: 0;
+    }
+}
+
+@media (max-width: 700px) {
+    .deadline {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}
+
+

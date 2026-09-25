@@ -1,0 +1,137 @@
+@use "@/styles" as *;
+
+.row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-5;
+    padding: $space-3;
+    border: 1px solid $border-light;
+    border-radius: $radius-lg;
+    background: $card-background;
+}
+
+.productInfo {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    gap: $space-4;
+}
+
+.productImage {
+    display: grid;
+    place-items: center;
+    flex: 0 0 72px;
+    width: 72px;
+    height: 72px;
+    overflow: hidden;
+    border: 1px solid $border-light;
+    border-radius: $radius-md;
+    background: $page-background-alt;
+
+    img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+}
+
+.productImage > [data-garment-artwork-preview] {
+    width: 100%;
+    height: 100%;
+}
+
+.colorFallback {
+    display: block;
+    width: 32px;
+    height: 32px;
+    border-radius: 3px;
+}
+
+.productCopy {
+    min-width: 0;
+
+    h4,
+    p {
+        margin: 0;
+    }
+
+    h4 {
+        color: $text-primary;
+    }
+
+    p {
+        margin-top: $space-1;
+        color: $text-secondary;
+    }
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+}
+
+.requiredBadge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 0 $space-3;
+    border: 1px solid $border-light;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: $font-semibold;
+}
+
+.requiredBadge {
+    background: $page-background-alt;
+    color: $text-primary;
+}
+
+
+.editAction,
+.removeAction {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: $space-2;
+    min-height: 38px;
+    padding: 0 $space-3;
+    border: 1px solid $border-light;
+    border-radius: $radius-md;
+    background: $card-background;
+    font-weight: $font-semibold;
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
+    }
+}
+
+.editAction {
+    color: $text-primary;
+}
+
+.removeAction {
+    color: $brand-red;
+}
+
+@media (max-width: 760px) {
+    .row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .actions {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .editAction,
+    .removeAction {
+        flex: 1;
+    }
+}
+
+

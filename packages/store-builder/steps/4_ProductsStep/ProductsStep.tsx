@@ -8,7 +8,7 @@ import { useCreateStore } from "../../context/CreateStoreContext";
 import { useStoreBuilderAdapter } from "../../context/StoreBuilderAdapterContext";
 import { useStoreCreationProducts } from "../../hooks/useStoreCreationProducts";
 
-import ProductEditorModal from "../../components/ProductEditorModal/ProductEditorModal";
+import ProductArtworkEditorModal from "../../components/ProductArtworkEditorModal/ProductArtworkEditorModal";
 import ProductSuggestionControls from "../../components/ProductSuggestionControls/ProductSuggestionControls";
 import ProductSuggestionSection from "../../components/ProductSuggestionSection/ProductSuggestionSection";
 import { createDefaultProductArtworkPlacement, type ProductArtworkPlacement } from "../../lib/decorationProfiles";
@@ -721,7 +721,7 @@ export default function SelectProductsStep() {
       </WizardLayout>
 
       {editingSuggestion && editingProduct && (
-        <ProductEditorModal
+        <ProductArtworkEditorModal
           suggestion={editingSuggestion}
           color={getEffectiveColor(editingSuggestion)}
           artworkSvg={artworkPreviewSvgsById[editingSuggestion.artworkTemplateId] ?? null}

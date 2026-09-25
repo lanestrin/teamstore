@@ -1,0 +1,185 @@
+@use "@/styles" as *;
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: grid;
+    place-items: center;
+    padding: $space-6;
+    background: rgb(15 23 42 / 72%);
+}
+
+.modal {
+    width: min(760px, 100%);
+    max-height: calc(100vh - 48px);
+    overflow: hidden;
+    background: $card-background;
+    border: 1px solid $border-light;
+    border-radius: $radius-lg;
+    box-shadow: 0 24px 80px rgb(0 0 0 / 30%);
+}
+
+.header,
+.footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-4;
+    padding: $space-5 $space-6;
+}
+
+.header {
+    border-bottom: 1px solid $border-light;
+
+    h2,
+    p {
+        margin: 0;
+    }
+
+    h2 {
+        color: $text-primary;
+    }
+
+    p {
+        margin-top: $space-1;
+        color: $text-secondary;
+    }
+}
+
+.close {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid $border-light;
+    border-radius: 999px;
+    background: $card-background;
+    color: $text-primary;
+}
+
+.body {
+    padding: $space-6;
+    overflow-y: auto;
+    max-height: min(560px, calc(100vh - 210px));
+}
+
+.instructions {
+    margin: 0 0 $space-5;
+    color: $text-secondary;
+}
+
+.colorGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: $space-3;
+}
+
+.colorOption {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr) 28px;
+    align-items: center;
+    gap: $space-3;
+    min-width: 0;
+    padding: $space-3;
+    text-align: left;
+    border: 1px solid $border-light;
+    border-radius: $radius-md;
+    background: $card-background;
+    color: $text-primary;
+
+    &[data-selected="true"] {
+        border-color: $brand-red;
+    }
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+}
+
+.thumbnail {
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    overflow: hidden;
+    border-radius: $radius-md;
+    background: $page-background-alt;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+}
+
+.colorCopy {
+    display: grid;
+    min-width: 0;
+    gap: $space-1;
+
+    strong,
+    span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    span {
+        color: $text-secondary;
+        font-size: 0.8rem;
+    }
+}
+
+.selectedIcon {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 999px;
+    background: $brand-red;
+    color: #fff;
+}
+
+.footer {
+    justify-content: flex-end;
+    border-top: 1px solid $border-light;
+}
+
+.cancelButton,
+.saveButton {
+    min-height: 40px;
+    padding: 0 $space-4;
+    border-radius: $radius-md;
+    font-weight: $font-semibold;
+}
+
+.cancelButton {
+    border: 1px solid $border-light;
+    background: $card-background;
+    color: $text-primary;
+}
+
+.saveButton {
+    border: 1px solid $brand-red;
+    background: $brand-red;
+    color: #fff;
+}
+
+@media (max-width: 640px) {
+    .overlay {
+        padding: $space-3;
+    }
+
+    .colorGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .header,
+    .footer,
+    .body {
+        padding: $space-4;
+    }
+}

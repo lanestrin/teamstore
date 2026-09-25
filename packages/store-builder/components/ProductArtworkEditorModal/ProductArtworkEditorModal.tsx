@@ -6,7 +6,7 @@ import { createDefaultProductArtworkPlacement, getDecorationProfile, type Produc
 import type { GeneratedSuggestion, ProductColorOption } from "../../types/productStep";
 import GarmentArtworkPreview from "../GarmentArtworkPreview/GarmentArtworkPreview";
 
-import styles from "./ProductEditorModal.module.scss";
+import styles from "./ProductArtworkEditorModal.module.scss";
 
 const MOVE_STEP = 0.02;
 const RESIZE_STEP = 0.05;
@@ -22,11 +22,20 @@ const FOCUSABLE_SELECTOR = [
   '[tabindex]:not([tabindex="-1"])',
 ].join(",");
 
-interface ProductEditorModalProps {
+interface ProductArtworkOption {
+  id: string;
+  label: string;
+}
+
+interface ProductArtworkEditorModalProps {
+  title?: string;
   suggestion: GeneratedSuggestion;
   color: ProductColorOption;
   artworkSvg: string | null;
+  artworkOptions?: readonly ProductArtworkOption[];
+  selectedArtworkId?: string;
   placement: ProductArtworkPlacement;
+  onArtworkChange?: (artworkTemplateId: string) => void;
   onPlacementChange: (placement: ProductArtworkPlacement) => void;
   onSave: () => void;
   onClose: () => void;
@@ -61,15 +70,19 @@ function getFocusableElements(container: HTMLElement): HTMLElement[] {
   );
 }
 
-export default function ProductEditorModal({
+export default function ProductArtworkEditorModal({
+  title = "Edit Artwork",
   suggestion,
   color,
   artworkSvg,
+  artworkOptions,
+  selectedArtworkId,
   placement,
+  onArtworkChange,
   onPlacementChange,
   onSave,
   onClose,
-}: ProductEditorModalProps) {
+}: ProductArtworkEditorModalProps) {
   const modalRef = useRef<HTMLElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -296,17 +309,17 @@ export default function ProductEditorModal({
         className={styles.modal}
         role="dialog"
         aria-modal="true"
-        aria-labelledby="product-editor-title"
-        aria-describedby="product-editor-description"
+        aria-labelledby="product-artwork-editor-title"
+        aria-describedby="product-artwork-editor-description"
       >
         <header className={styles.header}>
           <div>
-            <h2 id="product-editor-title">Edit Product</h2>
+            <h2 id="product-artwork-editor-title">{title}</h2>
 
             <p>{productName}</p>
           </div>
 
-          <button ref={closeButtonRef} type="button" className={styles.close} aria-label="Close product editor" onClick={onClose}>
+          <button ref={closeButtonRef} type="button" className={styles.close} aria-label="Close artwork editor" onClick={onClose}>
             <LuX aria-hidden="true" />
           </button>
         </header>
@@ -345,10 +358,28 @@ export default function ProductEditorModal({
 
           <aside className={styles.sidebar} aria-label="Artwork placement controls">
             <div className={styles.sidebarHeading}>
-              <h3>Artwork Placement</h3>
+              <h3>Artwork</h3>
 
-              <p id="product-editor-description">Move and resize the artwork for this garment only.</p>
+              <p id="product-artwork-editor-description">Choose the artwork, then position and size it for this garment.</p>
             </div>
+
+            {artworkOptions && artworkOptions.length > 0 && selectedArtworkId && onArtworkChange && (
+              <div className={styles.controlGroup}>
+                <label className={styles.artworkSelector}>
+                  <span className={styles.controlLabel}>Artwork</span>
+                  <select
+                    value={selectedArtworkId}
+                    onChange={(event) => onArtworkChange(event.currentTarget.value)}
+                  >
+                    {artworkOptions.map((artwork) => (
+                      <option key={artwork.id} value={artwork.id}>
+                        {artwork.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+            )}
 
             <div className={styles.controlGroup}>
               <span className={styles.controlLabel}>Position</span>
