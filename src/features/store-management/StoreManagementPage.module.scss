@@ -1,0 +1,342 @@
+@use "@/styles" as *;
+
+.page {
+    min-height: 100vh;
+    padding: $space-8 0;
+    background: $page-background;
+}
+
+.container {
+    @include page-container;
+
+    display: flex;
+    flex-direction: column;
+    gap: $space-5;
+}
+
+/* ========================================
+   Top Actions
+======================================== */
+
+.topActions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-4;
+}
+
+.backAction {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-2;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font-weight: $font-semibold;
+    color: $text-secondary;
+
+    &:hover {
+        color: $text-primary;
+    }
+}
+
+.primaryAction,
+.secondaryAction {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: $space-2;
+    padding: $space-3 $space-4;
+    font-weight: $font-semibold;
+    white-space: nowrap;
+
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
+        transform: none;
+    }
+}
+
+.primaryAction {
+    @include button-red;
+}
+
+.secondaryAction {
+    @include button-white;
+}
+
+/* ========================================
+   Store Header
+======================================== */
+
+.storeHeader {
+    @include card;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-8;
+    padding: $space-6;
+}
+
+.identity {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    gap: $space-4;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 72px;
+    width: 72px;
+    height: 72px;
+    overflow: hidden;
+    border: 1px solid $gray-200;
+    border-radius: $radius-lg;
+    background: $gray-50;
+
+    img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        padding: $space-2;
+        object-fit: contain;
+    }
+
+    span {
+        font-family: $font-heading;
+        font-size: 1.75rem;
+        font-weight: $font-bold;
+        color: $text-primary;
+    }
+}
+
+.identityContent {
+    min-width: 0;
+}
+
+.titleRow {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: $space-3;
+
+    h1 {
+        margin: 0;
+        font-family: $font-heading;
+        font-size: 1.75rem;
+        line-height: 1.15;
+        color: $text-primary;
+    }
+}
+
+.activeStatus {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: $space-1 $space-3;
+    border: 1px solid $success-border;
+    border-radius: $radius-pill;
+    background: $success-background;
+    font-size: 0.75rem;
+    font-weight: $font-bold;
+    line-height: 1.2;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: $success;
+}
+
+.storeUrl {
+    margin: $space-2 0 0;
+    font-size: 0.875rem;
+    color: $text-muted;
+    overflow-wrap: anywhere;
+}
+
+.storeFacts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(100px, 1fr));
+    gap: $space-6;
+    margin: 0;
+
+    div {
+        min-width: 0;
+    }
+
+    dt {
+        margin-bottom: $space-1;
+        font-size: 0.75rem;
+        font-weight: $font-bold;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: $text-muted;
+    }
+
+    dd {
+        margin: 0;
+        font-weight: $font-semibold;
+        line-height: $line-height-body;
+        color: $text-primary;
+    }
+}
+
+/* ========================================
+   Tabs
+======================================== */
+
+.tabs {
+    display: flex;
+    align-items: flex-end;
+    gap: $space-1;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    border-bottom: 1px solid $gray-200;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.tab {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: $space-2;
+    flex-shrink: 0;
+    padding: $space-4 $space-4;
+    border: 0;
+    background: transparent;
+    font-weight: $font-semibold;
+    color: $text-secondary;
+
+    &::after {
+        position: absolute;
+        right: $space-4;
+        bottom: -1px;
+        left: $space-4;
+        height: 2px;
+        background: transparent;
+        content: "";
+    }
+
+    &:disabled {
+        cursor: default;
+        opacity: 0.6;
+    }
+}
+
+.activeTab {
+    color: $text-primary;
+
+    &::after {
+        background: $brand-red;
+    }
+}
+
+.comingSoon {
+    padding: 0.15rem 0.4rem;
+    border-radius: $radius-pill;
+    background: $gray-100;
+    font-size: 0.625rem;
+    font-weight: $font-bold;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: $text-muted;
+}
+
+/* ========================================
+   Content
+======================================== */
+
+.content {
+    @include card;
+
+    display: flex;
+    flex-direction: column;
+    gap: $space-6;
+    padding: $space-6;
+}
+
+.stateCard {
+    @include card;
+
+    max-width: 600px;
+    margin: $space-8 auto;
+    padding: $space-8;
+    text-align: center;
+
+    h1 {
+        margin: 0 0 $space-3;
+        color: $text-primary;
+    }
+
+    p {
+        margin: 0 0 $space-5;
+        line-height: $line-height-body;
+        color: $text-secondary;
+    }
+}
+
+/* ========================================
+   Responsive
+======================================== */
+
+@media (max-width: 992px) {
+    .storeHeader {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .storeFacts {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .page {
+        padding: $space-6 0;
+    }
+
+    .topActions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .secondaryAction {
+        align-self: flex-start;
+    }
+
+    .storeHeader,
+    .content {
+        padding: $space-5;
+    }
+
+    .identity {
+        align-items: flex-start;
+    }
+
+    .logo {
+        flex-basis: 60px;
+        width: 60px;
+        height: 60px;
+    }
+
+    .titleRow {
+        align-items: flex-start;
+        flex-direction: column;
+
+        h1 {
+            font-size: 1.5rem;
+        }
+    }
+
+    .storeFacts {
+        grid-template-columns: 1fr;
+        gap: $space-4;
+    }
+
+}

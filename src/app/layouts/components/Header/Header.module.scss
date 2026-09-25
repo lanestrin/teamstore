@@ -26,9 +26,8 @@
 
 .logoImage {
   display: block;
-  width: auto;
-  max-width: 230px;
-  height: 40px;
+  max-width: 240px;
+  height: auto;
   transition: transform $transition-base;
 }
 
@@ -236,8 +235,8 @@
   }
 
   .logoImage {
-    max-width: 210px;
-    height: 34px;
+    max-width: 240px;
+    height: auto;
   }
 }
 
@@ -247,8 +246,8 @@
   }
 
   .logoImage {
-    max-width: 180px;
-    height: 32px;
+    max-width: 200px;
+    height: auto;
   }
 
   .cart {

@@ -14,6 +14,7 @@ import StoresPage from "../features/stores/StoresPage";
 import TeamStoreCreateStoreLayout from "../integrations/store-builder/TeamStoreCreateStoreLayout";
 import MainLayout from "./layouts/MainLayout";
 import RootLayout from "./layouts/RootLayout";
+import StoreManagementPage from "../features/store-management/StoreManagementPage";
 
 export const router = createBrowserRouter([
   {
@@ -63,12 +64,7 @@ export const router = createBrowserRouter([
             path: "account/stores/:storeId/edit",
             element: (
               <ProtectedRoute>
-                <ComingSoon
-                  title="Store Editing Is Coming Soon"
-                  description="Editing published stores is currently in development. You can still view or archive this store from your account."
-                  actionLabel="Return to Account"
-                  actionHref="/account"
-                />
+                <StoreManagementPage />
               </ProtectedRoute>
             ),
           },

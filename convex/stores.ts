@@ -3,12 +3,49 @@ import { ConvexError, v } from "convex/values";
 
 import type { Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
-
-import { decorateProductCardFromData, getProductColorsForProduct, getVariantsForProduct } from "./lib/productCatalog";
-
-import { replaceStoreProductSelections, resolveStoreProductSelections } from "./lib/storeProducts";
-
+import {
+  decorateProductCardFromData,
+  getProductColorsForProduct,
+  getResolvedProductImages,
+  getVariantsForProduct,
+} from "./lib/productCatalog";
+import {
+  prepareDraftStoreProductSelections,
+  replaceStoreProductSelections,
+  resolveStoreProductSelections,
+  storeProductSelection,
+} from "./lib/storeProducts";
 import { isValidSlug, normalizeOptionalText, normalizeRequiredItemsDeadline, validateColor, validateSlug } from "./lib/storeValidation";
+
+const storeActivity = v.union(
+  v.literal("basketball"),
+  v.literal("baseball"),
+  v.literal("football"),
+  v.literal("soccer"),
+  v.literal("softball"),
+  v.literal("volleyball"),
+  v.literal("wrestling"),
+  v.literal("spirit-wear"),
+  v.literal("other"),
+);
+
+const productColorFamily = v.union(
+  v.literal("black"),
+  v.literal("white"),
+  v.literal("gray"),
+  v.literal("silver"),
+  v.literal("red"),
+  v.literal("orange"),
+  v.literal("yellow"),
+  v.literal("green"),
+  v.literal("blue"),
+  v.literal("navy"),
+  v.literal("purple"),
+  v.literal("pink"),
+  v.literal("brown"),
+  v.literal("multicolor"),
+  v.literal("unknown"),
+);
 
 const storeArtworkSnapshot = v.object({
   artworkTemplateId: v.string(),
@@ -33,6 +70,208 @@ export const listMyActiveStores = query({
       .withIndex("by_creator_status", (q) => q.eq("createdBy", userId).eq("status", "active"))
       .order("desc")
       .collect();
+  },
+});
+
+/**
+ * Returns an active store owned by the signed-in user for store management.
+ *
+ * This query is intentionally separate from the public storefront query.
+ * Management access requires ownership and exposes the persisted configuration
+ * needed by the store editor.
+ */
+export const getStoreForManagement = query({
+  args: {
+    storeId: v.id("stores"),
+  },
+
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+
+    if (userId === null) {
+      throw new ConvexError("You must be signed in to manage a store.");
+    }
+
+    const store = await ctx.db.get(args.storeId);
+
+    if (store === null || store.createdBy !== userId || store.status !== "active") {
+      return null;
+    }
+
+    const storeProducts = await ctx.db
+      .query("storeProducts")
+      .withIndex("by_store", (q) => q.eq("storeId", store._id))
+      .collect();
+
+    const orderedStoreProducts = [...storeProducts].sort((first, second) => first.sortOrder - second.sortOrder);
+
+    const products = await Promise.all(
+      orderedStoreProducts.map(async (storeProduct) => {
+        const product = await ctx.db.get(storeProduct.productId);
+
+        if (product === null) {
+          return null;
+        }
+
+        const [variants, productColors, productImages] = await Promise.all([
+          getVariantsForProduct(ctx, product._id),
+          getProductColorsForProduct(ctx, product._id),
+          getResolvedProductImages(ctx, product._id),
+        ]);
+
+        const decoratedProduct = await decorateProductCardFromData(ctx, product, variants, productColors, "front");
+
+        const selectedColor = decoratedProduct.colorOptions.find((color) => color.colorKey === storeProduct.colorKey);
+
+        const selectedColorImages = productImages
+          .filter((image) => image.colorKey === storeProduct.colorKey)
+          .map((image) => ({
+            imageUrl: image.imageUrl,
+            view: image.view,
+            sortOrder: image.sortOrder,
+            decorationPreviewBounds: image.decorationPreviewBounds,
+          }));
+
+        return {
+          storeProductId: storeProduct._id,
+          productId: product._id,
+
+          name: product.name,
+          slug: product.slug,
+          category: product.category,
+          status: product.status,
+
+          color: selectedColor?.color ?? storeProduct.colorKey,
+          colorKey: storeProduct.colorKey,
+
+          imageUrl: selectedColor?.imageUrl,
+          primaryHexValue: selectedColor?.primaryHexValue,
+
+          images: selectedColorImages,
+
+          artworkTemplateId: storeProduct.artworkTemplateId,
+          artworkPlacement: storeProduct.artworkPlacement,
+
+          isRequired: storeProduct.isRequired,
+          sortOrder: storeProduct.sortOrder,
+        };
+      }),
+    );
+
+    const uploadedArtworks = await Promise.all(
+      (store.uploadedArtworks ?? []).map(async (artwork) => ({
+        ...artwork,
+        storageUrl: await ctx.storage.getUrl(artwork.storageId),
+      })),
+    );
+
+    return {
+      storeId: store._id,
+
+      organizationName: store.organizationName,
+      organizationSlug: store.organizationSlug,
+
+      name: store.name,
+      slug: store.slug,
+      description: store.description,
+
+      activity: store.activity,
+      storeType: store.storeType,
+
+      primaryColor: store.primaryColor,
+      secondaryColor: store.secondaryColor,
+
+      productColorFamily: store.productColorFamily,
+      productSecondaryColorFamily: store.productSecondaryColorFamily,
+      productGenerationSeed: store.productGenerationSeed,
+      requiredItemsDeadline: store.requiredItemsDeadline,
+
+      artworkText: store.artworkText,
+      artworkTemplates: store.artworkTemplates ?? [],
+      artworkSnapshots: store.artworkSnapshots ?? [],
+      uploadedArtworks,
+
+      logoUrl: store.logoStorageId ? await ctx.storage.getUrl(store.logoStorageId) : null,
+
+      status: store.status,
+      createdAt: store.createdAt,
+      updatedAt: store.updatedAt,
+
+      products: products.flatMap((product) => (product === null ? [] : [product])),
+    };
+  },
+});
+
+/**
+ * Replaces the product configuration for an active store owned by
+ * the signed-in user.
+ *
+ * Published-store management uses the same normalized storeProducts
+ * representation as store creation, but remains a separate mutation
+ * from the draft workflow.
+ */
+export const updateStoreProducts = mutation({
+  args: {
+    storeId: v.id("stores"),
+
+    activity: storeActivity,
+    productColorFamily,
+    productSecondaryColorFamily: v.optional(productColorFamily),
+    productGenerationSeed: v.number(),
+
+    productSelections: v.array(storeProductSelection),
+    requiredItemsDeadline: v.optional(v.string()),
+  },
+
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+
+    if (userId === null) {
+      throw new ConvexError("You must be signed in to manage a store.");
+    }
+
+    const existingStore = await ctx.db.get(args.storeId);
+
+    if (existingStore === null || existingStore.createdBy !== userId || existingStore.status !== "active") {
+      throw new ConvexError("Active store not found.");
+    }
+
+    if (!Number.isInteger(args.productGenerationSeed) || args.productGenerationSeed < 1) {
+      throw new ConvexError("Product generation seed must be a positive whole number.");
+    }
+
+    const productSelections = prepareDraftStoreProductSelections(args.productSelections);
+
+    if (productSelections.length === 0) {
+      throw new ConvexError("An active store must contain at least one product.");
+    }
+
+    const hasRequiredProducts = productSelections.some((selection) => selection.isRequired);
+
+    const requiredItemsDeadline = hasRequiredProducts ? normalizeRequiredItemsDeadline(args.requiredItemsDeadline) : undefined;
+
+    if (hasRequiredProducts && !requiredItemsDeadline) {
+      throw new ConvexError("A required items deadline is required when the store has required products.");
+    }
+
+    const now = Date.now();
+
+    await ctx.db.patch(args.storeId, {
+      activity: args.activity,
+      productColorFamily: args.productColorFamily,
+      productSecondaryColorFamily: args.productSecondaryColorFamily,
+      productGenerationSeed: args.productGenerationSeed,
+      requiredItemsDeadline,
+      updatedAt: now,
+    });
+
+    await replaceStoreProductSelections(ctx, args.storeId, productSelections, now);
+
+    return {
+      storeId: args.storeId,
+      productCount: productSelections.length,
+      updatedAt: now,
+    };
   },
 });
 
@@ -159,9 +398,7 @@ export const finalizeStore = mutation({
       }));
 
     const selectedProducts = await resolveStoreProductSelections(ctx, productSelections);
-
     const hasRequiredProducts = selectedProducts.some((selection) => selection.isRequired);
-
     const requiredItemsDeadline = hasRequiredProducts ? normalizeRequiredItemsDeadline(existingDraft.requiredItemsDeadline) : undefined;
 
     if (hasRequiredProducts && !requiredItemsDeadline) {
@@ -243,23 +480,16 @@ export const finalizeStore = mutation({
       organizationId,
       organizationName,
       organizationSlug,
-
       activity: existingDraft.activity,
       storeType: existingDraft.storeType,
-
       name: storeName,
       slug: storeSlug,
       description: storeDescription,
-
       artworkSnapshots,
-
       primaryColor: existingDraft.primaryColor,
       secondaryColor: existingDraft.secondaryColor,
-
       requiredItemsDeadline,
-
       currentStep: Math.max(existingDraft.currentStep, 5),
-
       status: "active",
       updatedAt: now,
     });
@@ -290,7 +520,6 @@ export const checkStoreSlugAvailability = query({
 
   handler: async (ctx, args) => {
     const organizationSlug = args.organizationSlug.trim().toLowerCase();
-
     const storeSlug = args.storeSlug.trim().toLowerCase();
 
     if (!organizationSlug || !storeSlug || !isValidSlug(organizationSlug) || !isValidSlug(storeSlug)) {
@@ -320,7 +549,6 @@ export const listActiveStores = query({
 
   handler: async (ctx) => {
     const stores = await ctx.db.query("stores").collect();
-
     const activeStores = stores.filter((store) => store.status === "active" && store.organizationSlug && store.slug);
 
     return await Promise.all(
@@ -332,17 +560,11 @@ export const listActiveStores = query({
 
         return {
           id: store._id,
-
           organizationSlug: store.organizationSlug!,
-
           slug: store.slug!,
-
           name: store.name ?? store.organizationName ?? "Team Store",
-
           activity: store.activity,
-
           productCount: storeProducts.length,
-
           logoUrl: store.logoStorageId ? await ctx.storage.getUrl(store.logoStorageId) : null,
         };
       }),
@@ -365,7 +587,6 @@ export const getActiveStoreBySlugs = query({
 
   handler: async (ctx, args) => {
     const organizationSlug = args.organizationSlug.trim().toLowerCase();
-
     const storeSlug = args.storeSlug.trim().toLowerCase();
 
     if (!organizationSlug || !storeSlug || !isValidSlug(organizationSlug) || !isValidSlug(storeSlug)) {
@@ -400,12 +621,10 @@ export const getActiveStoreBySlugs = query({
 
         const [variants, productColors] = await Promise.all([
           getVariantsForProduct(ctx, product._id),
-
           getProductColorsForProduct(ctx, product._id),
         ]);
 
         const decoratedProduct = await decorateProductCardFromData(ctx, product, variants, productColors, "front");
-
         const selectedColor = decoratedProduct.colorOptions.find((color) => color.colorKey === storeProduct.colorKey);
 
         if (!selectedColor) {
@@ -414,35 +633,21 @@ export const getActiveStoreBySlugs = query({
 
         return {
           storeProductId: storeProduct._id,
-
           productId: product._id,
-
           name: product.name,
           slug: product.slug,
           category: product.category,
-
           color: selectedColor.color,
-
           colorKey: storeProduct.colorKey,
-
           imageUrl: selectedColor.imageUrl,
-
           primaryHexValue: selectedColor.primaryHexValue,
-
           tone: selectedColor.tone,
-
           decorationPreviewBounds: selectedColor.decorationPreviewBounds,
-
           minPriceInCents: decoratedProduct.minPriceInCents,
-
           maxPriceInCents: decoratedProduct.maxPriceInCents,
-
           artworkTemplateId: storeProduct.artworkTemplateId,
-
           artworkPlacement: storeProduct.artworkPlacement,
-
           isRequired: storeProduct.isRequired,
-
           sortOrder: storeProduct.sortOrder,
         };
       }),
@@ -460,9 +665,7 @@ export const getActiveStoreBySlugs = query({
       ...store,
 
       uploadedArtworks,
-
       logoUrl: store.logoStorageId ? await ctx.storage.getUrl(store.logoStorageId) : null,
-
       products: products.flatMap((product) => (product ? [product] : [])),
     };
   },

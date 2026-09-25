@@ -1,0 +1,75 @@
+@use "@/styles" as *;
+
+.sections {
+    display: flex;
+    flex-direction: column;
+    gap: $space-7;
+}
+
+.group {
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+}
+
+.groupHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-4;
+
+    h3,
+    p {
+        margin: 0;
+    }
+
+    h3 {
+        font-size: 1rem;
+        color: $text-primary;
+    }
+
+    p {
+        margin-top: $space-1;
+        color: $text-secondary;
+    }
+}
+
+.countBadge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    padding: 0 $space-2;
+    border-radius: 999px;
+    background: $page-background-alt;
+    font-weight: $font-semibold;
+    color: $text-primary;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+}
+
+.emptyState {
+    display: grid;
+    place-items: center;
+    gap: $space-2;
+    padding: $space-8;
+    text-align: center;
+    color: $text-secondary;
+
+    svg {
+        width: 32px;
+        height: 32px;
+    }
+
+    h3,
+    p {
+        margin: 0;
+    }
+}
+
+
