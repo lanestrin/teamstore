@@ -22,7 +22,7 @@ export function getImageContentType(bytes: Uint8Array): string {
 
   // This identifies the format only. SVG displayed inline is sanitized separately.
   const prefix = new TextDecoder().decode(bytes.slice(0, 4096));
-  if (/^\s*(?:<\?xml[^?]*\?>\s*)?(?:<!--[\s\S]*?-->\s*)*<svg(?:\s|>)/i.test(prefix)) {
+  if (/^\s*(?:<\?xml[^?]*\?>\s*)?(?:<!--(?:[^-]|-(?!->))*-->\s*)*<svg(?:\s|>)/i.test(prefix)) {
     return "image/svg+xml";
   }
 
