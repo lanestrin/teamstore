@@ -175,10 +175,32 @@ export default defineSchema({
 
   users: defineTable({
     name: v.optional(v.string()),
+    image: v.optional(v.string()),
     email: v.optional(v.string()),
+    emailVerificationTime: v.optional(v.number()),
+    phone: v.optional(v.string()),
+    phoneVerificationTime: v.optional(v.number()),
     isAnonymous: v.optional(v.boolean()),
     isPlatformAdmin: v.optional(v.boolean()),
-  }).index("by_email", ["email"]),
+  })
+    .index("email", ["email"])
+    .index("phone", ["phone"]),
+
+  storeFiles: defineTable({
+    ownerId: v.id("users"),
+    storageId: v.optional(v.id("_storage")),
+    size: v.number(),
+    storeIds: v.array(v.id("stores")),
+    createdAt: v.number(),
+  })
+    .index("by_owner", ["ownerId"])
+    .index("by_storage", ["storageId"]),
+
+  storeUploadLimits: defineTable({
+    userId: v.id("users"),
+    windowStart: v.number(),
+    count: v.number(),
+  }).index("by_user", ["userId"]),
 
   organizations: defineTable({
     name: v.string(),

@@ -2,6 +2,8 @@ import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError, v } from "convex/values";
 
 import { mutation, query } from "./_generated/server";
+import { releaseStoreFiles, syncStoreFiles } from "./lib/storeFiles";
+import { assertStoreAddressAvailable } from "./lib/storeAddress";
 
 import { prepareDraftStoreProductSelections, replaceStoreProductSelections, storeProductSelection } from "./lib/storeProducts";
 import {
@@ -137,6 +139,8 @@ export const saveOrganizationStep = mutation({
         throw new ConvexError("Draft store not found.");
       }
 
+      await assertStoreAddressAvailable(ctx, organizationSlug, storeSlug, args.storeId);
+
       await ctx.db.patch(args.storeId, {
         organizationName,
         organizationSlug,
@@ -162,11 +166,15 @@ export const saveOrganizationStep = mutation({
         updatedAt: now,
       });
 
+      await syncStoreFiles(ctx, userId, args.storeId, existingStore);
+
       return {
         storeId: args.storeId,
         created: false,
       };
     }
+
+    await assertStoreAddressAvailable(ctx, organizationSlug, storeSlug);
 
     const storeId = await ctx.db.insert("stores", {
       createdBy: userId,
@@ -188,6 +196,8 @@ export const saveOrganizationStep = mutation({
       createdAt: now,
       updatedAt: now,
     });
+
+    await syncStoreFiles(ctx, userId, storeId, null);
 
     return {
       storeId,
@@ -289,6 +299,8 @@ export const saveArtworkStep = mutation({
       currentStep: Math.max(existingStore.currentStep, 4),
       updatedAt: Date.now(),
     });
+
+    await syncStoreFiles(ctx, userId, args.storeId, existingStore);
   },
 });
 
@@ -469,6 +481,8 @@ export const saveDraft = mutation({
 
       await replaceStoreProductSelections(ctx, args.storeId, productSelections, now);
 
+      await syncStoreFiles(ctx, userId, args.storeId, existingStore);
+
       return {
         storeId: args.storeId,
         created: false,
@@ -499,6 +513,8 @@ export const saveDraft = mutation({
     });
 
     await replaceStoreProductSelections(ctx, storeId, productSelections, now);
+
+    await syncStoreFiles(ctx, userId, storeId, null);
 
     return {
       storeId,
@@ -614,6 +630,7 @@ export const deleteDraft = mutation({
       await ctx.db.delete(storeProduct._id);
     }
 
+    await releaseStoreFiles(ctx, store);
     await ctx.db.delete(args.storeId);
 
     return {

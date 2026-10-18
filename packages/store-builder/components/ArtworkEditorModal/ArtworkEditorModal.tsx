@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { LuArrowDown, LuArrowLeft, LuArrowRight, LuArrowUp, LuRotateCcw, LuX } from "react-icons/lu";
 
 import type { ArtTemplateEditableElement } from "../../assets/art-templates";
+import { sanitizeArtworkSvg } from "../../lib/sanitizeArtworkSvg";
 
 import styles from "./ArtworkEditorModal.module.scss";
 import {
@@ -432,7 +433,7 @@ function ArtworkEditorModalContent({ svg, editableElements, adjustments, onCance
               dragStateRef.current = null;
             }}
             dangerouslySetInnerHTML={{
-              __html: editorSvg,
+              __html: sanitizeArtworkSvg(editorSvg),
             }}
           />
 

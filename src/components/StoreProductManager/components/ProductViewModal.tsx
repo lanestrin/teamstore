@@ -19,10 +19,6 @@ export default function ProductViewModal({ product, preview, onClose }: ProductV
   const selectedImage = images[selectedIndex] ?? null;
 
   useEffect(() => {
-    setSelectedIndex(0);
-  }, [product.storeProductId]);
-
-  useEffect(() => {
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     closeButtonRef.current?.focus();
