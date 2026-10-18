@@ -150,6 +150,15 @@ export interface SaveOrganizationStepResult {
   created: boolean;
 }
 
+export type StoreAddressAvailability =
+  { available: true } | { available: false; field: "organizationSlug" | "storeSlug"; message: string; suggestedOrganizationSlug?: string };
+
+export interface CheckStoreAddressInput {
+  organizationSlug: string;
+  storeSlug: string;
+  excludeStoreId?: StoreBuilderId;
+}
+
 export interface SaveColorsStepInput {
   storeId: StoreBuilderId;
   primaryColor: string;
@@ -228,6 +237,8 @@ export interface StoreBuilderAdapter {
   loadDraft(storeId: StoreBuilderId): Promise<LoadedStoreDraft | null>;
 
   uploadFile(file: File): Promise<StoreBuilderStorageId>;
+
+  checkStoreAddress(input: CheckStoreAddressInput): Promise<StoreAddressAvailability>;
 
   saveOrganizationStep(input: SaveOrganizationStepInput): Promise<SaveOrganizationStepResult>;
 

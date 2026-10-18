@@ -15,6 +15,9 @@ import type * as docs_selectedProductsData from "../docs/selectedProductsData.js
 import type * as http from "../http.js";
 import type * as lib_authz from "../lib/authz.js";
 import type * as lib_productCatalog from "../lib/productCatalog.js";
+import type * as lib_resetCode from "../lib/resetCode.js";
+import type * as lib_storeAddress from "../lib/storeAddress.js";
+import type * as lib_storeFiles from "../lib/storeFiles.js";
 import type * as lib_storeProducts from "../lib/storeProducts.js";
 import type * as lib_storeValidation from "../lib/storeValidation.js";
 import type * as productVariants from "../productVariants.js";
@@ -40,6 +43,9 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   "lib/authz": typeof lib_authz;
   "lib/productCatalog": typeof lib_productCatalog;
+  "lib/resetCode": typeof lib_resetCode;
+  "lib/storeAddress": typeof lib_storeAddress;
+  "lib/storeFiles": typeof lib_storeFiles;
   "lib/storeProducts": typeof lib_storeProducts;
   "lib/storeValidation": typeof lib_storeValidation;
   productVariants: typeof productVariants;

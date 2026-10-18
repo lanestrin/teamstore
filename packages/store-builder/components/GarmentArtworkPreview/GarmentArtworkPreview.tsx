@@ -10,6 +10,7 @@ import {
 
 import styles from "./GarmentArtworkPreview.module.scss";
 import { applyArtworkContrast, type ArtworkSurfaceTone } from "../../lib/artworkContrast";
+import { sanitizeArtworkSvg } from "../../lib/sanitizeArtworkSvg";
 
 interface GarmentArtworkPreviewProps {
   garmentImageUrl: string;
@@ -39,7 +40,7 @@ export default function GarmentArtworkPreview({
   const previewBounds = decorationPreviewBounds ?? decorationProfile.previewBounds;
 
   const renderedArtworkSvg = useMemo(
-    () => (artworkSvg ? applyArtworkContrast(artworkSvg, surfaceHex, surfaceTone) : undefined),
+    () => (artworkSvg ? sanitizeArtworkSvg(applyArtworkContrast(artworkSvg, surfaceHex, surfaceTone)) : undefined),
     [artworkSvg, surfaceHex, surfaceTone],
   );
 

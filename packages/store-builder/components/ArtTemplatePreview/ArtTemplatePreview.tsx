@@ -1,4 +1,5 @@
 import type { ArtTemplate } from "../../assets/art-templates";
+import { sanitizeArtworkSvg } from "../../lib/sanitizeArtworkSvg";
 import styles from "./ArtTemplatePreview.module.scss";
 
 interface ArtTemplatePreviewProps {
@@ -13,7 +14,7 @@ export default function ArtTemplatePreview({ template, svg }: ArtTemplatePreview
       role="img"
       aria-label={`${template.name} artwork preview`}
       dangerouslySetInnerHTML={{
-        __html: svg ?? template.svg,
+        __html: sanitizeArtworkSvg(svg ?? template.svg),
       }}
     />
   );

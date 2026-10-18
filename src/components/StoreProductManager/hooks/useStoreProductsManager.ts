@@ -551,8 +551,8 @@ export function useStoreProductsManager(store: ManagedStore) {
       return;
     }
 
-    const { [oldCombinationKey]: _oldSelection, ...remainingSelections } =
-      editorState.selections;
+    const remainingSelections = { ...editorState.selections };
+    delete remainingSelections[oldCombinationKey];
 
     const nextState: EditableProductState = {
       ...editorState,
@@ -639,8 +639,8 @@ export function useStoreProductsManager(store: ManagedStore) {
       return;
     }
 
-    const { [oldCombinationKey]: _oldSelection, ...remainingSelections } =
-      editorState.selections;
+    const remainingSelections = { ...editorState.selections };
+    delete remainingSelections[oldCombinationKey];
 
     const nextState: EditableProductState = {
       ...editorState,
@@ -699,7 +699,8 @@ export function useStoreProductsManager(store: ManagedStore) {
       colorKey,
       artworkTemplateId,
     );
-    const { [combinationKey]: _removed, ...remainingSelections } = editorState.selections;
+    const remainingSelections = { ...editorState.selections };
+    delete remainingSelections[combinationKey];
     await persistState({ ...editorState, selections: remainingSelections });
   }
 
