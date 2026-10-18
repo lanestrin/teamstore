@@ -1,5 +1,6 @@
 import { Email } from "@convex-dev/auth/providers/Email";
 import { Resend } from "resend";
+import { generateResetCode } from "./lib/resetCode";
 
 declare const process: {
   env: Record<string, string | undefined>;
@@ -11,7 +12,7 @@ export const ResendOTPPasswordReset = Email({
   maxAge: 60 * 15,
 
   async generateVerificationToken() {
-    return Math.floor(100000 + Math.random() * 900000).toString();
+    return generateResetCode();
   },
 
   async sendVerificationRequest({ identifier: email, provider, token }) {

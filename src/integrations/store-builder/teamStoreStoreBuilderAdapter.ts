@@ -1,4 +1,6 @@
 import type { ConvexReactClient } from "convex/react";
+import { ConvexError } from "convex/values";
+import { StoreAddressError } from "../../../packages/store-builder/lib/storeAddressError";
 
 import type {
   SaveArtworkStepInput,
@@ -21,6 +23,29 @@ function toProductId(value: string): Id<"products"> {
 
 function toStorageId(value: string): Id<"_storage"> {
   return value as Id<"_storage">;
+}
+
+function rethrowStoreAddressError(error: unknown): never {
+  if (error instanceof ConvexError) {
+    const data = error.data;
+    if (
+      data &&
+      typeof data === "object" &&
+      "code" in data &&
+      data.code === "STORE_ADDRESS_UNAVAILABLE" &&
+      "field" in data &&
+      (data.field === "organizationSlug" || data.field === "storeSlug") &&
+      "message" in data &&
+      typeof data.message === "string"
+    ) {
+      const suggestion =
+        "suggestedOrganizationSlug" in data && typeof data.suggestedOrganizationSlug === "string"
+          ? data.suggestedOrganizationSlug
+          : undefined;
+      throw new StoreAddressError(data.message, data.field, suggestion);
+    }
+  }
+  throw error;
 }
 
 function toUploadedArtworks(uploadedArtworks: StoreBuilderUploadedArtworkInput[]) {
@@ -100,44 +125,39 @@ export function createTeamStoreStoreBuilderAdapter(client: ConvexReactClient): S
     },
 
     async uploadFile(file) {
-      const uploadUrl = await client.mutation(api.storeUploads.generateUploadUrl, {});
-
-      const response = await fetch(uploadUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": file.type || "application/octet-stream",
-        },
-        body: file,
-      });
-
-      if (!response.ok) {
-        throw new Error(`Could not upload ${file.name}.`);
+      if (file.size === 0 || file.size > 5 * 1024 * 1024) {
+        throw new Error(`${file.name} must be between 1 byte and 5 MB.`);
       }
+      return await client.action(api.storeUploads.uploadFile, { bytes: await file.arrayBuffer() });
+    },
 
-      const result = (await response.json()) as {
-        storageId: Id<"_storage">;
-      };
-
-      return result.storageId;
+    async checkStoreAddress(input) {
+      return await client.query(api.stores.checkStoreSlugAvailability, {
+        organizationSlug: input.organizationSlug,
+        storeSlug: input.storeSlug,
+        excludeStoreId: input.excludeStoreId ? toStoreId(input.excludeStoreId) : undefined,
+      });
     },
 
     async saveOrganizationStep(input) {
-      const result = await client.mutation(api.storeDrafts.saveOrganizationStep, {
-        storeId: input.storeId ? toStoreId(input.storeId) : undefined,
+      const result = await client
+        .mutation(api.storeDrafts.saveOrganizationStep, {
+          storeId: input.storeId ? toStoreId(input.storeId) : undefined,
 
-        organizationName: input.organizationName,
-        organizationSlug: input.organizationSlug,
+          organizationName: input.organizationName,
+          organizationSlug: input.organizationSlug,
 
-        activity: input.activity,
-        storeType: input.storeType,
+          activity: input.activity,
+          storeType: input.storeType,
 
-        storeName: input.storeName,
-        storeSlug: input.storeSlug,
+          storeName: input.storeName,
+          storeSlug: input.storeSlug,
 
-        logoStorageId: input.logoStorageId ? toStorageId(input.logoStorageId) : undefined,
+          logoStorageId: input.logoStorageId ? toStorageId(input.logoStorageId) : undefined,
 
-        removeLogo: input.removeLogo,
-      });
+          removeLogo: input.removeLogo,
+        })
+        .catch(rethrowStoreAddressError);
 
       return {
         storeId: result.storeId,
@@ -213,10 +233,12 @@ export function createTeamStoreStoreBuilderAdapter(client: ConvexReactClient): S
     },
 
     async finalizeStore(input) {
-      const result = await client.mutation(api.stores.finalizeStore, {
-        storeId: toStoreId(input.storeId),
-        artworkSnapshots: input.artworkSnapshots,
-      });
+      const result = await client
+        .mutation(api.stores.finalizeStore, {
+          storeId: toStoreId(input.storeId),
+          artworkSnapshots: input.artworkSnapshots,
+        })
+        .catch(rethrowStoreAddressError);
 
       return {
         organizationSlug: result.organizationSlug,

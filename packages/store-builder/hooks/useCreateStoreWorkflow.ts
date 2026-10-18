@@ -5,6 +5,7 @@ import { useCreateStore } from "../context/CreateStoreContext";
 import type { ProductSelectionsDraft } from "../context/CreateStoreContext.types";
 import type { FinalizeStoreResult } from "../types/backend";
 import { useStoreBuilderAdapter } from "../context/StoreBuilderAdapterContext";
+import { StoreAddressError } from "../lib/storeAddressError";
 
 function normalizeOptionalText(value: string): string | undefined {
   const normalizedValue = value.trim();
@@ -62,6 +63,7 @@ export function useCreateStoreWorkflow({ draftId, onDraftIdChange, onExit, onCom
     storeId,
     setStoreId,
     currentStep,
+    setCurrentStep,
     primaryColor,
     secondaryColor,
     storeDraft,
@@ -256,7 +258,12 @@ export function useCreateStoreWorkflow({ draftId, onDraftIdChange, onExit, onCom
       resetStoreDraft();
       onComplete(result);
     } catch (error) {
-      window.alert(getErrorMessage(error));
+      if (error instanceof StoreAddressError) {
+        setCurrentStep(1);
+        window.alert(`${error.message} Please update the Organization step. Your products and artwork are saved.`);
+      } else {
+        window.alert(getErrorMessage(error));
+      }
     } finally {
       setIsFinalizing(false);
     }

@@ -296,10 +296,26 @@ export const listActiveByProduct = query({
       return [];
     }
 
-    return await ctx.db
+    const variants = await ctx.db
       .query("productVariants")
       .withIndex("by_product_status", (q) => q.eq("productId", args.productId).eq("status", "active"))
       .collect();
+
+    // Supplier costs and provider identifiers are restricted to management APIs.
+    return variants.map((variant) => ({
+      _id: variant._id,
+      _creationTime: variant._creationTime,
+      productId: variant.productId,
+      sku: variant.sku,
+      color: variant.color,
+      colorKey: variant.colorKey,
+      size: variant.size,
+      directPriceInCents: variant.directPriceInCents,
+      compareAtPriceInCents: variant.compareAtPriceInCents,
+      currency: variant.currency,
+      availability: variant.availability,
+      status: variant.status,
+    }));
   },
 });
 

@@ -172,6 +172,10 @@
 }
 
 @media (max-width: 768px) {
+  .wide {
+    width: 100%;
+  }
+
   .page {
     gap: var(--_tsb-space-6);
     padding: var(--_tsb-space-6);

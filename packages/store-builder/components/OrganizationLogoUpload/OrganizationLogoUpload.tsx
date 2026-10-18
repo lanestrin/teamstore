@@ -51,7 +51,9 @@ export default function OrganizationLogoUpload({
 
   return (
     <div className={formStyles.field}>
-      <label htmlFor="logo">Organization Logo</label>
+      <label htmlFor="logo">
+        Organization Logo <span className={styles.optional}>(optional)</span>
+      </label>
 
       <input
         ref={inputRef}

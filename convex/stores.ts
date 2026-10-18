@@ -3,6 +3,7 @@ import { ConvexError, v } from "convex/values";
 
 import type { Id } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
+import { assertStoreAddressAvailable, getStoreAddressAvailability } from "./lib/storeAddress";
 import {
   decorateProductCardFromData,
   getProductColorsForProduct,
@@ -379,6 +380,8 @@ export const finalizeStore = mutation({
     validateSlug(organizationSlug, "Organization slug");
     validateSlug(storeSlug, "Store slug");
 
+    await assertStoreAddressAvailable(ctx, organizationSlug, storeSlug, args.storeId);
+
     validateColor(existingDraft.primaryColor, "Primary color");
     validateColor(existingDraft.secondaryColor, "Secondary color");
 
@@ -433,31 +436,11 @@ export const finalizeStore = mutation({
       .withIndex("by_slug", (q) => q.eq("slug", organizationSlug))
       .unique();
 
-    const storesWithSlug = await ctx.db
-      .query("stores")
-      .withIndex("by_organization_slug_and_slug", (q) => q.eq("organizationSlug", organizationSlug).eq("slug", storeSlug))
-      .collect();
-
-    const conflictingStore = storesWithSlug.find((store) => store.status === "active" && store._id !== args.storeId);
-
-    if (conflictingStore) {
-      throw new ConvexError("That store URL is already in use for this organization.");
-    }
-
     const now = Date.now();
 
     let organizationId: Id<"organizations">;
 
     if (existingOrganization) {
-      const membership = await ctx.db
-        .query("organizationMembers")
-        .withIndex("by_organization_user", (q) => q.eq("organizationId", existingOrganization._id).eq("userId", userId))
-        .unique();
-
-      if (membership === null || (membership.role !== "owner" && membership.role !== "admin")) {
-        throw new ConvexError("That organization URL is already in use.");
-      }
-
       organizationId = existingOrganization._id;
     } else {
       organizationId = await ctx.db.insert("organizations", {
@@ -524,20 +507,13 @@ export const checkStoreSlugAvailability = query({
 
     if (!organizationSlug || !storeSlug || !isValidSlug(organizationSlug) || !isValidSlug(storeSlug)) {
       return {
-        available: false,
+        available: false as const,
+        field: !isValidSlug(organizationSlug) ? "organizationSlug" as const : "storeSlug" as const,
+        message: "Use lowercase letters, numbers, and single hyphens in the URL.",
       };
     }
 
-    const matchingStores = await ctx.db
-      .query("stores")
-      .withIndex("by_organization_slug_and_slug", (q) => q.eq("organizationSlug", organizationSlug).eq("slug", storeSlug))
-      .collect();
-
-    const conflictingStore = matchingStores.find((store) => store.status === "active" && store._id !== args.excludeStoreId);
-
-    return {
-      available: conflictingStore === undefined,
-    };
+    return await getStoreAddressAvailability(ctx, organizationSlug, storeSlug, args.excludeStoreId);
   },
 });
 

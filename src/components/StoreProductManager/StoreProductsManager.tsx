@@ -89,6 +89,7 @@ export default function StoreProductsManager({ store }: StoreProductsManagerProp
 
       {viewingProduct && (
         <ProductViewModal
+          key={viewingProduct.storeProductId}
           product={viewingProduct}
           preview={manager.getManagedProductPreview(viewingProduct)}
           onClose={() => setViewingProduct(null)}

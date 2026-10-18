@@ -23,6 +23,11 @@
     background-color var(--_tsb-transition-base);
 }
 
+.optional {
+  color: var(--_tsb-color-text-muted);
+  font-weight: 400;
+}
+
 .uploadWithLogo {
   align-items: stretch;
 
@@ -121,10 +126,12 @@
  * Keep the native file input keyboard-accessible while
  * visually hiding it.
  */
-.fileInput {
+.fileInput[type="file"] {
   position: absolute;
 
   width: 1px;
+  max-width: 1px;
+  min-height: 0;
   height: 1px;
   padding: 0;
   margin: -1px;
