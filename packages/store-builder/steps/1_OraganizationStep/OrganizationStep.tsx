@@ -13,6 +13,8 @@ import OrganizationLogoUpload from "../../components/OrganizationLogoUpload/Orga
 import { isValidStoreType } from "../../components/StoreTypeSelector/storeTypeOptions";
 import StoreTypeSelector from "../../components/StoreTypeSelector/StoreTypeSelector";
 import { useStoreBuilderAdapter } from "../../context/StoreBuilderAdapterContext";
+import { StoreAddressError } from "../../lib/storeAddressError";
+import { getUpdatedAddressSlug, validateAddressSlug } from "./organizationStep.validation";
 
 const STORE_ACTIVITIES = [
   { value: "basketball", label: "Basketball" },
@@ -37,19 +39,13 @@ const MAX_LOGO_SIZE = 5 * 1024 * 1024;
 
 type ValidationErrors = {
   organizationName?: string;
+  organizationSlug?: string;
   activity?: string;
   storeType?: string;
   storeName?: string;
+  storeSlug?: string;
   logo?: string;
 };
-
-function slugify(value: string): string {
-  return value
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
 
 function validateOrganizationName(value: string): string | undefined {
   return value.trim() ? undefined : "Enter your organization name.";
@@ -101,11 +97,15 @@ export default function OrganizationStep({ onDraftIdChange }: OrganizationStepPr
 
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [showErrorSummary, setShowErrorSummary] = useState(false);
+  const [suggestedOrganizationSlug, setSuggestedOrganizationSlug] = useState<string | null>(null);
+  const [isEditingLink, setIsEditingLink] = useState(false);
 
   const organizationNameRef = useRef<HTMLInputElement>(null);
+  const organizationSlugRef = useRef<HTMLInputElement>(null);
   const activityRef = useRef<HTMLSelectElement>(null);
   const storeTypeRef = useRef<HTMLInputElement>(null);
   const storeNameRef = useRef<HTMLInputElement>(null);
+  const storeSlugRef = useRef<HTMLInputElement>(null);
   const logoRef = useRef<HTMLInputElement>(null);
 
   const logoPreviewUrl = useFileDataUrl(storeDraft.logoFile);
@@ -120,8 +120,10 @@ export default function OrganizationStep({ onDraftIdChange }: OrganizationStepPr
   function handleOrganizationNameChange(value: string) {
     updateStoreDraft({
       organizationName: value,
-      organizationSlug: slugify(value),
+      organizationSlug: getUpdatedAddressSlug(storeDraft.organizationSlug, storeDraft.organizationName, value),
     });
+    setFieldError("organizationSlug");
+    setSuggestedOrganizationSlug(null);
 
     if (errors.organizationName) {
       setFieldError("organizationName", validateOrganizationName(value));
@@ -183,8 +185,9 @@ export default function OrganizationStep({ onDraftIdChange }: OrganizationStepPr
   function handleStoreNameChange(value: string) {
     updateStoreDraft({
       storeName: value,
-      storeSlug: slugify(value),
+      storeSlug: getUpdatedAddressSlug(storeDraft.storeSlug, storeDraft.storeName, value),
     });
+    setFieldError("storeSlug");
 
     if (errors.storeName) {
       setFieldError("storeName", validateStoreName(value));
@@ -212,19 +215,19 @@ export default function OrganizationStep({ onDraftIdChange }: OrganizationStepPr
   function focusAndScrollToField(field: keyof ValidationErrors) {
     const fieldRefs = {
       organizationName: organizationNameRef,
+      organizationSlug: organizationSlugRef,
       activity: activityRef,
       storeType: storeTypeRef,
       storeName: storeNameRef,
+      storeSlug: storeSlugRef,
       logo: logoRef,
     };
 
-    const element = fieldRefs[field].current;
-
-    if (!element) {
-      return;
-    }
+    if (field === "organizationSlug" || field === "storeSlug") setIsEditingLink(true);
 
     requestAnimationFrame(() => {
+      const element = fieldRefs[field].current;
+      if (!element) return;
       element.focus({ preventScroll: true });
       element.scrollIntoView({
         behavior: "smooth",
@@ -234,7 +237,15 @@ export default function OrganizationStep({ onDraftIdChange }: OrganizationStepPr
   }
 
   function scrollToFirstError(nextErrors: ValidationErrors) {
-    const fieldOrder: Array<keyof ValidationErrors> = ["organizationName", "activity", "storeType", "storeName", "logo"];
+    const fieldOrder: Array<keyof ValidationErrors> = [
+      "organizationName",
+      "activity",
+      "storeType",
+      "storeName",
+      "organizationSlug",
+      "storeSlug",
+      "logo",
+    ];
     const firstErrorField = fieldOrder.find((field) => nextErrors[field]);
 
     if (firstErrorField) {
@@ -263,9 +274,11 @@ export default function OrganizationStep({ onDraftIdChange }: OrganizationStepPr
 
     const nextErrors: ValidationErrors = {
       organizationName: validateOrganizationName(storeDraft.organizationName),
+      organizationSlug: validateAddressSlug(storeDraft.organizationSlug),
       activity: validateActivity(storeDraft.activity),
       storeType: validateStoreType(storeDraft.storeType),
       storeName: validateStoreName(storeDraft.storeName),
+      storeSlug: validateAddressSlug(storeDraft.storeSlug),
       logo: validateLogo(storeDraft.logoFile),
     };
 
@@ -284,9 +297,23 @@ export default function OrganizationStep({ onDraftIdChange }: OrganizationStepPr
     }
 
     setShowErrorSummary(false);
+    setSuggestedOrganizationSlug(null);
     setIsSavingOrganization(true);
 
     try {
+      const address = await adapter.checkStoreAddress({
+        organizationSlug: storeDraft.organizationSlug,
+        storeSlug: storeDraft.storeSlug,
+        excludeStoreId: storeId ?? undefined,
+      });
+      if (!address.available) {
+        setFieldError(address.field, address.message);
+        setSuggestedOrganizationSlug(address.suggestedOrganizationSlug ?? null);
+        setShowErrorSummary(true);
+        focusAndScrollToField(address.field);
+        return;
+      }
+
       const logoStorageId = logoWasRemoved ? null : await uploadLogo();
 
       const result = await adapter.saveOrganizationStep({
@@ -318,6 +345,13 @@ export default function OrganizationStep({ onDraftIdChange }: OrganizationStepPr
       onDraftIdChange(result.storeId);
       setCurrentStep(2);
     } catch (error) {
+      if (error instanceof StoreAddressError) {
+        setFieldError(error.field, error.message);
+        setSuggestedOrganizationSlug(error.suggestedOrganizationSlug ?? null);
+        setShowErrorSummary(true);
+        focusAndScrollToField(error.field);
+        return;
+      }
       const message = error instanceof Error ? error.message : "Could not save your organization.";
 
       window.alert(message);
@@ -348,6 +382,16 @@ export default function OrganizationStep({ onDraftIdChange }: OrganizationStepPr
       message: errors.storeName,
     },
     {
+      field: "organizationSlug" as const,
+      label: "Organization link",
+      message: errors.organizationSlug,
+    },
+    {
+      field: "storeSlug" as const,
+      label: "Store link",
+      message: errors.storeSlug,
+    },
+    {
       field: "logo" as const,
       label: "Organization Logo",
       message: errors.logo,
@@ -358,7 +402,7 @@ export default function OrganizationStep({ onDraftIdChange }: OrganizationStepPr
     <WizardLayout
       step={currentStep}
       title="Tell us about your organization"
-      description="This information will help us create your store and customize your experience."
+      description="Add your organization details, name your store, and choose what to sell."
       onNext={() => void handleNext()}
       nextLabel={isSavingOrganization ? "Saving..." : "Next"}
       nextDisabled={isSavingOrganization}
@@ -368,8 +412,12 @@ export default function OrganizationStep({ onDraftIdChange }: OrganizationStepPr
       <div className={styles.form}>
         {showErrorSummary && <FormErrorSummary errors={errorSummaryItems} onErrorClick={focusAndScrollToField} />}
 
-        <div className={styles.formGrid}>
-          <div className={styles.formColumn}>
+        <div className={styles.detailsGrid}>
+          <section className={styles.section} aria-labelledby="organization-details-title">
+            <header className={styles.sectionHeader}>
+              <h2 id="organization-details-title">Your organization</h2>
+              <p>Your team, school, or club.</p>
+            </header>
             <div className={formStyles.field}>
               <label htmlFor="organizationName">
                 Organization Name
@@ -396,7 +444,53 @@ export default function OrganizationStep({ onDraftIdChange }: OrganizationStepPr
               )}
 
               <p id="organizationName-helper" className={styles.helper}>
-                This is the name of your organization or club.
+                The name customers will recognize.
+              </p>
+            </div>
+
+            <OrganizationLogoUpload
+              organizationName={storeDraft.organizationName}
+              logoFile={storeDraft.logoFile}
+              logoPreviewUrl={logoPreviewUrl}
+              error={errors.logo}
+              inputRef={logoRef}
+              onFileChange={handleLogoChange}
+            />
+          </section>
+
+          <section className={styles.section} aria-labelledby="store-details-title">
+            <header className={styles.sectionHeader}>
+              <h2 id="store-details-title">Your store</h2>
+              <p>Give this store a name and choose its focus.</p>
+            </header>
+
+            <div className={formStyles.field}>
+              <label htmlFor="storeName">
+                Store Name
+                <span className={styles.required}>*</span>
+              </label>
+
+              <input
+                ref={storeNameRef}
+                id="storeName"
+                type="text"
+                placeholder="e.g. Fall 2026 Fanwear"
+                value={storeDraft.storeName}
+                className={errors.storeName ? styles.invalidControl : undefined}
+                aria-invalid={Boolean(errors.storeName)}
+                aria-describedby={errors.storeName ? "storeName-helper storeName-error" : "storeName-helper"}
+                onChange={(event) => handleStoreNameChange(event.target.value)}
+                onBlur={() => setFieldError("storeName", validateStoreName(storeDraft.storeName))}
+              />
+
+              {errors.storeName && (
+                <p id="storeName-error" className={styles.errorMessage} role="alert">
+                  {errors.storeName}
+                </p>
+              )}
+
+              <p id="storeName-helper" className={styles.helper}>
+                Shown on this store's homepage.
               </p>
             </div>
 
@@ -434,7 +528,7 @@ export default function OrganizationStep({ onDraftIdChange }: OrganizationStepPr
               )}
 
               <p id="activity-helper" className={styles.helper}>
-                Weâ€™ll use this to show relevant uniforms and fanwear.
+                Helps us suggest the right products for your store.
               </p>
             </div>
 
@@ -444,62 +538,108 @@ export default function OrganizationStep({ onDraftIdChange }: OrganizationStepPr
               inputRef={storeTypeRef}
               onChange={handleStoreTypeChange}
             />
-          </div>
+          </section>
+        </div>
 
-          <div className={styles.formColumn}>
-            <div className={formStyles.field}>
-              <label htmlFor="storeName">
-                Store Name
-                <span className={styles.required}>*</span>
-              </label>
-
-              <input
-                ref={storeNameRef}
-                id="storeName"
-                type="text"
-                placeholder="e.g. 2026 Spring Store"
-                value={storeDraft.storeName}
-                className={errors.storeName ? styles.invalidControl : undefined}
-                aria-invalid={Boolean(errors.storeName)}
-                aria-describedby={errors.storeName ? "storeName-helper storeName-error" : "storeName-helper"}
-                onChange={(event) => handleStoreNameChange(event.target.value)}
-                onBlur={() => setFieldError("storeName", validateStoreName(storeDraft.storeName))}
-              />
-
-              {errors.storeName && (
-                <p id="storeName-error" className={styles.errorMessage} role="alert">
-                  {errors.storeName}
-                </p>
-              )}
-
-              <p id="storeName-helper" className={styles.helper}>
-                This is the name displayed on your storefront.
-              </p>
+        <section className={styles.section} aria-labelledby="store-link-title">
+          <header className={styles.linkHeader}>
+            <div className={styles.sectionHeader}>
+              <h2 id="store-link-title">Your store link</h2>
+              <p>Customers will use this link to visit your store.</p>
             </div>
+            <button
+              type="button"
+              className={styles.customizeButton}
+              aria-expanded={isEditingLink}
+              aria-controls="store-link-fields"
+              onClick={() => setIsEditingLink((isEditing) => !isEditing)}
+            >
+              {isEditingLink ? "Hide customization" : "Customize link"}
+            </button>
+          </header>
 
-            <div className={formStyles.field}>
-              <label>Store Address</label>
+          <output className={styles.linkPreview} aria-label="Full store link" aria-live="off">
+            <span className={styles.linkDomain}>teamstore.com/store/</span>
+            <span>
+              {storeDraft.organizationSlug || "your-organization"}/{storeDraft.storeSlug || "your-store"}
+            </span>
+          </output>
 
-              <div className={styles.slug}>
-                <strong>
-                  teamstore.com/store/
-                  {storeDraft.organizationSlug || "your-organization"}/{storeDraft.storeSlug || "your-store-name"}
-                </strong>
+          {isEditingLink && (
+            <div id="store-link-fields" className={styles.linkFields}>
+              <div className={formStyles.field}>
+                <label htmlFor="organizationSlug">Organization link</label>
+                <input
+                  ref={organizationSlugRef}
+                  id="organizationSlug"
+                  type="text"
+                  value={storeDraft.organizationSlug}
+                  spellCheck={false}
+                  autoCapitalize="none"
+                  className={errors.organizationSlug ? styles.invalidControl : undefined}
+                  aria-invalid={Boolean(errors.organizationSlug)}
+                  aria-describedby={errors.organizationSlug ? "organizationSlug-helper organizationSlug-error" : "organizationSlug-helper"}
+                  onChange={(event) => {
+                    updateStoreDraft({ organizationSlug: event.target.value.toLowerCase() });
+                    setFieldError("organizationSlug");
+                    setSuggestedOrganizationSlug(null);
+                  }}
+                  onBlur={() => setFieldError("organizationSlug", validateAddressSlug(storeDraft.organizationSlug))}
+                />
+                <p id="organizationSlug-helper" className={styles.helper}>
+                  The first part of your link. Choose a different one if your organization name is already in use.
+                </p>
+                {errors.organizationSlug && (
+                  <p id="organizationSlug-error" className={styles.errorMessage} role="alert">
+                    {errors.organizationSlug}
+                  </p>
+                )}
+                {suggestedOrganizationSlug && (
+                  <button
+                    type="button"
+                    className={styles.suggestionButton}
+                    onClick={() => {
+                      updateStoreDraft({ organizationSlug: suggestedOrganizationSlug });
+                      setSuggestedOrganizationSlug(null);
+                      setFieldError("organizationSlug");
+                      focusAndScrollToField("organizationSlug");
+                    }}
+                  >
+                    Use {suggestedOrganizationSlug}
+                  </button>
+                )}
               </div>
 
-              <p className={styles.helper}>Your store address is generated automatically from the organization and store names.</p>
+              <div className={formStyles.field}>
+                <label htmlFor="storeSlug">Store link</label>
+                <input
+                  ref={storeSlugRef}
+                  id="storeSlug"
+                  type="text"
+                  value={storeDraft.storeSlug}
+                  spellCheck={false}
+                  autoCapitalize="none"
+                  className={errors.storeSlug ? styles.invalidControl : undefined}
+                  aria-invalid={Boolean(errors.storeSlug)}
+                  aria-describedby={errors.storeSlug ? "storeSlug-helper storeSlug-error" : "storeSlug-helper"}
+                  onChange={(event) => {
+                    updateStoreDraft({ storeSlug: event.target.value.toLowerCase() });
+                    setFieldError("storeSlug");
+                  }}
+                  onBlur={() => setFieldError("storeSlug", validateAddressSlug(storeDraft.storeSlug))}
+                />
+                <p id="storeSlug-helper" className={styles.helper}>
+                  The second part of your link. It must be unique within your organization.
+                </p>
+                {errors.storeSlug && (
+                  <p id="storeSlug-error" className={styles.errorMessage} role="alert">
+                    {errors.storeSlug}
+                  </p>
+                )}
+              </div>
             </div>
-
-            <OrganizationLogoUpload
-              organizationName={storeDraft.organizationName}
-              logoFile={storeDraft.logoFile}
-              logoPreviewUrl={logoPreviewUrl}
-              error={errors.logo}
-              inputRef={logoRef}
-              onFileChange={handleLogoChange}
-            />
-          </div>
-        </div>
+          )}
+        </section>
       </div>
     </WizardLayout>
   );

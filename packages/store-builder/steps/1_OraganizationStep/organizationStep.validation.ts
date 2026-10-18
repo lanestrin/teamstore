@@ -21,6 +21,14 @@ export function slugify(value: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
+export function getUpdatedAddressSlug(currentSlug: string, currentName: string, nextName: string): string {
+  return !currentSlug || currentSlug === slugify(currentName) ? slugify(nextName) : currentSlug;
+}
+
+export function validateAddressSlug(value: string): string | undefined {
+  return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value) ? undefined : "Use lowercase letters, numbers, and single hyphens in the URL.";
+}
+
 export function validateOrganizationName(value: string): string | undefined {
   return value.trim() ? undefined : "Enter your organization name.";
 }
